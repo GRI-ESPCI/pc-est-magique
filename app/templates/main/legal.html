@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+
+    <div class="row mb-3">
+        <div class="col">
+            <h1>{{ title }}</h1>
+        </div>
+    </div>
+    <div class="row"><p>
+        {{ _("Ce site est créé, géré et hébergé par le club GRI – BDE ESPCI "
+             "Paris - PSL.") }}
+    </p></div>
+    <div class="row"><p>
+        {{ _("Il est accessible publiquement ; en revanche, [il faudra "
+             "mettre ce texte à jour quand on sera au clair sur les "
+             "conditions d'accès au site].") }}
+    </p></div>
+    <div class="row"><p>
+        <a href="{{ url_for("main.contact") }}">{{ _("Contactez-nous") }}</a>
+        {{ _("pour toute question relative à la gestion de vos données.") }}
+    </p></div>
+    <!-- Toi l'étranger (ou pas) qui voit ça, bravo. Regarde au même endroit
+         sur intrarez.pc-est-magique.fr... -->
+
+{% endblock %}

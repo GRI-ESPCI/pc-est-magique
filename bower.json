@@ -1,0 +1,22 @@
+{
+    "name": "pc-est-magique",
+    "authors": [
+        "GRI"
+    ],
+    "description": "PC est magique Flask Web App",
+    "main": "",
+    "license": "MIT",
+    "homepage": "https://github.com/GRI-ESPCI/pc-est-magique",
+    "directory": "app/static/bower_components",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+        "bootstrap": "latest",
+        "moment": "latest"
+    }
+}

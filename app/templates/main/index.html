@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ _("Bonjour, %(name)s !", name=g.pceen.prenom) }}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col"><p>
+        {{ _("Bienvenue sur PC est magique !") }}
+    </p></div>
+</div>
+<div class="row mb-3">
+    <div class="col"><p>
+        {{ _("Une idée, un commentaire ? N'hésitez pas à ") }}
+        <a href="{{ url_for("main.contact") }}">{{ _("nous en faire part") }}
+        </a> !
+    </p></div>
+</div>
+
+{% endblock %}

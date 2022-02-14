@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% import "_form.html" as wtf %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://www.google.com/recaptcha/api.js" defer></script>
+<script src="{{ url_for("static", filename="js/captcha.js") }}" defer></script>
+{% endblock %}
+
+{% block app_content %}
+
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ title }}</h1>
+    </div>
+</div>
+<div class="row"><p>
+    {{ _("Pour toute question, remarque ou suggestion, n'hésitez pas à "
+         "nous contacter :") }}
+</p></div>
+<div class="row mb-4">
+    <form action="" method="post" role="form">
+        {{ form.hidden_tag() }}
+        <div class="form-floating mb-3">
+            {% if g.logged_in %}
+            {{ wtf.form_field(form.name, value=g.pceen.full_name) }}
+            {% else %}
+            {{ wtf.form_field(form.name) }}
+            {% endif %}
+        </div>
+        <div class="form-floating mb-3">
+            {% if g.logged_in %}
+            {{ wtf.form_field(form.email, value=g.pceen.email) }}
+            {% else %}
+            {{ wtf.form_field(form.email) }}
+            {% endif %}
+        </div>
+        <div class="form-floating mb-3">
+            {{ wtf.form_field(form.title, value=request.args.get("title",
+                                                                 "")) }}
+        </div>
+        <div class="form-floating mb-3">
+            {{ wtf.form_field(form.message, class="lines-6") }}
+        </div>
+        <div class="g-recaptcha form-floating mb-3"
+             data-sitekey="{{ config["GOOGLE_RECAPTCHA_SITEKEY"] }}"
+             data-callback="enable_submit"
+             data-expired-callback="disable_submit"></div>
+        <div>
+            {{ wtf.form_field(form.submit) }}
+        </div>
+    </form>
+</div>
+
+{% endblock %}

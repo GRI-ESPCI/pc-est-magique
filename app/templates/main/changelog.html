@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+
+    <div class="row mb-3">
+        <div class="col">
+            <h1>{{ title }}</h1>
+        </div>
+    </div>
+    <div class="row"><p>
+        {{ _("Ces notes de mise à jour présentent les modifications "
+             "principales du point de vue utilisateur. Pour un changelog "
+             "plus technique, voir") }}
+        <a href="https://github.com/GRI-ESPCI/pc-est-magique/blob/main/CHANGELOG.md">
+            {{ _("sur GitHub") }}</a>.
+    </p></div>
+    <div class="row mb-2">
+        <h3>v1.0 – Unreleased</h3>
+        <p>{{ _("Première version publique.") }}</p>
+    </div>
+
+{% endblock %}

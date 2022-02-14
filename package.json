@@ -1,0 +1,23 @@
+{
+  "name": "pc-est-magique",
+  "version": "0.0.1",
+  "description": "PC est magique Flask Web App",
+  "main": "n/a",
+  "scripts": {
+    "test": "n/a"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GRI-ESPCI/pc-est-magique.git"
+  },
+  "author": "GRIs – ESPCI Paris - PSL",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GRI-ESPCI/pc-est-magique/issues"
+  },
+  "homepage": "https://pc-est-magique.fr",
+  "dependencies": {
+    "bower": "^1.8.12",
+    "sass": "^1.42.1"
+  }
+}
