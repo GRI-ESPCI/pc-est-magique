@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ _("Photos") }}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col"><p>
+        {{ _("Collections :") }}
+    </p></div>
+</div>
+<div class="row row-cols g-2">
+    {% for collection in collections %}
+    <div class="col">
+        <div class="card" style="width: 15rem;">
+            <img src="{{ collection.featured_photo.thumb_src_with_token }}" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">{{ collection.name }}</h5>
+                {% if collection.description %}
+                <p class="card-text">{{ collection.description }}</p>
+                {% endif %}
+                <p class="card-text text-muted mb-1">
+                    {% if collection.start %}
+                    {{ moment(collection.start).format("MMMM YYYY") }}
+                    {% if collection.end %}
+                    – {{ moment(collection.end).format("MMMM YYYY") }}
+                    {% endif %}
+                    {% endif %}
+                </p>
+                <p class="card-text text-muted">
+                    {{ macros.s(len(collection.albums.all()), _("album")) }},
+                    {{ macros.s(collection.nb_photos, _("photo")) }}
+                </p>
+                <a href="{{ url_for("photos.collection", collection_dir=collection.dir_name) }}" class="btn btn-primary">Voir les albums</a>
+            </div>
+          </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+
+<div class="row">
+    <nav class="col">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ url_for("photos.main") }}">
+                {{ _("Photos") }}
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            {{ collection.name }}
+        </li>
+    </ol>
+    </nav>
+</div>
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ collection.name }}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col"><p>
+        {{ _("Albums dans cette collection :") }}
+    </p></div>
+</div>
+<div class="row row-cols g-2">
+    {% for album in collection.albums.all() %}
+    <div class="col">
+        <div class="card" style="width: 15rem;">
+            <img src="{{ album.featured_photo.thumb_src_with_token }}" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">{{ album.name }}</h5>
+                {% if album.description %}
+                <p class="card-text">{{ album.description }}</p>
+                {% endif %}
+                <p class="card-text text-muted">
+                    {% if album.start %}
+                    {{ moment(album.start).format("LL") }}
+                    {% if album.end %}
+                    – {{ moment(album.end).format("LL") }}
+                    {% endif %}
+                    {% endif %}
+                </p>
+                <p class="card-text text-muted">
+                    {{ macros.s(len(album.photos.all()), _("photo")) }}
+                </p>
+                <a href="{{ url_for("photos.album", collection_dir=collection.dir_name, album_dir=album.dir_name) }}" class="btn btn-primary">Voir les photos</a>
+            </div>
+          </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

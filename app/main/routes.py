@@ -1,7 +1,7 @@
 """PC est magique - Main Pages Routes"""
 
 import datetime
-import json
+import os
 
 import flask
 from flask_babel import _
@@ -83,3 +83,16 @@ def test_mail(blueprint: str, template: str) -> typing.RouteReturn:
         return f"<pre>{flask.escape(html_to_plaintext(body))}</pre>"
     else:
         return body
+
+
+@bp.route("/photo/<collection_dir>/<album_dir>/<photo_file>")
+@bp.route("/photo/<collection_dir>/<album_dir>/_thumbs/<photo_file>")
+def photo(collection_dir: str, album_dir: str,
+          photo_file: str) -> typing.RouteReturn:
+    """Serve photo (ONLY IF NO NGINX)."""
+    return flask.send_file(os.path.join(
+        flask.current_app.config["PHOTOS_BASE_PATH"],
+        collection_dir,
+        album_dir,
+        photo_file,
+    ))

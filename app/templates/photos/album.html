@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+
+<div class="row">
+    <nav class="col">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ url_for("photos.main") }}">
+                {{ _("Photos") }}
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{{ url_for("photos.collection", collection_dir=album.collection.dir_name) }}">
+                {{ album.collection.name }}
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            {{ album.name }}
+        </li>
+    </ol>
+    </nav>
+</div>
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ album.name }}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col"><p>
+        {{ _("Photos dans cet album :") }}
+    </p></div>
+</div>
+<div class="row row-cols g-2">
+    {% for photo in album.photos.all() %}
+    <div class="col">
+        <a href="{{ photo.src }}?md5={{ md5 }}&expires={{ expires}}">
+            <img src="{{ photo.thumb_src }}?md5={{ md5 }}&expires={{ expires}}"
+                 height="100px" />
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
