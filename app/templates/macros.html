@@ -4,7 +4,7 @@
 <!-- Outputs the SVG <use> tag that includes a given Bootstrap icon.
 
     Args:
-        name (str): the name of the Bootstrap icon.
+        name (str): The name of the Bootstrap icon.
 -->
 {% macro bootstrap_icon(name) %}
     <use href="{{ url_for("static",
@@ -58,4 +58,17 @@
         </div>
     </div>
     {% endwith %}
+{% endmacro %}
+
+
+<!-- Add a plural "s" to a name counting an element only if necessary.
+
+    Args:
+        elem (int): The element counted.
+        name (str): The name that refers it.
+
+    Output "{elem} {name}" if elem == 1, else "{elem} {name}s".
+-->
+{% macro s(elem, name) %}
+    {{ elem }} {{ name }}{% if elem != 1 %}s{% endif %}
 {% endmacro %}

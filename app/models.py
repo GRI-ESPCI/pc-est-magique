@@ -36,14 +36,15 @@ class PCeen(flask_login.UserMixin, Model):
     __tablename__ = "pceen"
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
-    username: Column[str | None] = column(sa.String(64), unique=True)
-    nom: Column[str | None] = column(sa.String(64))
-    prenom: Column[str | None] = column(sa.String(64))
-    promo: Column[int | None] = column(sa.Integer)
-    email: Column[str | None] = column(sa.String(120), unique=True)
-    locale: Column[str | None] = column(sa.String(8))
+    username: Column[str] = column(sa.String(64), unique=True, nullable=False)
+    nom: Column[str] = column(sa.String(64), nullable=False)
+    prenom: Column[str] = column(sa.String(64), nullable=False)
+    promo: Column[int | None] = column(sa.Integer, nullable=True)
+    email: Column[str] = column(sa.String(120), unique=True, nullable=False)
+    locale: Column[str | None] = column(sa.String(8), nullable=True)
     is_gri: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
-    _password_hash: Column[str | None] = column(sa.String(128))
+    _password_hash: Column[str] = column(sa.String(128), nullable=False)
+
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
