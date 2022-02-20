@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-  * Photos (blueprint, models, pages, script, env variables, nginx conf...)
+  * Photos (blueprint, models, pages, script, env variables, nginx conf,
+    metadata extraction, thumbs/gzipped versions...)
 
 
 ## v0.0.1 - 2022-02-11

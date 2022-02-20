@@ -69,7 +69,8 @@ def changelog() -> typing.RouteReturn:
 @context.gris_only
 def test() -> typing.RouteReturn:
     """Test page."""
-    raise RuntimeError("obanon")
+    return flask.render_template("main/test.html",
+                                 title=_("TEST"))
 
 
 @bp.route("/test_mail/<blueprint>/<template>")
@@ -86,13 +87,25 @@ def test_mail(blueprint: str, template: str) -> typing.RouteReturn:
 
 
 @bp.route("/photo/<collection_dir>/<album_dir>/<photo_file>")
-@bp.route("/photo/<collection_dir>/<album_dir>/_thumbs/<photo_file>")
 def photo(collection_dir: str, album_dir: str,
           photo_file: str) -> typing.RouteReturn:
-    """Serve photo (ONLY IF NO NGINX)."""
+    """Serve photo (fallback if no Nginx, should NOT bu used!)"""
     return flask.send_file(os.path.join(
         flask.current_app.config["PHOTOS_BASE_PATH"],
         collection_dir,
         album_dir,
+        photo_file,
+    ))
+
+
+@bp.route("/photo/<collection_dir>/<album_dir>/_thumbs/<photo_file>")
+def photo_thumb(collection_dir: str, album_dir: str,
+                photo_file: str) -> typing.RouteReturn:
+    """Serve photo thumbnail (fallback if no Nginx, should NOT bu used!)"""
+    return flask.send_file(os.path.join(
+        flask.current_app.config["PHOTOS_BASE_PATH"],
+        collection_dir,
+        album_dir,
+        "_thumbs",
         photo_file,
     ))

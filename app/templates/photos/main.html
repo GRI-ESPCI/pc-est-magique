@@ -14,9 +14,13 @@
 </div>
 <div class="row row-cols g-2">
     {% for collection in collections %}
+    {% with url = url_for("photos.collection", collection_dir=collection.dir_name) %}
     <div class="col">
         <div class="card" style="width: 15rem;">
-            <img src="{{ collection.featured_photo.thumb_src_with_token }}" class="card-img-top" alt="...">
+            <a href="{{ url }}">
+                <img src="{{ collection.featured_photo.thumb_src_with_token }}"
+                        class="card-img-top" alt="[NO PHOTOS]">
+            </a>
             <div class="card-body">
                 <h5 class="card-title">{{ collection.name }}</h5>
                 {% if collection.description %}
@@ -31,13 +35,21 @@
                     {% endif %}
                 </p>
                 <p class="card-text text-muted">
-                    {{ macros.s(len(collection.albums.all()), _("album")) }},
+                    {{ macros.s(collection.nb_albums, _("album")) }},
                     {{ macros.s(collection.nb_photos, _("photo")) }}
                 </p>
-                <a href="{{ url_for("photos.collection", collection_dir=collection.dir_name) }}" class="btn btn-primary">Voir les albums</a>
+                <a href="{{ url }}" class="btn btn-primary">Voir les albums</a>
+                <a href="{{ url }}?edit" class="btn btn-pc5 ms-3"
+                   title={{ _("Modifier") }}>
+                    <svg class="bi flex-shrink-0 text-secondary"
+                        width="20" height="20">
+                        {{ macros.bootstrap_icon("pencil") }}
+                    </svg>
+                </a>
             </div>
           </div>
     </div>
+    {% endwith %}
     {% endfor %}
 </div>
 

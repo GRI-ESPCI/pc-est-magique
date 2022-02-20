@@ -1,4 +1,11 @@
 {% extends "base.html" %}
+{% import "_form.html" as wtf %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for("static", filename="js/photos-edit-form.js") }}"
+        defer></script>
+{% endblock %}
 
 {% block app_content %}
 
@@ -11,7 +18,8 @@
             </a>
         </li>
         <li class="breadcrumb-item">
-            <a href="{{ url_for("photos.collection", collection_dir=album.collection.dir_name) }}">
+            <a href="{{ url_for("photos.collection",
+                                collection_dir=album.collection.dir_name) }}">
                 {{ album.collection.name }}
             </a>
         </li>
@@ -21,22 +29,126 @@
     </ol>
     </nav>
 </div>
-<div class="row mb-3">
-    <div class="col">
-        <h1>{{ album.name }}</h1>
+
+<div id="header" {{ "hidden" if "edit" in request.args else "" }}>
+    <div class="row mb-2">
+        <div class="col">
+            <h1>{{ album.name }}</h1>
+        </div>
+        <div class="col col-auto d-flex align-items-center"
+             title="{{ _("Miniature actuelle") if album.featured
+                   else _("Nouvelle miniature de la collection") }}">
+            <button role="button"
+                    {% if album.featured %}
+                    class="btn btn-success pe-none p-2" type="button"
+                    {% else %}
+                    class="btn btn-outline-success p-2" type="submit"
+                    form="modify-form"
+                    {% endif %}>
+                <svg class="bi flex-shrink-0 text-secondary"
+                    width="24" height="24">
+                    {{ macros.bootstrap_icon("star") }}
+                </svg>
+            </button>
+        </div>
+        <div class="col col-auto me-3 d-flex align-items-center">
+            <button class="btn btn-pc5 p-2" type="button" role="button"
+                    title="{{ _("Modifier l'album") }}"
+                    onclick="show_edit_form()">
+                <svg class="bi flex-shrink-0 text-secondary"
+                    width="24" height="24">
+                    {{ macros.bootstrap_icon("pencil") }}
+                </svg>
+            </button>
+        </div>
+    </div>
+    {% if album.description %}
+    <div class="row mb-4 fst-italic">
+        <div class="col">
+            {{ album.description }}
+        </div>
+    </div>
+    {% endif %}
+    <div class="row">
+        <div class="col">
+        <p>
+            <span>
+                {{ macros.s(album.nb_photos, _("photo")) }}
+            </span>
+            {% if album.start %}
+            <span class="user-select-none mx-2">&middot;</span>
+            <span>
+                {{ moment(album.start).format("LL") }}
+                {% if album.end %}
+                – {{ moment(album.end).format("LL") }}
+                {% endif %}
+            </span>
+            {% endif %}
+        </p>
+        </div>
     </div>
 </div>
-<div class="row">
-    <div class="col"><p>
-        {{ _("Photos dans cet album :") }}
-    </p></div>
-</div>
-<div class="row row-cols g-2">
+
+<form action="?" method="post" role="form" id="modify-form"
+      {{ "" if "edit" in request.args else "hidden" }}>
+    {{ form.hidden_tag() }}
+    <div class="row mb-3">
+        <div class="col">
+            <div class="form-floating ">
+                {{ wtf.form_field(form.name, value=album.name) }}
+            </div>
+        </div>
+        <div class="col col-auto me-3 d-flex align-items-center">
+            <button class="btn btn-pc5 p-2" type="button" role="button"
+                    title="{{ _("Arrêter de modifier") }}"
+                    onclick="hide_edit_form()">
+                <svg class="bi flex-shrink-0 text-secondary"
+                     width="24" height="24">
+                    {{ macros.bootstrap_icon("x-circle") }}
+                </svg>
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-12 col-md mb-3">
+            <div class="form-floating">
+                {{ wtf.form_field(form.description,
+                                  value=album.description or "") }}
+            </div>
+        </div>
+        <div class="col-auto me-4 d-flex align-items-center mb-3">
+            <div class="form-check form-switch">
+                {{ wtf.form_field(form.visible, checked=album.visible) }}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-12 col-md mb-3">
+            <div class="form-floating">
+                {{ wtf.form_field(form.start, value=album.start) }}
+            </div>
+        </div>
+        <div class="col col-12 col-md mb-3 me-4">
+            <div class="form-floating">
+                {{ wtf.form_field(form.end, value=album.end) }}
+            </div>
+        </div>
+    </div>
+    <div class="row mb-5">
+        <div class="col">
+            {{ wtf.form_field(form.submit) }}
+        </div>
+    </div>
+</form>
+
+<div class="row row-cols g-2 justify-content-center">
     {% for photo in album.photos.all() %}
-    <div class="col">
-        <a href="{{ photo.src }}?md5={{ md5 }}&expires={{ expires}}">
-            <img src="{{ photo.thumb_src }}?md5={{ md5 }}&expires={{ expires}}"
-                 height="100px" />
+    <div class="col col-auto">
+        <a href="{{ photo.src }}?{{ token_args }}">
+            <img src="{{ photo.thumb_src }}?{{ token_args }}" />
+            {# Si on veut changer la taille de la miniature, il faut
+               modifier sa génération dans scripts/sync_photos.py, et
+               tout regénérer ! (pas de script pour ça pour l'instant) #}
         </a>
     </div>
     {% endfor %}

@@ -131,7 +131,7 @@ class Photo(Model):
     id: Column[int] = column(sa.Integer(), primary_key=True)
     _album_id: Column[int] = column(sa.ForeignKey("album.id"), nullable=False)
     album: Relationship[Album] = many_to_one("Album.photos")
-    file_name: Column[str] = column(sa.String(64), nullable=False)
+    file_name: Column[str] = column(sa.String(120), nullable=False)
     width: Column[int] = column(sa.Integer(), nullable=False)
     height: Column[int] = column(sa.Integer(), nullable=False)
     _author_id: Column[int | None] = column(sa.ForeignKey("pceen.id"),
@@ -158,24 +158,24 @@ class Photo(Model):
     @property
     def thumb_full_path(self) -> str:
         """The full path of the photo's thumbnail (small version) on disk."""
-        return os.path.join(self.album.full_path, "_thumbs", self.file_name)
+        return os.path.join(self.album.thumbs_full_path, self.file_name)
 
     @property
     def src(self) -> str:
         """The online path to the photo."""
-        return os.path.join(self.album.src, self.file_name)
+        return f"{self.album.src}/{self.file_name}"
 
     @property
     def thumb_src(self) -> str:
         """The online path to the photo's thumbnail (small version)."""
-        return os.path.join(self.album.src, "_thumbs", self.file_name)
+        return f"{self.album.src}/_thumbs/{self.file_name}"
 
     @property
     def thumb_src_with_token(self) -> str:
         """The online query to the photo's thumbnail with md5 args."""
         ip = flask.request.headers.get("X-Real-Ip") or "10.1.2.14"                          # REMOVE THAT
-        md5, expires = self.album.get_access_token(ip)
-        return f"{self.thumb_src}?md5={md5}&expires={expires}"
+        token_args = self.album.get_access_token(ip)
+        return f"{self.thumb_src}?{token_args}"
 
 
 class Album(Model):
@@ -186,7 +186,7 @@ class Album(Model):
                                          nullable=False)
     collection: Relationship[Collection] = many_to_one("Collection.albums")
     dir_name: Column[str] = column(sa.String(120), nullable=False)
-    name: Column[str] = column(sa.String(32), nullable=False)
+    name: Column[str] = column(sa.String(120), nullable=False)
     description: Column[str] = column(sa.String(280), nullable=True)
     start: Column[datetime.date] = column(sa.Date(), nullable=True)
     end: Column[datetime.date] = column(sa.Date(), nullable=True)
@@ -208,17 +208,23 @@ class Album(Model):
         return os.path.join(self.collection.full_path, self.dir_name)
 
     @property
+    def thumbs_full_path(self) -> str:
+        """The full path of the album thumbnails (small versions) on disk."""
+        return os.path.join(self.full_path, "_thumbs")
+
+    @property
     def src(self) -> str:
         """The online path to the album."""
-        return os.path.join(self.collection.src, self.dir_name)
+        return f"{self.collection.src}/{self.dir_name}"
 
     @property
     def featured_photo(self) -> Photo | None:
         """The (first) photo of this album marked as featured, if any."""
-        return self.photos.filter_by(featured=True).first()
+        return (self.photos.filter_by(featured=True).first()
+                or self.photos.first())
 
     def get_access_token(self, ip: str,
-                         expires: datetime.datetime = None) -> tuple[str, int]:
+                         expires: datetime.datetime = None) -> str:
         """Forges the md5 token allowing access to the photos of this album.
 
         Args:
@@ -236,10 +242,9 @@ class Album(Model):
                 seconds=flask.current_app.config["PHOTOS_EXPIRES_DELAY"]
             )
         expires_timestamp = int(expires.timestamp())
-        uri = f"/{self.collection.dir_name}/{self.dir_name}/"
-        md5 = hashlib.md5(f"{expires_timestamp}{uri}{ip}".encode())
-        b64 = base64.urlsafe_b64encode(md5.digest()).decode()
-        return b64.replace("=", ""), expires_timestamp
+        md5 = hashlib.md5(f"{expires_timestamp}{self.src}{ip}".encode())
+        b64 = base64.urlsafe_b64encode(md5.digest()).replace(b"=", b"")
+        return f"md5={b64.decode()}&expires={expires_timestamp}"
 
 
 class Collection(Model):
@@ -247,7 +252,7 @@ class Collection(Model):
     id: Column[int] = column(sa.Integer(), primary_key=True)
     visible: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
     dir_name: Column[str] = column(sa.String(120), unique=True, nullable=False)
-    name: Column[str] = column(sa.String(32), nullable=False)
+    name: Column[str] = column(sa.String(120), nullable=False)
     description: Column[str] = column(sa.String(280), nullable=True)
     start: Column[datetime.date] = column(sa.Date(), nullable=True)
     end: Column[datetime.date] = column(sa.Date(), nullable=True)
@@ -269,22 +274,29 @@ class Collection(Model):
     @property
     def src(self) -> str:
         """The online path to the collection."""
-        return os.path.join("/photo", self.dir_name)
+        return f"/photo/{self.dir_name}"
 
     @property
     def featured_album(self) -> Photo | None:
         """The (first) album of this collection marked as featured, if any."""
-        return self.albums.filter_by(featured=True).first()
+        return (self.albums.filter_by(featured=True).first()
+                or self.albums.first())
 
     @property
     def featured_photo(self) -> Photo | None:
         """The featured photo of the collection's featured album, if any."""
         if (album := self.featured_album):
-            return album.photos.filter_by(featured=True).first()
+            return album.featured_photo
         else:
             return None
 
     @property
+    def nb_albums(self) -> int:
+        """The number of visible albums in the collection."""
+        return len(self.albums.filter_by(visible=True).all())
+
+    @property
     def nb_photos(self) -> int:
         """The total number of photos in the collection."""
-        return sum(album.nb_photos for album in self.albums.all())
+        return sum(album.nb_photos
+                   for album in self.albums.filter_by(visible=True).all())

@@ -15,6 +15,7 @@ Ce script peut uniquement être appelé depuis Flask :
 """
 
 import os
+import subprocess
 import sys
 
 import flask
@@ -23,6 +24,7 @@ import sqlalchemy.orm
 try:
     from app import db
     from app.models import Collection, Album, Photo
+    from app.tools import metadata
 except ImportError:
     sys.stderr.write(
         "ERREUR - Ce script peut uniquement être appelé depuis Flask :\n"
@@ -35,9 +37,18 @@ except ImportError:
 
 
 def main() -> None:
+    print("Syncing photos...")
     collections = {collection.dir_name: collection
                    for collection in Collection.query.all()}
 
+    n_collections_before = len(collections)
+    n_albums_before = sum(len(collec.albums.all())
+                          for collec in collections.values())
+    n_photos_before = sum(collec.nb_photos for collec in collections.values())
+    print(f"Currently in database: {n_collections_before} collections, "
+          f"{n_albums_before} albums, {n_photos_before} photos")
+
+    print("Scanning files on disk...\n")
     base = flask.current_app.config["PHOTOS_BASE_PATH"]
     for dirpath, dirnames, filenames in os.walk(base):
         relative_path = dirpath.removeprefix(base)
@@ -66,11 +77,25 @@ def main() -> None:
                                       "existing (but not detected before!?)")
                 sync_photos(album, filenames)
 
+            case ["", _, _, "_thumbs"]:
+                pass
+
             case ["", _, _, *_]:
                 print(f"WARNING - directory {relative_path} too nested, pass")
 
             case _:
                 print(f"!! WARNING !! - unhandled path: {relative_path}")
+
+    print("\nWriting changes...")
+    db.session.commit()
+    n_collections_after = len(collections)
+    n_albums_after = sum(len(collec.albums.all())
+                         for collec in collections.values())
+    n_photos_after = sum(collec.nb_photos for collec in collections.values())
+    print(f"Sync done! Now in database: {n_collections_after} collections "
+          f"({n_collections_after - n_collections_before:+}), "
+          f"{n_albums_after} albums ({n_albums_after - n_albums_before:+}), "
+          f"{n_photos_after} photos ({n_photos_after - n_photos_before:+}).")
 
 
 def sync_collections(collections: dict[str, Collection],
@@ -85,7 +110,6 @@ def sync_collections(collections: dict[str, Collection],
     expected_collections = collections.copy()
     for collection_dir in dirnames:
         if collection_dir in collections:
-            print(f"COLLECTION OK: {collection_dir}")
             expected_collections.pop(collection_dir)
         else:
             print(f"+ NEW COLLECTION: {collection_dir}")
@@ -99,8 +123,8 @@ def sync_collections(collections: dict[str, Collection],
     # Remaining collections, deleted
     for collection_dir, collection in expected_collections.items():
         print(f"- DELETED COLLECTION: {collection_dir}")
-        print(f"  - CASCADE: DELETED {len(collection.albums)} album(s)")
-        print(f"    - CASCADE: DELETED {collection.nb_photos} photo(s)")
+        print(f"  - CASCADE: DELETED {len(collection.albums.all())} albums")
+        print(f"    - CASCADE: DELETED {collection.nb_photos} photos")
         collections.pop(collection_dir)
         db.session.delete(collection)
 
@@ -112,12 +136,12 @@ def sync_albums(collection: Collection, dirnames: list[str]) -> None:
         collection: The collection to sync.
         dirnames: List of albums dir_names on disk in this collection.
     """
+    print(f"COLLECTION OK: {collection.dir_name}")
     albums = {album.dir_name: album for album in collection.albums.all()}
     expected_albums = albums.copy()
 
     for album_dir in dirnames:
         if album_dir in albums:
-            print(f"  ALBUM OK: {album_dir}")
             expected_albums.pop(album_dir)
         else:
             print(f"  + NEW ALBUM: {album_dir}")
@@ -126,11 +150,16 @@ def sync_albums(collection: Collection, dirnames: list[str]) -> None:
                 dir_name=album_dir, name=f"[IMPORTED] {album_dir}",
             )
             db.session.add(album)
+            # Create thumbnails directory
+            try:
+                os.mkdir(album.thumbs_full_path)
+            except FileExistsError:
+                pass
 
     # Remaining albums, deleted
     for album_dir, album in expected_albums.items():
         print(f"  - DELETED album: {album_dir}")
-        print(f"    - CASCADE: DELETED {album.nb_photos} photo(s)")
+        print(f"    - CASCADE: DELETED {album.nb_photos} photos")
         db.session.delete(album)
 
 
@@ -141,6 +170,7 @@ def sync_photos(album: Album, filenames: list[str]) -> None:
         album: The album to sync.
         filenames: List of file names on disk in this album.
     """
+    print(f"  ALBUM OK: {album.dir_name}")
     photos = {photo.file_name: photo for photo in album.photos.all()}
     expected_photos = photos.copy()
 
@@ -151,27 +181,72 @@ def sync_photos(album: Album, filenames: list[str]) -> None:
             ok += 1
         else:
             # Check extension
-            _, ext = os.path.splitext()
-            if ext.lower() not in ["jpg", "jpeg", "png"]:
-                print(f"    WARNING: Bad file type: {file_name}")
+            _, ext = os.path.splitext(file_name)
+            if ext.lower() not in [".jpg", ".jpeg", ".png"]:
+                if not ext.lower().endswith(".gz"):
+                    print(f"    WARNING: Bad file type: {file_name} "
+                          "(only .jpg, .jpeg or .png accepted)")
                 continue
+            # Check metadata
+            full_path = os.path.join(album.full_path, file_name)
+            with open(full_path, "rb") as fp:
+                image = metadata.ImageData(fp)
+            if image.width and image.height:
+                width, height = image.width, image.height
+            else:
+                width, height = metadata.get_size_fallback(full_path)
+                if not width or not height:
+                    print(f"    WARNING: {file_name}: unable to get width/"
+                          "height data, check the file in an editor and "
+                          "re-save it if okay (may be corrupted)")
+                    continue
             # New photo
-            print(f"    + NEW PHOTO: {file_name}.")
             photo = Photo(
-                album=album, file_name=file_name,
-                # width="HELLO", height="OUI",
-                # EXTRACT METADATA HERE
+                album=album, file_name=file_name, width=width, height=height,
+                author_str=image.author, timestamp=image.timestamp,
+                lat=image.lat, lng=image.lng, caption=image.caption,
             )
+            # Create thumbnail and gzipped versions
+            try:
+                subprocess.run([
+                        "convert", photo.full_path,  # Take the picture,
+                        "-resize", "136x136^",       # Fill a 136x136 box,
+                        "-gravity", "center",        # Refer to image center,
+                        "-extent", "136x136",        # Then crop overflow,
+                        photo.thumb_full_path        # There is the thumbnail!
+                    ],
+                    capture_output=True,
+                    check=True,
+                )
+            except subprocess.CalledProcessError as exc:
+                print(f"    WARNING: {file_name} Unable to create thumbnail:",
+                      exc.cmd, exc.stderr.decode())
+                continue
+            except Exception as exc:
+                print(f"    WARNING: {file_name} Unable to create thumbnail:",
+                      exc)
+                continue
+            subprocess.run(["gzip", "-fk", photo.full_path])
+            subprocess.run(["gzip", "-fk", photo.thumb_full_path])
+            # All OK: add photo
+            print(f"    + NEW PHOTO: {file_name}")
+            ok += 1
             db.session.add(photo)
-            # THUMB AND GZIP HERE (or register for later, or all later)
 
-    # Remaining albums, deleted
+    # Remaining photos, deleted
     deleted = 0
     for photo in expected_photos.values():
         deleted += 1
+        # Remove thumbnail and gzipped versions, if left behind
+        try: os.remove(photo.thumb_full_path)
+        except FileNotFoundError: pass
+        try: os.remove(f"{photo.full_path}.gz")
+        except FileNotFoundError: pass
+        try: os.remove(f"{photo.thumb_full_path}.gz")
+        except FileNotFoundError: pass
         db.session.delete(photo)
-        # REMOVE THUMB AND GZIP HERE?
     if deleted:
         print(f"    - DELETED {deleted} PHOTOS.")
 
+    album.nb_photos = ok
     print(f"    {ok} PHOTOS OK.")
