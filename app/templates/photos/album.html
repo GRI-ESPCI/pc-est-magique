@@ -1,10 +1,31 @@
 {% extends "base.html" %}
 {% import "_form.html" as wtf %}
 
+{% block styles %}
+{{ super() }}
+{% for filename in [
+    "bower_components/lightgallery/dist/css/lightgallery.css",
+    "bower_components/lightgallery/dist/css/lg-zoom.css",
+    "bower_components/lightgallery/dist/css/lg-thumbnail.css",
+    "bower_components/lightgallery/dist/css/lg-fullscreen.css",
+] %}
+<link href="{{ url_for("static", filename=filename) }}" rel="stylesheet" />
+{% endfor %}
+{% endblock %}
+
 {% block scripts %}
 {{ super() }}
-<script src="{{ url_for("static", filename="js/photos-edit-form.js") }}"
-        defer></script>
+{% for filename in [
+    "js/photos-edit-form.js",
+    "bower_components/lightgallery/dist/lightgallery.umd.js",
+    "bower_components/lightgallery/dist/plugins/zoom/lg-zoom.umd.js",
+    "bower_components/lightgallery/dist/plugins/thumbnail/lg-thumbnail.umd.js",
+    "bower_components/lightgallery/dist/plugins/fullscreen/lg-fullscreen.umd.js",
+    "js/photos-album.js",
+    "js/popovers.js",
+] %}
+<script src="{{ url_for("static", filename=filename) }}" defer></script>
+{% endfor %}
 {% endblock %}
 
 {% block app_content %}
@@ -91,11 +112,11 @@
 
 <form action="?" method="post" role="form" id="modify-form"
       {{ "" if "edit" in request.args else "hidden" }}>
-    {{ form.hidden_tag() }}
+    {{ album_form.hidden_tag() }}
     <div class="row mb-3">
         <div class="col">
             <div class="form-floating ">
-                {{ wtf.form_field(form.name, value=album.name) }}
+                {{ wtf.form_field(album_form.name, value=album.name) }}
             </div>
         </div>
         <div class="col col-auto me-3 d-flex align-items-center">
@@ -112,46 +133,192 @@
     <div class="row">
         <div class="col col-12 col-md mb-3">
             <div class="form-floating">
-                {{ wtf.form_field(form.description,
+                {{ wtf.form_field(album_form.description,
                                   value=album.description or "") }}
             </div>
         </div>
         <div class="col-auto me-4 d-flex align-items-center mb-3">
             <div class="form-check form-switch">
-                {{ wtf.form_field(form.visible, checked=album.visible) }}
+                {{ wtf.form_field(album_form.visible, checked=album.visible) }}
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col col-12 col-md mb-3">
             <div class="form-floating">
-                {{ wtf.form_field(form.start, value=album.start) }}
+                {{ wtf.form_field(album_form.start, value=album.start or "") }}
             </div>
         </div>
         <div class="col col-12 col-md mb-3 me-4">
             <div class="form-floating">
-                {{ wtf.form_field(form.end, value=album.end) }}
+                {{ wtf.form_field(album_form.end, value=album.end or "") }}
             </div>
         </div>
     </div>
     <div class="row mb-5">
         <div class="col">
-            {{ wtf.form_field(form.submit) }}
+            {{ wtf.form_field(album_form.submit) }}
         </div>
     </div>
 </form>
 
-<div class="row row-cols g-2 justify-content-center">
+<div class="row row-cols g-2 justify-content-center" id="lightgallery">
     {% for photo in album.photos.all() %}
     <div class="col col-auto">
-        <a href="{{ photo.src }}?{{ token_args }}">
-            <img src="{{ photo.thumb_src }}?{{ token_args }}" />
+        <a href="{{ photo.src }}?{{ token_args }}"
+           data-lg-size="{{ min(photo.height, photo.width) }}-{{ photo.height }}"
+           data-file_name="{{ photo.file_name }}"
+           data-caption="{{ photo.caption or "" }}"
+           data-author_str="{{ photo.author_str or "" }}"
+           data-date="{{ photo.timestamp.date() if photo.timestamp else "" }}"
+           data-time="{{ photo.timestamp.time() if photo.timestamp else "" }}"
+           data-lat="{{ photo.lat or "" }}" data-lng="{{ photo.lng or "" }}"
+           data-featured="{{ photo.featured or "" }}"
+           {% if photo.info %} title="{{ photo.info }}"{% endif %}
+        >
+            <img src="{{ url_for("static", filename="img/loading.gif") }}"
+                 data-src="{{ photo.thumb_src }}?{{ token_args }}"/>
             {# Si on veut changer la taille de la miniature, il faut
                modifier sa génération dans scripts/sync_photos.py, et
                tout regénérer ! (pas de script pour ça pour l'instant) #}
         </a>
     </div>
     {% endfor %}
+</div>
+
+<!-- Gallery custom buttons (moved through JS) -->
+<div hidden>
+    {# Boutons déplacés dans la barre de la galerie, une fois chargée #}
+    <button id="edit-button" type="button" aria-label="{{ _("Modifier") }}"
+            class="lg-icon d-flex align-items-center"
+            data-bs-target="#mo-edit" data-bs-toggle="modal">
+        <svg class="bi flex-shrink-0 mx-auto" width="17" height="17">
+            {{ macros.bootstrap_icon("pencil") }}
+        </svg>
+    </button>
+    <button id="follow-button" type="sumbit" form="edit-photo-form"
+            aria-label="{{ _("Miniature") }}"
+            class="lg-icon d-flex align-items-center">
+        <svg class="bi flex-shrink-0 mx-auto" width="17" height="17">
+            {{ macros.bootstrap_icon("star") }}
+        </svg>
+    </button>
+    <button id="followed-button" type="button" aria-label="{{ _("Miniature") }}"
+            class="lg-icon d-none align-items-center"
+            data-bs-toggle="popover" data-bs-placement="bottom"
+            title="{{ _("Déjà la miniature actuelle de l'album !") }}"
+            data-bs-trigger="focus">
+        <svg class="bi flex-shrink-0 mx-auto" width="17" height="17">
+            {{ macros.bootstrap_icon("star-fill") }}
+        </svg>
+    </button>
+    <button id="report-button" type="button" aria-label="{{ _("Signaler") }}"
+            class="lg-icon d-flex align-items-center"
+            data-bs-target="#mo-report" data-bs-toggle="modal">
+        <svg class="bi flex-shrink-0 mx-auto" width="17" height="17">
+            {{ macros.bootstrap_icon("flag") }}
+        </svg>
+    </button>
+</div>
+
+<!-- Edit modal -->
+<div class="modal fade" id="mo-edit" tabindex="-1"
+     aria-labelledby="mo-edit-lab" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="mo-edit-lab">
+                {{ _("Modifier la photo") }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="{{ _("Fermer") }}"></button>
+        </div>
+        <form action="" method="post" role="form" id="edit-photo-form">
+            <div class="modal-body container">
+                {{ photo_form.hidden_tag() }}
+                <div class="row mb-3"><div class="col">
+                    <div class="form-floating">
+                        {{ wtf.form_field(photo_form.photo_name,
+                                          readonly=True) }}
+                    </div>
+                </div></div>
+                <div class="row mb-3"><div class="col">
+                    <div class="form-floating">
+                        {{ wtf.form_field(photo_form.caption, maxlength=280) }}
+                    </div>
+                </div></div>
+                <div class="row mb-3"><div class="col">
+                    <div class="form-floating">
+                        {{ wtf.form_field(photo_form.author_str,
+                                          maxlength=64) }}
+                    </div>
+                </div></div>
+                <div class="row mb-3">
+                    <div class="col col-6">
+                        <div class="form-floating">
+                            {{ wtf.form_field(photo_form.date) }}
+                        </div>
+                    </div>
+                    <div class="col col-6">
+                        <div class="form-floating">
+                            {{ wtf.form_field(photo_form.time, step=1) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col col-6">
+                        <div class="form-floating">
+                            {{ wtf.form_field(photo_form.lat) }}
+                        </div>
+                    </div>
+                    <div class="col col-6">
+                        <div class="form-floating">
+                            {{ wtf.form_field(photo_form.lng) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                {{ wtf.form_field(photo_form.submit) }}
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+                    {{ _("En fait non") }}
+                </button>
+            </div>
+        </form>
+    </div></div>
+</div>
+
+<!-- Report modal -->
+<div class="modal fade" id="mo-report" tabindex="-1"
+     aria-labelledby="mo-report-lab" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="mo-report-lab">
+                {{ _("Signaler un problème") }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="{{ _("Fermer") }}"></button>
+        </div>
+        <div class="modal-body container">
+            <div class="row mb-3">
+                <div class="col">
+                    {{ _("Un problème avec cette photo ? Elle porte atteinte "
+                         "à votre image et vous souhaitez la supprimer, ou "
+                         "simplement une information est erronnée ? "
+                         "Dites-le nous !") }}
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a class="btn btn-danger" id="send-report-button"
+               href="{{ url_for("main.contact") }}?title={{ _("Problème avec "
+                     "la photo : %(path)s/__photo__", path=album.src) }}">
+                {{ _("Signaler un problème") }}
+            </a>
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+                {{ _("En fait non") }}
+            </button>
+        </div>
+    </div></div>
 </div>
 
 {% endblock %}

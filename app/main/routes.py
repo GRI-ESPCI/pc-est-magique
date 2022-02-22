@@ -1,6 +1,8 @@
 """PC est magique - Main Pages Routes"""
 
+import base64
 import datetime
+import hashlib
 import os
 
 import flask
@@ -86,10 +88,33 @@ def test_mail(blueprint: str, template: str) -> typing.RouteReturn:
         return body
 
 
+def check_md5(album_src: str) -> bool:
+    """Check md5 token (fallback if no Nginx, should NOT bu used!)"""
+    token = flask.request.args.get("md5")
+    expires = flask.request.args.get("expires")
+    if not token or not expires or not expires.isdigit():
+        return False
+    expires_ts = int(expires)
+    ip = flask.request.headers.get("X-Real-Ip") or "10.1.2.14"                          # REMOVE THAT
+    if not ip:
+        return False
+    secret = flask.current_app.config["PHOTOS_SECRET_KEY"]
+    md5 = hashlib.md5(f"{expires_ts}{album_src}{ip} {secret}".encode())
+    b64 = base64.urlsafe_b64encode(md5.digest()).replace(b"=", b"")
+    return (b64.decode() == token)
+
+
 @bp.route("/photo/<collection_dir>/<album_dir>/<photo_file>")
 def photo(collection_dir: str, album_dir: str,
           photo_file: str) -> typing.RouteReturn:
     """Serve photo (fallback if no Nginx, should NOT bu used!)"""
+    if not check_md5(f"/photo/{collection_dir}/{album_dir}"):
+        # Bad token: redirect to photos.photo to build new token (if
+        # authorized) then redirect back here
+        return flask.redirect(flask.url_for(
+            "photos.photo", collection_dir=collection_dir,
+            album_dir=album_dir, photo_file=photo_file,
+        ))
     return flask.send_file(os.path.join(
         flask.current_app.config["PHOTOS_BASE_PATH"],
         collection_dir,
@@ -102,6 +127,13 @@ def photo(collection_dir: str, album_dir: str,
 def photo_thumb(collection_dir: str, album_dir: str,
                 photo_file: str) -> typing.RouteReturn:
     """Serve photo thumbnail (fallback if no Nginx, should NOT bu used!)"""
+    if not check_md5(f"/photo/{collection_dir}/{album_dir}"):
+        # Bad token: redirect to photos.photo to build new token (if
+        # authorized) then redirect back here
+        return flask.redirect(flask.url_for(
+            "photos.photo", collection_dir=collection_dir,
+            album_dir=album_dir, photo_file=photo_file,
+        ))
     return flask.send_file(os.path.join(
         flask.current_app.config["PHOTOS_BASE_PATH"],
         collection_dir,

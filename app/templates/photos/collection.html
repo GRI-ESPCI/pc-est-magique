@@ -103,12 +103,12 @@
     <div class="row">
         <div class="col col-12 col-md mb-3">
             <div class="form-floating">
-                {{ wtf.form_field(form.start, value=collection.start) }}
+                {{ wtf.form_field(form.start, value=collection.start or "") }}
             </div>
         </div>
         <div class="col col-12 col-md mb-3 me-4">
             <div class="form-floating">
-                {{ wtf.form_field(form.end, value=collection.end) }}
+                {{ wtf.form_field(form.end, value=collection.end or "") }}
             </div>
         </div>
     </div>

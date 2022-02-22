@@ -17,6 +17,7 @@
     ],
     "dependencies": {
         "bootstrap": "latest",
-        "moment": "latest"
+        "moment": "latest",
+        "lightgallery": "latest"
     }
 }

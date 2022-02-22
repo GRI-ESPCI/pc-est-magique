@@ -151,6 +151,22 @@ class Photo(Model):
         return f"<Photo #{self.id} ('{self.album}' /{self.file_name})>"
 
     @property
+    def info(self) -> str:
+        """Description of the photo, from different args."""
+        parts = []
+        if self.caption:
+            parts.append(self.caption)
+        if self.author:
+            parts.append(self.author.full_name)
+        elif self.author_str:
+            parts.append(self.author_str)
+        if self.timestamp:
+            parts.append(self.timestamp.strftime("%x %X"))
+        if self.lat and self.lng:
+            parts.append(f"@{self.lat}/{self.lng}")
+        return ", ".join(parts)
+
+    @property
     def full_path(self) -> str:
         """The full path of the photo on disk."""
         return os.path.join(self.album.full_path, self.file_name)
@@ -241,10 +257,11 @@ class Album(Model):
             expires = datetime.datetime.now() + datetime.timedelta(
                 seconds=flask.current_app.config["PHOTOS_EXPIRES_DELAY"]
             )
-        expires_timestamp = int(expires.timestamp())
-        md5 = hashlib.md5(f"{expires_timestamp}{self.src}{ip}".encode())
+        expires_ts = int(expires.timestamp())
+        secret = flask.current_app.config["PHOTOS_SECRET_KEY"]
+        md5 = hashlib.md5(f"{expires_ts}{self.src}{ip} {secret}".encode())
         b64 = base64.urlsafe_b64encode(md5.digest()).replace(b"=", b"")
-        return f"md5={b64.decode()}&expires={expires_timestamp}"
+        return f"md5={b64.decode()}&expires={expires_ts}"
 
 
 class Collection(Model):

@@ -5,8 +5,25 @@ from wtforms.fields import html5
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
 
-from app.tools.validators import (DataRequired, Optional, Email, EqualTo,
-                                  Length, NewEmail)
+from app.tools.validators import (DataRequired, Optional, Length, NumberRange)
+
+
+class EditPhotoForm(FlaskForm):
+    """WTForm used to edit a photo."""
+    photo_name = wtforms.StringField(_l("Nom du fichier"),
+                                     validators=[DataRequired()])
+    caption = wtforms.StringField(_l("Légende (optionnel)"),
+                                  validators=[Optional(), Length(max=280)])
+    author_str = wtforms.StringField(_l("Auteur (optionnel)"),
+                                     validators=[Optional(), Length(max=64)])
+    date = html5.DateField(_l("Date (optionnel)"), validators=[Optional()])
+    time = html5.TimeField(_l("Heure (optionnel)"), format='%H:%M:%S',
+                           validators=[Optional()])
+    lat = html5.DecimalField(_l("Latitude (optionnel)"),
+                             validators=[Optional(), NumberRange(min=-90, max=90)])
+    lng = html5.DecimalField(_l("Longitude (optionnel)"),
+                             validators=[Optional(), NumberRange(min=-180, max=180)])
+    submit = wtforms.SubmitField(_l("Modifier la photo"))
 
 
 class EditAlbumForm(FlaskForm):

@@ -23,3 +23,7 @@ a[rel="external"]::after {
     opacity: 50%;
     z-index: 10;
 }
+
+/* .lg-on {
+    overflow: hidden;
+} */
