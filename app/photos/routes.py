@@ -53,7 +53,8 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
     if not album:
         flask.abort(404)
     # Restrictions d'accès ici (y compris visible=True)
-    ip = flask.request.headers.get("X-Real-Ip") or "10.1.2.14"                          # REMOVE THAT
+    ip = (flask.request.headers.get("X-Real-Ip")
+          or flask.current_app.config["FORCE_IP"])
     if not ip:
         flask.flash("IP non détectable, impossible d'accéder aux photos",
                     "danger")
@@ -113,6 +114,7 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
 
 
 @bp.route("<collection_dir>/<album_dir>/<photo_file>")
+@bp.route("<collection_dir>/<album_dir>/_thumbs/<photo_file>")
 @context.logged_in_only
 def photo(collection_dir: str, album_dir: str,
           photo_file: str)-> typing.RouteReturn:
@@ -137,12 +139,14 @@ def photo(collection_dir: str, album_dir: str,
     if not album:
         flask.abort(404)
     # Restrictions d'accès ici (y compris visible=True)
-    ip = flask.request.headers.get("X-Real-Ip") or "10.1.2.14"                          # REMOVE THAT
+    ip = (flask.request.headers.get("X-Real-Ip")
+          or flask.current_app.config["FORCE_IP"])
     if not ip:
         flask.flash("IP non détectable, impossible d'accéder aux photos",
                     "danger")
         flask.abort(403)
     token_args = album.get_access_token(ip)
+    photo_url = flask.request.base_url.replace("/photos/", "/photo/")
     return flask.redirect(
-        f"/photo/{collection_dir}/{album_dir}/{photo_file}?{token_args}"
+        f"{photo_url}?{token_args}"
     )

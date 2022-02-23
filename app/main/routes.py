@@ -95,7 +95,8 @@ def check_md5(album_src: str) -> bool:
     if not token or not expires or not expires.isdigit():
         return False
     expires_ts = int(expires)
-    ip = flask.request.headers.get("X-Real-Ip") or "10.1.2.14"                          # REMOVE THAT
+    ip = (flask.request.headers.get("X-Real-Ip")
+          or flask.current_app.config["FORCE_IP"])
     if not ip:
         return False
     secret = flask.current_app.config["PHOTOS_SECRET_KEY"]
@@ -105,39 +106,20 @@ def check_md5(album_src: str) -> bool:
 
 
 @bp.route("/photo/<collection_dir>/<album_dir>/<photo_file>")
+@bp.route("/photo/<collection_dir>/<album_dir>/_thumbs/<photo_file>")
 def photo(collection_dir: str, album_dir: str,
           photo_file: str) -> typing.RouteReturn:
     """Serve photo (fallback if no Nginx, should NOT bu used!)"""
     if not check_md5(f"/photo/{collection_dir}/{album_dir}"):
         # Bad token: redirect to photos.photo to build new token (if
         # authorized) then redirect back here
-        return flask.redirect(flask.url_for(
-            "photos.photo", collection_dir=collection_dir,
-            album_dir=album_dir, photo_file=photo_file,
-        ))
-    return flask.send_file(os.path.join(
+        return flask.redirect(flask.request.url.replace("/photo/", "/photos/"))
+    album_dir = os.path.join(
         flask.current_app.config["PHOTOS_BASE_PATH"],
         collection_dir,
         album_dir,
-        photo_file,
-    ))
-
-
-@bp.route("/photo/<collection_dir>/<album_dir>/_thumbs/<photo_file>")
-def photo_thumb(collection_dir: str, album_dir: str,
-                photo_file: str) -> typing.RouteReturn:
-    """Serve photo thumbnail (fallback if no Nginx, should NOT bu used!)"""
-    if not check_md5(f"/photo/{collection_dir}/{album_dir}"):
-        # Bad token: redirect to photos.photo to build new token (if
-        # authorized) then redirect back here
-        return flask.redirect(flask.url_for(
-            "photos.photo", collection_dir=collection_dir,
-            album_dir=album_dir, photo_file=photo_file,
-        ))
-    return flask.send_file(os.path.join(
-        flask.current_app.config["PHOTOS_BASE_PATH"],
-        collection_dir,
-        album_dir,
-        "_thumbs",
-        photo_file,
-    ))
+    )
+    if "/_thumbs/" in flask.request.url:
+        return flask.send_file(os.path.join(album_dir, "_thumbs", photo_file))
+    else:
+        return flask.send_file(os.path.join(album_dir, photo_file))

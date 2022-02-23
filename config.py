@@ -62,5 +62,6 @@ class Config():
     GOOGLE_RECAPTCHA_SECRET = os.environ.get("GOOGLE_RECAPTCHA_SECRET")
 
     BRANCH = os.environ.get("BRANCH")
+    FORCE_IP = os.environ.get("FORCE_IP")
 
     MAINTENANCE = bool(os.environ.get("MAINTENANCE"))

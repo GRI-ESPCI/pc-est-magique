@@ -1,4 +1,4 @@
-"""PC est magique - Importe les albums de photos sur le disque et pas en base.
+"""PC est magique - Synchronise les photos entre le disque et la BDD.
 
 Explore le répertoire de photos (variable d'environnement PHOTOS_BASE_PATH),
 crée les collections et albums manquants (en non visibles), ajoute les photos

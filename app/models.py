@@ -189,7 +189,8 @@ class Photo(Model):
     @property
     def thumb_src_with_token(self) -> str:
         """The online query to the photo's thumbnail with md5 args."""
-        ip = flask.request.headers.get("X-Real-Ip") or "10.1.2.14"                          # REMOVE THAT
+        ip = (flask.request.headers.get("X-Real-Ip")
+              or flask.current_app.config["FORCE_IP"])
         token_args = self.album.get_access_token(ip)
         return f"{self.thumb_src}?{token_args}"
 

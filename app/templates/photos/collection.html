@@ -27,7 +27,20 @@
 <div id="header" {{ "hidden" if "edit" in request.args else "" }}>
     <div class="row mb-2">
         <div class="col">
-            <h1>{{ collection.name }}</h1>
+            <p {% if not collection.visible %}
+               class="text-muted d-flex align-items-center"
+               {% endif %}>
+                <span class="h1">{{ collection.name }}</span>
+                {% if not collection.visible %}
+                <span class="badge bg-danger px-2 py-1 ms-3 d-flex
+                             align-items-center">
+                    <svg class="bi flex-shrink-0 me-2" width="18" height="18">
+                        {{ macros.bootstrap_icon("eye-slash") }}
+                    </svg>
+                    {{ _("Collection masquée") }}
+                </span>
+                {% endif %}
+            </p>
         </div>
         <div class="col col-auto me-3 d-flex align-items-center">
             <button class="btn btn-pc5 p-2" type="button" role="button"
@@ -128,7 +141,8 @@
              style="width: 15rem;">
             <a href="{{ url }}">
                 <img src="{{ album.featured_photo.thumb_src_with_token }}"
-                     class="card-img-top" alt="[NO PHOTOS]">
+                     class="card-img-top{{ "" if album.visible
+                           else " opacity-75" }}" alt="[NO PHOTOS]">
             </a>
             <div class="card-body">
                 <h5 class="card-title">
