@@ -16,6 +16,7 @@ from app.tools import captcha, utils, typing
 
 @bp.route("/")
 @bp.route("/index")
+@context.logged_in_only
 def index() -> typing.RouteReturn:
     """PC est magique home page."""
     return flask.render_template("main/index.html", title=_("Accueil"))

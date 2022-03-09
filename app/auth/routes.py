@@ -39,7 +39,7 @@ def new_username(prenom: str, nom: str) -> str:
 def auth_needed() -> typing.RouteReturn:
     """Authentification needed page."""
     return flask.render_template("auth/auth_needed.html",
-                                 title=_("Accès à Internet"))
+                                 title=_("Connexion nécessaire"))
 
 
 @bp.route("/register", methods=["GET", "POST"])

@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% import "_form.html" as wtf %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for("static", filename="js/sort-table.js") }}"
+        defer></script>
+<script src="{{ url_for("static", filename="js/gris-roles.js") }}"
+        defer></script>
+{% endblock %}
+
+{% block app_content %}
+
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ title }}</h1>
+    </div>
+</div>
+<div class="row mb-3"><div class="col table-responsive">
+    <form id="security-form" hidden>{{ form.hidden_tag() }}</form>
+    <table class="table table-striped table-hover table-bordered"><thead>
+        <tr>
+            <th scope="col">
+                <span class="d-flex user-select-none" onclick="sort('id');">
+                    <span>{{ _("ID") }}</span>
+                    <span class="mx-auto">
+                        <svg class="bi flex-shrink-0" width="16" height="16"
+                             id="sort-svg-id">
+                            <!-- Sort button inserted through JS -->
+                        </svg>
+                    </span>
+                </span>
+            </th>
+            <th scope="col">
+                <span class="d-flex user-select-none" onclick="sort('name');">
+                    <span>{{ _("Rôle") }}</span>
+                    <span class="mx-auto">
+                        <svg class="bi flex-shrink-0" width="16" height="16"
+                             id="sort-svg-name">
+                            <!-- Sort button inserted through JS -->
+                        </svg>
+                    </span>
+                </span>
+            </th>
+            <th scope="col">
+                <span class="d-flex user-select-none" onclick="sort('index');">
+                    <span>{{ _("Priorité") }}</span>
+                    <span class="mx-auto">
+                        <svg class="bi flex-shrink-0" width="16" height="16"
+                             id="sort-svg-index">
+                            <!-- Sort button inserted through JS -->
+                        </svg>
+                    </span>
+                </span>
+            </th>
+            <th scope="col">
+                <span class="d-flex user-select-none" onclick="sort('perms');">
+                    <span>{{ _("Permissions") }}</span>
+                    <span class="mx-auto">
+                        <svg class="bi flex-shrink-0" width="16" height="16"
+                             id="sort-svg-perms">
+                            <!-- Sort button inserted through JS -->
+                        </svg>
+                    </span>
+                </span>
+            </th>
+        </tr></thead>
+        <tbody id="sort-table">
+        {% for role in roles %}
+        <tr id="{{ role.id }}"
+            data-id="{{ str(role.id).rjust(5, '0') }}"
+            data-name="{{ role.name }}"
+            data-index="{{ role.index }}"
+            data-perms="{{ len(role.permissions) }}"
+        >
+            <td>{{ role.id }}</td>
+            <td>
+                <span class="badge rounded-pill border border-2 d-inline-flex
+                             align-items-center px-2 text-{{ "light"
+                             if role.is_dark_colored else "dark" }}"
+                      style="background-color: #{{ role.color or "ffffff" }}">
+                    {{ role.name }}
+                </span>
+            </td>
+            <td>{{ role.index }}</td>
+            <td>
+                {% for permission in role.permissions %}
+                <span class="badge border border-2 border-info d-inline-flex
+                             align-items-center px-2 text-dark mx-1">
+                    <span>{{ permission }}</span>
+                    <!-- <span>
+                        <svg class="bi flex-shrink-0 ms-2" width="15"
+                             height="15" onclick="remove_role(this, {{ role.id
+                                }}, {{ role.id }});" style="cursor: pointer;">
+                            {{ macros.bootstrap_icon("x-circle") }}
+                        </svg>
+                    </span> -->
+                </span>
+                {% endfor %}
+                <!--
+                <span class="add-role badge rounded-pill d-inline-flex
+                             align-items-center px-0 text-dark">
+                    <span>&nbsp;</span>
+                    <span>
+                        <svg class="bi flex-shrink-0" width="15" height="15"
+                             style="cursor: pointer;" data-bs-toggle="dropdown"
+                             id="new_perm_{{ role.id }}">
+                            {{ macros.bootstrap_icon("plus-circle") }}
+                        </svg>
+                        <div class="dropdown-menu container w-auto px-4"
+                             aria-labelledby="new_perm_{{ role.id }}">
+                            <div class="row row-cols">
+                                boup
+                            </div>
+                        </div>
+                    </span>
+                </span>
+                -->
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody></table>
+</div></div>
+
+<!-- Icons templates -->
+<div hidden>
+    <div id="icon-template-down">
+        {{ macros.bootstrap_icon("caret-down-fill") }}
+    </div>
+    <div id="icon-template-up">
+        {{ macros.bootstrap_icon("caret-up-fill") }}
+    </div>
+    <div id="icon-revert">
+        {{ macros.bootstrap_icon("arrow-counterclockwise") }}
+    </div>
+    <div id="icon-delete">
+        {{ macros.bootstrap_icon("x-circle") }}
+    </div>
+    <div id="new-role-template">
+        <span class="badge rounded-pill border border-2 d-inline-flex
+                     align-items-center px-2 mx-1">
+            <span class="role_name"></span>
+            <span>
+                <svg class="bi flex-shrink-0 ms-2" width="15" height="15"
+                     style="cursor: pointer;">
+                    {{ macros.bootstrap_icon("x-circle") }}
+                </svg>
+            </span>
+        </span>
+    </div>
+</div>
+
+{% endblock %}

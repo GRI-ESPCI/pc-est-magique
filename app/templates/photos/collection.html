@@ -133,7 +133,7 @@
 </form>
 
 <div class="row row-cols g-2">
-    {% for album in collection.albums.all() %}
+    {% for album in albums %}
     {% with url = url_for("photos.album", collection_dir=collection.dir_name,
                           album_dir=album.dir_name) %}
     <div class="col">

@@ -63,13 +63,14 @@ def column(sa_type, *, primary_key=False, nullable=False, default=None,
 
 
 def _relationship(table_dot_back_populates: str, **kwargs) -> Relationship:
-    try:
-        table, back_populates = table_dot_back_populates.split(".")
-    except ValueError:
-        raise RuntimeError(f"Value '{table_dot_back_populates}' must be "
-                           "of form 'Table.column'")
-    return sqlalchemy.orm.relationship(table, back_populates=back_populates,
-                                       **kwargs)
+    match table_dot_back_populates.split("."):
+        case table, back_populates:
+            return sqlalchemy.orm.relationship(
+                table, back_populates=back_populates, **kwargs
+            )
+        case _:
+            raise RuntimeError(f"Value '{table_dot_back_populates}' must "
+                               "be of form 'Table.column'")
 
 
 def one_to_many(table_dot_back_populates: str,
@@ -96,6 +97,21 @@ def many_to_one(table_dot_back_populates: str,
             linked to **many elements** in this table).
     """
     return _relationship(table_dot_back_populates, **kwargs)
+
+
+def many_to_many(table_dot_back_populates: str, secondary: type,
+                 **kwargs
+                 ) -> "Relationship": # [typing.Any]":
+    """Constructs a many-to-many relationship to an other table.
+
+    Args:
+        table_dot_back_populates: The foreign column linked to this one,
+            of form ``Table.column` (**many elements** of ``Table`` are
+            linked to **many elements** in this table).
+        secondary: The associative table used to join tables.
+    """
+    return _relationship(table_dot_back_populates,
+                         secondary=secondary.__table__, **kwargs)
 
 
 _Enum = sqlalchemy.Enum

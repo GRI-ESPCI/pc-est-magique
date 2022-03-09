@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% import "_form.html" as wtf %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for("static", filename="js/sort-table.js") }}"
+        defer></script>
+<script src="{{ url_for("static", filename="js/gris-pceens.js") }}"
+        defer></script>
+{% endblock %}
+
+{% block app_content %}
+
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ title }}</h1>
+    </div>
+</div>
+<div class="row mb-3"><div class="col table-responsive">
+    <form id="security-form" hidden>{{ form.hidden_tag() }}</form>
+    <table class="table table-striped table-hover table-bordered"><thead>
+        <tr>
+            <th scope="col">
+                <span class="d-flex user-select-none" onclick="sort('id');">
+                    <span>{{ _("ID") }}</span>
+                    <span class="mx-auto">
+                        <svg class="bi flex-shrink-0" width="16" height="16"
+                             id="sort-svg-id">
+                            <!-- Sort button inserted through JS -->
+                        </svg>
+                    </span>
+                </span>
+            </th>
+            <th scope="col">
+                <span class="d-flex user-select-none" onclick="sort('name');">
+                    <span>{{ _("Nom") }}</span>
+                    <span class="mx-auto">
+                        <svg class="bi flex-shrink-0" width="16" height="16"
+                             id="sort-svg-name">
+                            <!-- Sort button inserted through JS -->
+                        </svg>
+                    </span>
+                </span>
+            </th>
+            <th scope="col">
+                <span class="d-flex user-select-none" onclick="sort('promo');">
+                    <span>{{ _("Promo") }}</span>
+                    <span class="mx-auto">
+                        <svg class="bi flex-shrink-0" width="16" height="16"
+                             id="sort-svg-promo">
+                            <!-- Sort button inserted through JS -->
+                        </svg>
+                    </span>
+                </span>
+            </th>
+            <th scope="col">
+                <span class="d-flex user-select-none" onclick="sort('email');">
+                    <span>{{ _("Adresse e-mail") }}</span>
+                    <span class="mx-auto">
+                        <svg class="bi flex-shrink-0" width="16" height="16"
+                             id="sort-svg-email">
+                            <!-- Sort button inserted through JS -->
+                        </svg>
+                    </span>
+                </span>
+            </th>
+            <th scope="col">
+                <span class="d-flex user-select-none" onclick="sort('roles');">
+                    <span>{{ _("Rôles") }}</span>
+                    <span class="mx-auto">
+                        <svg class="bi flex-shrink-0" width="16" height="16"
+                             id="sort-svg-roles">
+                            <!-- Sort button inserted through JS -->
+                        </svg>
+                    </span>
+                </span>
+            </th>
+            <th scope="col">
+                <span class="d-flex user-select-none" onclick="sort('flag');">
+                    <span>
+                        <svg class="bi flex-shrink-0" width="22" height="22">
+                            {{ macros.bootstrap_icon("globe") }}
+                        </svg>
+                    </span>
+                    <span class="mx-auto">
+                        <svg class="bi flex-shrink-0" width="16" height="16"
+                             id="sort-svg-flag">
+                            <!-- Sort button inserted through JS -->
+                        </svg>
+                    </span>
+                </span>
+            </th>
+        </tr></thead>
+        <tbody id="sort-table">
+        {% for pceen in pceens %}
+        <tr data-id="{{ str(pceen.id).rjust(5, '0') }}"
+            data-name="{{ pceen.full_name }}"
+            data-promo="{{ pceen.promo or 0 }}"
+            data-email="{{ pceen.email }}"
+            data-roles="{{ pceen.roles[0].index if pceen.roles else 1000000 }}"
+            data-flag="{{ pceen.locale or "" }}"
+        >
+            <td>{{ pceen.id }}</td>
+            <td>{{ pceen.full_name }}</td>
+            <td>{{ pceen.promo or "–" }}</td>
+            <td><a href="mailto:{{ pceen.email }}" class="text-secondary">
+                {{- pceen.email -}}
+            </a></td>
+            <td>
+                {% for role in pceen.roles %}
+                <span class="badge rounded-pill border border-2 d-inline-flex
+                             align-items-center px-2"
+                      style="background-color: #{{ role.color or "ffffff" }}">
+                    <a href="{{ url_for("gris.roles") }}#{{ role.id }}"
+                       class="text-{{ "light" if role.is_dark_colored
+                                      else "dark" }}">
+                        {{ role.name }}
+                    </a>
+                    <span>
+                        <svg class="bi flex-shrink-0 ms-2" width="15"
+                             height="15" onclick="remove_role(this, {{ pceen.id
+                                }}, {{ role.id }});" style="cursor: pointer;">
+                            {{ macros.bootstrap_icon("x-circle") }}
+                        </svg>
+                    </span>
+                </span>
+                {% endfor %}
+                <span class="add-role badge rounded-pill d-inline-flex
+                             align-items-center px-0 text-dark">
+                    <span>&nbsp;</span>
+                    <span>
+                        <svg class="bi flex-shrink-0" width="15" height="15"
+                             style="cursor: pointer;" data-bs-toggle="dropdown"
+                              id="new_role_{{ pceen.id }}">
+                            {{ macros.bootstrap_icon("plus-circle") }}
+                        </svg>
+                        <div class="dropdown-menu container w-auto px-4"
+                             aria-labelledby="new_role_{{ pceen.id }}">
+                            <div class="row row-cols">
+                                {% for role in roles %}
+                                {% if role not in pceen.roles %}
+                                <a class="col-auto badge rounded-pill border
+                                          border-2 text-{{ "light"
+                                          if role.is_dark_colored
+                                          else "dark" }}
+                                          text-decoration-none"
+                                   style="background-color: #{{ role.color
+                                          or "ffffff" }}; cursor: pointer;"
+                                   onclick="add_role(this, {{ pceen.id }},
+                                                     {{ role.id }})">
+                                    {{ role.name }}
+                                </a>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </span>
+                </span>
+            </td>
+            <td>
+                {% if pceen.locale %}
+                <img class="flex-shrink-0" src="{{
+                        url_for("static",
+                                filename="svg/lang/{}.svg"
+                                         .format(pceen.locale))
+                     }}" width="22" height="22">
+                </img>
+                {% else %}
+                –
+                {% endif %}
+            </td>
+
+        </tr>
+        {% endfor %}
+    </tbody></table>
+</div></div>
+
+<!-- Icons templates -->
+<div hidden>
+    <div id="icon-template-down">
+        {{ macros.bootstrap_icon("caret-down-fill") }}
+    </div>
+    <div id="icon-template-up">
+        {{ macros.bootstrap_icon("caret-up-fill") }}
+    </div>
+    <div id="icon-revert">
+        {{ macros.bootstrap_icon("arrow-counterclockwise") }}
+    </div>
+    <div id="icon-delete">
+        {{ macros.bootstrap_icon("x-circle") }}
+    </div>
+    <div id="new-role-template">
+        <span class="badge rounded-pill border border-2 d-inline-flex
+                     align-items-center px-2">
+            <a href="{{ url_for("gris.roles") }}" class="role_name"></a>
+            <span>
+                <svg class="bi flex-shrink-0 ms-2" width="15" height="15"
+                     style="cursor: pointer;">
+                    {{ macros.bootstrap_icon("x-circle") }}
+                </svg>
+            </span>
+        </span>
+    </div>
+</div>
+
+{% endblock %}

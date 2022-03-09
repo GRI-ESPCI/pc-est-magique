@@ -11,6 +11,7 @@ Ce script peut uniquement être appelé depuis Flask :
 
 import subprocess
 import sys
+
 try:
     from app.models import Photo
     from app.tools.utils import print_progressbar

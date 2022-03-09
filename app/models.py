@@ -15,13 +15,30 @@ import sqlalchemy as sa
 from werkzeug import security as wzs
 
 from app import db
+from app.enums import PermissionType, PermissionScope
 from app.tools import typing
-from app.tools.columns import (column, one_to_many, many_to_one, my_enum,
-                               Column, Relationship)
+from app.tools.columns import (column, one_to_many, many_to_one, many_to_many,
+                               my_enum, Column, Relationship)
 
 
 Model = typing.cast(type[type], db.Model)   # type checking hack
 Enum = my_enum                              # type checking hack
+
+
+# Association tables
+
+class _PCeen_Role_AT(Model):
+    __tablename__ = "_pceen_role_at"
+    _pceen_id: Column[int] = column(sa.ForeignKey("pceen.id"),
+                                    primary_key=True)
+    _role_id: Column[int] = column(sa.ForeignKey("role.id"), primary_key=True)
+
+
+class _Role_Permission_AT(Model):
+    __tablename__ = "_role_permission_at"
+    _role_id: Column[int] = column(sa.ForeignKey("role.id"), primary_key=True)
+    _permission_id: Column[int] = column(sa.ForeignKey("permission.id"),
+                                         primary_key=True)
 
 
 class PCeen(flask_login.UserMixin, Model):
@@ -50,15 +67,57 @@ class PCeen(flask_login.UserMixin, Model):
     _password_hash: Column[str] = column(sa.String(128), nullable=False)
 
     photos: Relationship[list[Photo]] = one_to_many("Photo.author")
+    roles: Relationship[list[Role]] = many_to_many(
+        "Role.pceens", secondary=_PCeen_Role_AT, order_by="Role.index",
+    )
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
         return f"<PCeen #{self.id} ('{self.username}')>"
 
+    def __str__(self) -> str:
+        """Human-readible description of the PCeen."""
+        return f"pcéen \"{self.full_name}\""
+
     @property
     def full_name(self) -> str:
         """The pceens's first + last names."""
         return f"{self.prenom} {self.nom}"
+
+    @property
+    def permissions(self) -> set[Permission]:
+        """The set of all permissions this PCeen has."""
+        return set().union(*(role.permissions for role in self.roles))
+
+    def has_permission(self, type: PermissionType, scope: PermissionScope,
+                       elem: Model = None) -> bool:
+        """Check whether this PCeen has a given permission.
+
+        Args:
+            type: The permission type (.read, .write...).
+            scope: The permission scope (.pceen, .album...).
+            elem: The database entry to check the permission for, if
+                applicable.
+
+        Returns:
+            If the permission is granted.
+        """
+        # Check validity
+        if not scope.allow_elem and elem:
+            raise ValueError(f"Specifying elem is not allowed for {scope}")
+        if scope.need_elem and not elem:
+            raise ValueError(f"Specifying elem is mandatory for {scope}")
+        # Check all permissions
+        for permission in self.permissions:
+            if permission.grants_for(type, scope, elem):
+                return True
+        # Check all permissions for the parent permission
+        if scope.parent and elem:
+            parent_elem = getattr(elem, scope.parent_attr)
+            if self.has_permission(type, scope.parent, parent_elem):
+                return True
+        # No permission granted
+        return False
 
     def set_password(self, password: str) -> None:
         """Save or modify pceen password.
@@ -219,6 +278,15 @@ class Album(Model):
         """Returns repr(self)."""
         return f"<Album #{self.id} ('{self.dir_name}')>"
 
+    def __str__(self) -> str:
+        """Human-readible description of the album."""
+        return f"album \"{self.name}\""
+
+    @property
+    def view_permission_type(self) -> PermissionScope:
+        """The permission type needed to view this album."""
+        return PermissionType.read if self.visible else PermissionType.write
+
     @property
     def full_path(self) -> str:
         """The full path of the album on disk."""
@@ -283,6 +351,15 @@ class Collection(Model):
         """Returns repr(self)."""
         return f"<Collection #{self.id} ('{self.dir_name}')>"
 
+    def __str__(self) -> str:
+        """Human-readible description of the collection."""
+        return f"collection \"{self.name}\""
+
+    @property
+    def view_permission_type(self) -> PermissionScope:
+        """The permission type needed to view this collection."""
+        return PermissionType.read if self.visible else PermissionType.write
+
     @property
     def full_path(self) -> str:
         """The full path of the collection on disk."""
@@ -318,3 +395,118 @@ class Collection(Model):
         """The total number of photos in the collection."""
         return sum(album.nb_photos
                    for album in self.albums.filter_by(visible=True).all())
+
+
+class Role(Model):
+    """A role a PCeen can have."""
+    id: Column[int] = column(sa.Integer(), primary_key=True)
+    name: Column[str] = column(sa.String(64), nullable=False)
+    index: Column[int] = column(sa.Integer(), nullable=False, default=1000)
+    color: Column[str] = column(sa.String(6), nullable=True)
+
+    pceens: Relationship[list[PCeen]] = many_to_many(
+        "PCeen.roles", secondary=_PCeen_Role_AT
+    )
+    permissions: Relationship[list[Permission]] = many_to_many(
+        "Permission.roles", secondary=_Role_Permission_AT
+    )
+
+    def __repr__(self) -> str:
+        """Returns repr(self)."""
+        return f"<Role #{self.id} ({self.name})>"
+
+    def __str__(self) -> str:
+        """Human-readible description of the role."""
+        return f"role \"{self.name}\""
+
+    @property
+    def is_dark_colored(self) -> bool:
+        """Whether the role color is dark-themed.
+
+        Adapted from https://stackoverflow.com/a/58270890.
+        """
+        if not self.color:
+            return False
+        try:
+            red = int(self.color[:2], 16)
+            green = int(self.color[2:4], 16)
+            blue = int(self.color[4:], 16)
+        except ValueError:
+            return False
+        hsp_2 = (0.299 * red**2) + (0.587 * green**2) + (0.114 * blue**2)
+        return (hsp_2 < 19500)
+
+
+class Permission(Model):
+    """A permission a role can have."""
+    id: Column[int] = column(sa.Integer(), primary_key=True)
+    type: Column[PermissionType] = column(my_enum(PermissionType),
+                                          nullable=False)
+    scope: Column[PermissionScope] = column(my_enum(PermissionScope),
+                                            nullable=False)
+    ref_id: Column[int] = column(sa.Integer(), nullable=True)
+
+    roles: Relationship[list[Role]] = many_to_many(
+        "Role.permissions", secondary=_Role_Permission_AT
+    )
+
+    def __repr__(self) -> str:
+        """Returns repr(self)."""
+        try:
+            ref = self.ref or "<all>"
+        except ValueError:
+            ref = f"[#{self.ref_id}]"
+        return (f"<Permission #{self.id} ({self.type.name} / "
+                f"{self.scope.name}:{ref})>")
+
+    @property
+    def ref(self) -> Model | None:
+        """Database entry this permission refer to, or ``None`` if global.
+
+        Raises :exc:`ValueError` if this permission refer to non-existing
+        item.
+        """
+        table = {
+            PermissionScope.pceen: PCeen,
+            PermissionScope.collection: Collection,
+            PermissionScope.album: Album,
+            PermissionScope.role: Role,
+        }.get(self.scope)
+        if not table or not self.ref_id:
+            return None
+        item = table.query.get(self.ref_id)
+        if not item:
+            raise ValueError(
+                f"Permission {self} refer to non-existing {table.__name__}"
+            )
+        return item
+
+    def __str__(self) -> str:
+        """A human-readible description of this permission."""
+        if not self.scope.allow_elem:
+            return f"{self.type.name} / {self.scope.name}"
+        if self.ref_id is None:
+            return f"{self.type.name} / every {self.scope.name}"
+        try:
+            return f"{self.type.name} / {self.ref}"
+        except ValueError:
+            return f"{self.type.name} / [OLD {self.scope.name} #{self.ref_id}]"
+
+    def grants_for(self, type: PermissionType, scope: PermissionScope,
+                   elem: Model = None) -> bool:
+        """Check whether this permission grants given type and scope.
+
+        Args:
+            type: The permission type (.read, .write...).
+            scope: The permission scope (.pceen, .album...).
+            elem: The database entry to check the permission for, if
+                applicable.
+
+        Returns:
+            If the permission is granted.
+        """
+        return (
+            self.scope == scope
+            and ((self.type == type) or (self.type == PermissionType.all))
+            and ((self.ref_id is None) or (self.ref == elem))
+        )

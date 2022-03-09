@@ -5,6 +5,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+# v0.2.0 (2022-03-09)
+
+### Added
+
+  * :class:`.models.Role` and :class:`.models.Permission` system, with
+      * Enums :class:`.enums.PermissionType` and
+        :class:`.enums.PermissionScope`;
+      * Permission check method :class:`.models.Rezident.has_permission`,
+        context functions :func:`.context.has_permission`,
+        :func:`.context.check_permission`,
+        :func:`.context.check_any_permission`,
+        :func:`.context.check_all_permissions` and decorator
+        :func:`.context.permission_only`;
+  * GRI menu (form IntraRez) with PCeens and roles management pages.
+
+### Changed
+
+  * Photos access is now restricted to some permissions;
+  * Main page message.
+
+
 # v0.1.1 (2022-02-23)
 
 ### Added
