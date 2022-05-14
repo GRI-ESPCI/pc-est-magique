@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% import "_form.html" as wtf %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for("static", filename="js/photos-edit-form.js") }}"
+        defer></script>
+{% endblock %}
+
+{% block app_content %}
+
+<div class="row">
+    <nav class="col">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{ url_for("photos.main") }}">
+                {{ _("Photos") }}
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            {{ collection.name }}
+        </li>
+    </ol>
+    </nav>
+</div>
+
+<div id="header" {{ "hidden" if "edit" in request.args else "" }}>
+    <div class="row mb-2">
+        <div class="col">
+            <p {% if not collection.visible %}
+               class="text-muted d-flex align-items-center"
+               {% endif %}>
+                <span class="h1">{{ collection.name }}</span>
+                {% if not collection.visible %}
+                <span class="badge bg-danger px-2 py-1 ms-3 d-flex
+                             align-items-center">
+                    <svg class="bi flex-shrink-0 me-2" width="18" height="18">
+                        {{ macros.bootstrap_icon("eye-slash") }}
+                    </svg>
+                    {{ _("Collection masquée") }}
+                </span>
+                {% endif %}
+            </p>
+        </div>
+        <div class="col col-auto me-3 d-flex align-items-center">
+            <button class="btn btn-pc5 p-2" type="button" role="button"
+                    title="{{ _("Modifier la collection") }}"
+                    onclick="show_edit_form()">
+                <svg class="bi flex-shrink-0 text-secondary"
+                    width="24" height="24">
+                    {{ macros.bootstrap_icon("pencil") }}
+                </svg>
+            </button>
+        </div>
+    </div>
+    {% if collection.description %}
+    <div class="row mb-4 fst-italic">
+        <div class="col">
+            {{ collection.description }}
+        </div>
+    </div>
+    {% endif %}
+    <div class="row">
+        <div class="col">
+        <p>
+            <span>
+                {{ macros.s(collection.nb_albums, _("album")) }}
+            </span>
+            {% if collection.start %}
+            <span class="user-select-none mx-2">&middot;</span>
+            <span>
+                {{ moment(collection.start).format("MMMM YYYY") }}
+                {% if collection.end %}
+                – {{ moment(collection.end).format("MMMM YYYY") }}
+                {% endif %}
+            </span>
+            {% endif %}
+        </p>
+        </div>
+    </div>
+</div>
+
+<form action="?" method="post" role="form" id="modify-form"
+      {{ "" if "edit" in request.args else "hidden" }}>
+    {{ form.hidden_tag() }}
+    <div class="row mb-3">
+        <div class="col">
+            <div class="form-floating ">
+                {{ wtf.form_field(form.name, value=collection.name) }}
+            </div>
+        </div>
+        <div class="col col-auto me-3 d-flex align-items-center">
+            <button class="btn btn-pc5 p-2" type="button" role="button"
+                    title="{{ _("Arrêter de modifier") }}"
+                    onclick="hide_edit_form()">
+                <svg class="bi flex-shrink-0 text-secondary"
+                     width="24" height="24">
+                    {{ macros.bootstrap_icon("x-circle") }}
+                </svg>
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-12 col-md mb-3">
+            <div class="form-floating">
+                {{ wtf.form_field(form.description,
+                                  value=collection.description or "") }}
+            </div>
+        </div>
+        <div class="col-auto me-4 d-flex align-items-center mb-3">
+            <div class="form-check form-switch">
+                {{ wtf.form_field(form.visible, checked=collection.visible) }}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col col-12 col-md mb-3">
+            <div class="form-floating">
+                {{ wtf.form_field(form.start, value=collection.start or "") }}
+            </div>
+        </div>
+        <div class="col col-12 col-md mb-3 me-4">
+            <div class="form-floating">
+                {{ wtf.form_field(form.end, value=collection.end or "") }}
+            </div>
+        </div>
+    </div>
+    <div class="row mb-5">
+        <div class="col">
+            {{ wtf.form_field(form.submit) }}
+        </div>
+    </div>
+</form>
+
+<div class="row row-cols g-2">
+    {% for album in albums %}
+    {% with url = url_for("photos.album", collection_dir=collection.dir_name,
+                          album_dir=album.dir_name) %}
+    <div class="col">
+        <div class="card{{ "" if album.visible else " text-muted" }}"
+             style="width: 15rem;">
+            <a href="{{ url }}">
+                <img src="{{ album.featured_photo.src_with_token }}"
+                     class="card-img-top{{ "" if album.visible
+                           else " opacity-75" }}" alt="[NO PHOTOS]">
+            </a>
+            <div class="card-body">
+                <h5 class="card-title">
+                    {{ album.name }}
+                    {% if not album.visible %}
+                    <span class="fw-normal badge bg-danger p-1 align-top"
+                          title="{{ _("Album non visible") }}">
+                        <svg class="bi flex-shrink-0" width="18" height="18">
+                            {{ macros.bootstrap_icon("eye-slash") }}
+                        </svg>
+                    </span>
+                    {% endif %}
+                </h5>
+                {% if album.description %}
+                <p class="card-text">{{ album.description }}</p>
+                {% endif %}
+                <p class="card-text text-muted mb-1">
+                    {% if album.start %}
+                    {{ moment(album.start).format("LL") }}
+                    {% if album.end %}
+                    – {{ moment(album.end).format("LL") }}
+                    {% endif %}
+                    {% endif %}
+                </p>
+                <p class="card-text text-muted">
+                    {{ macros.s(album.nb_photos, _("photo")) }}
+                </p>
+                <a href="{{ url }}" class="btn btn-primary">Voir les photos</a>
+                <a href="{{ url }}?edit" class="btn btn-pc5 ms-3"
+                   title={{ _("Modifier") }}>
+                    <svg class="bi flex-shrink-0 text-secondary"
+                        width="20" height="20">
+                        {{ macros.bootstrap_icon("pencil") }}
+                    </svg>
+                </a>
+            </div>
+          </div>
+    </div>
+    {% endwith %}
+    {% endfor %}
+</div>
+
+{% endblock %}

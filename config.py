@@ -53,9 +53,15 @@ class Config():
     MAIL_WEBHOOK = os.environ.get("MAIL_WEBHOOK")
     GRI_ROLE_ID = os.environ.get("GRI_ROLE_ID")
 
+    PHOTOS_BASE_PATH = os.environ.get("PHOTOS_BASE_PATH")
+    PHOTOS_SECRET_KEY = os.environ.get("PHOTOS_SECRET_KEY")
+    _delay_str = os.environ.get("PHOTOS_EXPIRES_DELAY")
+    PHOTOS_EXPIRES_DELAY = int(_delay_str) if _delay_str.isdigit() else 3600
+
     GOOGLE_RECAPTCHA_SITEKEY = os.environ.get("GOOGLE_RECAPTCHA_SITEKEY")
     GOOGLE_RECAPTCHA_SECRET = os.environ.get("GOOGLE_RECAPTCHA_SECRET")
 
     BRANCH = os.environ.get("BRANCH")
+    FORCE_IP = os.environ.get("FORCE_IP")
 
     MAINTENANCE = bool(os.environ.get("MAINTENANCE"))

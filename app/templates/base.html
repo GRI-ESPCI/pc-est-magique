@@ -84,6 +84,12 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar navbar-collapse" id="navbar_content">
+                <ul class="navbar-nav mx-auto flex-row flex-wrap
+                           justify-content-end">
+                    {% if g.is_gri %}
+                    {% include "gris/menu.html" %}
+                    {% endif %}
+                </ul>
                 <ul class="navbar-nav ms-auto flex-row flex-wrap
                            justify-content-end">
                     {% if not g.logged_in %}

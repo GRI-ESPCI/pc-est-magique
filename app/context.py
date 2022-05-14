@@ -7,7 +7,7 @@ from flask import g
 from flask_babel import _
 import flask_login
 
-from app.models import PCeen
+from app.models import Model, PCeen, PermissionType, PermissionScope
 from app.tools import utils, typing
 
 
@@ -131,3 +131,107 @@ def gris_only(route: _Route) -> _Route:
             return utils.ensure_safe_redirect("auth.login")
 
     return new_route
+
+
+def has_permission(type: PermissionType,
+                   scope: PermissionScope,
+                   elem: Model | None = None) -> bool | None:
+    """Check if the current user (if logged in) has a specific permission.
+
+    Args:
+        type: The permission type (.read, .write...).
+        scope: The permission scope (.pceen, .album...).
+        elem: The database entry to check the permission for, if applicable.
+
+    Returns:
+        ``None`` if no user is logged in, else whether the logged in user
+        has the requested permission.
+    """
+    if not g.logged_in:
+        return None
+    return g.pceen.has_permission(type=type, scope=scope, elem=elem)
+
+
+def check_permission(type: PermissionType,
+                     scope: PermissionScope,
+                     elem: Model | None = None) -> None:
+    """Ensure that the current user (if logged in) has a specific permission.
+
+    Aborts with a redirection to the login page if not logged in;
+    aborts with a 403 if the user does not have the requested permission;
+    else silently returns.
+
+    Args:
+        type, scope, elem: Passed to :func:`.has_permission`.
+    """
+    permission = has_permission(type=type, scope=scope, elem=elem)
+    if permission is None:
+        flask.flash(_("Veuillez vous authentifier pour accéder à cette page."),
+                    "warning")
+        flask.abort(utils.ensure_safe_redirect("auth.login"))
+    elif not permission:
+        flask.abort(403)    # 403 Not Authorized
+
+
+PSE = (tuple[PermissionType, PermissionScope]
+       | tuple[PermissionType, PermissionScope, Model | None])
+
+
+def check_any_permission(*pses: PSE) -> None:
+    """Ensure that the current user has at least one of several permissions.
+
+    Behaves like :func:`.check_permission`.
+
+    Args:
+        *pses: Permissions arguments to check: tuples ``(type, scope)``
+            or ``(type, scope, elem)`` to pass to :func:`.has_permission`.
+    """
+    if not pses:
+        return
+    pse, *other = pses
+    if has_permission(*pse):
+        return
+    if other:
+        check_any_permission(*other)    # Other permissions: check
+    else:
+        check_permission(*pse)      # Last permission, none granted: abort
+
+
+def check_all_permissions(*pses: PSE) -> None:
+    """Ensure that the current user has all of several permissions.
+
+    Behaves like :func:`.check_permission`.
+
+    Args:
+        *pses: Permissions arguments to check: tuples ``(type, scope)``
+            or ``(type, scope, elem)`` to pass to :func:`.has_permission`.
+    """
+    if not pses:
+        return
+    pse, *other = pses
+    check_permission(*pse)
+    check_all_permissions(*other)
+
+
+def permission_only(type: PermissionType,
+                    scope: PermissionScope,
+                    elem: Model | None = None
+    ) -> typing.Callable[[_Route], _Route]:
+    """Route function decorator to restrict route to a specific permission.
+
+    Decorator version of :func:`.check_permission`.
+
+    Args:
+        type, scope, elem: Passed to :func:`.check_permission`.
+
+    Returns:
+        The decorator to apply to protect the route.
+    """
+    def decorator(route: _Route) -> _Route:
+        @functools.wraps(route)
+        def new_route(*args: _RP.args,
+                      **kwargs: _RP.kwargs) -> typing.RouteReturn:
+            check_permission(type=type, scope=scope, elem=elem)
+            return route(*args, **kwargs)
+        return new_route
+    return decorator

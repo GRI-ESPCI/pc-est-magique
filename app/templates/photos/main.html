@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ _("Photos") }}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col"><p>
+        {{ macros.s(len(collections), _("collection")) }}
+    </p></div>
+</div>
+<div class="row row-cols g-2">
+    {% for collection in collections %}
+    {% with url = url_for("photos.collection",
+                          collection_dir=collection.dir_name) %}
+    <div class="col">
+        <div class="card{{ "" if collection.visible else " text-muted" }}"
+             style="width: 15rem;">
+            <a href="{{ url }}">
+                <img src="{{ collection.featured_photo.src_with_token }}"
+                     class="card-img-top{{ "" if collection.visible
+                            else " opacity-75" }}" alt="[NO ALBUMS]">
+            </a>
+            <div class="card-body">
+                <h5 class="card-title">
+                    {{ collection.name }}
+                    {% if not collection.visible %}
+                    <span class="fw-normal badge bg-danger p-1 align-top"
+                          title="{{ _("Collection non visible") }}">
+                        <svg class="bi flex-shrink-0" width="18" height="18">
+                            {{ macros.bootstrap_icon("eye-slash") }}
+                        </svg>
+                    </span>
+                    {% endif %}
+                </h5>
+                {% if collection.description %}
+                <p class="card-text">{{ collection.description }}</p>
+                {% endif %}
+                <p class="card-text text-muted mb-1">
+                    {% if collection.start %}
+                    {{ moment(collection.start).format("MMMM YYYY") }}
+                    {% if collection.end %}
+                    – {{ moment(collection.end).format("MMMM YYYY") }}
+                    {% endif %}
+                    {% endif %}
+                </p>
+                <p class="card-text text-muted">
+                    {{ macros.s(collection.nb_albums, _("album")) }},
+                    {{ macros.s(collection.nb_photos, _("photo")) }}
+                </p>
+                <a href="{{ url }}" class="btn btn-primary">Voir les albums</a>
+                <a href="{{ url }}?edit" class="btn btn-pc5 ms-3"
+                   title={{ _("Modifier") }}>
+                    <svg class="bi flex-shrink-0 text-secondary"
+                        width="20" height="20">
+                        {{ macros.bootstrap_icon("pencil") }}
+                    </svg>
+                </a>
+            </div>
+          </div>
+    </div>
+    {% endwith %}
+    {% endfor %}
+</div>
+
+{% endblock %}

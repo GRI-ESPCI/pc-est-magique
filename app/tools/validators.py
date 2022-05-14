@@ -73,6 +73,25 @@ class Length(wtforms.validators.Length):
         super().__init__(min, max, message)
 
 
+class NumberRange(wtforms.validators.NumberRange):
+    def __init__(self,
+                 min: int | float | None = None,
+                 max: int | float | None = None,
+                 message: JinjaStr | None = None) -> None:
+        if min < 0 and max < 0:
+            raise ValueError("NumberRange validator cannot have both min and "
+                             "max arguments not set.")
+        if message is None:
+            if min < 0:
+                message = _l("Doit être inférieur à %(max)f.", max=max)
+            elif max < 0:
+                message = _l("Doit être supérieur à %(min)f.", min=min)
+            else:
+                message = _l("Doit être entre %(min)f et %(max)f.",
+                             min=min, max=max)
+        super().__init__(min, max, message)
+
+
 class NewEmail(CustomValidator):
     message = _l("Adresse e-mail déjà liée à un autre compte.")
 

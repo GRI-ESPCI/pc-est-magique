@@ -1,0 +1,29 @@
+<li class="nav-item dropdown me-auto">
+    <button type="button" data-bs-toggle="dropdown"
+        class="btn btn-outline-danger dropdown-toggle"
+        id="m_gri" aria-expanded="false">
+        {{ _("Menu GRI") }}
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="m_gri">
+        <li><a class="dropdown-item"
+               href="{{ url_for("gris.pceens") }}">
+            {{ _("PCéens") }}
+        </a></li>
+        <li><a class="dropdown-item"
+               href="{{ url_for("gris.roles") }}">
+            {{ _("Rôles") }}
+        </a></li>
+        <li><a class="dropdown-item"
+               href="{{ url_for("gris.run_script") }}">
+            {{ _("Exécuter un script") }}
+        </a></li>
+        <li><a class="dropdown-item"
+               href="https://pgadmin.pc-est-magique.fr"
+               target="_blank" rel="external">
+            {{ _("pgAdmin") }}
+        </a></li>
+        <li><a class="dropdown-item disabled" href="#">
+            {{ _("À venir...") }}
+        </a></li>
+    </ul>
+</li>

@@ -14,7 +14,7 @@ Rien pour l'instant
 * Autres packages Linux : ``postgresql postfix git npm``, plus pour le
   déploiement : ``supervisor nginx`` ;
 * Package npm : ``bower sass``
-    * Package Bower : ``bootstrap moment``
+    * Package Bower : ``bootstrap moment lightgallery``
 * Packages Python : Voir [`requirements.txt`](requirements.txt), plus pour le
   déploiement : ``gunicorn pymysql cryptography`` ;
 * Pour le déploiement : un utilisateur Linux ``pc-est-magique`` dédié.
@@ -52,8 +52,8 @@ https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deploymen
      sudo su postgres -c psql
      ```
      ```sql
-     CREATE ROLE pc-est-magique WITH LOGIN PASSWORD '<mdp-db>';
-     CREATE DATABASE pc-est-magique OWNER pc-est-magique ENCODING "UTF8";
+     CREATE ROLE pc_est_magique WITH LOGIN PASSWORD '<mdp-db>';
+     CREATE DATABASE pc_est_magique OWNER pc_est_magique ENCODING "UTF8";
      EXIT;
      ```
 
@@ -142,6 +142,57 @@ Configuration de Nginx :
 ```
 sudo cp .conf_models/nginx.conf /etc/nginx/sites-enabled/pc-est-magique
 sudo service nginx reload
+```
+
+ATTENTION : par défaut, le module ``ngx_http_secure_link_module`` (dont on a
+besoin pour les tokens de sécurisation d'accès aux photos) n'est pas inclus
+dans Nginx ! Il faut donc désinstaller la version installée via ``apt`` (par
+exemple), et le recompiler (voir http://nginx.org/en/docs/configure.html) en
+activant le *flag* ``--with-http_secure_link_module``.
+
+À titre d'exemple, voici la configuration utilisée pour build la version
+actuelle sur la Griway :
+
+```
+./configure \
+  --prefix=/usr/local \
+  --sbin-path=/sbin/nginx \
+  --conf-path=/etc/nginx/nginx.conf \
+  --pid-path=/run/nginx.pid \
+  --lock-path=/var/lock/nginx.lock \
+  --error-log-path=/var/log/nginx/error.log \
+  --http-log-path=/var/log/nginx/access.log \
+  --user=nginx \
+  --group=nginx \
+  --with-debug \
+  --with-file-aio \
+  --with-http_gzip_static_module \
+  --with-http_realip_module \
+  --with-http_ssl_module \
+  --with-http_secure_link_module \
+  --with-pcre-jit
+```
+
+Et la configuration du service ``systemctl``
+(``/lib/systemd/system/nginx.service``) :
+
+```
+[Unit]
+Description=The NGINX HTTP and reverse proxy server
+After=syslog.target network-online.target remote-fs.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/nginx.pid
+ExecStartPre=/sbin/nginx -t
+ExecStart=/sbin/nginx
+ExecReload=/sbin/nginx -s reload
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
 ```
 
 

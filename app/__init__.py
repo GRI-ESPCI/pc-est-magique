@@ -22,7 +22,6 @@ import flask_login
 import flask_mail
 import flask_moment
 import flask_babel
-from werkzeug import urls as wku
 
 from config import Config
 from app import enums
@@ -88,10 +87,12 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
 
     # Register blueprints
     # ! Keep imports here to avoid circular import issues !
-    from app import errors, main, auth
+    from app import errors, main, auth, gris, photos
     app.register_blueprint(errors.bp)
     app.register_blueprint(main.bp)
     app.register_blueprint(auth.bp)
+    app.register_blueprint(gris.bp, url_prefix="/gris")
+    app.register_blueprint(photos.bp, url_prefix="/photos")
 
     # Configure logging
     loggers.configure_logging(app)
@@ -107,6 +108,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     # ! Keep import here to avoid circular import issues !
     from app import context
     app.before_request(context.create_request_context)
+    app.jinja_env.globals["has_permission"] = context.has_permission
 
     # Set up custom logging
     @app.after_request
