@@ -11,7 +11,8 @@ __all__ = ["PermissionType", "PermissionScope"]
 
 
 class PermissionType(enum.Enum):
-    """"The type of a permission."""
+    """ "The type of a permission."""
+
     def __repr__(self) -> str:
         return f"<{type(self).__name__}.{self.name}>"
 
@@ -30,7 +31,7 @@ class _PSParams(NamedTuple):
 
 
 class PermissionScope(enum.Enum):
-    """"The scope of a permission.
+    """ "The scope of a permission.
 
     Attrs:
         allow_elem (bool): If this scope allows specific permissions.
@@ -43,8 +44,15 @@ class PermissionScope(enum.Enum):
             used to retrieve its parent. Should be set if and only if
             ``parent`` is set.
     """
-    def __new__(cls, allow_elem: bool, need_elem: bool, _parent: str | None,
-                parent_attr: str | None, query: Callable[[ModuleType], list] | None = None):
+
+    def __new__(
+        cls,
+        allow_elem: bool,
+        need_elem: bool,
+        _parent: str | None,
+        parent_attr: str | None,
+        query: Callable[[ModuleType], list] | None = None,
+    ):
         obj = object.__new__(cls)
         obj._value_ = enum.auto()
         obj.allow_elem = allow_elem

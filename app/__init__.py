@@ -38,6 +38,7 @@ class PCEstMagiqueApp(flask.Flask):
         actions_logger (logging.Logger): Child of app logger used to
             report important actions (see :mod:`.tools.loggers`).
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Add actions logger
@@ -79,8 +80,9 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.jinja_env.trim_blocks = True
     app.jinja_env.lstrip_blocks = True
     app.jinja_env.globals.update(**__builtins__)
-    app.jinja_env.globals.update(**{name: getattr(enums, name)
-                                    for name in enums.__all__})
+    app.jinja_env.globals.update(
+        **{name: getattr(enums, name) for name in enums.__all__}
+    )
     app.jinja_env.globals["__version__"] = __version__
     app.jinja_env.globals["copyright"] = in_app_copyright
     app.jinja_env.globals["babel"] = flask_babel
@@ -88,6 +90,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     # Register blueprints
     # ! Keep imports here to avoid circular import issues !
     from app import errors, main, auth, gris, photos
+
     app.register_blueprint(errors.bp)
     app.register_blueprint(main.bp)
     app.register_blueprint(auth.bp)
@@ -101,12 +104,14 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     # Set up mail processors building
     # ! Keep import here to avoid circular import issues !
     from app import email
+
     app.before_first_request(email.init_premailer)
     app.before_first_request(email.init_textifier)
 
     # Set up custom context creation
     # ! Keep import here to avoid circular import issues !
     from app import context
+
     app.before_request(context.create_request_context)
     app.jinja_env.globals["has_permission"] = context.has_permission
 
@@ -116,11 +121,11 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
         """Add a logging entry describing the response served."""
         if flask.request.endpoint != "static":
             endpoint = flask.request.endpoint or f"[CP:<{flask.request.url}>]"
-            if response.status_code < 400:          # Success
+            if response.status_code < 400:  # Success
                 msg = f"Served '{endpoint}'"
-                if response.status_code >= 300:     # Redirect
+                if response.status_code >= 300:  # Redirect
                     msg += " [redirecting]"
-            else:                                   # Error
+            else:  # Error
                 msg = f"Served error page ({flask.request}: {response.status})"
 
             remote_ip = flask.request.headers.get("X-Real-Ip", "<unknown IP>")
@@ -159,6 +164,7 @@ def _get_locale() -> str | None:
         db.session.commit()
 
     return locale
+
 
 # Set up user loader
 @login.user_loader

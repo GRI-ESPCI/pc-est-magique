@@ -15,9 +15,7 @@ from app.models import PCeen, Permission, Role, PermissionScope, PermissionType
 from app.tools import utils, typing
 
 
-def add_remove_role(action: str,
-                    pceen_id: str,
-                    role_id: str) -> tuple[str | dict, int]:
+def add_remove_role(action: str, pceen_id: str, role_id: str) -> tuple[str | dict, int]:
     """Process a role add/remove request, or return an error.
 
     Args:
@@ -53,9 +51,9 @@ def add_remove_role(action: str,
         return f"PCeen #{pceen_id} already has role #{role_id}", 409
     if action == "remove" and role not in pceen.roles:
         return f"PCeen #{pceen_id} does not has role #{role_id}", 409
-    if not context.has_permission(type=PermissionType.write,
-                                        scope=PermissionScope.role,
-                                        elem=role):
+    if not context.has_permission(
+        type=PermissionType.write, scope=PermissionScope.role, elem=role
+    ):
         return "Unauthorized (you nasty cheater)", 403
     # Proceed
     try:
@@ -104,16 +102,17 @@ def add_perm(
         If the permission was successfully added, an empty dict with a 204.
     """
     # Check request refer to existing objects
-    role : Role = Role.query.get(role_id)
+    role: Role = Role.query.get(role_id)
     if not role:
         return f"Invalid role '{role_id}'", 404
     # Check rights
-    if not context.has_permission(type=PermissionType.write,
-                                  scope=PermissionScope.role, elem=role):
+    if not context.has_permission(
+        type=PermissionType.write, scope=PermissionScope.role, elem=role
+    ):
         return "Unauthorized (you nasty cheater)", 403
     # Check request refer to existing objects
     if perm_id:
-        perm : Permission = Permission.query.get(perm_id)
+        perm: Permission = Permission.query.get(perm_id)
         if not perm:
             return f"Invalid perm '{perm_id}'", 404
     else:
@@ -172,15 +171,16 @@ def remove_perm(role_id: str, perm_id: str) -> tuple[str | dict, int]:
         If the permission was successfully removed, an empty dict with a 204.
     """
     # Check request refer to existing objects
-    role : Role = Role.query.get(role_id)
+    role: Role = Role.query.get(role_id)
     if not role:
         return f"Invalid role '{role_id}'", 404
-    perm : Permission = Permission.query.get(perm_id)
+    perm: Permission = Permission.query.get(perm_id)
     if not perm:
         return f"Invalid perm '{perm_id}'", 404
     # Check request is acceptable
-    if not context.has_permission(type=PermissionType.write,
-                                  scope=PermissionScope.role, elem=role):
+    if not context.has_permission(
+        type=PermissionType.write, scope=PermissionScope.role, elem=role
+    ):
         return "Unauthorized (you nasty cheater)", 403
     if role not in perm.roles:
         return f"This permission does not exist", 409
@@ -247,15 +247,19 @@ def pceens() -> typing.RouteReturn:
     if form.is_submitted():
         # Check request is well formed
         if form.validate():
-            return add_remove_role(form.action.data, form.pceen_id.data,
-                                   form.role_id.data)
+            return add_remove_role(
+                form.action.data, form.pceen_id.data, form.role_id.data
+            )
         else:
             return "Bad formed request", 400
 
-    return flask.render_template("gris/pceens.html", form=form,
-                                 pceens=PCeen.query.all(),
-                                 roles=Role.query.all(),
-                                 title=_("Gestion des PCéens"))
+    return flask.render_template(
+        "gris/pceens.html",
+        form=form,
+        pceens=PCeen.query.all(),
+        roles=Role.query.all(),
+        title=_("Gestion des PCéens"),
+    )
 
 
 @bp.route("/roles", methods=["GET", "POST"])
@@ -271,17 +275,24 @@ def roles() -> typing.RouteReturn:
             case "get_elements":
                 return get_elements(form.scope_name.data)
             case "add":
-                return add_perm(form.role_id.data, form.perm_id.data,
-                                form.type_name.data, form.scope_name.data,
-                                form.ref_id.data)
+                return add_perm(
+                    form.role_id.data,
+                    form.perm_id.data,
+                    form.type_name.data,
+                    form.scope_name.data,
+                    form.ref_id.data,
+                )
             case "remove":
                 return remove_perm(form.role_id.data, form.perm_id.data)
             case action:
                 return f"Invalid action '{action}'", 400
 
-    return flask.render_template("gris/roles.html", form=form,
-                                 roles=Role.query.all(),
-                                 title=_("Gestion des rôles"))
+    return flask.render_template(
+        "gris/roles.html",
+        form=form,
+        roles=Role.query.all(),
+        title=_("Gestion des rôles"),
+    )
 
 
 @bp.route("/run_script", methods=["GET", "POST"])
@@ -292,7 +303,7 @@ def run_script() -> typing.RouteReturn:
     if form.validate_on_submit():
         # Exécution du script
         _stdin = sys.stdin
-        sys.stdin = io.StringIO()   # Block script for wainting for stdin
+        sys.stdin = io.StringIO()  # Block script for wainting for stdin
         try:
             with contextlib.redirect_stdout(io.StringIO()) as stdout:
                 with contextlib.redirect_stderr(sys.stdout):
@@ -306,12 +317,13 @@ def run_script() -> typing.RouteReturn:
             sys.stdin = _stdin
 
         output_str = str(flask.escape(output))
-        output = flask.Markup(
-            output_str.replace("\n", "<br/>").replace(" ", "&nbsp;")
+        output = flask.Markup(output_str.replace("\n", "<br/>").replace(" ", "&nbsp;"))
+        return flask.render_template(
+            "gris/run_script.html",
+            form=form,
+            output=output,
+            title=_("Exécuter un script"),
         )
-        return flask.render_template("gris/run_script.html", form=form,
-                                     output=output,
-                                     title=_("Exécuter un script"))
-    return flask.render_template("gris/run_script.html", form=form,
-                                 output=None,
-                                 title=_("Exécuter un script"))
+    return flask.render_template(
+        "gris/run_script.html", form=form, output=None, title=_("Exécuter un script")
+    )

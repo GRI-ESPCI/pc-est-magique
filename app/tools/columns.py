@@ -13,38 +13,51 @@ Relationship = sqlalchemy.orm.RelationshipProperty
 _Q = typing.TypeVar("_Q")
 
 
-@typing.overload        # Primary column
-def column(sa_type: sqlalchemy.types.TypeEngine[_Q],
-           *,
-           primary_key: bool,
-    ) -> Column: # [_Q]:
+@typing.overload  # Primary column
+def column(
+    sa_type: sqlalchemy.types.TypeEngine[_Q],
+    *,
+    primary_key: bool,
+) -> Column:  # [_Q]:
     ...
-@typing.overload        # Non-nullable column
-def column(sa_type: sqlalchemy.types.TypeEngine[_Q],
-           *,
-           nullable: bool,
-           default: _Q | None = None,
-           unique: bool = False,
-    ) -> Column: # [_Q]:
+
+
+@typing.overload  # Non-nullable column
+def column(
+    sa_type: sqlalchemy.types.TypeEngine[_Q],
+    *,
+    nullable: bool,
+    default: _Q | None = None,
+    unique: bool = False,
+) -> Column:  # [_Q]:
     ...
-@typing.overload        # Nullable column
-def column(sa_type: sqlalchemy.types.TypeEngine[_Q],
-           *,
-           default: _Q | None = None,
-           unique: bool = False,
-    ) -> Column: # [_Q | None]:
+
+
+@typing.overload  # Nullable column
+def column(
+    sa_type: sqlalchemy.types.TypeEngine[_Q],
+    *,
+    default: _Q | None = None,
+    unique: bool = False,
+) -> Column:  # [_Q | None]:
     ...
-@typing.overload        # Non-nullable foreign column
-def column(sa_type: sqlalchemy.ForeignKey,
-           *,
-           nullable: bool,
-    ) -> Column: # [typing.Any]:
+
+
+@typing.overload  # Non-nullable foreign column
+def column(
+    sa_type: sqlalchemy.ForeignKey,
+    *,
+    nullable: bool,
+) -> Column:  # [typing.Any]:
     ...
-@typing.overload        # Nullable foreign column
-def column(sa_type: sqlalchemy.ForeignKey) -> Column: # [typing.Any]:
+
+
+@typing.overload  # Nullable foreign column
+def column(sa_type: sqlalchemy.ForeignKey) -> Column:  # [typing.Any]:
     ...
-def column(sa_type, *, primary_key=False, nullable=False, default=None,
-           unique=False):
+
+
+def column(sa_type, *, primary_key=False, nullable=False, default=None, unique=False):
     """Constructs a SQLAlchemy column.
 
     Args:
@@ -52,14 +65,17 @@ def column(sa_type, *, primary_key=False, nullable=False, default=None,
         primary_key, nullable, default, unique: Passed to
             :class:`sqlalchemy.Column`.
     """
-    column = Column(sa_type, primary_key=primary_key, nullable=nullable,
-                    default=default, unique=unique)
+    column = Column(
+        sa_type,
+        primary_key=primary_key,
+        nullable=nullable,
+        default=default,
+        unique=unique,
+    )
     if isinstance(sa_type, sqlalchemy.ForeignKey):
-        return typing.cast(Column # [object]
-                           , column)
+        return typing.cast(Column, column)  # [object]
     else:
-        return typing.cast(Column # [sa_type.python_type]
-                           , column)
+        return typing.cast(Column, column)  # [sa_type.python_type]
 
 
 def _relationship(table_dot_back_populates: str, **kwargs) -> Relationship:
@@ -69,13 +85,14 @@ def _relationship(table_dot_back_populates: str, **kwargs) -> Relationship:
                 table, back_populates=back_populates, **kwargs
             )
         case _:
-            raise RuntimeError(f"Value '{table_dot_back_populates}' must "
-                               "be of form 'Table.column'")
+            raise RuntimeError(
+                f"Value '{table_dot_back_populates}' must " "be of form 'Table.column'"
+            )
 
 
-def one_to_many(table_dot_back_populates: str,
-                **kwargs
-                ) -> "Relationship": #[list[typing.Any]]":
+def one_to_many(
+    table_dot_back_populates: str, **kwargs
+) -> "Relationship":  # [list[typing.Any]]":
     """Constructs a one-to-many relationship to an other table.
 
     Args:
@@ -83,12 +100,12 @@ def one_to_many(table_dot_back_populates: str,
             of form ``Table.column` (**many elements** of ``Table`` are
             linked to **one element** in this table).
     """
-    return  _relationship(table_dot_back_populates, **kwargs)
+    return _relationship(table_dot_back_populates, **kwargs)
 
 
-def many_to_one(table_dot_back_populates: str,
-                **kwargs
-                ) -> "Relationship": # [typing.Any]":
+def many_to_one(
+    table_dot_back_populates: str, **kwargs
+) -> "Relationship":  # [typing.Any]":
     """Constructs a many-to-one relationship to an other table.
 
     Args:
@@ -99,9 +116,9 @@ def many_to_one(table_dot_back_populates: str,
     return _relationship(table_dot_back_populates, **kwargs)
 
 
-def many_to_many(table_dot_back_populates: str, secondary: type,
-                 **kwargs
-                 ) -> "Relationship": # [typing.Any]":
+def many_to_many(
+    table_dot_back_populates: str, secondary: type, **kwargs
+) -> "Relationship":  # [typing.Any]":
     """Constructs a many-to-many relationship to an other table.
 
     Args:
@@ -110,11 +127,13 @@ def many_to_many(table_dot_back_populates: str, secondary: type,
             linked to **many elements** in this table).
         secondary: The associative table used to join tables.
     """
-    return _relationship(table_dot_back_populates,
-                         secondary=secondary.__table__, **kwargs)
+    return _relationship(
+        table_dot_back_populates, secondary=secondary.__table__, **kwargs
+    )
 
 
 _Enum = sqlalchemy.Enum
+
 
 def my_enum(enum: type[enum.Enum]) -> sqlalchemy.types.TypeEngine:
     """:class:`sqlalchemy.Enum` but better typed.

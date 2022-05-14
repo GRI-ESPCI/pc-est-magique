@@ -41,13 +41,12 @@ def create_request_context() -> typing.RouteReturn | None:
 
     # Get user
     current_user = typing.cast(
-        flask_login.AnonymousUserMixin | PCeen,
-        flask_login.current_user
+        flask_login.AnonymousUserMixin | PCeen, flask_login.current_user
     )
     g.logged_in = current_user.is_authenticated
     if g.logged_in:
         g.logged_in_user = typing.cast(PCeen, current_user)
-        g.pceen = g.logged_in_user       # May be overridden later if doas
+        g.pceen = g.logged_in_user  # May be overridden later if doas
         g.is_gri = g.pceen.is_gri
 
     # Check doas
@@ -62,17 +61,22 @@ def create_request_context() -> typing.RouteReturn | None:
             # Not authorized to do things as other pceens!
             new_args = flask.request.args.copy()
             del new_args["doas"]
-            return flask.redirect(flask.url_for(
-                flask.request.endpoint or "main.index", **new_args
-            ))
+            return flask.redirect(
+                flask.url_for(flask.request.endpoint or "main.index", **new_args)
+            )
 
     # Check maintenance
     if flask.current_app.config["MAINTENANCE"]:
         if g.is_gri:
-            flask.flash(_("Le site est en mode maintenance : seuls les GRI "
-                          "peuvent y accéder."), "warning")
+            flask.flash(
+                _(
+                    "Le site est en mode maintenance : seuls les GRI "
+                    "peuvent y accéder."
+                ),
+                "warning",
+            )
         else:
-            flask.abort(503)    # 503 Service Unavailable
+            flask.abort(503)  # 503 Service Unavailable
 
     # All set!
     return None
@@ -95,13 +99,15 @@ def logged_in_only(route: _Route) -> _Route:
     Returns:
         The protected route.
     """
+
     @functools.wraps(route)
     def new_route(*args: _RP.args, **kwargs: _RP.kwargs) -> typing.RouteReturn:
         if g.logged_in:
             return route(*args, **kwargs)
         else:
-            flask.flash(_("Veuillez vous authentifier pour accéder "
-                          "à cette page."), "warning")
+            flask.flash(
+                _("Veuillez vous authentifier pour accéder " "à cette page."), "warning"
+            )
             return utils.ensure_safe_redirect("auth.auth_needed")
 
     return new_route
@@ -118,24 +124,26 @@ def gris_only(route: _Route) -> _Route:
     Returns:
         The protected route.
     """
+
     @functools.wraps(route)
     def new_route(*args: _RP.args, **kwargs: _RP.kwargs) -> typing.RouteReturn:
         if g.is_gri:
             return route(*args, **kwargs)
         elif g.logged_in:
-            flask.abort(403)    # 403 Not Authorized
-            raise   # never reached, just to tell the type checker
+            flask.abort(403)  # 403 Not Authorized
+            raise  # never reached, just to tell the type checker
         else:
-            flask.flash(_("Veuillez vous authentifier pour accéder "
-                          "à cette page."), "warning")
+            flask.flash(
+                _("Veuillez vous authentifier pour accéder " "à cette page."), "warning"
+            )
             return utils.ensure_safe_redirect("auth.login")
 
     return new_route
 
 
-def has_permission(type: PermissionType,
-                   scope: PermissionScope,
-                   elem: Model | None = None) -> bool | None:
+def has_permission(
+    type: PermissionType, scope: PermissionScope, elem: Model | None = None
+) -> bool | None:
     """Check if the current user (if logged in) has a specific permission.
 
     Args:
@@ -152,9 +160,9 @@ def has_permission(type: PermissionType,
     return g.pceen.has_permission(type=type, scope=scope, elem=elem)
 
 
-def check_permission(type: PermissionType,
-                     scope: PermissionScope,
-                     elem: Model | None = None) -> None:
+def check_permission(
+    type: PermissionType, scope: PermissionScope, elem: Model | None = None
+) -> None:
     """Ensure that the current user (if logged in) has a specific permission.
 
     Aborts with a redirection to the login page if not logged in;
@@ -166,15 +174,18 @@ def check_permission(type: PermissionType,
     """
     permission = has_permission(type=type, scope=scope, elem=elem)
     if permission is None:
-        flask.flash(_("Veuillez vous authentifier pour accéder à cette page."),
-                    "warning")
+        flask.flash(
+            _("Veuillez vous authentifier pour accéder à cette page."), "warning"
+        )
         flask.abort(utils.ensure_safe_redirect("auth.login"))
     elif not permission:
-        flask.abort(403)    # 403 Not Authorized
+        flask.abort(403)  # 403 Not Authorized
 
 
-PSE = (tuple[PermissionType, PermissionScope]
-       | tuple[PermissionType, PermissionScope, Model | None])
+PSE = (
+    tuple[PermissionType, PermissionScope]
+    | tuple[PermissionType, PermissionScope, Model | None]
+)
 
 
 def check_any_permission(*pses: PSE) -> None:
@@ -192,9 +203,9 @@ def check_any_permission(*pses: PSE) -> None:
     if has_permission(*pse):
         return
     if other:
-        check_any_permission(*other)    # Other permissions: check
+        check_any_permission(*other)  # Other permissions: check
     else:
-        check_permission(*pse)      # Last permission, none granted: abort
+        check_permission(*pse)  # Last permission, none granted: abort
 
 
 def check_all_permissions(*pses: PSE) -> None:
@@ -213,10 +224,9 @@ def check_all_permissions(*pses: PSE) -> None:
     check_all_permissions(*other)
 
 
-def permission_only(type: PermissionType,
-                    scope: PermissionScope,
-                    elem: Model | None = None
-    ) -> typing.Callable[[_Route], _Route]:
+def permission_only(
+    type: PermissionType, scope: PermissionScope, elem: Model | None = None
+) -> typing.Callable[[_Route], _Route]:
     """Route function decorator to restrict route to a specific permission.
 
     Decorator version of :func:`.check_permission`.
@@ -227,11 +237,13 @@ def permission_only(type: PermissionType,
     Returns:
         The decorator to apply to protect the route.
     """
+
     def decorator(route: _Route) -> _Route:
         @functools.wraps(route)
-        def new_route(*args: _RP.args,
-                      **kwargs: _RP.kwargs) -> typing.RouteReturn:
+        def new_route(*args: _RP.args, **kwargs: _RP.kwargs) -> typing.RouteReturn:
             check_permission(type=type, scope=scope, elem=elem)
             return route(*args, **kwargs)
+
         return new_route
+
     return decorator

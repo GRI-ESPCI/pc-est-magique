@@ -47,13 +47,9 @@ class ImageData(exif.Image):
             if offset := self._get_from_attrs(*offset_attrs):
                 offset_z = offset.replace(":", "")
                 return datetime.datetime.strptime(
-                    f"{str_timestamp} {offset_z}",
-                    "%Y:%m:%d %H:%M:%S %z"
+                    f"{str_timestamp} {offset_z}", "%Y:%m:%d %H:%M:%S %z"
                 )
-            return datetime.datetime.strptime(
-                f"{str_timestamp}",
-                "%Y:%m:%d %H:%M:%S"
-            )
+            return datetime.datetime.strptime(f"{str_timestamp}", "%Y:%m:%d %H:%M:%S")
         return None
 
     @property
@@ -75,9 +71,9 @@ class ImageData(exif.Image):
     def _get_gps_coord(self, value_attr: str, ref_attr: str) -> float | None:
         match self._safe_get(value_attr), self._safe_get(ref_attr):
             case (deg, minutes, seconds), "N" | "E" | None:
-                return deg + minutes/60 + seconds/3600
+                return deg + minutes / 60 + seconds / 3600
             case (deg, minutes, seconds), "S" | "W":
-                return -(deg + minutes/60 + seconds/3600)
+                return -(deg + minutes / 60 + seconds / 3600)
             case _:
                 return None
 
@@ -100,6 +96,6 @@ def get_size_fallback(path: str) -> tuple(int, int) | tuple(None, None):
         The tuple ``(width, height)`` (``(None, None)`` if any error occurs).
     """
     try:
-       return PIL.Image.open(path).size
+        return PIL.Image.open(path).size
     except Exception:
         return (None, None)

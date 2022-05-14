@@ -33,23 +33,30 @@ def main() -> None:
     for i, photo in enumerate(photos):
         # Create thumbnail and gzipped versions
         try:
-            subprocess.run([
-                    "convert", photo.full_path,  # Take the picture,
-                    "-resize", "136x136^",       # Fill a 136x136 box,
-                    "-gravity", "center",        # Refer to image center,
-                    "-extent", "136x136",        # Then crop overflow,
-                    photo.thumb_full_path        # There is the thumbnail!
+            subprocess.run(
+                [
+                    "convert",
+                    photo.full_path,  # Take the picture,
+                    "-resize",
+                    "136x136^",  # Fill a 136x136 box,
+                    "-gravity",
+                    "center",  # Refer to image center,
+                    "-extent",
+                    "136x136",  # Then crop overflow,
+                    photo.thumb_full_path,  # There is the thumbnail!
                 ],
                 capture_output=True,
                 check=True,
             )
         except subprocess.CalledProcessError as exc:
-            print(f"WARNING: {photo.full_path} Unable to create thumbnail:",
-                  exc.cmd, exc.stderr.decode())
+            print(
+                f"WARNING: {photo.full_path} Unable to create thumbnail:",
+                exc.cmd,
+                exc.stderr.decode(),
+            )
             continue
         except Exception as exc:
-            print(f"WARNING: {photo.full_path} Unable to create thumbnail:",
-                  exc)
+            print(f"WARNING: {photo.full_path} Unable to create thumbnail:", exc)
             continue
         subprocess.run(["gzip", "-fk", photo.full_path])
         subprocess.run(["gzip", "-fk", photo.thumb_full_path])

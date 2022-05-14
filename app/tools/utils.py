@@ -23,13 +23,13 @@ def log_action(message: str, warning: bool = False) -> None:
     if not isinstance(current_app, PCEstMagiqueApp):
         raise RuntimeError("Current app is not an PCEstMagiqueApp!?!")
     current_app.actions_logger.log(
-        logging.WARNING if warning else logging.INFO,
-        message
+        logging.WARNING if warning else logging.INFO, message
     )
 
 
-def safe_redirect(endpoint: str,
-                  **params: str | bool | None) -> typing.RouteReturn | None:
+def safe_redirect(
+    endpoint: str, **params: str | bool | None
+) -> typing.RouteReturn | None:
     """Redirect to a specific page, except if we are already here.
 
     Avoids infinite redirection loops caused by redirecting to the
@@ -69,8 +69,9 @@ def safe_redirect(endpoint: str,
     return flask.redirect(flask.url_for(endpoint, **params))
 
 
-def ensure_safe_redirect(endpoint: str,
-                         **params: str | bool | None) -> typing.RouteReturn:
+def ensure_safe_redirect(
+    endpoint: str, **params: str | bool | None
+) -> typing.RouteReturn:
     """Like :func:`.safe_redirect`, but raises an exception if cannot redirect.
 
     Args:
@@ -110,7 +111,7 @@ def redirect_to_next(**params: str | bool | None) -> typing.RouteReturn:
 
     try:
         next_page = flask.url_for(next_endpoint, **params)
-    except werkzeug.routing.BuildError:     # type: ignore
+    except werkzeug.routing.BuildError:  # type: ignore
         next_page = None
 
     if not next_page or wku.url_parse(next_page).netloc != "":
@@ -141,15 +142,16 @@ def run_script(name: str) -> None:
     script.main()
 
 
-def print_progressbar(iteration: int,
-                      total: int,
-                      prefix: str = "",
-                      suffix: str = "",
-                      decimals: int = 1,
-                      length: int = 100,
-                      fill: str = "█",
-                      print_end: str = "\r"
-    ) -> None:
+def print_progressbar(
+    iteration: int,
+    total: int,
+    prefix: str = "",
+    suffix: str = "",
+    decimals: int = 1,
+    length: int = 100,
+    fill: str = "█",
+    print_end: str = "\r",
+) -> None:
     """Call in a loop to create a terminal progress bar.
 
     Args:
@@ -164,7 +166,7 @@ def print_progressbar(iteration: int,
     """
     percent = f"{{0:.{decimals}f}}".format(100 * (iteration / float(total)))
     filled_length = int(length * iteration // total)
-    bar = fill * filled_length + '-' * (length - filled_length)
+    bar = fill * filled_length + "-" * (length - filled_length)
     print(f"\r{prefix} |{bar}| {percent}% {suffix}", end=print_end)
     # Print new line on complete
     if iteration == total:

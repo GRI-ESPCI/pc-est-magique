@@ -18,28 +18,36 @@ from werkzeug import security as wzs
 from app import db
 from app.enums import PermissionType, PermissionScope
 from app.tools import typing
-from app.tools.columns import (column, one_to_many, many_to_one, many_to_many,
-                               my_enum, Column, Relationship)
+from app.tools.columns import (
+    column,
+    one_to_many,
+    many_to_one,
+    many_to_many,
+    my_enum,
+    Column,
+    Relationship,
+)
 
 
-Model = typing.cast(type[type], db.Model)   # type checking hack
-Enum = my_enum                              # type checking hack
+Model = typing.cast(type[type], db.Model)  # type checking hack
+Enum = my_enum  # type checking hack
 
 
 # Association tables
 
+
 class _PCeen_Role_AT(Model):
     __tablename__ = "_pceen_role_at"
-    _pceen_id: Column[int] = column(sa.ForeignKey("pceen.id"),
-                                    primary_key=True)
+    _pceen_id: Column[int] = column(sa.ForeignKey("pceen.id"), primary_key=True)
     _role_id: Column[int] = column(sa.ForeignKey("role.id"), primary_key=True)
 
 
 class _Role_Permission_AT(Model):
     __tablename__ = "_role_permission_at"
     _role_id: Column[int] = column(sa.ForeignKey("role.id"), primary_key=True)
-    _permission_id: Column[int] = column(sa.ForeignKey("permission.id"),
-                                         primary_key=True)
+    _permission_id: Column[int] = column(
+        sa.ForeignKey("permission.id"), primary_key=True
+    )
 
 
 class PCeen(flask_login.UserMixin, Model):
@@ -55,6 +63,7 @@ class PCeen(flask_login.UserMixin, Model):
         * get_id(): a method that returns a unique identifier for the
             pceen as a string.
     """
+
     __tablename__ = "pceen"
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
@@ -69,7 +78,9 @@ class PCeen(flask_login.UserMixin, Model):
 
     photos: Relationship[list[Photo]] = one_to_many("Photo.author")
     roles: Relationship[list[Role]] = many_to_many(
-        "Role.pceens", secondary=_PCeen_Role_AT, order_by="Role.index",
+        "Role.pceens",
+        secondary=_PCeen_Role_AT,
+        order_by="Role.index",
     )
 
     def __repr__(self) -> str:
@@ -90,8 +101,9 @@ class PCeen(flask_login.UserMixin, Model):
         """The set of all permissions this PCeen has."""
         return set().union(*(role.permissions for role in self.roles))
 
-    def has_permission(self, type: PermissionType, scope: PermissionScope,
-                       elem: Model = None) -> bool:
+    def has_permission(
+        self, type: PermissionType, scope: PermissionScope, elem: Model = None
+    ) -> bool:
         """Check whether this PCeen has a given permission.
 
         Args:
@@ -159,7 +171,7 @@ class PCeen(flask_login.UserMixin, Model):
         return jwt.encode(
             {"reset_password": self.id, "exp": time.time() + expires_in},
             flask.current_app.config["SECRET_KEY"],
-            algorithm="HS256"
+            algorithm="HS256",
         )
 
     @classmethod
@@ -177,9 +189,7 @@ class PCeen(flask_login.UserMixin, Model):
         """
         try:
             id = jwt.decode(
-                token,
-                flask.current_app.config["SECRET_KEY"],
-                algorithms=["HS256"]
+                token, flask.current_app.config["SECRET_KEY"], algorithms=["HS256"]
             )["reset_password"]
         except Exception:
             return
@@ -188,23 +198,21 @@ class PCeen(flask_login.UserMixin, Model):
 
 class Photo(Model):
     """A photo."""
+
     id: Column[int] = column(sa.Integer(), primary_key=True)
     _album_id: Column[int] = column(sa.ForeignKey("album.id"), nullable=False)
     album: Relationship[Album] = many_to_one("Album.photos")
     file_name: Column[str] = column(sa.String(120), nullable=False)
     width: Column[int] = column(sa.Integer(), nullable=False)
     height: Column[int] = column(sa.Integer(), nullable=False)
-    _author_id: Column[int | None] = column(sa.ForeignKey("pceen.id"),
-                                            nullable=True)
+    _author_id: Column[int | None] = column(sa.ForeignKey("pceen.id"), nullable=True)
     author: Relationship[PCeen | None] = many_to_one("PCeen.photos")
     author_str: Column[str | None] = column(sa.String(64), nullable=True)
-    timestamp: Column[datetime.datetime | None] = column(sa.DateTime(),
-                                                         nullable=True)
+    timestamp: Column[datetime.datetime | None] = column(sa.DateTime(), nullable=True)
     lat: Column[float | None] = column(sa.Float(), nullable=True)
     lng: Column[float | None] = column(sa.Float(), nullable=True)
     caption: Column[str | None] = column(sa.String(280), nullable=True)
-    featured: Column[bool] = column(sa.Boolean(), nullable=False,
-                                    default=False)
+    featured: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -244,8 +252,10 @@ class Photo(Model):
     @property
     def src_with_token(self) -> str:
         """The online query to the photo's with md5 args."""
-        ip = (flask.request.headers.get("X-Real-Ip")
-              or flask.current_app.config["FORCE_IP"])
+        ip = (
+            flask.request.headers.get("X-Real-Ip")
+            or flask.current_app.config["FORCE_IP"]
+        )
         token_args = self.album.get_access_token(ip)
         return f"{self.src}?{token_args}"
 
@@ -257,30 +267,33 @@ class Photo(Model):
     @property
     def thumb_src_with_token(self) -> str:
         """The online query to the photo's thumbnail with md5 args."""
-        ip = (flask.request.headers.get("X-Real-Ip")
-              or flask.current_app.config["FORCE_IP"])
+        ip = (
+            flask.request.headers.get("X-Real-Ip")
+            or flask.current_app.config["FORCE_IP"]
+        )
         token_args = self.album.get_access_token(ip)
         return f"{self.thumb_src}?{token_args}"
 
 
 class Album(Model):
     """A album of photos."""
+
     id: Column[int] = column(sa.Integer(), primary_key=True)
     visible: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
-    _collection_id: Column[int] = column(sa.ForeignKey("collection.id"),
-                                         nullable=False)
+    _collection_id: Column[int] = column(sa.ForeignKey("collection.id"), nullable=False)
     collection: Relationship[Collection] = many_to_one("Collection.albums")
     dir_name: Column[str] = column(sa.String(120), nullable=False)
     name: Column[str] = column(sa.String(120), nullable=False)
     description: Column[str] = column(sa.String(280), nullable=True)
     start: Column[datetime.date] = column(sa.Date(), nullable=True)
     end: Column[datetime.date] = column(sa.Date(), nullable=True)
-    featured: Column[bool] = column(sa.Boolean(), nullable=False,
-                                    default=False)
+    featured: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
     nb_photos: Column[int] = column(sa.Integer, nullable=False, default=0)
 
     photos: Relationship[list[Photo]] = one_to_many(
-        "Photo.album", cascade="all, delete-orphan", lazy="dynamic",
+        "Photo.album",
+        cascade="all, delete-orphan",
+        lazy="dynamic",
     )
 
     def __repr__(self) -> str:
@@ -314,11 +327,9 @@ class Album(Model):
     @property
     def featured_photo(self) -> Photo | None:
         """The (first) photo of this album marked as featured, if any."""
-        return (self.photos.filter_by(featured=True).first()
-                or self.photos.first())
+        return self.photos.filter_by(featured=True).first() or self.photos.first()
 
-    def get_access_token(self, ip: str,
-                         expires: datetime.datetime = None) -> str:
+    def get_access_token(self, ip: str, expires: datetime.datetime = None) -> str:
         """Forges the md5 token allowing access to the photos of this album.
 
         Args:
@@ -344,6 +355,7 @@ class Album(Model):
 
 class Collection(Model):
     """A collection of albums."""
+
     id: Column[int] = column(sa.Integer(), primary_key=True)
     visible: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
     dir_name: Column[str] = column(sa.String(120), unique=True, nullable=False)
@@ -353,7 +365,9 @@ class Collection(Model):
     end: Column[datetime.date] = column(sa.Date(), nullable=True)
 
     albums: Relationship[list[Album]] = one_to_many(
-        "Album.collection", cascade="all, delete-orphan", lazy="dynamic",
+        "Album.collection",
+        cascade="all, delete-orphan",
+        lazy="dynamic",
     )
 
     def __repr__(self) -> str:
@@ -372,8 +386,7 @@ class Collection(Model):
     @property
     def full_path(self) -> str:
         """The full path of the collection on disk."""
-        return os.path.join(flask.current_app.config["PHOTOS_BASE_PATH"],
-                            self.dir_name)
+        return os.path.join(flask.current_app.config["PHOTOS_BASE_PATH"], self.dir_name)
 
     @property
     def src(self) -> str:
@@ -383,13 +396,12 @@ class Collection(Model):
     @property
     def featured_album(self) -> Photo | None:
         """The (first) album of this collection marked as featured, if any."""
-        return (self.albums.filter_by(featured=True).first()
-                or self.albums.first())
+        return self.albums.filter_by(featured=True).first() or self.albums.first()
 
     @property
     def featured_photo(self) -> Photo | None:
         """The featured photo of the collection's featured album, if any."""
-        if (album := self.featured_album):
+        if album := self.featured_album:
             return album.featured_photo
         else:
             return None
@@ -402,12 +414,14 @@ class Collection(Model):
     @property
     def nb_photos(self) -> int:
         """The total number of photos in the collection."""
-        return sum(album.nb_photos
-                   for album in self.albums.filter_by(visible=True).all())
+        return sum(
+            album.nb_photos for album in self.albums.filter_by(visible=True).all()
+        )
 
 
 class Role(Model):
     """A role a PCeen can have."""
+
     id: Column[int] = column(sa.Integer(), primary_key=True)
     name: Column[str] = column(sa.String(64), nullable=False)
     index: Column[int] = column(sa.Integer(), nullable=False, default=1000)
@@ -443,16 +457,15 @@ class Role(Model):
         except ValueError:
             return False
         hsp_2 = (0.299 * red**2) + (0.587 * green**2) + (0.114 * blue**2)
-        return (hsp_2 < 19500)
+        return hsp_2 < 19500
 
 
 class Permission(Model):
     """A permission a role can have."""
+
     id: Column[int] = column(sa.Integer(), primary_key=True)
-    type: Column[PermissionType] = column(my_enum(PermissionType),
-                                          nullable=False)
-    scope: Column[PermissionScope] = column(my_enum(PermissionScope),
-                                            nullable=False)
+    type: Column[PermissionType] = column(my_enum(PermissionType), nullable=False)
+    scope: Column[PermissionScope] = column(my_enum(PermissionScope), nullable=False)
     ref_id: Column[int] = column(sa.Integer(), nullable=True)
 
     roles: Relationship[list[Role]] = many_to_many(
@@ -465,8 +478,9 @@ class Permission(Model):
             ref = self.ref or "<all>"
         except ValueError:
             ref = f"[#{self.ref_id}]"
-        return (f"<Permission #{self.id} ({self.type.name} / "
-                f"{self.scope.name}:{ref})>")
+        return (
+            f"<Permission #{self.id} ({self.type.name} / " f"{self.scope.name}:{ref})>"
+        )
 
     @property
     def ref(self) -> Model | None:
@@ -497,12 +511,13 @@ class Permission(Model):
         if self.ref_id is None:
             return f"{self.type.name} / every {self.scope.name}"
         try:
-            return f"{self.type.name} / {self.scope.name} \"{self.ref}\""
+            return f'{self.type.name} / {self.scope.name} "{self.ref}"'
         except ValueError:
             return f"{self.type.name} / [OLD {self.scope.name} #{self.ref_id}]"
 
-    def grants_for(self, type: PermissionType, scope: PermissionScope,
-                   elem: Model = None) -> bool:
+    def grants_for(
+        self, type: PermissionType, scope: PermissionScope, elem: Model = None
+    ) -> bool:
         """Check whether this permission grants given type and scope.
 
         Args:
@@ -521,7 +536,9 @@ class Permission(Model):
         )
 
     @classmethod
-    def get_or_create(cls, type_: PermissionType, scope: PermissionScope, ref_id: int | None = None) -> Permission:
+    def get_or_create(
+        cls, type_: PermissionType, scope: PermissionScope, ref_id: int | None = None
+    ) -> Permission:
         perm = cls.query.filter_by(scope=scope, type=type_, ref_id=ref_id).first()
         if not perm:
             perm = cls(scope=scope, type=type_, ref_id=ref_id)

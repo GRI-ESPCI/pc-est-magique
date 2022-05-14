@@ -34,13 +34,16 @@ def scripts_list() -> list[tuple[str, str]]:
 
 class ChoseScriptForm(FlaskForm):
     """WTForm used to chose a script to execute."""
-    script = wtforms.SelectField(_l("Script"), choices=scripts_list(),
-                                 validators=[DataRequired()])
+
+    script = wtforms.SelectField(
+        _l("Script"), choices=scripts_list(), validators=[DataRequired()]
+    )
     submit = wtforms.SubmitField(_l("Exécuter"))
 
 
 class AddRemoveRoleForm(FlaskForm):
     """WTForm used to chose a script to execute."""
+
     action = wtforms.HiddenField("", validators=[DataRequired()])
     pceen_id = wtforms.HiddenField("", validators=[DataRequired()])
     role_id = wtforms.HiddenField("", validators=[DataRequired()])
@@ -48,6 +51,7 @@ class AddRemoveRoleForm(FlaskForm):
 
 class AddRemovePermissionForm(FlaskForm):
     """WTForm used to chose a script to execute."""
+
     action = wtforms.HiddenField("", validators=[DataRequired()])
     role_id = wtforms.HiddenField("", validators=[Optional()])
     perm_id = wtforms.HiddenField("", validators=[Optional()])

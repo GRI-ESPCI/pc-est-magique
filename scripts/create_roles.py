@@ -33,7 +33,6 @@ def main() -> None:
         Permission(type=PermissionType.all, scope=PermissionScope.collection),
     ]
     db.session.add_all(permissions)
-    admin = Role(name="Admin", index=0, color="ff0000",
-                 permissions=permissions)
+    admin = Role(name="Admin", index=0, color="ff0000", permissions=permissions)
     db.session.add(admin)
     db.session.commit()

@@ -27,8 +27,9 @@ def get_or_die(name: str) -> str:
     return var
 
 
-class Config():
+class Config:
     """PC est magique Flask Web App Configuration."""
+
     SECRET_KEY = os.environ.get("SECRET_KEY")
 
     LANGUAGES = ["fr", "en"]
