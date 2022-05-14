@@ -2,7 +2,7 @@
 
 import flask
 
-bp = flask.Blueprint("errors", __name__)
+bp = flask.Blueprint("errors", __name__, template_folder="templates")
 
 # ! Keep at the bottom to avoid circular import issues !
 from app.errors import handlers
