@@ -6,7 +6,7 @@ from flask_babel import _
 
 from app import context, db
 from app.photos import bp, forms
-from app.models import Collection, PermissionScope, PermissionType
+from app.models import Collection, PermissionScope, PermissionType, Photo
 from app.tools import typing
 
 
@@ -141,10 +141,11 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
                           "l'album !"), "success")
             db.session.commit()
 
+    photos = album.photos.order_by(Photo.timestamp).all()
     token_args = album.get_access_token(ip)
     return flask.render_template("photos/album.html", album=album,
-                                 token_args=token_args, album_form=album_form,
-                                 photo_form=photo_form,
+                                 photos=photos, token_args=token_args,
+                                 album_form=album_form, photo_form=photo_form,
                                  title=f"{album.name} – {collection.name}")
 
 

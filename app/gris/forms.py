@@ -6,7 +6,7 @@ import wtforms
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
 
-from app.tools.validators import DataRequired
+from app.tools.validators import DataRequired, Optional
 
 
 def scripts_list() -> list[tuple[str, str]]:
@@ -39,8 +39,18 @@ class ChoseScriptForm(FlaskForm):
     submit = wtforms.SubmitField(_l("Exécuter"))
 
 
-class SecurityForm(FlaskForm):
+class AddRemoveRoleForm(FlaskForm):
     """WTForm used to chose a script to execute."""
     action = wtforms.HiddenField("", validators=[DataRequired()])
     pceen_id = wtforms.HiddenField("", validators=[DataRequired()])
     role_id = wtforms.HiddenField("", validators=[DataRequired()])
+
+
+class AddRemovePermissionForm(FlaskForm):
+    """WTForm used to chose a script to execute."""
+    action = wtforms.HiddenField("", validators=[DataRequired()])
+    role_id = wtforms.HiddenField("", validators=[Optional()])
+    perm_id = wtforms.HiddenField("", validators=[Optional()])
+    scope_name = wtforms.HiddenField("", validators=[Optional()])
+    type_name = wtforms.HiddenField("", validators=[Optional()])
+    ref_id = wtforms.HiddenField("", validators=[Optional()])

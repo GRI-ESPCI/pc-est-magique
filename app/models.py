@@ -1,15 +1,16 @@
 """PC est magique Flask App - Database Models"""
 
 from __future__ import annotations
+
 import base64
 import datetime
 import hashlib
-
 import os
 import time
 
 import jwt
 import flask
+import flask_babel
 import flask_login
 import sqlalchemy as sa
 from werkzeug import security as wzs
@@ -77,7 +78,7 @@ class PCeen(flask_login.UserMixin, Model):
 
     def __str__(self) -> str:
         """Human-readible description of the PCeen."""
-        return f"pcéen \"{self.full_name}\""
+        return f"{self.full_name} {self.promo or '(no promo)'}"
 
     @property
     def full_name(self) -> str:
@@ -220,7 +221,7 @@ class Photo(Model):
         elif self.author_str:
             parts.append(self.author_str)
         if self.timestamp:
-            parts.append(self.timestamp.strftime("%x %X"))
+            parts.append(flask_babel.format_datetime(self.timestamp, "long"))
         if self.lat and self.lng:
             parts.append(f"@{self.lat}/{self.lng}")
         return ", ".join(parts)
@@ -239,6 +240,14 @@ class Photo(Model):
     def src(self) -> str:
         """The online path to the photo."""
         return f"{self.album.src}/{self.file_name}"
+
+    @property
+    def src_with_token(self) -> str:
+        """The online query to the photo's with md5 args."""
+        ip = (flask.request.headers.get("X-Real-Ip")
+              or flask.current_app.config["FORCE_IP"])
+        token_args = self.album.get_access_token(ip)
+        return f"{self.src}?{token_args}"
 
     @property
     def thumb_src(self) -> str:
@@ -280,7 +289,7 @@ class Album(Model):
 
     def __str__(self) -> str:
         """Human-readible description of the album."""
-        return f"album \"{self.name}\""
+        return f"{self.collection.name} / {self.name}"
 
     @property
     def view_permission_type(self) -> PermissionScope:
@@ -353,7 +362,7 @@ class Collection(Model):
 
     def __str__(self) -> str:
         """Human-readible description of the collection."""
-        return f"collection \"{self.name}\""
+        return self.name
 
     @property
     def view_permission_type(self) -> PermissionScope:
@@ -417,7 +426,7 @@ class Role(Model):
 
     def __str__(self) -> str:
         """Human-readible description of the role."""
-        return f"role \"{self.name}\""
+        return self.name
 
     @property
     def is_dark_colored(self) -> bool:
@@ -488,7 +497,7 @@ class Permission(Model):
         if self.ref_id is None:
             return f"{self.type.name} / every {self.scope.name}"
         try:
-            return f"{self.type.name} / {self.ref}"
+            return f"{self.type.name} / {self.scope.name} \"{self.ref}\""
         except ValueError:
             return f"{self.type.name} / [OLD {self.scope.name} #{self.ref_id}]"
 
@@ -510,3 +519,12 @@ class Permission(Model):
             and ((self.type == type) or (self.type == PermissionType.all))
             and ((self.ref_id is None) or (self.ref == elem))
         )
+
+    @classmethod
+    def get_or_create(cls, type_: PermissionType, scope: PermissionScope, ref_id: int | None = None) -> Permission:
+        perm = cls.query.filter_by(scope=scope, type=type_, ref_id=ref_id).first()
+        if not perm:
+            perm = cls(scope=scope, type=type_, ref_id=ref_id)
+            db.session.add(perm)
+            db.session.commit
+        return perm

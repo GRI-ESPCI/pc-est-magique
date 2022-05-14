@@ -64,6 +64,17 @@
                     </span>
                 </span>
             </th>
+            <th scope="col">
+                <span class="d-flex user-select-none" onclick="sort('users');">
+                    <span>{{ _("Nombre de PCéens") }}</span>
+                    <span class="mx-auto">
+                        <svg class="bi flex-shrink-0" width="16" height="16"
+                             id="sort-svg-perms">
+                            <!-- Sort button inserted through JS -->
+                        </svg>
+                    </span>
+                </span>
+            </th>
         </tr></thead>
         <tbody id="sort-table">
         {% for role in roles %}
@@ -72,6 +83,7 @@
             data-name="{{ role.name }}"
             data-index="{{ role.index }}"
             data-perms="{{ len(role.permissions) }}"
+            data-users="{{ len(role.pceens) }}"
         >
             <td>{{ role.id }}</td>
             <td>
@@ -84,39 +96,36 @@
             </td>
             <td>{{ role.index }}</td>
             <td>
-                {% for permission in role.permissions %}
+                {% for perm in role.permissions %}
                 <span class="badge border border-2 border-info d-inline-flex
-                             align-items-center px-2 text-dark mx-1">
-                    <span>{{ permission }}</span>
-                    <!-- <span>
+                             align-items-center px-2 text-dark mx-1 mb-1">
+                    <span>{{ perm }}</span>
+                    <span>
                         <svg class="bi flex-shrink-0 ms-2" width="15"
-                             height="15" onclick="remove_role(this, {{ role.id
-                                }}, {{ role.id }});" style="cursor: pointer;">
+                             height="15" onclick="remove_perm(this, {{ role.id
+                                }}, {{ perm.id }});" style="cursor: pointer;">
                             {{ macros.bootstrap_icon("x-circle") }}
                         </svg>
-                    </span> -->
+                    </span>
                 </span>
                 {% endfor %}
-                <!--
+
                 <span class="add-role badge rounded-pill d-inline-flex
                              align-items-center px-0 text-dark">
                     <span>&nbsp;</span>
                     <span>
                         <svg class="bi flex-shrink-0" width="15" height="15"
-                             style="cursor: pointer;" data-bs-toggle="dropdown"
-                             id="new_perm_{{ role.id }}">
+                             style="cursor: pointer;" data-bs-toggle="modal"
+                             data-bs-target="#addPermissionModal"
+                             data-role-id="{{ role.id }}"
+                             data-role-name="{{ role.name }}">
                             {{ macros.bootstrap_icon("plus-circle") }}
                         </svg>
-                        <div class="dropdown-menu container w-auto px-4"
-                             aria-labelledby="new_perm_{{ role.id }}">
-                            <div class="row row-cols">
-                                boup
-                            </div>
-                        </div>
                     </span>
                 </span>
-                -->
+
             </td>
+            <td>{{ len(role.pceens) }}</td>
         </tr>
         {% endfor %}
     </tbody></table>
@@ -136,10 +145,10 @@
     <div id="icon-delete">
         {{ macros.bootstrap_icon("x-circle") }}
     </div>
-    <div id="new-role-template">
+    <div id="new-perm-template">
         <span class="badge rounded-pill border border-2 d-inline-flex
-                     align-items-center px-2 mx-1">
-            <span class="role_name"></span>
+                     align-items-center px-2 text-dark mx-1">
+            <span class="perm_name"></span>
             <span>
                 <svg class="bi flex-shrink-0 ms-2" width="15" height="15"
                      style="cursor: pointer;">
@@ -148,6 +157,54 @@
             </span>
         </span>
     </div>
+</div>
+
+<!-- Add permission modal -->
+<div class="modal fade" id="addPermissionModal" tabindex="-1" aria-labelledby="aPMLabel" aria-hidden="true">
+<div class="modal-dialog">
+<div class="modal-content">
+    <form id="add-perm-form">
+        <div class="modal-header">
+            <h5 class="modal-title" id="aPMLabel">{{ _("Nouvelle permission") }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+                {{ _("Rôle :") }} <strong class="pem-role-name"></strong>
+                <input type="hidden" class="pem-role-id" name="role_id">
+            </div>
+            <div class="mb-3">
+                {{ _("Type :") }}
+                {% for type_ in PermissionType %}
+                    <input type="radio" class="btn-check" name="type_name" value="{{ type_.name }}" id="type-{{ type_.name }}" autocomplete="off" required>
+                    <label class="btn btn-outline-success mb-1" for="type-{{ type_.name }}">{{ type_.name }}</label>
+                {% endfor %}
+            </div>
+            <div class="mb-3">
+                {{ _("Scope :") }}
+                {% for scope in PermissionScope %}
+                    <input type="radio" class="btn-check" name="scope_name" value="{{ scope.name }}" id="scope-{{ scope.name }}" autocomplete="off" onchange="get_elements(this, '{{ scope.name }}')" required>
+                    <label class="btn btn-outline-success mb-1" for="scope-{{ scope.name }}">{{ scope.name }}</label>
+                {% endfor %}
+            </div>
+            <div class="mb-3 container m-0">
+                <div class="row">
+                    <div class="col-auto px-0 my-auto">
+                        {{ _("Élément :") }}
+                    </div>
+                    <div class="col" id="new_perm-elements">
+                        <select class="form-select" name="ref_id" disabled></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Fermer") }}</button>
+            <button type="submit" class="btn btn-primary">{{ _("Ajouter") }}</button>
+        </div>
+    </form>
+</div>
+</div>
 </div>
 
 {% endblock %}

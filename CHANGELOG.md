@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+# v0.2.1 (2022-05-14)
+
+### Added
+
+  * Permissions add/removal in GRI menu.
+
+### Changed
+
+  * Photos are now sorted by timestamp;
+  * Collections/albums cover photo are now in high resolution;
+  * Localized photos timestamp format.
+
+
 # v0.2.0 (2022-03-09)
 
 ### Added
@@ -18,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         :func:`.context.check_any_permission`,
         :func:`.context.check_all_permissions` and decorator
         :func:`.context.permission_only`;
-  * GRI menu (form IntraRez) with PCeens and roles management pages.
+  * GRI menu (from IntraRez) with PCeens and roles management pages.
 
 ### Changed
 

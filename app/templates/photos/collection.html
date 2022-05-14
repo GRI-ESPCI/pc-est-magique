@@ -140,7 +140,7 @@
         <div class="card{{ "" if album.visible else " text-muted" }}"
              style="width: 15rem;">
             <a href="{{ url }}">
-                <img src="{{ album.featured_photo.thumb_src_with_token }}"
+                <img src="{{ album.featured_photo.src_with_token }}"
                      class="card-img-top{{ "" if album.visible
                            else " opacity-75" }}" alt="[NO PHOTOS]">
             </a>

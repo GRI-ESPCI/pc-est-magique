@@ -176,7 +176,7 @@
 </form>
 
 <div class="row row-cols g-2 justify-content-center" id="lightgallery">
-    {% for photo in album.photos.all() %}
+    {% for photo in photos %}
     <div class="col col-auto">
         <a href="{{ photo.src }}?{{ token_args }}"
            data-lg-size="{{ min(photo.height, photo.width) }}-{{ photo.height }}"
