@@ -10,7 +10,7 @@ from flask_babel import _
 from discord_webhook import DiscordWebhook
 
 from app import context
-from app.main import bp, forms
+from app.routes.main import bp, forms
 from app.tools import captcha, utils, typing
 
 

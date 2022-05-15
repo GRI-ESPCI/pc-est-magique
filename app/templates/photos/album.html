@@ -16,12 +16,12 @@
 {% block scripts %}
 {{ super() }}
 {% for filename in [
-    "js/photos-edit-form.js",
+    "js/photos/edit-form.js",
     "bower_components/lightgallery/dist/lightgallery.umd.js",
     "bower_components/lightgallery/dist/plugins/zoom/lg-zoom.umd.js",
     "bower_components/lightgallery/dist/plugins/thumbnail/lg-thumbnail.umd.js",
     "bower_components/lightgallery/dist/plugins/fullscreen/lg-fullscreen.umd.js",
-    "js/photos-album.js",
+    "js/photos/album.js",
     "js/popovers.js",
 ] %}
 <script src="{{ url_for("static", filename=filename) }}" defer></script>

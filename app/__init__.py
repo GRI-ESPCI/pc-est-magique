@@ -89,7 +89,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
 
     # Register blueprints
     # ! Keep imports here to avoid circular import issues !
-    from app import errors, main, auth, gris, photos
+    from app.routes import errors, main, auth, gris, photos
 
     app.register_blueprint(errors.bp)
     app.register_blueprint(main.bp)

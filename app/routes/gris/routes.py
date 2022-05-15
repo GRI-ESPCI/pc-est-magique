@@ -10,7 +10,7 @@ from flask_babel import _
 
 from app import context, db
 from app import models
-from app.gris import bp, forms
+from app.routes.gris import bp, forms
 from app.models import PCeen, Permission, Role, PermissionScope, PermissionType
 from app.tools import utils, typing
 

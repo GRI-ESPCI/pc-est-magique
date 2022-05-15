@@ -5,7 +5,7 @@ import flask
 from flask_babel import _
 
 from app import context, db
-from app.photos import bp, forms
+from app.routes.photos import bp, forms
 from app.models import Collection, PermissionScope, PermissionType, Photo
 from app.tools import typing
 

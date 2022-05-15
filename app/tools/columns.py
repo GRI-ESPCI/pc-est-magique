@@ -117,7 +117,7 @@ def many_to_one(
 
 
 def many_to_many(
-    table_dot_back_populates: str, secondary: type, **kwargs
+    table_dot_back_populates: str, secondary: type | str, **kwargs
 ) -> "Relationship":  # [typing.Any]":
     """Constructs a many-to-many relationship to an other table.
 
@@ -128,7 +128,9 @@ def many_to_many(
         secondary: The associative table used to join tables.
     """
     return _relationship(
-        table_dot_back_populates, secondary=secondary.__table__, **kwargs
+        table_dot_back_populates,
+        secondary=secondary if isinstance(secondary, str) else secondary.__table__,
+        **kwargs,
     )
 
 

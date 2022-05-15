@@ -2,7 +2,7 @@
     Source from Flask-Moment.include_moment function, copied here to
     allow deferred loading of moment.js
 */
-moment.locale("en");
+moment.locale("fr");
 function flask_moment_render(elem) {
     const timestamp = moment(elem.dataset.timestamp);
     const func = elem.dataset.function;

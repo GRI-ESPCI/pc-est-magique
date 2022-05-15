@@ -2,7 +2,7 @@
 
 import flask
 
-bp = flask.Blueprint("photos", __name__, template_folder="templates")
+bp = flask.Blueprint("photos", __name__)
 
 # ! Keep at the bottom to avoid circular import issues !
-from app.photos import routes
+from app.routes.photos import routes

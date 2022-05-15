@@ -2,7 +2,7 @@
 
 import flask
 
-bp = flask.Blueprint("auth", __name__, template_folder="templates")
+bp = flask.Blueprint("auth", __name__)
 
 # ! Keep at the bottom to avoid circular import issues !
-from app.auth import routes
+from app.routes.auth import routes
