@@ -3,6 +3,7 @@
 import base64
 import datetime
 import hashlib
+import logging
 import os
 
 import flask
@@ -94,7 +95,7 @@ def test_mail(blueprint: str, template: str) -> typing.RouteReturn:
         return body
 
 
-def check_md5(album_src: str) -> bool:
+def _check_md5(album_src: str) -> bool:
     """Check md5 token (fallback if no Nginx, should NOT bu used!)"""
     token = flask.request.args.get("md5")
     expires = flask.request.args.get("expires")
@@ -114,7 +115,8 @@ def check_md5(album_src: str) -> bool:
 @bp.route("/photo/<collection_dir>/<album_dir>/_thumbs/<photo_file>")
 def photo(collection_dir: str, album_dir: str, photo_file: str) -> typing.RouteReturn:
     """Serve photo (fallback if no Nginx, should NOT bu used!)"""
-    if not check_md5(f"/photo/{collection_dir}/{album_dir}"):
+    logging.warning("Photo served by Flask and not nginx!")
+    if not _check_md5(f"/photo/{collection_dir}/{album_dir}"):
         # Bad token: redirect to photos.photo to build new token (if
         # authorized) then redirect back here
         return flask.redirect(flask.request.url.replace("/photo/", "/photos/"))

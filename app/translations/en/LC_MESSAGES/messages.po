@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2022-05-15 20:14+0200\n"
+"POT-Creation-Date: 2022-05-15 22:25+0200\n"
 "PO-Revision-Date: 2022-03-19 19:42+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
@@ -27,7 +27,7 @@ msgstr "The site is under maintenance: only GRI can access it."
 msgid "Veuillez vous authentifier pour accéder à cette page."
 msgstr "Please log in to access to this page."
 
-#: app/routes/auth/email.py:17 app/routes/auth/routes.py:68
+#: app/routes/auth/email.py:17 app/routes/auth/routes.py:44
 msgid "Compte créé avec succès !"
 msgstr "Account successfully created!"
 
@@ -47,7 +47,7 @@ msgstr "Password"
 msgid "Rester connecté"
 msgstr "Remember me"
 
-#: app/routes/auth/forms.py:26 app/routes/auth/routes.py:101
+#: app/routes/auth/forms.py:26 app/routes/auth/routes.py:77
 #: app/templates/auth/auth_needed.html:17 app/templates/auth/register.html:41
 #: app/templates/auth/reset_password.html:29
 #: app/templates/auth/reset_password_request.html:26 app/templates/base.html:99
@@ -84,7 +84,7 @@ msgstr "Sign up"
 msgid "Envoyer le mail de réinitialisation"
 msgstr "Send reset mail"
 
-#: app/routes/auth/forms.py:60 app/routes/auth/routes.py:165
+#: app/routes/auth/forms.py:60 app/routes/auth/routes.py:141
 msgid "Nouveau mot de passe"
 msgstr "New password"
 
@@ -96,31 +96,31 @@ msgstr "New password (validation)"
 msgid "Valider"
 msgstr "Validate"
 
-#: app/routes/auth/routes.py:42
+#: app/routes/auth/routes.py:18
 msgid "Connexion nécessaire"
 msgstr "Connection needed"
 
-#: app/routes/auth/routes.py:74
+#: app/routes/auth/routes.py:50
 msgid "Nouveau compte"
 msgstr "New account"
 
-#: app/routes/auth/routes.py:92
+#: app/routes/auth/routes.py:68
 msgid "Nom d'utilisateur inconnu"
 msgstr "Unknown username"
 
-#: app/routes/auth/routes.py:94
+#: app/routes/auth/routes.py:70
 msgid "Mot de passe incorrect"
 msgstr "Wrong password"
 
-#: app/routes/auth/routes.py:98
+#: app/routes/auth/routes.py:74
 msgid "Connecté !"
 msgstr "Connected!"
 
-#: app/routes/auth/routes.py:113
+#: app/routes/auth/routes.py:89
 msgid "Vous avez été déconnecté."
 msgstr "You have been signed out."
 
-#: app/routes/auth/routes.py:130
+#: app/routes/auth/routes.py:106
 msgid ""
 "Un email a été envoyé avec les instructions pour réinitialiser le mot de "
 "passe. Pensez à vérifier vos spams."
@@ -128,19 +128,19 @@ msgstr ""
 "An email has been send with password reset instructions. Please check "
 "your spams."
 
-#: app/routes/auth/routes.py:140
+#: app/routes/auth/routes.py:116
 msgid "Mot de passe oublié"
 msgstr "Password Lost"
 
-#: app/routes/auth/routes.py:148
+#: app/routes/auth/routes.py:124
 msgid "Ce lien n'est pas utilisable en étant authentifié."
 msgstr "This link cannot be used by an authenticated user."
 
-#: app/routes/auth/routes.py:153
+#: app/routes/auth/routes.py:129
 msgid "Lien de réinitialisation invalide ou expiré."
 msgstr "Reset link invalid or expired."
 
-#: app/routes/auth/routes.py:161
+#: app/routes/auth/routes.py:137
 msgid "Le mot de passe a été réinitialisé avec succès."
 msgstr "Your password has been successfully reset."
 
@@ -156,22 +156,22 @@ msgstr "Script"
 msgid "Exécuter"
 msgstr "Run"
 
-#: app/routes/gris/routes.py:148
-msgid "Permission ajoutée"
-msgstr "Permission added"
-
-#: app/routes/gris/routes.py:261
+#: app/routes/gris/routes.py:42
 msgid "Gestion des PCéens"
 msgstr "Manage PCéens"
 
-#: app/routes/gris/routes.py:294
+#: app/routes/gris/routes.py:75
 msgid "Gestion des rôles"
 msgstr "Manage roles"
 
-#: app/routes/gris/routes.py:325 app/routes/gris/routes.py:328
+#: app/routes/gris/routes.py:106 app/routes/gris/routes.py:109
 #: app/templates/gris/menu.html:18
 msgid "Exécuter un script"
 msgstr "Run a script"
+
+#: app/routes/gris/utils.py:141
+msgid "Permission ajoutée"
+msgstr "Permission added"
 
 #: app/routes/main/forms.py:17
 msgid "Adresse e-mail (optionnel)"
@@ -189,21 +189,21 @@ msgstr "Message"
 msgid "Envoyer"
 msgstr "Send"
 
-#: app/routes/main/routes.py:22 app/templates/base.html:162
+#: app/routes/main/routes.py:23 app/templates/base.html:162
 #: app/templates/errors/403.html:26 app/templates/errors/404.html:23
 #: app/templates/errors/other.html:17 app/templates/mails_base.html:74
 msgid "Accueil"
 msgstr "Home"
 
-#: app/routes/main/routes.py:32
+#: app/routes/main/routes.py:33
 msgid "Le captcha n'a pas pu être vérifié. Veuillez réessayer."
 msgstr "The captcha could not be verified. Please try again."
 
-#: app/routes/main/routes.py:44
+#: app/routes/main/routes.py:45
 msgid "Message transmis !"
 msgstr "Message transmitted!"
 
-#: app/routes/main/routes.py:49
+#: app/routes/main/routes.py:50
 msgid ""
 "Oh non ! Le message n'a pas pu être transmis. N'hésitez pas à contacter "
 "un GRI aux coordonnées en bas de page.<br/>(Erreur : "
@@ -211,19 +211,19 @@ msgstr ""
 "O no! The message could not be transmitted. Please feel free to reach GRI"
 " at the contact information below.<br/>(Error: "
 
-#: app/routes/main/routes.py:59
+#: app/routes/main/routes.py:60
 msgid "Contact"
 msgstr "Contact"
 
-#: app/routes/main/routes.py:65 app/templates/base.html:184
+#: app/routes/main/routes.py:66 app/templates/base.html:184
 msgid "Mentions légales"
 msgstr "Legal notice"
 
-#: app/routes/main/routes.py:72
+#: app/routes/main/routes.py:73
 msgid "Notes de mise à jour"
 msgstr "Changelog"
 
-#: app/routes/main/routes.py:80
+#: app/routes/main/routes.py:81
 msgid "TEST"
 msgstr "TEST"
 
@@ -858,3 +858,4 @@ msgstr "This date must be in the past!"
 #: app/utils/validators.py:114
 msgid "Cette date doit être dans le futur !"
 msgstr "This date must be in the future!"
+
