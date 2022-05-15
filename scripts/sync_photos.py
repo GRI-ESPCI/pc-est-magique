@@ -24,7 +24,7 @@ import sqlalchemy.orm
 try:
     from app import db
     from app.models import Collection, Album, Photo
-    from app.tools import metadata
+    from app.utils import metadata
 except ImportError:
     sys.stderr.write(
         "ERREUR - Ce script peut uniquement être appelé depuis Flask :\n"

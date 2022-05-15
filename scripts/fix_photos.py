@@ -14,7 +14,7 @@ import sys
 
 try:
     from app.models import Photo
-    from app.tools.utils import print_progressbar
+    from app.utils.helpers import print_progressbar
 except ImportError:
     sys.stderr.write(
         "ERREUR - Ce script peut uniquement être appelé depuis Flask :\n"

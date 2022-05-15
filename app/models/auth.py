@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+import typing
 
 import jwt
 import flask
@@ -12,19 +13,16 @@ from werkzeug import security as wzs
 
 from app import db
 from app.enums import PermissionType, PermissionScope
-from app.tools import typing
-from app.tools.columns import (
+from app.utils.columns import (
     column,
     one_to_many,
     many_to_many,
-    my_enum,
     Column,
     Relationship,
 )
 
 
 Model = typing.cast(type[type], db.Model)  # type checking hack
-Enum = my_enum  # type checking hack
 
 
 class PCeen(flask_login.UserMixin, Model):

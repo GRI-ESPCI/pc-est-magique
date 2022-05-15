@@ -46,7 +46,7 @@ class PCEstMagiqueApp(flask.Flask):
 
 
 # Imports needing PCEstMagiqueApp - don't move!
-from app.tools import loggers, utils, typing
+from app.utils import helpers, loggers, typing
 
 # Load extensions
 db = flask_sqlalchemy.SQLAlchemy()

@@ -6,7 +6,7 @@ from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
 from discord_webhook import DiscordEmbed
 
-from app.tools.validators import DataRequired, Optional, Email
+from app.utils.validators import DataRequired, Optional, Email
 
 
 class ContactForm(FlaskForm):

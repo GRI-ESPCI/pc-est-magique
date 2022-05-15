@@ -1,10 +1,9 @@
 """PC est magique Flask App - Database Models"""
 
 import enum
+import typing
 
 import sqlalchemy
-
-from app.tools import typing
 
 
 Column = sqlalchemy.Column

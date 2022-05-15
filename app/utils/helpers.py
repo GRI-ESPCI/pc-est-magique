@@ -9,7 +9,7 @@ import werkzeug
 from werkzeug import urls as wku
 
 from app import PCEstMagiqueApp
-from app.tools import typing
+from app.utils import typing
 
 
 def log_action(message: str, warning: bool = False) -> None:

@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import datetime
-import typing
 import PIL.Image
 
 import exif
@@ -62,7 +63,7 @@ class ImageData(exif.Image):
         """Image longitude, or ``None`` if not available."""
         return self._get_gps_coord("gps_longitude", "gps_longitude_ref")
 
-    def _get_from_attrs(self, *attrs: str) -> typing.Any:
+    def _get_from_attrs(self, *attrs: str) -> Any:
         for attr in attrs:
             if value := self._safe_get(attr):
                 return value
@@ -77,7 +78,7 @@ class ImageData(exif.Image):
             case _:
                 return None
 
-    def _safe_get(self, attr: str, default: typing.Any = None) -> typing.Any:
+    def _safe_get(self, attr: str, default: Any = None) -> Any:
         try:
             return self.get(attr, default=default)
         except Exception:

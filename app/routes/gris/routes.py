@@ -12,7 +12,7 @@ from app import context, db
 from app import models
 from app.routes.gris import bp, forms
 from app.models import PCeen, Permission, Role, PermissionScope, PermissionType
-from app.tools import utils, typing
+from app.utils import helpers, typing
 
 
 def add_remove_role(action: str, pceen_id: str, role_id: str) -> tuple[str | dict, int]:
@@ -308,7 +308,7 @@ def run_script() -> typing.RouteReturn:
             with contextlib.redirect_stdout(io.StringIO()) as stdout:
                 with contextlib.redirect_stderr(sys.stdout):
                     try:
-                        utils.run_script(form.script.data)
+                        helpers.run_script(form.script.data)
                     except Exception:
                         output = stdout.getvalue() + traceback.format_exc()
                     else:

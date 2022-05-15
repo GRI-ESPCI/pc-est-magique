@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2022-03-09 19:30+0100\n"
+"POT-Creation-Date: 2022-05-15 20:14+0200\n"
 "PO-Revision-Date: 2022-03-19 19:42+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
@@ -23,102 +23,104 @@ msgstr ""
 msgid "Le site est en mode maintenance : seuls les GRI peuvent y accéder."
 msgstr "The site is under maintenance: only GRI can access it."
 
-#: app/context.py:103 app/context.py:129 app/context.py:169
+#: app/context.py:109 app/context.py:137 app/context.py:178
 msgid "Veuillez vous authentifier pour accéder à cette page."
 msgstr "Please log in to access to this page."
 
-#: app/auth/email.py:17 app/auth/routes.py:67
+#: app/routes/auth/email.py:17 app/routes/auth/routes.py:68
 msgid "Compte créé avec succès !"
 msgstr "Account successfully created!"
 
-#: app/auth/email.py:38 app/auth/templates/mails/reset_password.html:7
+#: app/routes/auth/email.py:38 app/templates/auth/mails/reset_password.html:7
 msgid "Réinitialisation du mot de passe"
 msgstr "Password reset"
 
-#: app/auth/forms.py:14
+#: app/routes/auth/forms.py:22
 msgid "Nom d'utilisateur / Adresse e-mail"
 msgstr "Username / Mail address"
 
-#: app/auth/forms.py:16 app/auth/forms.py:32
+#: app/routes/auth/forms.py:24 app/routes/auth/forms.py:41
 msgid "Mot de passe"
 msgstr "Password"
 
-#: app/auth/forms.py:18
+#: app/routes/auth/forms.py:25
 msgid "Rester connecté"
 msgstr "Remember me"
 
-#: app/auth/forms.py:19 app/auth/routes.py:97
-#: app/auth/templates/auth_needed.html:17 app/auth/templates/register.html:41
-#: app/auth/templates/reset_password.html:29
-#: app/auth/templates/reset_password_request.html:26 app/templates/base.html:99
+#: app/routes/auth/forms.py:26 app/routes/auth/routes.py:101
+#: app/templates/auth/auth_needed.html:17 app/templates/auth/register.html:41
+#: app/templates/auth/reset_password.html:29
+#: app/templates/auth/reset_password_request.html:26 app/templates/base.html:99
 msgid "Connexion"
 msgstr "Sign in"
 
-#: app/auth/forms.py:24 app/main/forms.py:14 app/gris/templates/pceens.html:36
+#: app/routes/auth/forms.py:32 app/routes/main/forms.py:15
+#: app/templates/gris/pceens.html:36
 msgid "Nom"
 msgstr "Name"
 
-#: app/auth/forms.py:26
+#: app/routes/auth/forms.py:34
 msgid "Prénom"
 msgstr "First name"
 
-#: app/auth/forms.py:28
+#: app/routes/auth/forms.py:36
 msgid "Promotion"
 msgstr "Promotion"
 
-#: app/auth/forms.py:29 app/auth/forms.py:42 app/gris/templates/pceens.html:58
+#: app/routes/auth/forms.py:38 app/routes/auth/forms.py:52
+#: app/templates/gris/pceens.html:58
 msgid "Adresse e-mail"
 msgstr "Mail address"
 
-#: app/auth/forms.py:34
+#: app/routes/auth/forms.py:43
 msgid "Mot de passe (validation)"
 msgstr "Password (validation)"
 
-#: app/auth/forms.py:37
+#: app/routes/auth/forms.py:46
 msgid "Créer mon compte"
 msgstr "Sign up"
 
-#: app/auth/forms.py:44
+#: app/routes/auth/forms.py:53
 msgid "Envoyer le mail de réinitialisation"
 msgstr "Send reset mail"
 
-#: app/auth/forms.py:49 app/auth/routes.py:159
+#: app/routes/auth/forms.py:60 app/routes/auth/routes.py:165
 msgid "Nouveau mot de passe"
 msgstr "New password"
 
-#: app/auth/forms.py:51
+#: app/routes/auth/forms.py:63
 msgid "Nouveau mot de passe (validation)"
 msgstr "New password (validation)"
 
-#: app/auth/forms.py:54
+#: app/routes/auth/forms.py:66
 msgid "Valider"
 msgstr "Validate"
 
-#: app/auth/routes.py:42
+#: app/routes/auth/routes.py:42
 msgid "Connexion nécessaire"
 msgstr "Connection needed"
 
-#: app/auth/routes.py:73
+#: app/routes/auth/routes.py:74
 msgid "Nouveau compte"
 msgstr "New account"
 
-#: app/auth/routes.py:88
+#: app/routes/auth/routes.py:92
 msgid "Nom d'utilisateur inconnu"
 msgstr "Unknown username"
 
-#: app/auth/routes.py:90
+#: app/routes/auth/routes.py:94
 msgid "Mot de passe incorrect"
 msgstr "Wrong password"
 
-#: app/auth/routes.py:94
+#: app/routes/auth/routes.py:98
 msgid "Connecté !"
 msgstr "Connected!"
 
-#: app/auth/routes.py:110
+#: app/routes/auth/routes.py:113
 msgid "Vous avez été déconnecté."
 msgstr "You have been signed out."
 
-#: app/auth/routes.py:126
+#: app/routes/auth/routes.py:130
 msgid ""
 "Un email a été envoyé avec les instructions pour réinitialiser le mot de "
 "passe. Pensez à vérifier vos spams."
@@ -126,78 +128,82 @@ msgstr ""
 "An email has been send with password reset instructions. Please check "
 "your spams."
 
-#: app/auth/routes.py:132
+#: app/routes/auth/routes.py:140
 msgid "Mot de passe oublié"
 msgstr "Password Lost"
 
-#: app/auth/routes.py:139
+#: app/routes/auth/routes.py:148
 msgid "Ce lien n'est pas utilisable en étant authentifié."
 msgstr "This link cannot be used by an authenticated user."
 
-#: app/auth/routes.py:145
+#: app/routes/auth/routes.py:153
 msgid "Lien de réinitialisation invalide ou expiré."
 msgstr "Reset link invalid or expired."
 
-#: app/auth/routes.py:154
+#: app/routes/auth/routes.py:161
 msgid "Le mot de passe a été réinitialisé avec succès."
 msgstr "Your password has been successfully reset."
 
-#: app/errors/handlers.py:21 app/errors/templates/403.html:8
+#: app/routes/errors/handlers.py:24 app/templates/errors/403.html:8
 msgid "Accès restreint"
 msgstr "Access restricted"
 
-#: app/gris/forms.py:37
+#: app/routes/gris/forms.py:39
 msgid "Script"
 msgstr "Script"
 
-#: app/gris/forms.py:39
+#: app/routes/gris/forms.py:41
 msgid "Exécuter"
 msgstr "Run"
 
-#: app/gris/routes.py:95
+#: app/routes/gris/routes.py:148
+msgid "Permission ajoutée"
+msgstr "Permission added"
+
+#: app/routes/gris/routes.py:261
 msgid "Gestion des PCéens"
 msgstr "Manage PCéens"
 
-#: app/gris/routes.py:113
+#: app/routes/gris/routes.py:294
 msgid "Gestion des rôles"
 msgstr "Manage roles"
 
-#: app/gris/routes.py:143 app/gris/routes.py:146
-#: app/gris/templates/menu.html:18
+#: app/routes/gris/routes.py:325 app/routes/gris/routes.py:328
+#: app/templates/gris/menu.html:18
 msgid "Exécuter un script"
 msgstr "Run a script"
 
-#: app/main/forms.py:15
+#: app/routes/main/forms.py:17
 msgid "Adresse e-mail (optionnel)"
 msgstr "Mail address (optional)"
 
-#: app/main/forms.py:17
+#: app/routes/main/forms.py:19
 msgid "Titre"
 msgstr "Title"
 
-#: app/main/forms.py:18
+#: app/routes/main/forms.py:20
 msgid "Message"
 msgstr "Message"
 
-#: app/main/forms.py:19
+#: app/routes/main/forms.py:21
 msgid "Envoyer"
 msgstr "Send"
 
-#: app/main/routes.py:22 app/templates/base.html:162
-#: app/errors/templates/403.html:26 app/errors/templates/404.html:23
-#: app/errors/templates/other.html:17 app/templates/mails_base.html:74
+#: app/routes/main/routes.py:22 app/templates/base.html:162
+#: app/templates/errors/403.html:26 app/templates/errors/404.html:23
+#: app/templates/errors/other.html:17 app/templates/mails_base.html:74
 msgid "Accueil"
 msgstr "Home"
 
-#: app/main/routes.py:31
+#: app/routes/main/routes.py:32
 msgid "Le captcha n'a pas pu être vérifié. Veuillez réessayer."
 msgstr "The captcha could not be verified. Please try again."
 
-#: app/main/routes.py:42
+#: app/routes/main/routes.py:44
 msgid "Message transmis !"
 msgstr "Message transmitted!"
 
-#: app/main/routes.py:45
+#: app/routes/main/routes.py:49
 msgid ""
 "Oh non ! Le message n'a pas pu être transmis. N'hésitez pas à contacter "
 "un GRI aux coordonnées en bas de page.<br/>(Erreur : "
@@ -205,120 +211,120 @@ msgstr ""
 "O no! The message could not be transmitted. Please feel free to reach GRI"
 " at the contact information below.<br/>(Error: "
 
-#: app/main/routes.py:52
+#: app/routes/main/routes.py:59
 msgid "Contact"
 msgstr "Contact"
 
-#: app/main/routes.py:60 app/templates/base.html:184
+#: app/routes/main/routes.py:65 app/templates/base.html:184
 msgid "Mentions légales"
 msgstr "Legal notice"
 
-#: app/main/routes.py:67
+#: app/routes/main/routes.py:72
 msgid "Notes de mise à jour"
 msgstr "Changelog"
 
-#: app/main/routes.py:76
+#: app/routes/main/routes.py:80
 msgid "TEST"
 msgstr "TEST"
 
-#: app/photos/forms.py:13
+#: app/routes/photos/forms.py:14
 msgid "Nom du fichier"
 msgstr "File name"
 
-#: app/photos/forms.py:15
+#: app/routes/photos/forms.py:16
 msgid "Légende (optionnel)"
 msgstr "Caption (optional)"
 
-#: app/photos/forms.py:17
+#: app/routes/photos/forms.py:19
 msgid "Auteur (optionnel)"
 msgstr "Author (optional)"
 
-#: app/photos/forms.py:19
+#: app/routes/photos/forms.py:21
 msgid "Date (optionnel)"
 msgstr "Date (optional)"
 
-#: app/photos/forms.py:20
+#: app/routes/photos/forms.py:23
 msgid "Heure (optionnel)"
 msgstr "Time (optional)"
 
-#: app/photos/forms.py:22
+#: app/routes/photos/forms.py:26
 msgid "Latitude (optionnel)"
 msgstr "Latitute (optional)"
 
-#: app/photos/forms.py:24
+#: app/routes/photos/forms.py:30
 msgid "Longitude (optionnel)"
 msgstr "Longitude (optional)"
 
-#: app/photos/forms.py:26 app/photos/templates/album.html:243
+#: app/routes/photos/forms.py:33 app/templates/photos/album.html:243
 msgid "Modifier la photo"
 msgstr "Edit photo"
 
-#: app/photos/forms.py:31
+#: app/routes/photos/forms.py:40
 msgid "Nom de l'album"
 msgstr "Album name"
 
-#: app/photos/forms.py:33 app/photos/forms.py:47
+#: app/routes/photos/forms.py:43 app/routes/photos/forms.py:58
 msgid "Description (optionnel)"
 msgstr "Description (optional)"
 
-#: app/photos/forms.py:35 app/photos/forms.py:49
+#: app/routes/photos/forms.py:45 app/routes/photos/forms.py:60
 msgid "Date de début (optionnel)"
 msgstr "Start date (optional)"
 
-#: app/photos/forms.py:37 app/photos/forms.py:51
+#: app/routes/photos/forms.py:46 app/routes/photos/forms.py:61
 msgid "Date de fin (optionnel)"
 msgstr "End date (optional)"
 
-#: app/photos/forms.py:39
+#: app/routes/photos/forms.py:47
 msgid "Album visible"
 msgstr "Album visible"
 
-#: app/photos/forms.py:40 app/photos/templates/album.html:90
+#: app/routes/photos/forms.py:48 app/templates/photos/album.html:90
 msgid "Modifier l'album"
 msgstr "Edit album"
 
-#: app/photos/forms.py:45
+#: app/routes/photos/forms.py:55
 msgid "Nom de la collection"
 msgstr "Collection name"
 
-#: app/photos/forms.py:53
+#: app/routes/photos/forms.py:62
 msgid "Collection visible"
 msgstr "Collection visible"
 
-#: app/photos/forms.py:54 app/photos/templates/collection.html:47
+#: app/routes/photos/forms.py:63 app/templates/photos/collection.html:47
 msgid "Modifier la collection"
 msgstr "Edit collection"
 
-#: app/photos/routes.py:23 app/photos/templates/album.html:38
-#: app/photos/templates/collection.html:17 app/photos/templates/main.html:7
+#: app/routes/photos/routes.py:26 app/templates/photos/album.html:38
+#: app/templates/photos/collection.html:17 app/templates/photos/main.html:7
 msgid "Photos"
 msgstr "Photos"
 
-#: app/photos/routes.py:67
+#: app/routes/photos/routes.py:77
 msgid "Collection modifiée avec succès !"
 msgstr "Collection successfully edited!"
 
-#: app/photos/routes.py:106
+#: app/routes/photos/routes.py:119
 msgid "Album modifié avec succès !"
 msgstr "Album successfully edited!"
 
-#: app/photos/routes.py:111
+#: app/routes/photos/routes.py:125
 msgid "Cet album est maintenant la miniature de la collection !"
 msgstr "This album is now the collection's thumbnail!"
 
-#: app/photos/routes.py:120
+#: app/routes/photos/routes.py:133
 msgid "Impossible de modifier la photo !"
 msgstr "Unable to edit photo!"
 
-#: app/photos/routes.py:134
+#: app/routes/photos/routes.py:147
 msgid "Photo modifiée avec succès !"
 msgstr "Photo successfully edited!"
 
-#: app/photos/routes.py:140
+#: app/routes/photos/routes.py:154
 msgid "Cette photo est maintenant la miniature de l'album !"
 msgstr "This photo is now the album's thumbnail!"
 
-#: app/auth/templates/auth_needed.html:21 app/auth/templates/login.html:32
+#: app/templates/auth/auth_needed.html:21 app/templates/auth/login.html:32
 #: app/templates/base.html:105
 msgid "Créer un compte"
 msgstr "Sign up"
@@ -331,7 +337,7 @@ msgstr "Sign out"
 msgid "Version"
 msgstr "Version"
 
-#: app/auth/templates/reset_password_request.html:33
+#: app/templates/auth/reset_password_request.html:33
 #: app/templates/base.html:169
 msgid "Nous contacter"
 msgstr "Contact us"
@@ -345,8 +351,9 @@ msgstr "Source code"
 msgid "Action réalisée en tant que %(doas)s"
 msgstr "Action done as %(doas)s"
 
-#: app/templates/doas.html:5 app/templates/macros.html:53
-#: app/photos/templates/album.html:246 app/photos/templates/album.html:312
+#: app/templates/doas.html:5 app/templates/gris/roles.html:202
+#: app/templates/macros.html:53 app/templates/photos/album.html:246
+#: app/templates/photos/album.html:312
 msgid "Fermer"
 msgstr "Close"
 
@@ -380,104 +387,104 @@ msgstr "I no longer wish to receive emails"
 msgid "Se désinscrire"
 msgstr "Unsubscribe"
 
-#: app/auth/templates/auth_needed.html:11
+#: app/templates/auth/auth_needed.html:11
 msgid "Un compte est nécessaire pour accéder à cette page."
 msgstr "An account is necessary to access this page."
 
-#: app/auth/templates/auth_needed.html:26
+#: app/templates/auth/auth_needed.html:26
 msgid "En cas de problème, n'hésitez pas à "
 msgstr "If any problem, do not hesitate to "
 
-#: app/auth/templates/auth_needed.html:27
+#: app/templates/auth/auth_needed.html:27
 msgid "nous contacter"
 msgstr "contact us"
 
-#: app/auth/templates/login.html:29
+#: app/templates/auth/login.html:29
 msgid "Pas inscrit ?"
 msgstr "Not registered?"
 
-#: app/auth/templates/login.html:35
+#: app/templates/auth/login.html:35
 msgid "Mot de passe oublié ?"
 msgstr "Password lost?"
 
-#: app/auth/templates/login.html:38
+#: app/templates/auth/login.html:38
 msgid "Réinitialiser"
 msgstr "Reset"
 
-#: app/auth/templates/register.html:38
+#: app/templates/auth/register.html:38
 msgid "Déjà inscrit ?"
 msgstr "Already registered?"
 
-#: app/auth/templates/reset_password.html:26
-#: app/auth/templates/reset_password_request.html:23
+#: app/templates/auth/reset_password.html:26
+#: app/templates/auth/reset_password_request.html:23
 msgid "Ça t'es revenu ?"
 msgstr "Got it back?"
 
-#: app/auth/templates/reset_password_request.html:30
+#: app/templates/auth/reset_password_request.html:30
 msgid "Adresse e-mail oubliée ? Autre soucis ?"
 msgstr "Forget your email? Other issue?"
 
-#: app/auth/templates/mails/account_registered.html:7
+#: app/templates/auth/mails/account_registered.html:7
 msgid "Votre compte a bien été créé"
 msgstr "Your account has successfully been created"
 
-#: app/auth/templates/mails/account_registered.html:12
-#: app/auth/templates/mails/reset_password.html:12
+#: app/templates/auth/mails/account_registered.html:12
+#: app/templates/auth/mails/reset_password.html:12
 #, python-format
 msgid "Bonjour %(name)s,"
 msgstr "Hello %(name)s,"
 
-#: app/auth/templates/mails/account_registered.html:14
+#: app/templates/auth/mails/account_registered.html:14
 msgid "Votre compte sur PC est magique a bien été créé :"
 msgstr "Your PC est magique account has successfully been created:"
 
-#: app/auth/templates/mails/account_registered.html:18
+#: app/templates/auth/mails/account_registered.html:18
 msgid "Identifiant :"
 msgstr "ID:"
 
-#: app/auth/templates/mails/account_registered.html:22
+#: app/templates/auth/mails/account_registered.html:22
 msgid "Nom :"
 msgstr "Name:"
 
-#: app/auth/templates/mails/account_registered.html:26
+#: app/templates/auth/mails/account_registered.html:26
 msgid "Prénom :"
 msgstr "First name:"
 
-#: app/auth/templates/mails/account_registered.html:30
+#: app/templates/auth/mails/account_registered.html:30
 msgid "Promotion :"
 msgstr "Grad class:"
 
-#: app/auth/templates/mails/account_registered.html:36
+#: app/templates/auth/mails/account_registered.html:36
 msgid "Adresse e-mail :"
 msgstr "Mail address:"
 
-#: app/auth/templates/mails/account_registered.html:45
-#: app/auth/templates/mails/reset_password.html:42
+#: app/templates/auth/mails/account_registered.html:45
+#: app/templates/auth/mails/reset_password.html:42
 msgid "Très bonne journée,"
 msgstr "Have a good day,"
 
-#: app/auth/templates/mails/account_registered.html:48
-#: app/auth/templates/mails/reset_password.html:45
+#: app/templates/auth/mails/account_registered.html:48
+#: app/templates/auth/mails/reset_password.html:45
 msgid "Les GRI"
 msgstr "The GRI team"
 
-#: app/auth/templates/mails/reset_password.html:14
+#: app/templates/auth/mails/reset_password.html:14
 msgid ""
 "Pour réinitialiser votre mot de passe, appuyez simplement sur le bouton "
 "ci-dessous :"
 msgstr "To reset your password, simply click the button below:"
 
-#: app/auth/templates/mails/reset_password.html:23
+#: app/templates/auth/mails/reset_password.html:23
 msgid "Réinitialiser mon mot de passe"
 msgstr "Reset my password"
 
-#: app/auth/templates/mails/reset_password.html:30
+#: app/templates/auth/mails/reset_password.html:30
 msgid ""
 "Si vous n'avez pas fait de demande de réinitialisation de mot de passe, "
 "merci d'ignorer cet email."
 msgstr "If you have not requested a password reset, please ignore this email."
 
-#: app/auth/templates/mails/reset_password.html:34
+#: app/templates/auth/mails/reset_password.html:34
 msgid ""
 "Pour toute question ou pour plus d'informations, vous pouvez simplement "
 "répondre à cet email."
@@ -485,21 +492,21 @@ msgstr ""
 "For any question or for more information, you can simply answer this "
 "email."
 
-#: app/errors/templates/403.html:9
+#: app/templates/errors/403.html:9
 msgid "Vous n'avez pas le droit d'accéder à cette page."
 msgstr "You do not have rights to access this page."
 
-#: app/errors/templates/403.html:13
+#: app/templates/errors/403.html:13
 msgid ""
 "Si vous pensez que c'est une erreur, alors vous savez à qui demander "
 "l'accès."
 msgstr "If you think this is an error, then you know who ask the access to."
 
-#: app/errors/templates/403.html:17
+#: app/templates/errors/403.html:17
 msgid "Dans le cas contraire, passez votre chemin, vil personnage !"
 msgstr "If not, go away, you vile character!"
 
-#: app/errors/templates/403.html:20 app/errors/templates/404.html:17
+#: app/templates/errors/403.html:20 app/templates/errors/404.html:17
 msgid ""
 "Si cette page s'affiche en suivant un lien ou bouton interne au site, "
 "n'hésitez pas à "
@@ -507,19 +514,19 @@ msgstr ""
 "If this page is shown after following an internal link or button, do not "
 "hesitate to "
 
-#: app/errors/templates/403.html:22 app/errors/templates/404.html:19
+#: app/templates/errors/403.html:22 app/templates/errors/404.html:19
 msgid "nous en informer"
 msgstr "report us about it"
 
-#: app/errors/templates/404.html:8 app/errors/templates/other.html:8
+#: app/templates/errors/404.html:8 app/templates/errors/other.html:8
 msgid "Oh non !"
 msgstr "Oh no!"
 
-#: app/errors/templates/404.html:9
+#: app/templates/errors/404.html:9
 msgid "Cette page a visiblement disparu."
 msgstr "This page has obviously disappeared."
 
-#: app/errors/templates/404.html:13
+#: app/templates/errors/404.html:13
 msgid ""
 "Si vous venez d'un lien externe, favori..., essayez d'accéder à la page "
 "voulu en navigant dans l'application."
@@ -527,15 +534,15 @@ msgstr ""
 "If you come from an external link, bookmark..., try accessing to the page"
 " you want through the application menus."
 
-#: app/errors/templates/503.html:21
+#: app/templates/errors/503.html:21
 msgid "Un instant !"
 msgstr "One moment!"
 
-#: app/errors/templates/503.html:22
+#: app/templates/errors/503.html:22
 msgid "PC est magique est actuellement en maintenance."
 msgstr "PC est magique is currently under maintenance."
 
-#: app/errors/templates/503.html:26
+#: app/templates/errors/503.html:26
 msgid ""
 "Les GRI travaillent en ce moment même au déploiement de nouvelles "
 "fonctionnalités ou à la résolution d'un problème."
@@ -543,67 +550,95 @@ msgstr ""
 "The GRI are currently working deploying new features or resolving an "
 "issue."
 
-#: app/errors/templates/503.html:30
+#: app/templates/errors/503.html:30
 msgid "Patience ! Le service devrait revenir d'ici quelques minutes."
 msgstr "Be patient! The service should be back in a few minutes."
 
-#: app/errors/templates/other.html:9
+#: app/templates/errors/other.html:9
 msgid "Une erreur inattendue est survenue."
 msgstr "An unexpected error has occurred."
 
-#: app/errors/templates/other.html:13
+#: app/templates/errors/other.html:13
 msgid "Les GRI ont été informés du problème. Désolés !"
 msgstr "The system admins have been informed of the issue. Sorry!"
 
-#: app/gris/templates/menu.html:5
+#: app/templates/gris/menu.html:5
 msgid "Menu GRI"
 msgstr "GRI menu"
 
-#: app/gris/templates/menu.html:10
+#: app/templates/gris/menu.html:10
 msgid "PCéens"
 msgstr "PCéens"
 
-#: app/gris/templates/menu.html:14 app/gris/templates/pceens.html:69
+#: app/templates/gris/menu.html:14 app/templates/gris/pceens.html:69
 msgid "Rôles"
 msgstr "Roles"
 
-#: app/gris/templates/menu.html:23
+#: app/templates/gris/menu.html:23
 msgid "pgAdmin"
 msgstr "pgAdmin"
 
-#: app/gris/templates/menu.html:26
+#: app/templates/gris/menu.html:26
 msgid "À venir..."
 msgstr "Upcoming..."
 
-#: app/gris/templates/pceens.html:25 app/gris/templates/roles.html:25
+#: app/templates/gris/pceens.html:25 app/templates/gris/roles.html:25
 msgid "ID"
 msgstr "ID"
 
-#: app/gris/templates/pceens.html:47
+#: app/templates/gris/pceens.html:47
 msgid "Promo"
 msgstr "Grad class"
 
-#: app/gris/templates/roles.html:36
+#: app/templates/gris/roles.html:36
 msgid "Rôle"
 msgstr "Role"
 
-#: app/gris/templates/roles.html:47
+#: app/templates/gris/roles.html:47
 msgid "Priorité"
 msgstr "Priority"
 
-#: app/gris/templates/roles.html:58
+#: app/templates/gris/roles.html:58
 msgid "Permissions"
 msgstr "Permissions"
 
-#: app/gris/templates/run_script.html:14
+#: app/templates/gris/roles.html:69
+msgid "Nombre de PCéens"
+msgstr "# PCéens"
+
+#: app/templates/gris/roles.html:168
+msgid "Nouvelle permission"
+msgstr "New permission"
+
+#: app/templates/gris/roles.html:173
+msgid "Rôle :"
+msgstr "Role:"
+
+#: app/templates/gris/roles.html:177
+msgid "Type :"
+msgstr "Type:"
+
+#: app/templates/gris/roles.html:184
+msgid "Scope :"
+msgstr "Scope:"
+
+#: app/templates/gris/roles.html:193
+msgid "Élément :"
+msgstr "Item:"
+
+#: app/templates/gris/roles.html:203
+msgid "Ajouter"
+msgstr "Add"
+
+#: app/templates/gris/run_script.html:14
 msgid "Choisir un script à exécuter :"
 msgstr "Chose a script to run:"
 
-#: app/gris/templates/run_script.html:17
+#: app/templates/gris/run_script.html:17
 msgid "Attention : exécuter un script peut avoir des effets de bord."
 msgstr "Warning: running a script can have side effects."
 
-#: app/main/templates/changelog.html:11
+#: app/templates/main/changelog.html:11
 msgid ""
 "Ces notes de mise à jour présentent les modifications principales du "
 "point de vue utilisateur. Pour un changelog plus technique, voir"
@@ -611,15 +646,15 @@ msgstr ""
 "These release notes present the main changes from a user perspective. For"
 " a more technical changelog, see"
 
-#: app/main/templates/changelog.html:15
+#: app/templates/main/changelog.html:15
 msgid "sur GitHub"
 msgstr "on GitHub"
 
-#: app/main/templates/changelog.html:19
+#: app/templates/main/changelog.html:19
 msgid "Première version publique : photos et permissions."
 msgstr "First public version: photos and permissions."
 
-#: app/main/templates/contact.html:18
+#: app/templates/main/contact.html:18
 msgid ""
 "Pour toute question, remarque ou suggestion, n'hésitez pas à nous "
 "contacter :"
@@ -627,33 +662,33 @@ msgstr ""
 "If you have any question, comment or suggestion, please feel free to "
 "contact us:"
 
-#: app/main/templates/index.html:7
+#: app/templates/main/index.html:7
 #, python-format
 msgid "Bonjour, %(name)s !"
 msgstr "Hello, %(name)s!"
 
-#: app/main/templates/index.html:12
+#: app/templates/main/index.html:12
 msgid "Bienvenue sur PC est magique !"
 msgstr "Welcome on PC est magique!"
 
-#: app/main/templates/index.html:20
+#: app/templates/main/index.html:20
 msgid "ACCÉDER AUX PHOTOS"
 msgstr "GO TO PHOTOS"
 
-#: app/main/templates/index.html:27
+#: app/templates/main/index.html:27
 msgid "Accès aux photos non disponible pour l'instant."
 msgstr "Photos access not available for now."
 
-#: app/main/templates/index.html:34
+#: app/templates/main/index.html:34
 msgid ""
 "Le site est encore dans ses premières phases de bêta : notamment, les "
 "comptes doivent être validés manuellement avant de pouvoir accéder aux "
 "photos, etc. Patience !"
 msgstr ""
-"This site is still in first beta phases: notably, the accounts have to "
-"be manually validated in order to access photos, etc. Be patient!"
+"This site is still in first beta phases: notably, the accounts have to be"
+" manually validated in order to access photos, etc. Be patient!"
 
-#: app/main/templates/index.html:41
+#: app/templates/main/index.html:41
 msgid ""
 "Ce site a également emprunté l'habillage graphique de l'IntraRez (un "
 "autre service des GRI, que les gens à la Rez connaissent bien); cela "
@@ -662,81 +697,81 @@ msgstr ""
 "This site also uses IntraRez graphics (an other GRI service, that folks "
 "in the Rezidence know well); this will certainly change with time."
 
-#: app/main/templates/index.html:48
+#: app/templates/main/index.html:48
 msgid "Une idée, un commentaire ? N'hésitez pas à "
 msgstr "An idea, a comment? Do not hesitate to "
 
-#: app/main/templates/index.html:49
+#: app/templates/main/index.html:49
 msgid "nous en faire part"
 msgstr "tell us about it"
 
-#: app/main/templates/legal.html:11
+#: app/templates/main/legal.html:11
 msgid "Ce site est créé, géré et hébergé par le club GRI – BDE ESPCI Paris - PSL."
 msgstr ""
 "This website is created, managed and hosted by the GRI club – BDE ESPCI "
 "Paris - PSL."
 
-#: app/main/templates/legal.html:15
+#: app/templates/main/legal.html:15
 msgid ""
 "Il est accessible publiquement ; en revanche, [il faudra mettre ce texte "
 "à jour quand on sera au clair sur les conditions d'accès au site]."
 msgstr ""
 
-#: app/main/templates/legal.html:20
+#: app/templates/main/legal.html:20
 msgid "Contactez-nous"
 msgstr "Contact us"
 
-#: app/main/templates/legal.html:21
+#: app/templates/main/legal.html:21
 msgid "pour toute question relative à la gestion de vos données."
 msgstr "for every question about the management of your data."
 
-#: app/photos/templates/album.html:67
+#: app/templates/photos/album.html:67
 msgid "Album masqué"
 msgstr "Album hidden"
 
-#: app/photos/templates/album.html:73
+#: app/templates/photos/album.html:73
 msgid "Miniature actuelle"
 msgstr "Current thumbnail"
 
-#: app/photos/templates/album.html:74
+#: app/templates/photos/album.html:74
 msgid "Nouvelle miniature de la collection"
 msgstr "New collection's thumbnail"
 
-#: app/photos/templates/album.html:110 app/photos/templates/collection.html:171
-#: app/photos/templates/main.html:52
+#: app/templates/photos/album.html:110 app/templates/photos/collection.html:171
+#: app/templates/photos/main.html:52
 msgid "photo"
 msgstr "photo"
 
-#: app/photos/templates/album.html:137 app/photos/templates/collection.html:94
+#: app/templates/photos/album.html:137 app/templates/photos/collection.html:94
 msgid "Arrêter de modifier"
 msgstr "Stop editing"
 
-#: app/photos/templates/album.html:205 app/photos/templates/collection.html:175
-#: app/photos/templates/main.html:56
+#: app/templates/photos/album.html:205 app/templates/photos/collection.html:175
+#: app/templates/photos/main.html:56
 msgid "Modifier"
 msgstr "Edit"
 
-#: app/photos/templates/album.html:213 app/photos/templates/album.html:219
+#: app/templates/photos/album.html:213 app/templates/photos/album.html:219
 msgid "Miniature"
 msgstr "Thumbnail"
 
-#: app/photos/templates/album.html:222
+#: app/templates/photos/album.html:222
 msgid "Déjà la miniature actuelle de l'album !"
 msgstr "Already the album's thumbnail!"
 
-#: app/photos/templates/album.html:228
+#: app/templates/photos/album.html:228
 msgid "Signaler"
 msgstr "Report"
 
-#: app/photos/templates/album.html:296 app/photos/templates/album.html:331
+#: app/templates/photos/album.html:296 app/templates/photos/album.html:331
 msgid "En fait non"
 msgstr "Actually, no"
 
-#: app/photos/templates/album.html:309 app/photos/templates/album.html:328
+#: app/templates/photos/album.html:309 app/templates/photos/album.html:328
 msgid "Signaler un problème"
 msgstr "Report an issue"
 
-#: app/photos/templates/album.html:317
+#: app/templates/photos/album.html:317
 msgid ""
 "Un problème avec cette photo ? Elle porte atteinte à votre image et vous "
 "souhaitez la supprimer, ou simplement une information est erronnée ? "
@@ -745,81 +780,81 @@ msgstr ""
 "An issue with this picture? It affects your image and you want to delete "
 "it, or it simply has an erroneous info? Tell us!"
 
-#: app/photos/templates/album.html:326
+#: app/templates/photos/album.html:326
 #, python-format
 msgid "Problème avec la photo : %(path)s/__photo__"
 msgstr "Issue with photo: %(path)s/__photo__"
 
-#: app/photos/templates/collection.html:40
+#: app/templates/photos/collection.html:40
 msgid "Collection masquée"
 msgstr "Hidden collection"
 
-#: app/photos/templates/collection.html:67 app/photos/templates/main.html:51
+#: app/templates/photos/collection.html:67 app/templates/photos/main.html:51
 msgid "album"
 msgstr "album"
 
-#: app/photos/templates/collection.html:152
+#: app/templates/photos/collection.html:152
 msgid "Album non visible"
 msgstr "Album not visible"
 
-#: app/photos/templates/main.html:12
+#: app/templates/photos/main.html:12
 msgid "collection"
 msgstr "collection"
 
-#: app/photos/templates/main.html:32
+#: app/templates/photos/main.html:32
 msgid "Collection non visible"
 msgstr "Collection not visible"
 
-#: app/tools/validators.py:35
+#: app/utils/validators.py:35
 msgid "Ce champ est requis."
 msgstr "This field is required."
 
-#: app/tools/validators.py:42
+#: app/utils/validators.py:42
 msgid "Adresse email invalide."
 msgstr "Invalid email address."
 
-#: app/tools/validators.py:51
+#: app/utils/validators.py:49
 msgid "Valeur différente du champ précédent."
 msgstr "The value differ from the previous field."
 
-#: app/tools/validators.py:65
+#: app/utils/validators.py:64
 #, python-format
 msgid "Doit faire moins de %(max)d caractères."
 msgstr "Must be less than %(max)d characters long."
 
-#: app/tools/validators.py:68
+#: app/utils/validators.py:66
 #, python-format
 msgid "Doit faire au moins %(min)d caractères."
 msgstr "Must be at least %(min)d characters long."
 
-#: app/tools/validators.py:71
+#: app/utils/validators.py:68
 #, python-format
 msgid "Doit faire entre %(min)d et %(max)d caractères."
 msgstr "Must be between %(min)d and %(max)d characters."
 
-#: app/tools/validators.py:86
+#: app/utils/validators.py:88
 #, python-format
 msgid "Doit être inférieur à %(max)f."
 msgstr "Must be lower than %(max)f."
 
-#: app/tools/validators.py:88
+#: app/utils/validators.py:90
 #, python-format
 msgid "Doit être supérieur à %(min)f."
 msgstr "Must be higher than %(min)f."
 
-#: app/tools/validators.py:90
+#: app/utils/validators.py:92
 #, python-format
 msgid "Doit être entre %(min)f et %(max)f."
 msgstr "Must be between %(min)f and %(max)f."
 
-#: app/tools/validators.py:96
+#: app/utils/validators.py:97
 msgid "Adresse e-mail déjà liée à un autre compte."
 msgstr "Mail address already linked to an account."
 
-#: app/tools/validators.py:104
+#: app/utils/validators.py:105
 msgid "Cette date doit être dans le passé !"
 msgstr "This date must be in the past!"
 
-#: app/tools/validators.py:113
+#: app/utils/validators.py:114
 msgid "Cette date doit être dans le futur !"
 msgstr "This date must be in the future!"

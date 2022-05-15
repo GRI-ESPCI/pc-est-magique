@@ -11,7 +11,7 @@ from discord_webhook import DiscordWebhook
 
 from app import context
 from app.routes.main import bp, forms
-from app.tools import captcha, utils, typing
+from app.utils import captcha, helpers, typing
 
 
 @bp.route("/")
@@ -42,7 +42,7 @@ def contact() -> typing.RouteReturn:
             rep = webhook.execute()
             if rep:
                 flask.flash(_("Message transmis !"), "success")
-                return utils.ensure_safe_redirect("main.index")
+                return helpers.ensure_safe_redirect("main.index")
 
             flask.flash(
                 flask.Markup(

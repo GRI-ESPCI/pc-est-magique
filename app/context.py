@@ -8,7 +8,7 @@ from flask_babel import _
 import flask_login
 
 from app.models import Model, PCeen, PermissionType, PermissionScope
-from app.tools import utils, typing
+from app.utils import helpers, typing
 
 
 def create_request_context() -> typing.RouteReturn | None:
@@ -108,7 +108,7 @@ def logged_in_only(route: _Route) -> _Route:
             flask.flash(
                 _("Veuillez vous authentifier pour accéder " "à cette page."), "warning"
             )
-            return utils.ensure_safe_redirect("auth.auth_needed")
+            return helpers.ensure_safe_redirect("auth.auth_needed")
 
     return new_route
 
@@ -136,7 +136,7 @@ def gris_only(route: _Route) -> _Route:
             flask.flash(
                 _("Veuillez vous authentifier pour accéder " "à cette page."), "warning"
             )
-            return utils.ensure_safe_redirect("auth.login")
+            return helpers.ensure_safe_redirect("auth.login")
 
     return new_route
 
@@ -177,7 +177,7 @@ def check_permission(
         flask.flash(
             _("Veuillez vous authentifier pour accéder à cette page."), "warning"
         )
-        flask.abort(utils.ensure_safe_redirect("auth.login"))
+        flask.abort(helpers.ensure_safe_redirect("auth.login"))
     elif not permission:
         flask.abort(403)  # 403 Not Authorized
 

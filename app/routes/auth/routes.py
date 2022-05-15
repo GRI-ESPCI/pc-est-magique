@@ -10,7 +10,7 @@ import unidecode
 from app import context, db
 from app.routes.auth import bp, forms, email
 from app.models import PCeen
-from app.tools import typing, utils
+from app.utils import helpers, typing
 
 
 def new_username(prenom: str, nom: str) -> str:
@@ -47,7 +47,7 @@ def auth_needed() -> typing.RouteReturn:
 def register() -> typing.RouteReturn:
     """PC est magique registration page."""
     if flask.g.logged_in:
-        return utils.redirect_to_next()
+        return helpers.redirect_to_next()
 
     form = forms.RegistrationForm()
     if form.validate_on_submit():
@@ -61,14 +61,14 @@ def register() -> typing.RouteReturn:
         pceen.set_password(form.password.data)
         db.session.add(pceen)
         db.session.commit()
-        utils.log_action(
+        helpers.log_action(
             f"Registered account {pceen} ({pceen.prenom} {pceen.nom} "
             f"{pceen.promo}, {pceen.email})"
         )
         flask.flash(_("Compte créé avec succès !"), "success")
         flask_login.login_user(pceen, remember=False)
         email.send_account_registered_email(pceen)
-        return utils.redirect_to_next()
+        return helpers.redirect_to_next()
 
     return flask.render_template(
         "auth/register.html", title=_("Nouveau compte"), form=form
@@ -79,7 +79,7 @@ def register() -> typing.RouteReturn:
 def login() -> typing.RouteReturn:
     """PC est magique login page."""
     if flask.g.logged_in:
-        return utils.redirect_to_next()
+        return helpers.redirect_to_next()
 
     form = forms.LoginForm()
     if form.validate_on_submit():
@@ -96,7 +96,7 @@ def login() -> typing.RouteReturn:
             # OK
             flask_login.login_user(pceen, remember=form.remember_me.data)
             flask.flash(_("Connecté !"), "success")
-            return utils.redirect_to_next()
+            return helpers.redirect_to_next()
 
     return flask.render_template("auth/login.html", title=_("Connexion"), form=form)
 
@@ -112,14 +112,14 @@ def logout() -> typing.RouteReturn:
         flask.g.is_gri = False
         flask.flash(_("Vous avez été déconnecté."), "success")
 
-    return utils.redirect_to_next()
+    return helpers.redirect_to_next()
 
 
 @bp.route("/reset_password_request", methods=["GET", "POST"])
 def reset_password_request() -> typing.RouteReturn:
     """PC est magique password reset request page."""
     if flask.g.logged_in:
-        return utils.redirect_to_next()
+        return helpers.redirect_to_next()
 
     form = forms.ResetPasswordRequestForm()
     if form.validate_on_submit():
@@ -134,7 +134,7 @@ def reset_password_request() -> typing.RouteReturn:
             ),
             "info",
         )
-        return utils.ensure_safe_redirect("auth.login")
+        return helpers.ensure_safe_redirect("auth.login")
 
     return flask.render_template(
         "auth/reset_password_request.html", title=_("Mot de passe oublié"), form=form
@@ -146,20 +146,20 @@ def reset_password(token) -> typing.RouteReturn:
     """PC est magique password reset page (link sent by mail)."""
     if flask.g.logged_in:
         flask.flash(_("Ce lien n'est pas utilisable en étant authentifié."), "warning")
-        return utils.redirect_to_next()
+        return helpers.redirect_to_next()
 
     pceen = PCeen.verify_reset_password_token(token)
     if not pceen:
         flask.flash(_("Lien de réinitialisation invalide ou expiré."), "danger")
-        return utils.redirect_to_next()
+        return helpers.redirect_to_next()
 
     form = forms.ResetPasswordForm()
     if form.validate_on_submit():
         pceen.set_password(form.password.data)
         db.session.commit()
-        utils.log_action(f"Reset password of {pceen}")
+        helpers.log_action(f"Reset password of {pceen}")
         flask.flash(_("Le mot de passe a été réinitialisé avec succès."), "success")
-        return utils.ensure_safe_redirect("auth.login")
+        return helpers.ensure_safe_redirect("auth.login")
 
     return flask.render_template(
         "auth/reset_password.html", title=_("Nouveau mot de passe"), form=form
