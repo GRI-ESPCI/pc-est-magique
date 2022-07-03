@@ -1,0 +1,52 @@
+{# Account card - used variables: pceen #}
+{% extends "cards/base.html" %}
+
+{% block card_title %}
+{{ _("Compte") }}
+{% endblock %}
+
+{% block card_icon %}
+{{ macros.bootstrap_icon("person-badge") }}
+{% endblock %}
+
+{% block card_table %}
+<tr>
+    <th scope="row" class="ps-4">{{ _("Identifiant") }}</th>
+    <td>{{ pceen.username }}</td>
+</tr>
+<tr>
+    <th scope="row" class="ps-4">{{ _("Nom") }}</th>
+    <td class="text-break">{{ pceen.nom }}</td>
+</tr>
+<tr>
+    <th scope="row" class="ps-4">{{ _("Prénom") }}</th>
+    <td class="text-break">{{ pceen.prenom }}</td>
+</tr>
+<tr>
+    <th scope="row" class="ps-4">{{ _("Promotion") }}</th>
+    <td>{{ promotions().get(pceen.promo, pceen.promo) }}</td>
+</tr>
+<tr>
+    <th scope="row" class="ps-4">{{ _("Email") }}</th>
+    <td class="text-break">
+        <a href="mailto:{{ pceen.email }}" class="text-dark">
+            {{ pceen.email }}
+        </a>
+    </td>
+</tr>
+{% endblock %}
+
+{% block card_footer %}
+<a class="btn btn-outline-dark me-3 mb-2 position-relative"
+   href="{{ url_for("profile.modify_account", doas=doas,
+                    next=request.url_rule.endpoint) }}">
+    {{ _("Modifier une information") }}
+    {{ macros.badge("NEW") }}
+</a>
+<a class="btn btn-outline-dark me-3 position-relative"
+   href="{{ url_for("profile.update_password", doas=doas,
+                    next=request.url_rule.endpoint) }}">
+    {{ _("Changer de mot de passe") }}
+    {{ macros.badge("NEW") }}
+</a>
+{% endblock %}

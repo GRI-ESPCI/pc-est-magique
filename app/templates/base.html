@@ -62,10 +62,14 @@
         {% block body %}
         {% block navbar %}
         <nav class="navbar navbar-expand-md navbar-light mb-4 py-0
-                    bg-primary border-bottom border-2 border-secondary">
+                    bg-{{ "danger" if hasattr(g, "_ban")
+                        or (hasattr(g, "pceen") and g.pceen.is_banned)
+                        else "primary" }}
+                    border-bottom border-2 border-secondary">
         <div class="container-fluid ps-0">
             <a class="navbar-brand p-0" href="{{ url_for("main.index") }}">
-                <img src="{{ url_for("static", filename="img/gri.png") }}"
+                <img src="{{ url_for("static",
+                                     filename="img/gri_80x80.png") }}"
                      width="80" height="80" class="d-inline-block m-0"
                      alt="GRI" />
                 <span class="align-text-top">
@@ -90,8 +94,7 @@
                     {% include "gris/menu.html" %}
                     {% endif %}
                 </ul>
-                <ul class="navbar-nav ms-auto flex-row flex-wrap
-                           justify-content-end">
+                <ul class="navbar-nav flex-row flex-wrap justify-content-end">
                     {% if not g.logged_in %}
                     <li class="nav-item">
                         <a class="btn btn-outline-secondary mx-2 my-1"
@@ -106,6 +109,28 @@
                         </a>
                     </li>
                     {% else %}      {# Utilisateur connecté #}
+                    {% if has_permission(PermissionType.read, PermissionScope.intrarez) %}
+                    <li class="nav-item">
+                        <a class="btn btn-outline-secondary mx-2 my-1 position-relative"
+                           href="{{ url_for("payments.main") }}">
+                            {{ _("Abonnement") }}
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if has_permission(PermissionType.read, PermissionScope.photos) %}
+                    <li class="nav-item">
+                        <a class="btn btn-outline-secondary mx-2 my-1 position-relative"
+                           href="{{ url_for("photos.main") }}">
+                            {{ _("Photos") }}
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="btn btn-outline-secondary mx-2 my-1"
+                           href="{{ url_for("profile.main") }}">
+                            {{ _("Profil") }}
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a class="btn btn-outline-secondary mx-2 my-1"
                            href="{{ url_for("auth.logout") }}">

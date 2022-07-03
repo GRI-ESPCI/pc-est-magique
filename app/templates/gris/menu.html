@@ -18,6 +18,14 @@
             {{ _("Exécuter un script") }}
         </a></li>
         <li><a class="dropdown-item"
+               href="{{ url_for("gris.monitoring_ds") }}">
+            {{ _("Monitoring (Darkstat)") }}
+        </a></li>
+        <li><a class="dropdown-item"
+               href="{{ url_for("gris.monitoring_bw") }}">
+            {{ _("Monitoring (Bandwidthd)") }}
+        </a></li>
+        <li><a class="dropdown-item"
                href="https://pgadmin.pc-est-magique.fr"
                target="_blank" rel="external">
             {{ _("pgAdmin") }}

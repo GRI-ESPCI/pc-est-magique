@@ -9,46 +9,42 @@
 </div>
 <div class="row">
     <div class="col"><p>
-        {{ _("Bienvenue sur PC est magique !") }}
+        {{ _("Bienvenue sur PC est magique ! Ce nouveau portail a pour "
+             "ambition de réunir le maximum de services informatiques des "
+             "PCéens (élèves et alumni, mais aussi locataires de la Rez, "
+             "dans le futur doctorants etc) : photos, accès à Internet à la "
+             "Rez (ancien IntraRez), prochainement le site du Bar, les "
+             "commandes du Club Q, et plein d'autres choses...") }}
     </p></div>
 </div>
-{% if has_permission(PermissionType.read, PermissionScope.photos) %}
-<div class="row mb-5">
-    <div class="col">
-        <a class="btn btn-primary"
-           href="{{ url_for("photos.main") }}">
-            {{ _("ACCÉDER AUX PHOTOS") }}
-        </a>
-    </div>
-</div>
-{% else %}
-<div class="row mb-5">
-    <div class="col"><p class="fst-italic text-danger">
-        {{ _("Accès aux photos non disponible pour l'instant.") }}
-    </p></div>
-</div>
-{% endif %}
 
-<div class="row">
-    <div class="col"><p>
-        {{ _("Le site est encore dans ses premières phases de bêta : "
-             "notamment, les comptes doivent être validés manuellement "
-             "avant de pouvoir accéder aux photos, etc. Patience !") }}
-    </p></div>
-</div>
-<div class="row">
-    <div class="col"><p>
-        {{ _("Ce site a également emprunté l'habillage graphique de "
-             "l'IntraRez (un autre service des GRI, que les gens à la "
-             "Rez connaissent bien); cela changera certainement à terme.") }}
-    </p></div>
-</div>
 <div class="row mb-3">
     <div class="col"><p>
         {{ _("Une idée, un commentaire ? N'hésitez pas à ") }}
         <a href="{{ url_for("main.contact") }}">{{ _("nous en faire part") }}
         </a> !
     </p></div>
+</div>
+
+<div class="row row-cols row-cols-xl-3 gy-4 gx-1">
+    {% with pceen = g.pceen %}
+    <div class="col">
+        {% include "cards/profile.html" %}
+    </div>
+    {% if has_permission(PermissionType.read, PermissionScope.intrarez) %}
+    <div class="col">
+        {% include "cards/subscription.html" %}
+    </div>
+    {% endif %}
+    {% if has_permission(PermissionType.read, PermissionScope.photos) %}
+    <div class="col">
+        {% include "cards/photos.html" %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <div class="col">
+        {% include "cards/coming_soon.html" %}
+    </div>
 </div>
 
 {% endblock %}

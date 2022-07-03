@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% import "_form.html" as wtf %}
 
 {% block app_content %}
 
@@ -8,38 +7,61 @@
         <h1>{{ title }}</h1>
     </div>
 </div>
-<form action="" method="post" role="form">
-    {{ form.hidden_tag() }}
-    <div class="row row-cols-1 row-cols-lg-2 mb-4">
-        <div class="col"><div class="form-floating mb-3">
-            {{ wtf.form_field(form.prenom) }}
-        </div></div>
-        <div class="col"><div class="form-floating mb-3">
-            {{ wtf.form_field(form.nom) }}
-        </div></div>
-        <div class="col"><div class="form-floating mb-3">
-            {{ wtf.form_field(form.promo) }}
-        </div></div>
-        <div class="col"><div class="form-floating mb-3">
-            {{ wtf.form_field(form.email) }}
-        </div></div>
-        <div class="col"><div class="form-floating mb-3">
-            {{ wtf.form_field(form.password) }}
-        </div></div>
-        <div class="col"><div class="form-floating mb-3">
-            {{ wtf.form_field(form.password2) }}
-        </div></div>
-        <div>
-            {{ wtf.form_field(form.submit) }}
+<div class="row mb-3">
+    <div class="col">
+        {{ _("Trois méthodes sont possibles pour créer un compte PC est magique :") }}
+        <ul>
+            <li>
+                {{ _("Soit en accédant à ce site depuis le réseau de la Rez (parcours Rezident) ;") }}
+            </li>
+            <li>
+                {{ _("Soit en s'authentifiant via le SSO de espci.psl.eu (parcours Élève / doctorant, à venir) ;") }}
+            </li>
+            <li>
+                {{ _("Soit en recevant un token de connexion sur une adresse espci.org (parcours Alumni, à venir).") }}
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="row mb-5 justify-content-center text-center">
+    <div class="col col-3 px-4">
+        {% if g.internal %}
+        <a class="btn btn-primary" href="{{ url_for("auth.register_rezident", **request.args) }}">
+            {{ _("Inscription Rezident") }}
+        </a>
+        {% else %}
+        <div class="d-inline-block" data-bs-toggle="tooltip"
+             title="{{ _("Disponible uniquement depuis le réseau de la Rez") }}">
+            <a class="btn btn-primary disabled" disabled>
+                {{ _("Inscription Rezident") }}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col col-3 px-4">
+        <div class="d-inline-block" data-bs-toggle="tooltip" title="{{ _("Fonctionnalité à venir") }}">
+            <a class="btn btn-primary disabled" disabled>
+                {{ _("Authentification espci.psl.eu") }}
+            </a>
         </div>
     </div>
-</form>
-<div class="row"><p>
-    {{ _("Déjà inscrit ?") }}
-    <a class="btn btn-outline-primary ms-2"
-       href="{{ url_for("auth.login", **request.args) }}">
-        {{ _("Connexion") }}
-    </a>
-    </p></div>
+    <div class="col col-3 px-4">
+        <div class="d-inline-block" data-bs-toggle="tooltip" title="{{ _("Fonctionnalité à venir") }}">
+            <a class="btn btn-primary disabled" disabled>
+                {{ _("Authentification espci.org") }}
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <p>
+        {{ _("Déjà inscrit ?") }}
+        <a class="btn btn-outline-primary ms-2" href="{{ url_for("auth.login", **request.args) }}">
+            {{ _("Connexion") }}
+        </a>
+    </p>
+</div>
 
 {% endblock %}

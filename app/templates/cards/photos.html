@@ -1,0 +1,31 @@
+{# Photos card - used variables: photos_infos #}
+{% extends "cards/base.html" %}
+
+{% block card_title %}
+{{ _("Photos") }} {{ macros.badge() }}
+{% endblock %}
+
+{% block card_icon %}
+{{ macros.bootstrap_icon("camera") }}
+{% endblock %}
+
+{% block card_table %}
+<tr>
+    <th scope="row" class="ps-4">{{ _("Collections") }}</th>
+    <td>{{ photos_infos.nb_collections }}</td>
+</tr>
+<tr>
+    <th scope="row" class="ps-4">{{ _("Albums") }}</th>
+    <td>{{ photos_infos.nb_albums }}</td>
+</tr>
+<tr>
+    <th scope="row" class="ps-4">{{ _("Photos") }}</th>
+    <td>{{ photos_infos.nb_photos }}</td>
+</tr>
+{% endblock %}
+
+{% block card_footer %}
+<a href="{{ url_for("photos.main") }}" class="btn btn-outline-dark">
+    {{ _("Voir les photos") }}
+</a>
+{% endblock %}

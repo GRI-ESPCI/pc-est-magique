@@ -6,7 +6,7 @@ See github.com/GRI-ESPCI/pc-est-magique for informations.
 __title__ = "pc-est-magique"
 __author__ = "Loïc Simon, Louis Grandvaux & other GRIs"
 __license__ = "MIT"
-__copyright__ = "2022 GRIs – ESPCI Paris - PSL"
+__copyright__ = "2021-2022 GRIs – ESPCI Paris - PSL"
 __all__ = ["create_app"]
 
 
@@ -22,12 +22,13 @@ import flask_login
 import flask_mail
 import flask_moment
 import flask_babel
+from werkzeug import urls as wku
 
 from config import Config
 from app import enums
 
 
-in_app_copyright = "2022 GRI ESPCI"
+in_app_copyright = "2021-2022 GRI ESPCI"
 
 
 # Define Flask subclass
@@ -38,14 +39,15 @@ class PCEstMagiqueApp(flask.Flask):
         actions_logger (logging.Logger): Child of app logger used to
             report important actions (see :mod:`.tools.loggers`).
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Add actions logger
+        # Add PCens actions logger
         self.actions_logger = self.logger.getChild("actions")
 
 
 # Imports needing PCEstMagiqueApp - don't move!
-from app.tools import loggers, utils, typing
+from app.utils import helpers, loggers, typing
 
 # Load extensions
 db = flask_sqlalchemy.SQLAlchemy()
@@ -79,20 +81,36 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.jinja_env.trim_blocks = True
     app.jinja_env.lstrip_blocks = True
     app.jinja_env.globals.update(**__builtins__)
-    app.jinja_env.globals.update(**{name: getattr(enums, name)
-                                    for name in enums.__all__})
+    app.jinja_env.globals.update(
+        **{name: getattr(enums, name) for name in enums.__all__}
+    )
     app.jinja_env.globals["__version__"] = __version__
     app.jinja_env.globals["copyright"] = in_app_copyright
     app.jinja_env.globals["babel"] = flask_babel
 
     # Register blueprints
     # ! Keep imports here to avoid circular import issues !
-    from app import errors, main, auth, gris, photos
+    from app.routes import (
+        auth,
+        devices,
+        errors,
+        gris,
+        main,
+        payments,
+        photos,
+        profile,
+        rooms,
+    )
+
     app.register_blueprint(errors.bp)
     app.register_blueprint(main.bp)
     app.register_blueprint(auth.bp)
+    app.register_blueprint(devices.bp, url_prefix="/devices")
+    app.register_blueprint(rooms.bp, url_prefix="/rooms")
     app.register_blueprint(gris.bp, url_prefix="/gris")
     app.register_blueprint(photos.bp, url_prefix="/photos")
+    app.register_blueprint(payments.bp, url_prefix="/payments")
+    app.register_blueprint(profile.bp, url_prefix="/profile")
 
     # Configure logging
     loggers.configure_logging(app)
@@ -101,12 +119,31 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     # Set up mail processors building
     # ! Keep import here to avoid circular import issues !
     from app import email
+
     app.before_first_request(email.init_premailer)
     app.before_first_request(email.init_textifier)
+
+    # Set up captive portal
+    @app.before_request
+    def _captive_portal() -> typing.RouteReturn | None:
+        """Captive portal: redirect external requests to homepage."""
+        netlocs = app.config["NETLOCS"]
+        if netlocs is None or app.debug or app.testing:
+            # Captive portal disabled or testing: process all requests
+            return None
+        if flask.request.endpoint:
+            # No infinite redirections loop
+            return None
+        if wku.url_parse(flask.request.url).netloc not in netlocs:
+            # Requested URL not in netlocs: redirect
+            return context.capture()
+        # Valid URL
+        return None
 
     # Set up custom context creation
     # ! Keep import here to avoid circular import issues !
     from app import context
+
     app.before_request(context.create_request_context)
     app.jinja_env.globals["has_permission"] = context.has_permission
 
@@ -116,11 +153,11 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
         """Add a logging entry describing the response served."""
         if flask.request.endpoint != "static":
             endpoint = flask.request.endpoint or f"[CP:<{flask.request.url}>]"
-            if response.status_code < 400:          # Success
+            if response.status_code < 400:  # Success
                 msg = f"Served '{endpoint}'"
-                if response.status_code >= 300:     # Redirect
+                if response.status_code >= 300:  # Redirect
                     msg += " [redirecting]"
-            else:                                   # Error
+            else:  # Error
                 msg = f"Served error page ({flask.request}: {response.status})"
 
             remote_ip = flask.request.headers.get("X-Real-Ip", "<unknown IP>")
@@ -159,6 +196,7 @@ def _get_locale() -> str | None:
         db.session.commit()
 
     return locale
+
 
 # Set up user loader
 @login.user_loader

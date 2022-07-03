@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+{{ super() }}
+<script src={{ url_for("static",
+                       filename="bower_components/web-pingjs/ping.js") }}
+        defer></script>
+<script src={{ url_for("static", filename="js/devices/connect-check.js") }}
+        defer></script>
+{% endblock %}
+
+{% block app_content %}
+
+{% if request.args.get("hello") %}
+<div class="row mt-3 mb-5">
+    <div class="col"><div class="progress registration-steps fs-5">
+        <div class="progress-bar w-25 bg-success bg-gradient">
+            {{ _("Compte") }}
+        </div>
+        <div class="progress-bar w-25 bg-success bg-gradient border-start">
+            {{ _("Chambre") }}
+        </div>
+        <div class="progress-bar w-25 bg-success bg-gradient border-start">
+            {{ _("Appareil") }}
+        </div>
+        <div class="progress-bar w-25 bg-secondary bg-gradient border-start"
+             id="last">
+            {{ _("Internet") }}
+        </div>
+    </div></div>
+</div>
+{% endif %}
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ title }}</h1>
+    </div>
+</div>
+<div class="row"><p>
+    {{ _("C'est tout bon ! La passerelle va être configurée pour accorder "
+         "l'accès à Internet à cet appareil.") }}
+</p></div>
+<div class="row"><p>
+    {{ _("Cette opération peut prendre quelques minutes. Cette page "
+         "indiquera automatiquement quand ce sera bon !") }}
+</p></div>
+<div class="row mt-2 mb-4">
+    <div>
+        <div class="d-flex align-items-center">
+            {{ _("Test de la connexion...") }}
+            <div class="spinner-border text-primary mx-3" id="spinner">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <span class="cc-ok text-success fw-bold mx-3 opacity-0">
+                {{ _("Connecté !") }}
+            </span>
+            <a class="cc-ok btn btn-success opacity-0"
+               href={{ url_for("main.rickroll") }}>
+                {{ _("Accéder à Internet") }}
+            </a>
+        </div>
+    </div>
+</div>
+<div class="row mt-5"><p>
+    {{ _("Si il n'y a toujours rien après 10 minutes, essayez "
+         "de débrancher / rebrancher l'appareil, puis de le redémarrer.") }}
+</p></div>
+<div class="row"><p>
+    {{ _("Si le problème persiste, ") }}
+    <a href="{{ url_for("main.contact") }}">{{ _("contactez-nous") }}</a>
+    {{ _("pour voir ensemble comment résoudre ce problème.") }}
+</p></div>
+
+{% endblock %}
