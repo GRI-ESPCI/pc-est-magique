@@ -8,10 +8,10 @@ from app.models import PCeen
 
 
 def new_username(prenom: str, nom: str) -> str:
-    """Create a new pceen unique username from a forname and a name.
+    """Create a new pceen unique username from its names.
 
     Args:
-        prenom: The pceen's forname.
+        prenom: The pceen's first name.
         nom: The pceen's last name.
 
     Returns:

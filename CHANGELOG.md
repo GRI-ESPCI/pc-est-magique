@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+# v2.0.0 (unreleased)
+
+Fusion of IntraRez (https://github.com/GRI-ESPCI/intrarez) into this project.
+
+Since IntraRez had its own version and was in v1.6.3, this project is 
+directly bumped from v0.2.1 to v2.0.0.
+
+See original IntraRez changelog in `INTRAREZ_CHANGELOG.MD`.
+
+
 # v0.2.1 (2022-05-14)
 
 ### Added
@@ -25,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * :class:`.models.Role` and :class:`.models.Permission` system, with
       * Enums :class:`.enums.PermissionType` and
         :class:`.enums.PermissionScope`;
-      * Permission check method :class:`.models.Rezident.has_permission`,
+      * Permission check method :class:`.models.PCeen.has_permission`,
         context functions :func:`.context.has_permission`,
         :func:`.context.check_permission`,
         :func:`.context.check_any_permission`,

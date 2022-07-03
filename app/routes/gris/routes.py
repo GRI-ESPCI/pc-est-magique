@@ -1,4 +1,4 @@
-"""Intranet de la Rez - Gris Pages Routes"""
+"""PC est magique - Gris Pages Routes"""
 
 import contextlib
 import io
@@ -16,27 +16,46 @@ from app.routes.gris.utils import (
     add_remove_role,
     get_perm_elements,
     remove_perm,
+    add_edit_ban,
 )
 from app.utils import helpers, typing
 
 
 @bp.route("/pceens", methods=["GET", "POST"])
-@context.permission_only(PermissionType.read, PermissionScope.pceen)
+@context.gris_only
 def pceens() -> typing.RouteReturn:
     """PCéens list page."""
-    form = forms.AddRemoveRoleForm()
-    if form.is_submitted():
+    roles_form = forms.AddRemoveRoleForm()
+    ban_form = forms.BanForm()
+
+    if roles_form.is_submitted():
         # Check request is well formed
-        if form.validate():
+        if roles_form.validate():
             return add_remove_role(
-                form.action.data, form.pceen_id.data, form.role_id.data
+                roles_form.action.data,
+                roles_form.pceen_id.data,
+                roles_form.role_id.data,
             )
         else:
-            return "Bad formed request", 400
+            return {"message": "Bad formed request", "detail": roles_form.errors}, 400
+
+    if ban_form.validate_on_submit():
+        add_edit_ban(
+            unban=ban_form.unban.data,
+            pceen=ban_form.pceen.data,
+            ban_id=ban_form.ban_id.data,
+            infinite=ban_form.infinite.data,
+            hours=ban_form.hours.data,
+            days=ban_form.days.data,
+            months=ban_form.months.data,
+            reason=ban_form.reason.data,
+            message=ban_form.message.data,
+        )
 
     return flask.render_template(
         "gris/pceens.html",
-        form=form,
+        roles_form=roles_form,
+        ban_form=ban_form,
         pceens=PCeen.query.all(),
         roles=Role.query.all(),
         title=_("Gestion des PCéens"),
@@ -79,9 +98,11 @@ def roles() -> typing.RouteReturn:
 @bp.route("/run_script", methods=["GET", "POST"])
 @context.gris_only
 def run_script() -> typing.RouteReturn:
-    """Run an IntraRez script."""
+    """Run a PC est magique script."""
     form = forms.ChoseScriptForm()
     if form.validate_on_submit():
+        script = form.script.data
+        helpers.log_action(f"Executing script from GRI menu: {script}")
         # Exécution du script
         _stdin = sys.stdin
         sys.stdin = io.StringIO()  # Block script for wainting for stdin
@@ -89,8 +110,9 @@ def run_script() -> typing.RouteReturn:
             with contextlib.redirect_stdout(io.StringIO()) as stdout:
                 with contextlib.redirect_stderr(sys.stdout):
                     try:
-                        helpers.run_script(form.script.data)
-                    except Exception:
+                        helpers.run_script(script)
+                    except Exception as exc:
+                        helpers.log_action(f" -> ERROR: {exc}", warning=True)
                         output = stdout.getvalue() + traceback.format_exc()
                     else:
                         output = stdout.getvalue()
@@ -107,4 +129,22 @@ def run_script() -> typing.RouteReturn:
         )
     return flask.render_template(
         "gris/run_script.html", form=form, output=None, title=_("Exécuter un script")
+    )
+
+
+@bp.route("/monitoring_ds")
+@context.gris_only
+def monitoring_ds() -> typing.RouteReturn:
+    """Integration of Darkstat network monitoring."""
+    return flask.render_template(
+        "gris/monitoring_ds.html", title=_("Darkstat network monitoring")
+    )
+
+
+@bp.route("/monitoring_bw")
+@context.gris_only
+def monitoring_bw() -> typing.RouteReturn:
+    """Integration of Bandwidthd network monitoring."""
+    return flask.render_template(
+        "gris/monitoring_bw.html", title=_("Bandwidthd network monitoring")
     )

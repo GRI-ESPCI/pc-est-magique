@@ -1,7 +1,8 @@
-"""PC est magique Flask App - Database Models"""
+"""PC est magique Flask App - Authentification Models"""
 
 from __future__ import annotations
 
+import datetime
 import time
 import typing
 
@@ -12,17 +13,20 @@ import sqlalchemy as sa
 from werkzeug import security as wzs
 
 from app import db
-from app.enums import PermissionType, PermissionScope
+from app.enums import PermissionType, PermissionScope, SubState
+from app.utils import helpers
 from app.utils.columns import (
     column,
     one_to_many,
     many_to_many,
+    my_enum,
     Column,
     Relationship,
 )
 
 
 Model = typing.cast(type[type], db.Model)  # type checking hack
+Enum = my_enum  # type checking hack
 
 
 class PCeen(flask_login.UserMixin, Model):
@@ -49,6 +53,7 @@ class PCeen(flask_login.UserMixin, Model):
     email: Column[str] = column(sa.String(120), unique=True, nullable=False)
     locale: Column[str | None] = column(sa.String(8), nullable=True)
     is_gri: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
+    sub_state: Column[SubState] = column(Enum(SubState), nullable=True)
     _password_hash: Column[str] = column(sa.String(128), nullable=False)
 
     photos: Relationship[list[models.Photo]] = one_to_many("Photo.author")
@@ -57,6 +62,19 @@ class PCeen(flask_login.UserMixin, Model):
         secondary="_pceen_role_at",
         order_by="Role.index",
     )
+    bans: Relationship[list[models.Ban]] = one_to_many("Ban.pceen")
+    devices: Relationship[list[models.Device]] = one_to_many("Device.pceen")
+    rentals: Relationship[list[models.Rental]] = one_to_many("Rental.pceen")
+    subscriptions: Relationship[list[models.Subscription]] = one_to_many(
+        "Subscription.pceen"
+    )
+    payments: Relationship[list[models.Payment]] = one_to_many(
+        "Payment.pceen", foreign_keys="Payment._pceen_id"
+    )
+    payments_created: Relationship[list[models.Payment]] = one_to_many(
+        "Payment.gri", foreign_keys="Payment._gri_id"
+    )
+    photos: Relationship[list[models.Photo]] = one_to_many("Photo.author")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -106,6 +124,151 @@ class PCeen(flask_login.UserMixin, Model):
                 return True
         # No permission granted
         return False
+
+    @property
+    def first_seen(self) -> datetime.datetime:
+        """The first time the pceen registered a device, or now."""
+        if not self.devices:
+            return datetime.datetime.utcnow()
+        return min(device.registered for device in self.devices)
+
+    @property
+    def current_device(self) -> models.Device | None:
+        """The PCeen's last seen device, or ``None``."""
+        if not self.devices:
+            return None
+        return max(self.devices, key=lambda device: device.last_seen_time)
+
+    @property
+    def last_seen(self) -> datetime.datetime | None:
+        """The last time the PCeen logged in, or ``None``."""
+        if not self.current_device:
+            return None
+        return self.current_device.last_seen
+
+    @property
+    def other_devices(self) -> list[models.Device]:
+        """The PCeen's non-current* devices.
+
+        Sorted from most recently seen to latest seen.
+
+        *If the PCeen's "current_device" is not the device currently
+        making the request (connection from outside/GRIs list), it is
+        included in this list.
+        """
+        all = sorted(
+            self.devices, key=lambda device: device.last_seen_time, reverse=True
+        )
+        if flask.g.internal and self == flask.g.pceen:
+            # Really connected from current device: exclude it from other
+            return all[1:]
+        else:
+            # Connected from outside/an other device: include it
+            return all
+
+    @property
+    def current_rental(self) -> models.Rental | None:
+        """The PCeen's current rental, or ``None``."""
+        try:
+            return next(rent for rent in self.rentals if rent.is_current)
+        except StopIteration:
+            return None
+
+    @property
+    def old_rentals(self) -> list[models.Rental]:
+        """The PCeen's non-current rentals."""
+        return [rental for rental in self.rentals if not rental.is_current]
+
+    @property
+    def current_room(self) -> models.Room | None:
+        """The PCeen's current room, or ``None``."""
+        current_rental = self.current_rental
+        return current_rental.room if current_rental else None
+
+    @property
+    def has_a_room(self) -> bool:
+        """Whether the PCeen has currently a room rented."""
+        return self.current_rental is not None
+
+    @property
+    def current_subscription(self) -> models.Subscription | None:
+        """:class:`Subscription`: The PCeen's current subscription, or
+        ``None``."""
+        if not self.subscriptions:
+            return None
+        return max(self.subscriptions, key=lambda sub: sub.start)
+
+    @property
+    def old_subscriptions(self) -> list[models.Subscription]:
+        """:class:`list[Subscription]`: The PCeen's non-current
+        subscriptions.
+
+        Sorted from most recent to last recent subscription."""
+        return sorted(
+            (sub for sub in self.subscriptions if not sub.is_active),
+            key=lambda sub: sub.end,
+            reverse=True,
+        )
+
+    def compute_sub_state(self) -> SubState:
+        """Compute the PCeen's subscription state.
+
+        Theoretically returns :attr:`~PCeen.sub_state`, but computed
+        from :attr:`~PCeen.subscriptions`: it will differ the first
+        minutes of the day of state change, before the daily scheduled
+        script ``update_sub_states`` changes it.
+
+        Returns:
+            :class:.SubState`:
+        """
+        sub = self.current_subscription
+        if not sub:
+            # Default: trial
+            return SubState.trial
+        elif not sub.is_active:
+            return SubState.outlaw
+        elif sub.is_trial:
+            return SubState.trial
+        else:
+            return SubState.subscribed
+
+    def add_first_subscription(self) -> None:
+        """ "Add subscription to first offer (free month).
+
+        The subscription starts the day the PCeen registered its first
+        device (usually today), and ends today.
+        """
+        if not self.devices:
+            return
+        offer = models.Offer.first_offer()
+        start = self.first_seen.date()
+        sub = models.Subscription(
+            pceen=self,
+            offer=offer,
+            payment=None,
+            start=start,
+            end=datetime.date.today(),
+        )
+        db.session.add(sub)
+        self.sub_state = SubState.trial
+        db.session.commit()
+        helpers.log_action(
+            f"Added {sub} to {offer}, with no payment, "
+            f"granting Internet access for {start} – {start + offer.delay}"
+        )
+
+    @property
+    def current_ban(self) -> models.Ban | None:
+        """The PCeen's current ban, or ``None``."""
+        try:
+            return next(ban for ban in self.bans if ban.is_active)
+        except StopIteration:
+            return None
+
+    @property
+    def is_banned(self) -> bool:
+        """Whether the PCeen is currently under a ban."""
+        return self.current_ban is not None
 
     def set_password(self, password: str) -> None:
         """Save or modify pceen password.

@@ -1,11 +1,15 @@
-"""Intranet de la Rez - Gris Pages Routes"""
+"""PC est magique - Gris Pages Routes"""
 
+import datetime
 import flask
 from flask_babel import _
 
+from dateutil import relativedelta
+
 from app import context, db
 from app import models
-from app.models import PCeen, Permission, Role, PermissionScope, PermissionType
+from app.models import Ban, PCeen, Permission, Role, PermissionScope, PermissionType
+from app.utils import helpers
 
 
 def add_remove_role(action: str, pceen_id: str, role_id: str) -> tuple[str | dict, int]:
@@ -230,3 +234,80 @@ def get_perm_elements(scope_name: str) -> tuple[str | dict, int]:
     except Exception as exc:
         db.session.rollback()
         return f"Unexpected error: {exc}", 500
+
+
+def compute_ban_end(
+    start: datetime.datetime,
+    infinite: bool,
+    hours: int | None,
+    days: int | None,
+    months: int | None,
+) -> datetime.datetime | None:
+    """Compute the end datetime of the ban from form data.
+
+    Args:
+        start: The beginning of the ban.
+        infinite: Whether the ban is infinite.
+        hours: The number of hours of the ban, if applicable.
+        days: The number of days of the ban, if applicable.
+        months: The number of months of the ban, if applicable.
+
+    Returns:
+        The end of the ban, or ``None`` if infinite.
+    """
+    if infinite:
+        return None
+    else:
+        return start + relativedelta.relativedelta(
+            hours=int(hours or 0),
+            days=int(days or 0),
+            months=int(months or 0),
+        )
+
+
+def add_edit_ban(
+    unban: str | None,
+    pceen: str,
+    ban_id: str | None,
+    infinite: bool,
+    hours: int | None,
+    days: int | None,
+    months: int | None,
+    reason: str,
+    message: str | None,
+) -> None:
+    """Process a ban add/update request, or return an error."""
+    if ban_id:
+        ban = Ban.query.get(int(ban_id))
+        if unban:
+            # Terminate existing ban
+            ban.end = datetime.datetime.utcnow()
+            helpers.log_action(f"Terminated {ban}")
+            flask.flash(_("Le ban a été terminé."), "success")
+        else:
+            # Update existing ban
+            ban.end = compute_ban_end(ban.start, infinite, hours, days, months)
+            ban.reason = reason
+            ban.message = message
+            helpers.log_action(f"Modified {ban}: {ban.end} / {ban.reason}")
+            flask.flash(_("Le ban a bien été modifié."), "success")
+    else:
+        # New ban
+        pceen = PCeen.query.get(int(pceen))
+        if pceen.is_banned:
+            flask.flash(_("Ce PCéén est déjà banni !"), "danger")
+        else:
+            start = datetime.datetime.utcnow()
+            end = compute_ban_end(start, infinite, hours, days, months)
+            ban = Ban(
+                pceen=pceen,
+                start=start,
+                end=end,
+                reason=reason,
+                message=message,
+            )
+            db.session.add(ban)
+            helpers.log_action(f"Added {ban}: {ban.end} / {ban.reason}")
+            flask.flash(_("Le mécréant a bien été banni."), "success")
+    db.session.commit()
+    helpers.run_script("gen_dhcp.py")  # Update DHCP rules

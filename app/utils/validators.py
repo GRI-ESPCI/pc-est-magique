@@ -6,7 +6,7 @@ import flask
 import wtforms
 from flask_babel import lazy_gettext as _l
 
-from app.models import PCeen
+from app.models import PCeen, Room, Ban
 from app.utils.typing import JinjaStr
 
 
@@ -48,6 +48,15 @@ class EqualTo(wtforms.validators.EqualTo):
         if message is None:
             message = _l("Valeur différente du champ précédent.")
         super().__init__(fieldname, message)
+
+
+class MacAddress(wtforms.validators.MacAddress):
+    def __init__(self, message: JinjaStr | None = None) -> None:
+        if message is None:
+            message = _l(
+                "Adresse MAC invalide (format attendu : " "xx:xx:xx:xx:xx:xx)."
+            )
+        super().__init__(message)
 
 
 class Length(wtforms.validators.Length):
@@ -101,6 +110,27 @@ class NewEmail(CustomValidator):
         return (pceen is None) or (pceen == flask.g.pceen)
 
 
+class ValidPCeenID(CustomValidator):
+    message = _l("PCeen ID invalide.")
+
+    def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
+        return field.data.isdigit() and bool(PCeen.query.get(int(field.data)))
+
+
+class ValidRoom(CustomValidator):
+    message = _l("Numéro de chambre invalide.")
+
+    def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
+        return bool(Room.query.get(field.data))
+
+
+class ValidBanID(CustomValidator):
+    message = _l("Ban ID invalide.")
+
+    def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
+        return field.data.isdigit() and bool(Ban.query.get(int(field.data)))
+
+
 class PastDate(CustomValidator):
     message = _l("Cette date doit être dans le passé !")
 
@@ -117,3 +147,11 @@ class FutureDate(CustomValidator):
         if not field.data:
             return True
         return field.data >= datetime.date.today()
+
+
+class PhoneNumber(CustomValidator):
+    message = _l("Numéro de téléphone invalide (il doit être français).")
+
+    def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
+        num = field.data.replace("+33", "0").replace(" ", "")
+        return num.isdigit() and len(num) == 10 and num.startswith("0")

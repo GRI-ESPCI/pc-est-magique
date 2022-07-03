@@ -7,6 +7,59 @@ Application Flask tournant sur https://pc-est-magique.fr.
 
 Rien pour l'instant
 
+Seules les fonctionnalités majeures sont listées ici ; voir
+[`CHANGELOG.md`](CHANGELOG.md) pour les détails.
+
+### 2.0
+
+* Factorisation du site de l'IntraRez (anciennement sur 
+  https://intrarez.pc-est-magique.fr, https://github.com/GRI-ESPCI/intrarez) 
+  comme module ce site plus global.
+* Ajout du module de photos.
+* Nouveau système de rôles et permissions.
+
+### 1.6
+
+* Système de ban par les GRI / si non paiement, coupant l'accès Internet.
+
+### 1.5
+
+* Mise en service des paiements :
+  * Pages d'information, de choix de l'offre et de paiement ;
+  * Paiement par Lydia / CB (automatisé), virement bancaire ou espèces ;
+  * Ajout / validation de paiement manuel par les GRI ;
+  * Souscription automatique à l'offre de bienvenue à la première connexion.
+* Envoi de mails riches, au format HTML pour divers motifs.
+* Ajout de la possibilité de modifier diverses informations sur son profil ;
+* Enregistrement en base de la langue préférée de chaque utilisateur ;
+* Mode maintenance activable par les GRI et page pour exécuter un script.
+
+### 1.4
+
+* Accès extérieur et contexte de connexion.
+* Captcha pour le formulaire de contact depuis l'extérieur.
+
+### 1.3
+
+* Mécanisme de changement de chambre.
+* Affichages de l'adresse IP attribuée aux appareils dans le profil.
+* Gestion des chambres et appareils par les GRI (doas).
+
+### 1.2
+
+* Menu GRI pour la gestion des PCéens et le monitoring réseau.
+
+### 1.1
+
+* Portail captif pour simplifier la connexion au réseau.
+
+### 1.0
+
+* Release initiale, fonctionnalités de base en tant que site IntraRez :
+  * Connexion des rezidents, chambres et appareils (détection automatique),
+  * Génération des règles DHCP pour chaque chambre et script de mise à jour,
+  * Menu GRI avec liste des rezidents.
+
 
 ## Exigences
 
@@ -14,7 +67,7 @@ Rien pour l'instant
 * Autres packages Linux : ``postgresql postfix git npm``, plus pour le
   déploiement : ``supervisor nginx`` ;
 * Package npm : ``bower sass``
-    * Package Bower : ``bootstrap moment lightgallery``
+    * Package Bower : ``bootstrap moment webping-js lightgallery``
 * Packages Python : Voir [`requirements.txt`](requirements.txt), plus pour le
   déploiement : ``gunicorn pymysql cryptography`` ;
 * Pour le déploiement : un utilisateur Linux ``pc-est-magique`` dédié.
@@ -212,3 +265,86 @@ flask translate compile
 flask sass compile
 sudo supervisorctl start pc-est-magique
 ```
+
+(côté développement, voir plus bas)
+
+
+
+## Notes de développement
+
+Je vais ici noter pas à pas ce que je fais, pour simplifier au maximum
+l'appréhension du code par d'éventuels GRI futurs.
+
+
+### Début de l'installation
+
+### 11/09/2021 - Loïc 137
+
+Tout a été créé en suivant ce tutoriel :
+https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
+
+Requirements : je pars sur Python 3.10, parce que le nouveau statement `match`
+me fait beaucoup trop de l'oeil.
+
+À ce jour, Python 3.10 n'est disponible qu'en version *release candidate* 2
+(donc quasiment finale), et devrait sortir début octobre (donc avant la
+release de l'IntraRez).
+
+Installation propre de plusieurs versions de Python sur un même OS :
+https://hackersandslackers.com/multiple-python-versions-ubuntu-20-04
+
+Installation d'un virtual env fresh
+
+Utilisation de SQLAlchemy 1.4 (2.x pas prêt)
+
+#### Gestion des migrations de db
+
+Lors du développement d'une nouvelle version modifiant le modèle de données :
+  * En local : ``flask db migrate -m "Migration to <version>"`` ;
+  * Vérifier le fichier créé dans ``migrations/versions``.
+    **ATTENTION** : notemment, si on crée une nouvelle colonne non-nullable,
+    il faut modifier le code généré automatiquement :
+    ```py
+        op.add_column('table', sa.Column('col', sa.Boolean(), nullable=False))
+    ```
+    devient
+    ```py
+        op.add_column('table', sa.Column('col', sa.Boolean(), nullable=True))
+        op.execute("UPDATE table SET col = false")      # Ou autre valeur
+        op.alter_column('table', 'col', type_=sa.Boolean(), nullable=False)
+    ```
+  * ``flask db upgrade`` pour appliquer localement ;
+  * (autres modifs hors db)
+  * Release de la version.
+
+
+#### Spécificités
+
+Je pars sur une structure en modules (basée sur les *blueprints* Flask),
+détaillée au chapitre XV du tuto :
+https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xv-a-better-application-structure
+
+
+Application bilingue (utilisant Flask-Babel) : lorsque le code est modifié,
+* Exécuter ``flask translate update`` ;
+* Modifier/ajouter les clés de traduction dans
+  ``app/translations/en/LC_MESSAGES/messages.po``. Les entrées modifiées
+  sont indiquées avec ``#, fuzzy`` : **supprimer ce commentaire** après
+  avoir vérifié qu'il n'y avait pas d'erreur / modifié la traduction ;
+* Exécuter ``flask translate compile``.
+
+
+### 20/09/21 - Loïc 137
+
+Abandon de Flask-Bootstrap, qui est sur Bootstrap 3 et assez restreignant.
+
+À la place, je crée le template de base à la main (en créant à peu près
+les blocs que Flask-Bootstrap créait), de même pour le template des forms.
+
+J'ai repris le code de Flask-Bootstrap pour ce qui est de la gestion des
+forms, directement dans [`app/templates/_form.html`](app/templates/_form.html).
+
+Utilisation des icônes SVG [Bootstrap Icons](https://icons.getbootstrap.com/),
+directement dans app/static/svg. Voir le code d'affichage des notifications
+dans [`app/templates/base.php`](app/templates/base.php) pour savoir comment
+utiliser ces icônes (rechercher `svg`).

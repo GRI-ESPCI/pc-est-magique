@@ -90,4 +90,6 @@ def register(app: PCEstMagiqueApp) -> None:
     @click.argument("name")
     def script(name: str) -> None:
         """Run the script <NAME> in the application context."""
+        for func in app.before_first_request_funcs:
+            func()
         run_script(name)

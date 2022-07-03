@@ -1,9 +1,11 @@
-"""PC est magique Flask App - Database Models"""
+"""PC est magique Flask App - Admin Pages Models"""
 
 from __future__ import annotations
 
+import datetime
 import typing
 
+from dateutil import relativedelta
 import sqlalchemy as sa
 
 from app import db
@@ -11,6 +13,7 @@ from app.enums import PermissionType, PermissionScope
 from app.utils.columns import (
     column,
     many_to_many,
+    many_to_one,
     my_enum,
     Column,
     Relationship,
@@ -22,8 +25,6 @@ Enum = my_enum  # type checking hack
 
 
 # Association tables
-
-
 class _PCeen_Role_AT(Model):
     __tablename__ = "_pceen_role_at"
     _pceen_id: Column[int] = column(sa.ForeignKey("pceen.id"), primary_key=True)
@@ -108,7 +109,7 @@ class Permission(Model):
         Raises :exc:`ValueError` if this permission refer to non-existing
         item.
         """
-        if not self.scope.allow_item or not self.ref_id:
+        if not self.scope.allow_elem or not self.ref_id:
             return None
         item = self.scope.query(models).get(self.ref_id)
         if not item:
@@ -156,6 +157,36 @@ class Permission(Model):
             db.session.add(perm)
             db.session.commit
         return perm
+
+
+class Ban(Model):
+    """A ban of a PCeen from accessing the Internet."""
+
+    id: Column[int] = column(sa.Integer(), primary_key=True)
+    _pceen_id: Column[int] = column(sa.ForeignKey("pceen.id"), nullable=False)
+    pceen: Relationship[models.PCeen] = many_to_one("PCeen.bans")
+    start: Column[datetime.datetime] = column(sa.DateTime(), nullable=False)
+    end: Column[datetime.datetime | None] = column(sa.DateTime(), nullable=True)
+    reason: Column[str] = column(sa.String(32), nullable=False)
+    message: Column[str | None] = column(sa.String(2000), nullable=True)
+
+    def __repr__(self) -> str:
+        """Returns repr(self)."""
+        return f"<Ban #{self.id} of {self.pceen} (-> {self.end})>"
+
+    @property
+    def duration(self) -> relativedelta.relativedelta | None:
+        """Relative delta ``end - start``, or ``None`` if no end."""
+        if self.end:
+            return relativedelta.relativedelta(self.end, self.start)
+        else:
+            return None
+
+    @property
+    def is_active(self) -> bool:
+        """Whether the ban is currently active."""
+        now = datetime.datetime.utcnow()
+        return (self.start <= now) and ((not self.end) or now < self.end)
 
 
 from app import models

@@ -6,24 +6,40 @@ a[rel="external"]::after {
   margin: 0 3px 0 5px;
 }
 
+/* Process enregistrement */
+.registration-steps {
+  height: 40px !important;
+}
+
+/* Nous contacter */
+.gri-card {
+  width: 16rem;
+}
+
+/* Profil */
+.p-card {
+  width: 20rem;
+}
+
+/* Offer */
+.o-card {
+  width: 19rem;
+}
+
 /* Textarea */
 .lines-6 {
-    height: 150px !important;
+  height: 150px !important;
 }
 
 /* Maintenance stripes overlay */
 .maintenance-stripes {
-    background: repeating-linear-gradient(
-        -45deg,
-        #000000,
-        #000000 25px,
-        #ffff00 25px,
-        #ffff00 50px
-    );
-    opacity: 50%;
-    z-index: 10;
+  background: repeating-linear-gradient(
+    -45deg,
+    #000000,
+    #000000 25px,
+    #ffff00 25px,
+    #ffff00 50px
+  );
+  opacity: 50%;
+  z-index: 10;
 }
-
-/* .lg-on {
-    overflow: hidden;
-} */

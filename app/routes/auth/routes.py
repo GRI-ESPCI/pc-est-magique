@@ -4,7 +4,7 @@ import flask
 import flask_login
 from flask_babel import _
 
-from app import db
+from app import context, db
 from app.routes.auth import bp, forms, email
 from app.models import PCeen
 from app.routes.auth.utils import new_username
@@ -19,9 +19,19 @@ def auth_needed() -> typing.RouteReturn:
     )
 
 
-@bp.route("/register", methods=["GET", "POST"])
+@bp.route("/register")
 def register() -> typing.RouteReturn:
-    """PC est magique registration page."""
+    """PC est magique manual registration method choice page."""
+    if flask.g.logged_in:
+        return helpers.redirect_to_next()
+
+    return flask.render_template("auth/register.html", title=_("Nouveau compte"))
+
+
+@bp.route("/register/rezident", methods=["GET", "POST"])
+@context.internal_only
+def register_rezident() -> typing.RouteReturn:
+    """PC est magique Rezident registration page."""
     if flask.g.logged_in:
         return helpers.redirect_to_next()
 
@@ -47,7 +57,7 @@ def register() -> typing.RouteReturn:
         return helpers.redirect_to_next()
 
     return flask.render_template(
-        "auth/register.html", title=_("Nouveau compte"), form=form
+        "auth/register_rezident.html", title=_("Nouveau compte Rezident"), form=form
     )
 
 

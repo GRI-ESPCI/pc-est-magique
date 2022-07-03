@@ -1,5 +1,6 @@
 """PC est magique - Main Pages Routes"""
 
+from collections import namedtuple
 import base64
 import datetime
 import hashlib
@@ -11,6 +12,7 @@ from flask_babel import _
 from discord_webhook import DiscordWebhook
 
 from app import context
+from app.models import Ban, PermissionScope, PermissionType, Collection, Album, Photo
 from app.routes.main import bp, forms
 from app.utils import captcha, helpers, typing
 
@@ -20,7 +22,26 @@ from app.utils import captcha, helpers, typing
 @context.logged_in_only
 def index() -> typing.RouteReturn:
     """PC est magique home page."""
-    return flask.render_template("main/index.html", title=_("Accueil"))
+    if (
+        context.has_permission(PermissionType.read, PermissionScope.intrarez)
+        and not flask.g.intrarez_setup
+    ):
+        return helpers.safe_redirect(
+            flask.g.redemption_endpoint, **flask.g.redemption_params
+        )
+
+    if context.has_permission(PermissionType.read, PermissionScope.photos):
+        photos_infos = namedtuple(
+            "PhotosInfos", ["nb_collections", "nb_albums", "nb_photos"]
+        )(
+            len(Collection.query.all()),
+            len(Album.query.all()),
+            len(Photo.query.all()),
+        )
+
+    return flask.render_template(
+        "main/index.html", title=_("Accueil"), photos_infos=photos_infos
+    )
 
 
 @bp.route("/contact", methods=["GET", "POST"])
@@ -72,6 +93,37 @@ def changelog() -> typing.RouteReturn:
     return flask.render_template(
         "main/changelog.html", title=_("Notes de mise à jour"), datetime=datetime
     )
+
+
+@bp.route("/connect_check")
+@context.internal_only
+def connect_check() -> typing.RouteReturn:
+    """Connect check page."""
+    return flask.render_template("main/connect_check.html", title=_("Accès à Internet"))
+
+
+@bp.route("/banned")
+def banned() -> typing.RouteReturn:
+    """Page shown when the Rezident is banned."""
+    flask.g._ban = 1
+    try:
+        ban = Ban.query.get(flask.g._ban)
+    except AttributeError:
+        return helpers.redirect_to_next()
+    return flask.render_template(
+        "main/banned.html", ban=ban, title=_("Accès à Internet restreint")
+    )
+
+
+@bp.route("/home")
+def rickroll() -> typing.RouteReturn:
+    """The old good days..."""
+    if flask.g.logged_in:
+        with open("logs/rickrolled.log", "a") as fh:
+            fh.write(
+                f"{datetime.datetime.now()}: rickrolled " f"{flask.g.pceen.full_name}\n"
+            )
+    return flask.redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
 
 @bp.route("/test")

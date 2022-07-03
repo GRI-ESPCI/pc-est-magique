@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ title }}</h1>
+    </div>
+</div>
+<div class="row row-cols row-cols-xl-3 gy-4 gx-1">
+    {% with pceen = g.pceen, doas = None %}
+    <div class="col">{% include "cards/account.html" %}</div>
+    <div class="col">{% include "cards/room.html" %}</div>
+    <div class="col">{% include "cards/device.html" %}</div>
+    {% endwith %}
+</div>
+
+<!-- Modals devices -->
+{% for device in g.pceen.other_devices %}
+{% with pceen = g.pceen %}
+{% include "cards/device_modal.html" %}
+{% endwith %}
+{% endfor %}
+
+{% endblock %}

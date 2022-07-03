@@ -51,5 +51,65 @@
         </div>
     </form>
 </div>
+<div class="row mt-5 mb-2">
+    <h2>{{ _("Les GRIs") }}</h2>
+</div>
+<div class="row row-cols row-cols-lg-3 g-4 mb-3">
+    {# Ami GRI, si tu cherches à modifier la liste des GRIs affichée, ça se
+       passe dans app/static/gris.json ! #}
+    {% for gri in gris %}
+    <div class="col"><div class="card gri-card">
+        <div class="card-body">
+            <h5 class="card-title">{{ gri["name"] }}</h5>
+            <h6 class="card-subtitle text-muted">
+                {% if gri["role"] %}
+                {{ gri["role"].get(babel.get_locale().language[:2],
+                                   gri["role"]["en"]) }}
+                {% endif %}
+            </h6>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                {% if gri["room"] %}
+                {{ _("Chambre") }} <b>{{ gri["room"] }}</b></li>
+                {% else %}
+                <i class="text-muted">{{ _("Pas à la Rez") }}</i>
+                {% endif %}
+            <li class="list-group-item">
+                {% if gri["messenger"] %}
+                <a class="card-link text-decoration-none"
+                   href="https://www.facebook.com/messages/t/{{
+                       gri["messenger"]["id"] }}">
+                    <img src="{{ url_for("static",
+                                         filename="img/messenger.png") }}"
+                         width="18px" class="me-1" />
+                    {{ gri["messenger"]["name"] }}
+                </a>
+                {% else %}
+                <i class="text-muted">{{ _("Pas sur Messenger") }}</i>
+                {% endif %}
+            </li>
+            <li class="list-group-item">
+                {% if gri["discord"] %}
+                <a class="card-link text-decoration-none"
+                   href="https://discord.com/users/{{ gri["discord"]["id"] }}">
+                    <img src="{{ url_for("static",
+                                         filename="img/discord.png") }}"
+                         width="18px" class="me-1" />
+                    @{{ gri["discord"]["name"] }}#{{
+                        gri["discord"]["discriminant"] }}
+                </a>
+                {% else %}
+                <i class="text-muted">{{ _("Pas sur Discord") }}</i>
+                {% endif %}
+            </li>
+        </ul>
+    </div></div>
+    {% endfor %}
+</div>
+<div class="row fst-italic"><p>
+    {{ _("N'hésitez pas notamment à nous contacter pour nous rappeler de "
+         "mettre à jour cette liste. On va 100 %% oublier.") }}
+</p></div>
 
 {% endblock %}

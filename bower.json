@@ -18,6 +18,7 @@
     "dependencies": {
         "bootstrap": "latest",
         "moment": "latest",
+        "web-pingjs": "latest",
         "lightgallery": "latest"
     }
 }

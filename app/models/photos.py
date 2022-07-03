@@ -1,4 +1,4 @@
-"""PC est magique Flask App - Database Models"""
+"""PC est magique Flask App - Photos Models"""
 
 from __future__ import annotations
 

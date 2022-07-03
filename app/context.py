@@ -1,13 +1,16 @@
 """"PC est magique - Custom request context"""
 
+from ipaddress import IPv4Address
 import functools
+import re
+import subprocess
 
 import flask
 from flask import g
 from flask_babel import _
 import flask_login
 
-from app.models import Model, PCeen, PermissionType, PermissionScope
+from app.models import Model, Device, PCeen, PermissionType, PermissionScope
 from app.utils import helpers, typing
 
 
@@ -17,6 +20,15 @@ def create_request_context() -> typing.RouteReturn | None:
     Intended to be registered by :func:`before_request`.
 
     Defines:
+      * :attr:`flask.g.remote_ip` (default ``None``):
+            The caller's IP. Should never be ``None``, except if there is
+            a problem with Nginx and that the current user is GRI.
+      * :attr:`flask.g.internal` (default ``False``):
+            ``True`` if the request comes from the internal Rez network,
+            ``False`` if it comes from the Internet.
+      * :attr:`flask.g.mac` (default ``None``):
+            The caller's MAC address. Defined only if
+            :attr:`flask.g.internal` is ``True``.
       * :attr:`flask.g.logged_in` (default ``False``):
             Shorthand for :attr:`flask_login.current_user.is_authenticated`.
       * :attr:`flask.g.logged_in_user` (default ``None``):
@@ -31,13 +43,45 @@ def create_request_context() -> typing.RouteReturn | None:
             :attr:`~flask.g.doas`, or :attr:`flask.g.logged_in_user`.
       * :attr:`flask.g.is_gri` (default ``False``):
             ``True`` if the user is logged in and is a GRI.
+      * :attr:`flask.g.has_a_room` (default ``False``):
+            ``True`` if the user is logged in and has a current rental.
+      * :attr:`flask.g.device` (default ``None``):
+            The :class:`~.models.Device` of the current request, if
+            registered. Not defined if attr:`flask.g.internal` is ``False``.
+      * :attr:`flask.g.own_device` (default ``False``):
+            ``True`` if the user is logged in and that :attr:`flask.g.device`
+            is defined and owned by the user.
+      * :attr:`flask.g.intrarez_setup` (default ``True``):
+            ``False`` if either:
+              * The user is not logged in;
+              * The user is logged in but do not have a room;
+              * The user is logged in, has a room but connects from
+                the internal network from a device not registered;
+              * The user is logged in, has a room and connects from the
+                internal network from a device registered but not owned
+                by him.
+      * :attr:`flask.g.redemption_endpoint` (default ``None``):
+            The endpoint of the page that the user must visit first to
+            regularize its situation (see :func:`.intrarez_setup_only`).
+            Defined only if attr:`flask.g.intrarez_setup` is ``False``.
+      * :attr:`flask.g.redemption_params` (default ``{}``):
+            The query parameters for attr:`flask.g.redemption_endpoint`.
     """
     # Defaults
+    g.remote_ip = None
+    g.mac = None
+    g.internal = False
     g.logged_in = False
     g.logged_in_user = None
     g.pceen = None
     g.is_gri = False
     g.doas = False
+    g.has_a_room = False
+    g.device = None
+    g.own_device = False
+    g.intrarez_setup = True
+    g.redemption_endpoint = None
+    g.redemption_params = {}
 
     # Get user
     current_user = typing.cast(
@@ -48,6 +92,9 @@ def create_request_context() -> typing.RouteReturn | None:
         g.logged_in_user = typing.cast(PCeen, current_user)
         g.pceen = g.logged_in_user  # May be overridden later if doas
         g.is_gri = g.pceen.is_gri
+    else:
+        g.intrarez_setup = False
+        g.redemption_endpoint = "auth.auth_needed"
 
     # Check doas
     doas_id = flask.request.args.get("doas", "")
@@ -78,13 +125,165 @@ def create_request_context() -> typing.RouteReturn | None:
         else:
             flask.abort(503)  # 503 Service Unavailable
 
+    # Get IP
+    g.remote_ip = flask.current_app.config["FORCE_IP"] or _get_remote_ip()
+    if not g.remote_ip:
+        # X-Real-Ip header not set by Nginx: application bug?
+        if g.is_gri:
+            flask.flash("X-Real-Ip header not present! Check Nginx config!", "danger")
+        else:
+            g.intrarez_setup = False
+            g.redemption_endpoint = "devices.error"
+            g.redemption_params = {"reason": "ip"}
+            return helpers.safe_redirect("devices.error", reason="ip")
+
+    # Get MAC
+    if not g.doas:
+        # Doas = never internal, because we are not on PCeen's device
+        g.mac = flask.current_app.config["FORCE_MAC"] or _get_mac(g.remote_ip)
+        g.internal = bool(g.mac)
+    if not g.internal and not g.intrarez_setup:
+        g.redemption_endpoint = "main.external_home"
+
+    if not g.logged_in:
+        # All further checks need a logged-in user
+        return None
+
+    # Inform type-checker we now have a real PCeen
+    g.pceen = typing.cast(PCeen, g.pceen)
+
+    # Check room
+    g.has_a_room = g.pceen.has_a_room
+    if not g.has_a_room:
+        g.intrarez_setup = False
+        g.redemption_endpoint = "rooms.register"
+        if not g.doas:
+            g.redemption_params = {"hello": True}
+
+    if g.internal:
+        # Get device
+        g.device = Device.query.filter_by(mac_address=g.mac).first()
+        if g.device:
+            g.device.update_last_seen()
+        else:
+            if g.intrarez_setup:
+                # Internal but device not registered: must register
+                g.intrarez_setup = False
+                g.redemption_endpoint = "devices.register"
+                g.redemption_params = {"mac": g.mac}
+                if not g.doas:
+                    g.redemption_params["hello"] = True
+            # Last check need a device
+            return None
+
+        # Check device owner
+        g.own_device = g.pceen == g.device.pceen
+        if g.intrarez_setup and not g.own_device:
+            # Internal, device but not owned: must transfer
+            g.intrarez_setup = False
+            g.redemption_endpoint = "devices.transfer"
+            g.redemption_params = {"mac": g.mac}
+            if not g.doas:
+                g.redemption_params["hello"] = True
+            return None
+
+    # Check at least one device
+    if g.intrarez_setup and not g.pceen.devices:
+        g.intrarez_setup = False
+        g.redemption_endpoint = "devices.register"
+        return None
+
+    # Add first subscription if necessary
+    if g.intrarez_setup and not g.pceen.current_subscription:
+        g.pceen.add_first_subscription()
+
     # All set!
     return None
 
 
-# Type variables for decoraters below
+def _get_remote_ip() -> str | None:
+    """Fetch the remote IP from the request headers.
+
+    Returns:
+        The calling IP, or ``None`` if the header is missing.
+    """
+    return flask.request.headers.get("X-Real-Ip")
+
+
+def _get_mac(remote_ip) -> str | None:
+    """Fetch the remote rezident MAC address from the ARP table.
+
+    Args:
+        remote_ip: The IP of the remote rezident.
+
+    Returns:
+        The corresponding MAC address, or ``None`` if not in the list.
+    """
+    output = subprocess.run(["/sbin/arp", "-a"], capture_output=True)
+    # arp -a liste toutes les correspondances IP - mac connues
+    # résultat : lignes "domain (ip) at mac_address ..."
+    match = re.search(
+        rf"^.*? \({remote_ip}\) at ([0-9a-f:]{{17}}).*", output.stdout.decode(), re.M
+    )
+    if match:
+        return match.group(1)
+    else:
+        return None
+
+
+# Type variables for decorators below
 _RP = typing.ParamSpec("_RP")
 _Route = typing.Callable[_RP, typing.RouteReturn]
+
+
+def intrarez_setup_only(route: _Route) -> _Route:
+    """Route function decorator to restrict route to all-good users.
+
+    Redirects user to :attr:`flask.g.redemption_endpoint` if
+    :attr:`flask.g.intrarez_setup` is ``False``.
+
+    Args:
+        route: The route function to restrict access to.
+
+    Returns:
+        The protected route.
+    """
+
+    @functools.wraps(route)
+    def new_route(*args: _RP.args, **kwargs: _RP.kwargs) -> typing.RouteReturn:
+        if g.intrarez_setup:
+            return route(*args, **kwargs)
+        else:
+            return (
+                helpers.safe_redirect(g.redemption_endpoint, **g.redemption_params)
+                or route()
+            )
+
+    return new_route
+
+
+def internal_only(route: _Route) -> _Route:
+    """Route function decorator to restrict route to internal network.
+
+    Aborts with a 401 Unauthorized if the request comes from the Internet
+    (:attr:`flask.g.internal` is ``False``).
+
+    Args:
+        route: The route function to restrict access to.
+
+    Returns:
+        The protected route.
+    """
+
+    @functools.wraps(route)
+    def new_route(*args: _RP.args, **kwargs: _RP.kwargs) -> typing.RouteReturn:
+        if g.internal:
+            return route(*args, **kwargs)
+        else:
+            flask.abort(401)  # 401 Unauthorized
+            raise  # never reached, just to tell the type checker
+
+    return new_route
 
 
 def logged_in_only(route: _Route) -> _Route:
@@ -247,3 +446,33 @@ def permission_only(
         return new_route
 
     return decorator
+
+
+def _address_in_range(address: str, start: str, stop: str) -> bool:
+    return IPv4Address(start) <= IPv4Address(address) <= IPv4Address(stop)
+
+
+def capture() -> typing.RouteReturn | None:
+    """Redirect request to the adequate page based on its remote IP.
+
+    Function called by the captive portal if the requested address is not one
+    of PC est magique.
+
+    Returns:
+        The return value of :func:`flask.redirect`, or ``None`` if we are
+        already on the adequate page (process request).
+    """
+    remote_ip = _get_remote_ip()
+    if not remote_ip:
+        # X-Real-Ip header not set by Nginx: application bug?
+        return helpers.safe_redirect("devices.error", reason="ip")
+    if _address_in_range(remote_ip, "10.0.0.100", "10.0.0.199"):
+        # 10.0.0.100-199: Not registered
+        return helpers.safe_redirect("main.index")
+    if _address_in_range(remote_ip, "10.0.8.0", "10.0.255.255"):
+        # 10.0.8-255.0-255: Banned (IP stores ban ID)
+        a, b, c, d = flask.g.remote_ip.split(".")
+        flask.g._ban = (int(c) - 8) * 256 + int(d)
+        return helpers.safe_redirect("main.banned")
+
+    return helpers.safe_redirect("main.index")

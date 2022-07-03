@@ -1,12 +1,21 @@
 """PC est magique - Gris-only Pages Forms"""
 
+import datetime
 import os
 
+from dateutil import relativedelta
 import wtforms
+from wtforms.fields import html5
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
 
-from app.utils.validators import DataRequired, Optional
+from app.utils.validators import (
+    DataRequired,
+    Optional,
+    Length,
+    ValidPCeenID,
+    ValidBanID,
+)
 
 
 def scripts_list() -> list[tuple[str, str]]:
@@ -58,3 +67,22 @@ class AddRemovePermissionForm(FlaskForm):
     scope_name = wtforms.HiddenField("", validators=[Optional()])
     type_name = wtforms.HiddenField("", validators=[Optional()])
     ref_id = wtforms.HiddenField("", validators=[Optional()])
+
+
+class BanForm(FlaskForm):
+    """WTForm used to ban someone."""
+
+    pceen = wtforms.HiddenField("", validators=[DataRequired(), ValidPCeenID()])
+    ban_id = wtforms.HiddenField("", validators=[Optional(), ValidBanID()])
+    infinite = wtforms.BooleanField(_l("Illimité"), default=True)
+    hours = html5.IntegerField(_l("Heures"), validators=[Optional()])
+    days = html5.IntegerField(_l("Jours"), validators=[Optional()])
+    months = html5.IntegerField(_l("Mois"), validators=[Optional()])
+    reason = wtforms.TextField(
+        _l("Motif court"), validators=[DataRequired(), Length(max=32)]
+    )
+    message = wtforms.TextAreaField(
+        _l("Message détaillé"), validators=[Optional(), Length(max=2000)]
+    )
+    submit = wtforms.SubmitField(_l("Bannez-moi ça les modos || Mettre à jour le ban"))
+    unban = wtforms.SubmitField(_l("Mettre fin au ban"))

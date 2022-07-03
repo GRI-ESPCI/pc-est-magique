@@ -1,10 +1,12 @@
 """Useful miscellaneous functions."""
 
+import datetime
 import logging
 import os
 import importlib
 
 import flask
+from flask_babel import lazy_gettext as _l
 import werkzeug
 from werkzeug import urls as wku
 
@@ -37,7 +39,7 @@ def safe_redirect(
 
     It also automatically add the following URL parameters if not present:
       * ``next``, allowing to go back to the original request later if
-        necessary (see :func:`tools.utils.redirect_to_next`). To disable
+        necessary (see :func:`utils.helpers.redirect_to_next`). To disable
         this behavior, pass ``next=None``;
       * ``doas``, allowing to preserve doas mode through redirection
         (see :attr:`flask.g.doas`).
@@ -131,8 +133,7 @@ def run_script(name: str) -> None:
     Raises:
         FileNotFoundError: if the given name is not an existing script.
     """
-    if name.endswith(".py"):
-        name = name[:-3]
+    name = name.removesuffix(".py")
     file = os.path.join("scripts", f"{name}.py")
     if not os.path.isfile(file):
         raise FileNotFoundError(

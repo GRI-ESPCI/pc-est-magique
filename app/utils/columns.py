@@ -85,7 +85,7 @@ def _relationship(table_dot_back_populates: str, **kwargs) -> Relationship:
             )
         case _:
             raise RuntimeError(
-                f"Value '{table_dot_back_populates}' must " "be of form 'Table.column'"
+                f"Value '{table_dot_back_populates}' must be of form 'Table.column'"
             )
 
 

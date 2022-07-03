@@ -11,6 +11,22 @@ from app.routes.errors import bp
 from app.utils import typing
 
 
+@bp.app_errorhandler(401)
+def unauthorized_error(error: HTTPException) -> typing.RouteReturn:
+    err_name = f"{error.code} {error.name}"
+    err_descr = error.description
+    flask.current_app.logger.warning(f"{err_name} -- {flask.request}")
+    return (
+        flask.render_template(
+            "errors/401.html",
+            err_name=err_name,
+            err_descr=err_descr,
+            title=_("Accès restreint"),
+        ),
+        401,
+    )
+
+
 @bp.app_errorhandler(403)
 def forbidden_error(error: HTTPException) -> typing.RouteReturn:
     err_name = f"{error.code} {error.name}"

@@ -6,7 +6,7 @@ See github.com/GRI-ESPCI/pc-est-magique for informations.
 __title__ = "pc-est-magique"
 __author__ = "Loïc Simon, Louis Grandvaux & other GRIs"
 __license__ = "MIT"
-__copyright__ = "2022 GRIs – ESPCI Paris - PSL"
+__copyright__ = "2021-2022 GRIs – ESPCI Paris - PSL"
 __all__ = ["create_app"]
 
 
@@ -22,12 +22,13 @@ import flask_login
 import flask_mail
 import flask_moment
 import flask_babel
+from werkzeug import urls as wku
 
 from config import Config
 from app import enums
 
 
-in_app_copyright = "2022 GRI ESPCI"
+in_app_copyright = "2021-2022 GRI ESPCI"
 
 
 # Define Flask subclass
@@ -41,7 +42,7 @@ class PCEstMagiqueApp(flask.Flask):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Add actions logger
+        # Add PCens actions logger
         self.actions_logger = self.logger.getChild("actions")
 
 
@@ -89,13 +90,27 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
 
     # Register blueprints
     # ! Keep imports here to avoid circular import issues !
-    from app.routes import errors, main, auth, gris, photos
+    from app.routes import (
+        auth,
+        devices,
+        errors,
+        gris,
+        main,
+        payments,
+        photos,
+        profile,
+        rooms,
+    )
 
     app.register_blueprint(errors.bp)
     app.register_blueprint(main.bp)
     app.register_blueprint(auth.bp)
+    app.register_blueprint(devices.bp, url_prefix="/devices")
+    app.register_blueprint(rooms.bp, url_prefix="/rooms")
     app.register_blueprint(gris.bp, url_prefix="/gris")
     app.register_blueprint(photos.bp, url_prefix="/photos")
+    app.register_blueprint(payments.bp, url_prefix="/payments")
+    app.register_blueprint(profile.bp, url_prefix="/profile")
 
     # Configure logging
     loggers.configure_logging(app)
@@ -107,6 +122,23 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
 
     app.before_first_request(email.init_premailer)
     app.before_first_request(email.init_textifier)
+
+    # Set up captive portal
+    @app.before_request
+    def _captive_portal() -> typing.RouteReturn | None:
+        """Captive portal: redirect external requests to homepage."""
+        netlocs = app.config["NETLOCS"]
+        if netlocs is None or app.debug or app.testing:
+            # Captive portal disabled or testing: process all requests
+            return None
+        if flask.request.endpoint:
+            # No infinite redirections loop
+            return None
+        if wku.url_parse(flask.request.url).netloc not in netlocs:
+            # Requested URL not in netlocs: redirect
+            return context.capture()
+        # Valid URL
+        return None
 
     # Set up custom context creation
     # ! Keep import here to avoid circular import issues !

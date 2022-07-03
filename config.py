@@ -59,10 +59,21 @@ class Config:
     _delay_str = os.environ.get("PHOTOS_EXPIRES_DELAY")
     PHOTOS_EXPIRES_DELAY = int(_delay_str) if _delay_str.isdigit() else 3600
 
+    LYDIA_BASE_URL = os.environ.get("LYDIA_BASE_URL")
+    LYDIA_VENDOR_TOKEN = os.environ.get("LYDIA_VENDOR_TOKEN")
+    LYDIA_PRIVATE_TOKEN = os.environ.get("LYDIA_PRIVATE_TOKEN")
+
     GOOGLE_RECAPTCHA_SITEKEY = os.environ.get("GOOGLE_RECAPTCHA_SITEKEY")
     GOOGLE_RECAPTCHA_SECRET = os.environ.get("GOOGLE_RECAPTCHA_SECRET")
 
+    GRI_BASIC_PASSWORD = os.environ.get("GRI_BASIC_PASSWORD")
+
     BRANCH = os.environ.get("BRANCH")
     FORCE_IP = os.environ.get("FORCE_IP")
+    FORCE_MAC = os.environ.get("FORCE_MAC")
+
+    NETLOCS = os.environ.get("NETLOCS")
+    if NETLOCS is not None:
+        NETLOCS = NETLOCS.split(";")
 
     MAINTENANCE = bool(os.environ.get("MAINTENANCE"))

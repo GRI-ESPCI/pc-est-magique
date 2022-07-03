@@ -7,7 +7,7 @@ from types import ModuleType
 from typing import Callable, NamedTuple
 
 
-__all__ = ["PermissionType", "PermissionScope"]
+__all__ = ["PermissionType", "PermissionScope", "SubState", "PaymentStatus"]
 
 
 class PermissionType(enum.Enum):
@@ -31,7 +31,7 @@ class _PSParams(NamedTuple):
 
 
 class PermissionScope(enum.Enum):
-    """ "The scope of a permission.
+    """The scope of a permission.
 
     Attrs:
         allow_elem (bool): If this scope allows specific permissions.
@@ -65,12 +65,16 @@ class PermissionScope(enum.Enum):
     def __repr__(self) -> str:
         return f"<{type(self).__name__}.{self.name}>"
 
+    # Global scopes (modules)
+    photos = _PSParams(allow_elem=False, need_elem=False)
+    intrarez = _PSParams(allow_elem=False, need_elem=False)
+
+    # Elements scopes
     pceen = _PSParams(
         allow_elem=True,
         need_elem=False,
         query=lambda models: models.PCeen.query,
     )
-    photos = _PSParams(allow_elem=False, need_elem=False)
     collection = _PSParams(
         allow_elem=True,
         need_elem=False,
@@ -88,3 +92,23 @@ class PermissionScope(enum.Enum):
         need_elem=False,
         query=lambda models: models.Role.query,
     )
+
+
+class SubState(enum.Enum):
+    """ "The subscription state of a PCeen."""
+
+    subscribed = enum.auto()
+    trial = enum.auto()
+    outlaw = enum.auto()
+
+
+class PaymentStatus(enum.Enum):
+    """ "The status of a Payment."""
+
+    manual = enum.auto()
+    creating = enum.auto()
+    waiting = enum.auto()
+    accepted = enum.auto()
+    refused = enum.auto()
+    cancelled = enum.auto()
+    error = enum.auto()

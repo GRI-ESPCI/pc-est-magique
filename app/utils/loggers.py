@@ -21,7 +21,7 @@ def _execute_webhook(app: PCEstMagiqueApp, webhook: DiscordWebhook) -> None:
         if not response:
             app.logger.error(
                 f"ATTENTION : Échec lors de l'envoi du webhook {webhook.url} "
-                f"({webhook.content}): {response.code} {response.text}"
+                f"({webhook.content}): {response.status_code} {response.text}"
             )
 
 
@@ -41,7 +41,9 @@ class DiscordHandler(StreamHandler):
     def emit(self, record: logging.LogRecord) -> requests.Response:
         """Method called to make this handler send a record."""
         content = self.format(record)
-        webhook = DiscordWebhook(url=self.webhook, content=content)
+        webhook = DiscordWebhook(
+            url=self.webhook, content=content, rate_limit_retry=True
+        )
         # Send in a separate thread
         app = typing.cast(PCEstMagiqueApp, flask.current_app._get_current_object())
         threading.Thread(target=_execute_webhook, args=(app, webhook)).start()
@@ -107,12 +109,16 @@ class DiscordErrorFormatter(DiscordFormatter):
         Retrieves request IP and logged-in pceen name if applicable.
         """
         msg = super().format(record)
-        remote_ip = flask.request.headers.get("X-Real-Ip", "<unknown IP>")
         try:
-            if flask.g.logged_in:
-                remote_ip += f" / {flask.g.pceen.full_name[:25]}"
+            remote_ip = flask.g.remote_ip or "<missing header>"
         except AttributeError:
-            pass
+            remote_ip = "<unknown IP>"
+        else:
+            try:
+                if flask.g.logged_in:
+                    remote_ip += f" / {flask.g.pceen.full_name[:25]}"
+            except AttributeError:
+                pass
 
         return (
             f"{self.role_mention}ALED ça a planté ! (chez {remote_ip})\n" f"```{msg}```"
