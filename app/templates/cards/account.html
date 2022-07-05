@@ -24,7 +24,7 @@
 </tr>
 <tr>
     <th scope="row" class="ps-4">{{ _("Promotion") }}</th>
-    <td>{{ promotions().get(pceen.promo, pceen.promo) }}</td>
+    <td>{{ pceen.promo or "-" }}</td>
 </tr>
 <tr>
     <th scope="row" class="ps-4">{{ _("Email") }}</th>

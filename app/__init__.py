@@ -47,7 +47,7 @@ class PCEstMagiqueApp(flask.Flask):
 
 
 # Imports needing PCEstMagiqueApp - don't move!
-from app.utils import helpers, loggers, typing
+from app.utils import helpers, loggers, typing, sso
 
 # Load extensions
 db = flask_sqlalchemy.SQLAlchemy()
@@ -56,6 +56,7 @@ login = flask_login.LoginManager()
 mail = flask_mail.Mail()
 moment = flask_moment.Moment()
 babel = flask_babel.Babel()
+saml = sso.SAML()
 
 
 def create_app(config_class: type = Config) -> PCEstMagiqueApp:
@@ -76,6 +77,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     mail.init_app(app)
     moment.init_app(app)
     babel.init_app(app)
+    saml.init_app(app)
 
     # Set up Jinja
     app.jinja_env.trim_blocks = True

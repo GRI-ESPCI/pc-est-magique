@@ -7,6 +7,7 @@ Create Date: 2022-07-03 02:39:43.020939
 """
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 
 
 # revision identifiers, used by Alembic.
@@ -171,14 +172,9 @@ def upgrade():
         ),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.add_column(
-        "pceen",
-        sa.Column(
-            "sub_state",
-            sa.Enum("subscribed", "trial", "outlaw", name="substate"),
-            nullable=True,
-        ),
-    )
+    sub_state_enum = sa.Enum("subscribed", "trial", "outlaw", name="substate")
+    sub_state_enum.create(op.get_bind())
+    op.add_column("pceen", sa.Column("sub_state", sub_state_enum, nullable=True))
     # ### end Alembic commands ###
     # Create a temporary "_permission_scope" type, convert and drop the "old" type
     tmp_type.create(op.get_bind(), checkfirst=False)
@@ -189,7 +185,7 @@ def upgrade():
     # Create and convert to the "new" scope type
     new_type.create(op.get_bind(), checkfirst=False)
     op.execute(
-        "ALTER TABLE permission ALTER COLUMN scope TYPE scope USING scope::text::scope"
+        "ALTER TABLE permission ALTER COLUMN scope TYPE permission_scope USING scope::text::permission_scope"
     )
     tmp_type.drop(op.get_bind(), checkfirst=False)
 
@@ -217,6 +213,6 @@ def downgrade():
     # Create and convert to the "old" scope type
     old_type.create(op.get_bind(), checkfirst=False)
     op.execute(
-        "ALTER TABLE permission ALTER COLUMN scope TYPE scope USING scope::text::scope"
+        "ALTER TABLE permission ALTER COLUMN scope TYPE permission_scope USING scope::text::permission_scope"
     )
     tmp_type.drop(op.get_bind(), checkfirst=False)

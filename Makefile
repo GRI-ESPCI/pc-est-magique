@@ -15,7 +15,7 @@ help:
 install:
 	@echo "Installing PC est magique (development mode)..."
 	# Check packages
-	EXECUTABLES = python3 psql postfix git npm
+	EXECUTABLES = python3 psql postfix git npm xmlsec1
 	K := $(foreach exec,$(EXECUTABLES),\
 	    $(if $(shell which $(exec)),some string,$(error "No $(exec) in PATH")))
 	# Install dependecies

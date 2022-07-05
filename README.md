@@ -64,7 +64,7 @@ Seules les fonctionnalités majeures sont listées ici ; voir
 ## Exigences
 
 * Python >= 3.10 ;
-* Autres packages Linux : ``postgresql postfix git npm``, plus pour le
+* Autres packages Linux : ``postgresql postfix git npm xmlsec1``, plus pour le
   déploiement : ``supervisor nginx`` ;
 * Package npm : ``bower sass``
     * Package Bower : ``bootstrap moment webping-js lightgallery``
