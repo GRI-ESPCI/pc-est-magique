@@ -22,7 +22,7 @@ class SAML(flask_saml.FlaskSAML):
         self.app = app
 
         app.config["SAML_PREFIX"] = "/saml"
-        app.config["SAML_DEFAULT_REDIRECT"] = "/"
+        app.config["SAML_DEFAULT_REDIRECT"] = app.config["APPLICATION_ROOT"]
         app.config["SAML_USE_SESSIONS"] = False
 
         self.config = {
@@ -70,8 +70,12 @@ class SAML(flask_saml.FlaskSAML):
             flask.flash(str(exception), "error")
 
     def _get_client(self):
-        acs_url = flask.url_for("login_acs", _external=True)
-        metadata_url = flask.url_for("metadata", _external=True)
+        acs_url = flask.url_for(
+            "login_acs", _external=True, _scheme=self.app.config["PREFERRED_URL_SCHEME"]
+        )
+        metadata_url = flask.url_for(
+            "metadata", _external=True, _scheme=self.app.config["PREFERRED_URL_SCHEME"]
+        )
         settings = {
             "entityid": metadata_url,
             "key_file": self.app.config["SAML_CERTIFICATE_PRIVATE_KEY_FILE"],
