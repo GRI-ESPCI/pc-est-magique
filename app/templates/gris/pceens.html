@@ -152,6 +152,7 @@
         </tr></thead>
         <tbody id="sort-table">
         {% for pceen in pceens %}
+        {% with subscription = pceen.current_subscription %}
         <tr data-id="{{ str(pceen.id).rjust(5, '0') }}"
             data-name="{{ pceen.full_name }}"
             data-promo="{{ pceen.promo or 0 }}"
@@ -343,14 +344,6 @@
             </td>
 
             <td>
-            {% if pceen.current_device %}
-                <span title="{{ pceen.current_device.last_seen }} UTC">
-                {{ moment(pceen.current_device.last_seen).format("LLL") }}
-                </span>
-            {% endif %}
-            </td>
-
-            <td>
                 {% if pceen.is_banned %}
                 {% with ban = pceen.current_ban %}
                 <button class="btn btn-danger p-1 pt-0"
@@ -395,6 +388,7 @@
             </td>
 
         </tr>
+        {% endwith %}
         {% endfor %}
     </tbody></table>
 </div></div>
