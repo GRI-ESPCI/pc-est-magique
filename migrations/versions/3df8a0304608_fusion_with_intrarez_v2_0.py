@@ -91,7 +91,7 @@ def upgrade():
         sa.Column("created", sa.DateTime(), nullable=False),
         sa.Column("payed", sa.DateTime(), nullable=True),
         sa.Column(
-            "scope",
+            "status",
             sa.Enum(
                 "manual",
                 "creating",

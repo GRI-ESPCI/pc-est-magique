@@ -122,7 +122,7 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
             album.collection.featured_album.featured = False
             album.featured = True
             flask.flash(
-                _("Cet album est maintenant la miniature de la " "collection !"),
+                _("Cet album est maintenant la miniature de la collection !"),
                 "success",
             )
         db.session.commit()
@@ -151,7 +151,7 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
             photo.album.featured_photo.featured = False
             photo.featured = True
             flask.flash(
-                _("Cette photo est maintenant la miniature de " "l'album !"), "success"
+                _("Cette photo est maintenant la miniature de l'album !"), "success"
             )
             db.session.commit()
 

@@ -54,7 +54,8 @@ class PCeen(flask_login.UserMixin, Model):
     locale: Column[str | None] = column(sa.String(8), nullable=True)
     is_gri: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
     sub_state: Column[SubState] = column(Enum(SubState), nullable=True)
-    _password_hash: Column[str] = column(sa.String(128), nullable=False)
+    _password_hash: Column[str] = column(sa.String(128), nullable=True)
+    espci_sso_enabled: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
 
     photos: Relationship[list[models.Photo]] = one_to_many("Photo.author")
     roles: Relationship[list[models.Role]] = many_to_many(

@@ -143,7 +143,7 @@ def create_request_context() -> typing.RouteReturn | None:
         g.mac = flask.current_app.config["FORCE_MAC"] or _get_mac(g.remote_ip)
         g.internal = bool(g.mac)
     if not g.internal and not g.intrarez_setup:
-        g.redemption_endpoint = "main.external_home"
+        g.redemption_endpoint = "main.index"
 
     if not g.logged_in:
         # All further checks need a logged-in user

@@ -47,7 +47,7 @@ class PCEstMagiqueApp(flask.Flask):
 
 
 # Imports needing PCEstMagiqueApp - don't move!
-from app.utils import helpers, loggers, typing, sso
+from app.utils import helpers, loggers, typing
 
 # Load extensions
 db = flask_sqlalchemy.SQLAlchemy()
@@ -56,7 +56,6 @@ login = flask_login.LoginManager()
 mail = flask_mail.Mail()
 moment = flask_moment.Moment()
 babel = flask_babel.Babel()
-saml = sso.SAML()
 
 
 def create_app(config_class: type = Config) -> PCEstMagiqueApp:
@@ -77,7 +76,6 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     mail.init_app(app)
     moment.init_app(app)
     babel.init_app(app)
-    saml.init_app(app)
 
     # Set up Jinja
     app.jinja_env.trim_blocks = True
@@ -103,10 +101,12 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
         profile,
         rooms,
     )
+    from app.routes.auth import saml
 
     app.register_blueprint(errors.bp)
     app.register_blueprint(main.bp)
     app.register_blueprint(auth.bp)
+    app.register_blueprint(saml.bp, url_prefix="/saml")
     app.register_blueprint(devices.bp, url_prefix="/devices")
     app.register_blueprint(rooms.bp, url_prefix="/rooms")
     app.register_blueprint(gris.bp, url_prefix="/gris")

@@ -15,7 +15,7 @@
                 {{ _("Soit en accédant à ce site depuis le réseau de la Rez (parcours Rezident) ;") }}
             </li>
             <li>
-                {{ _("Soit en s'authentifiant via le SSO de espci.psl.eu (parcours Élève / doctorant, à venir) ;") }}
+                {{ _("Soit en s'authentifiant avec un compte ESPCI (parcours Élève, et doctorant dans le futur) ;") }}
             </li>
             <li>
                 {{ _("Soit en recevant un token de connexion sur une adresse espci.org (parcours Alumni, à venir).") }}
@@ -40,11 +40,9 @@
         {% endif %}
     </div>
     <div class="col col-3 px-4">
-        <div class="d-inline-block" data-bs-toggle="tooltip" title="{{ _("Fonctionnalité à venir") }}">
-            <a class="btn btn-primary disabled" disabled>
-                {{ _("Authentification espci.psl.eu") }}
-            </a>
-        </div>
+        <a class="btn btn-primary" href="{{ url_for("auth_saml.login", **request.args) }}">
+            {{ _("Authentification espci.psl.eu") }}
+        </a>
     </div>
     <div class="col col-3 px-4">
         <div class="d-inline-block" data-bs-toggle="tooltip" title="{{ _("Fonctionnalité à venir") }}">
