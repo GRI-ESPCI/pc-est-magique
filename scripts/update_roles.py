@@ -62,7 +62,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
     """Rôles à définir. Modifier cette fonction pour modifier les rôles.
 
     Args:
-        perms: Permissions définies dans perms(), après récupération / création.
+        perms: Permissions définies dans permissions(), après récupération / création.
     """
     return {
         "Admin": dict(
@@ -81,7 +81,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["access_intrarez"],
             ],
         ),
-        "Élève": dict(
+        "Élève": dict(  # NE PAS RENOMMER - nom utilisé dans app/routes/auth/saml/utils.py
             index=10,
             color="64b9e9",
             permissions=[

@@ -2,28 +2,43 @@
 
 {% block app_content %}
 
-    <div class="row mb-3">
-        <div class="col">
-            <h1>{{ title }}</h1>
-        </div>
+<div class="row mb-3">
+    <div class="col">
+        <h1>{{ title }}</h1>
     </div>
-    <div class="row"><p>
-        {{ _("Ce site est créé, géré et hébergé par le club GRI – BDE ESPCI "
-             "Paris - PSL.") }}
-    </p></div>
-    <div class="row"><p>
-        {{ _("Il est accessible publiquement ; en revanche, [il faudra "
-             "mettre ce texte à jour quand on sera au clair sur les "
-             "conditions d'accès au site].") }}
-    </p></div>
-    <div class="row"><p>
+</div>
+<div class="row">
+    <p>
+        {{ _("Ce site est créé, géré et hébergé par le club GRI – BDE "
+             "ESPCI Paris - PSL.") }}
+    </p>
+</div>
+<div class="row">
+    <p>
+        {{ _("Il est accessible publiquement ; en revanche, la création "
+             "de compte est conditionnée à soit :") }}
+    </p>
+    <ul>
+        <li>
+            {{ _("L'accès à ce site depuis le réseau interne de la "
+                 "résidence de l'ESPCI ;") }}
+        </li>
+        <li>
+            {{ _("L'authentification à l'aide d'un compte ESPCI Paris - PSL "
+                 "ayant accès aux services des élèves.") }}
+        </li>
+    </ul>
+</div>
+<div class="row">
+    <p>
         <a href="{{ url_for("main.contact") }}">{{ _("Contactez-nous") }}</a>
         {{ _("pour toute question relative à la gestion de vos données.") }}
-    </p></div>
-    <!-- Le premier non-GRI qui voit ça peut nous contacter pour nous dire
+    </p>
+</div>
+<!-- Le premier non-GRI qui voit ça peut nous contacter pour nous dire
      que le poulet est entré dans la mare, on lui offrira une bière
      (ou autre chose à sa convenance). Mais honnêtement, j'ai pas trop
      peur pour mon portefeuille. -->
-    <!-- OK en fait même le premier GRI qui voit ça peut me contacter... -->
+<!-- OK en fait même le premier GRI qui voit ça peut me contacter... -->
 
 {% endblock %}

@@ -7,7 +7,7 @@ from flask_babel import _
 from app import context, db
 from app.routes.auth import bp, forms, email
 from app.models import PCeen
-from app.routes.auth.utils import new_username
+from app.routes.auth.utils import new_username, grant_rezident_role
 from app.utils import helpers, typing
 
 
@@ -45,10 +45,11 @@ def register_rezident() -> typing.RouteReturn:
             email=form.email.data,
         )
         pceen.set_password(form.password.data)
+        grant_rezident_role(pceen)
         db.session.add(pceen)
         db.session.commit()
         helpers.log_action(
-            f"Registered account {pceen} ({pceen.prenom} {pceen.nom} "
+            f"Internal -> Registered account {pceen} ({pceen.prenom} {pceen.nom} "
             f"{pceen.promo}, {pceen.email})"
         )
         flask.flash(_("Compte créé avec succès !"), "success")
