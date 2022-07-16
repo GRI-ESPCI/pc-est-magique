@@ -74,14 +74,14 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["manage_collections"],
             ],
         ),
-        "Rezident": dict(
+        "Rezident": dict(  # NE PAS RENOMMER - nom utilisé dans app/routes/auth/utils.py
             index=10,
             color="d5c0a9",
             permissions=[
                 perms["access_intrarez"],
             ],
         ),
-        "Élève": dict(  # NE PAS RENOMMER - nom utilisé dans app/routes/auth/saml/utils.py
+        "Élève": dict(  # NE PAS RENOMMER - nom utilisé dans app/routes/auth/utils.py
             index=10,
             color="64b9e9",
             permissions=[

@@ -5,6 +5,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+# v2.1.0 (2022-07-17)
+
+### Added
+
+  * Authentication with ESPCI SSO
+      * New :mod:`routes.auth.saml` blueprint;
+      * Column :attr:`models.PCeen._password_hash` is now nullable;
+      * New column :attr:`models.PCeen.espci_sso_enabled`;
+      * Adapted login / sign-in pages;
+      * New config variables ``SAML_IDP_METADATA_URL``, ``SAML_IDP_METADATA_FALLBACK_URL``,
+        ``SAML_CERTIFICATE_PRIVATE_KEY_FILE``, ``SAML_CERTIFICATE_PUBLIC_KEY_FILE``.
+  * Automatically grand ``Rezident`` role when registrating from the Rez network;
+
+### Changed
+
+  * Updated legal mentions page.
+
+### Fixed
+
+  * GRI PCéens list was missing subscribtion information and modals.
+
+
 # v2.0.1 (2022-07-06)
 
 Test of SAML implementation.
@@ -14,7 +36,7 @@ Test of SAML implementation.
 
 Fusion of IntraRez (https://github.com/GRI-ESPCI/intrarez) into this project.
 
-Since IntraRez had its own version and was in v1.6.3, this project is 
+Since IntraRez had its own version and was in v1.6.3, this project is
 directly bumped from v0.2.1 to v2.0.0.
 
 See original IntraRez changelog in `INTRAREZ_CHANGELOG.MD`.

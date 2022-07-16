@@ -8,7 +8,7 @@ from flask_babel import _
 
 from app import db
 from app.models import PCeen
-from app.routes.auth.utils import new_username, grant_student_role
+from app.routes.auth.utils import new_username, grant_student_role, grant_promotion_role
 from app.utils import helpers
 
 
@@ -78,6 +78,7 @@ def reconciliate_account(pceen: PCeen, attributes: SAMLAttributes) -> None:
     )
     if promo:
         grant_student_role(pceen)
+        grant_promotion_role(pceen, promo)
     pceen.espci_sso_enabled = True
     db.session.commit()
     helpers.log_action(
@@ -103,7 +104,9 @@ def create_new_account(attributes: SAMLAttributes) -> PCeen:
         email=email,
         espci_sso_enabled=True,
     )
-    grant_student_role(pceen)
+    if promo:
+        grant_student_role(pceen)
+        grant_promotion_role(pceen, promo)
     db.session.add(pceen)
     db.session.commit()
     helpers.log_action(

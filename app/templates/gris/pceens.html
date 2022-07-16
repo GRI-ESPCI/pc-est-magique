@@ -393,6 +393,160 @@
     </tbody></table>
 </div></div>
 
+<!-- Modals -->
+{% for pceen in pceens %}
+{% with doas = pceen.id %}
+<div class="modal fade" id="mo-account-{{ pceen.id }}" tabindex="-1"
+     aria-labelledby="mo-account-lab" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="mo-account-lab">{{ _("Compte") }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="{{ _("Fermer") }}"></button>
+        </div>
+        <div class="modal-body">
+            {% include "cards/account.html" %}
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+                {{ _("Fermer") }}
+            </button>
+        </div>
+    </div></div>
+</div>
+
+<div class="modal fade" id="mo-room-{{ pceen.id }}" tabindex="-1"
+     aria-labelledby="mo-room-lab" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="mo-room-lab">{{ _("Chambre") }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="{{ _("Fermer") }}"></button>
+        </div>
+        <div class="modal-body">
+            {% include "cards/room.html" %}
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+                {{ _("Fermer") }}
+            </button>
+        </div>
+    </div></div>
+</div>
+
+{% if pceen.current_device %}
+<div class="modal fade" id="mo-device-{{ pceen.id }}" tabindex="-1"
+     aria-labelledby="mo-device-lab" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="mo-device-lab">{{ _("Appareils") }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="{{ _("Fermer") }}"></button>
+        </div>
+        <div class="modal-body">
+            {% include "cards/device.html" %}
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+                {{ _("Fermer") }}
+            </button>
+        </div>
+    </div></div>
+</div>
+{% endif %}
+
+{% if pceen.current_subscription %}
+<div class="modal fade" id="mo-sub-{{ pceen.id }}" tabindex="-1"
+     aria-labelledby="mo-sub-lab" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="mo-sub-lab">{{ _("Abonnement") }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="{{ _("Fermer") }}"></button>
+        </div>
+        <div class="modal-body">
+            {% include "cards/subscription.html" %}
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+                {{ _("Fermer") }}
+            </button>
+        </div>
+    </div></div>
+</div>
+{% endif %}
+
+{% for device in pceen.other_devices %}
+{% include "cards/device_modal.html" %}
+{% endfor %}
+
+{% endwith %}
+{% endfor %}
+
+<!-- Ban modal -->
+<div class="modal fade" id="mo-ban" tabindex="-1"
+     aria-labelledby="mo-ban-lab" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="mo-ban-lab">
+                {{ _("Bannir _name_ || Ban de _name_") }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="{{ _("Fermer") }}"></button>
+        </div>
+        <form action="" method="post" role="form">
+            <div class="modal-body container">
+                {{ ban_form.hidden_tag() }}
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-3">
+                        <div class="form-check form-switch">
+                        {{ wtf.form_field(ban_form.infinite) }}
+                        </div>
+                    </div>
+                    <div class="col-3 px-1">
+                        <div class="form-floating duration-control text-muted">
+                            {{ wtf.form_field(ban_form.hours, disabled=True,
+                                            class="duration-input") }}
+                        </div>
+                    </div>
+                    <div class="col-3 px-1">
+                        <div class="form-floating duration-control text-muted">
+                            {{ wtf.form_field(ban_form.days, disabled=True,
+                                            class="duration-input") }}
+                        </div>
+                    </div>
+                    <div class="col-3 ps-1">
+                        <div class="form-floating duration-control text-muted">
+                            {{ wtf.form_field(ban_form.months, disabled=True,
+                                            class="duration-input") }}
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3"><div class="col">
+                    <div class="form-floating">
+                        {{ wtf.form_field(ban_form.reason, maxlength=32) }}
+                    </div>
+                </div></div>
+                <div class="row mb-3"><div class="col">
+                    <div class="form-floating">
+                        {{ wtf.form_field(ban_form.message, maxlength=2000) }}
+                    </div>
+                </div></div>
+            </div>
+            <div class="modal-footer">
+                {{ wtf.form_field(ban_form.unban, class="btn btn-success",
+                                  hidden=True) }}
+                {{ wtf.form_field(ban_form.submit, class="btn btn-danger") }}
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+                    {{ _("En fait non") }}
+                </button>
+            </div>
+        </form>
+    </div></div>
+</div>
+
 <!-- Icons templates -->
 <div hidden>
     <div id="icon-template-down">

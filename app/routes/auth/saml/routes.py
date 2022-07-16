@@ -116,11 +116,6 @@ def metadata() -> typing.RouteReturn:
 @bp.route("/login")
 def login() -> typing.RouteReturn:
     """Route starting SAML authentication request, by redirecting the user to the IdP."""
-    # params = dict(**flask.request.args)
-    # return_endpoint = helpers.get_next_endpoint(**params)
-    # del params["next"]
-    # return_url = flask.url_for(return_endpoint, **params)
-
     _, info = _saml_client.prepare_for_authenticate()
     headers = dict(info["headers"])
     response = flask.redirect(headers.pop("Location"), code=302)
@@ -161,7 +156,7 @@ def acs() -> typing.RouteReturn:
 
     # Authentication OK, process attributes
     for mail in attributes["mail"]:
-        if pceen := PCeen.query.filter_by(mail=mail).first():
+        if pceen := PCeen.query.filter_by(email=mail).first():
             if not pceen.espci_sso_enabled:
                 reconciliate_account(pceen, attributes)
 
