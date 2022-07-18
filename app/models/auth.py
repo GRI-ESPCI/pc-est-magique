@@ -254,7 +254,7 @@ class PCeen(flask_login.UserMixin, Model):
         self.sub_state = SubState.trial
         db.session.commit()
         helpers.log_action(
-            f"Added {sub} to {offer}, with no payment, "
+            f"Added {sub!r} to {offer!r}, with no payment, "
             f"granting Internet access for {start} – {start + offer.delay}"
         )
 

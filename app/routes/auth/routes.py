@@ -49,7 +49,7 @@ def register_rezident() -> typing.RouteReturn:
         db.session.add(pceen)
         db.session.commit()
         helpers.log_action(
-            f"Internal -> Registered account {pceen} ({pceen.prenom} {pceen.nom} "
+            f"Internal -> Registered account {pceen!r} ({pceen.prenom} {pceen.nom} "
             f"{pceen.promo}, {pceen.email})"
         )
         flask.flash(_("Compte créé avec succès !"), "success")
@@ -144,7 +144,7 @@ def reset_password(token) -> typing.RouteReturn:
     if form.validate_on_submit():
         pceen.set_password(form.password.data)
         db.session.commit()
-        helpers.log_action(f"Reset password of {pceen}")
+        helpers.log_action(f"Reset password of {pceen!r}")
         flask.flash(_("Le mot de passe a été réinitialisé avec succès."), "success")
         return helpers.ensure_safe_redirect("auth.login")
 

@@ -35,7 +35,7 @@ def register() -> typing.RouteReturn:
             db.session.add(device)
             db.session.commit()
             helpers.log_action(
-                f"Registered {device} ({mac_address}, type '{device.type}')"
+                f"Registered {device!r} ({mac_address}, type '{device.type}')"
             )
             helpers.run_script("gen_dhcp.py")  # Update DHCP rules
             flask.flash(_("Appareil enregistré avec succès !"), "success")
@@ -79,7 +79,7 @@ def modify(device_id: str | None = None) -> typing.RouteReturn:
             flask.flash(_("Action non implémentée"), "warning")
 
         db.session.commit()
-        helpers.log_action(f"Modified {device} (type '{device.type}')")
+        helpers.log_action(f"Modified {device!r} (type '{device.type}')")
         return helpers.redirect_to_next()
 
     return flask.render_template(
@@ -114,7 +114,7 @@ def transfer() -> typing.RouteReturn:
             old_pceen = device.pceen
             device.pceen = g.pceen
             db.session.commit()
-            helpers.log_action(f"Transferred {device}, formerly owned by {old_pceen}")
+            helpers.log_action(f"Transferred {device!r}, formerly owned by {old_pceen!r}")
             helpers.run_script("gen_dhcp.py")  # Update DHCP rules
             flask.flash(_("Appareil transféré avec succès !"), "success")
             # OK

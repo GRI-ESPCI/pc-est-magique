@@ -91,7 +91,7 @@ def collection(collection_dir: str) -> typing.RouteReturn:
 
 
 @bp.route("<collection_dir>/<album_dir>", methods=["GET", "POST"])
-@context.logged_in_only
+@context.permission_only(PermissionType.read, PermissionScope.photos)
 def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
     """Photos album page (list of photos)."""
     collection = Collection.query.filter_by(dir_name=collection_dir).first()
@@ -185,7 +185,7 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
 
 @bp.route("<collection_dir>/<album_dir>/<photo_file>")
 @bp.route("<collection_dir>/<album_dir>/_thumbs/<photo_file>")
-@context.logged_in_only
+@context.permission_only(PermissionType.read, PermissionScope.photos)
 def photo(collection_dir: str, album_dir: str, photo_file: str) -> typing.RouteReturn:
     """Photo page: redirect to /photo with token, if access authorized.
 

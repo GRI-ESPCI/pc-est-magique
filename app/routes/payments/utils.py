@@ -49,8 +49,8 @@ def add_subscription(pceen: PCeen, offer: Offer, payment: Payment) -> Subscripti
 
     # Remove ban and update DHCP
     if pceen.is_banned:
+        helpers.log_action(f"{pceen!r} subscribed, terminated {pceen.current_ban!r}")
         pceen.current_ban.end = datetime.datetime.utcnow()
-        helpers.log_action(f"{pceen} subscribed, terminated {pceen.current_ban}")
         db.session.commit()
         helpers.run_script("gen_dhcp.py")  # Update DHCP rules
 

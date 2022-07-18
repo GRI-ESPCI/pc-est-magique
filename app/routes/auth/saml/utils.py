@@ -82,7 +82,7 @@ def reconciliate_account(pceen: PCeen, attributes: SAMLAttributes) -> None:
     pceen.espci_sso_enabled = True
     db.session.commit()
     helpers.log_action(
-        f"ESPCI SSO -> Matched account {pceen} with ESPCI account, updated it ({pceen.prenom} {pceen.nom} "
+        f"ESPCI SSO -> Matched account {pceen!r} with ESPCI account, updated it ({pceen.prenom} {pceen.nom} "
         f"{pceen.promo}, {pceen.email})"
     )
 
@@ -110,6 +110,6 @@ def create_new_account(attributes: SAMLAttributes) -> PCeen:
     db.session.add(pceen)
     db.session.commit()
     helpers.log_action(
-        f"ESPCI SSO -> Registered account {pceen} ({pceen.prenom} {pceen.nom} {pceen.promo}, {pceen.email})"
+        f"ESPCI SSO -> Registered account {pceen!r} ({pceen.prenom} {pceen.nom} {pceen.promo}, {pceen.email})"
     )
     return pceen

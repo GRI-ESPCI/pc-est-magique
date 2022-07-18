@@ -282,14 +282,14 @@ def add_edit_ban(
         if unban:
             # Terminate existing ban
             ban.end = datetime.datetime.utcnow()
-            helpers.log_action(f"Terminated {ban}")
+            helpers.log_action(f"Terminated {ban!r}")
             flask.flash(_("Le ban a été terminé."), "success")
         else:
             # Update existing ban
             ban.end = compute_ban_end(ban.start, infinite, hours, days, months)
             ban.reason = reason
             ban.message = message
-            helpers.log_action(f"Modified {ban}: {ban.end} / {ban.reason}")
+            helpers.log_action(f"Modified {ban!r}: {ban.end} / {ban.reason}")
             flask.flash(_("Le ban a bien été modifié."), "success")
     else:
         # New ban
@@ -307,7 +307,7 @@ def add_edit_ban(
                 message=message,
             )
             db.session.add(ban)
-            helpers.log_action(f"Added {ban}: {ban.end} / {ban.reason}")
+            helpers.log_action(f"Added {ban!r}: {ban.end} / {ban.reason}")
             flask.flash(_("Le mécréant a bien été banni."), "success")
     db.session.commit()
     helpers.run_script("gen_dhcp.py")  # Update DHCP rules

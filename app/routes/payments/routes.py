@@ -20,7 +20,7 @@ def create_first_offer() -> None:
         offer = Offer.create_first_offer()
         db.session.add(offer)
         db.session.commit()
-        helpers.log_action(f"Created first offer ({offer})")
+        helpers.log_action(f"Created first offer ({offer!r})")
 
 
 @bp.route("")
@@ -131,7 +131,7 @@ def add_payment(offer: str = None) -> typing.RouteReturn:
 
     # Add subscription
     subscription = add_subscription(pceen, offer, payment)
-    helpers.log_action(f"Added {subscription} to {offer}, with {payment} added by GRI")
+    helpers.log_action(f"Added {subscription!r} to {offer!r}, with {payment!r} added by GRI")
 
     flask.flash("Paiement et abonnement enregistrés !", "success")
     flask.flash("Mail d'information envoyé !", "success")
@@ -190,7 +190,7 @@ def lydia_callback_confirm() -> typing.RouteReturn:
 
     subscription = add_subscription(pceen, offer, payment)
     helpers.log_action(
-        f"Added {subscription} to {offer}, with {payment} via Lydia CONFIRM"
+        f"Added {subscription!r} to {offer!r}, with {payment!r} via Lydia CONFIRM"
     )
     return "", 204
 
@@ -309,7 +309,7 @@ def lydia_validate(payment_id: int) -> typing.RouteReturn:
 
     subscription = add_subscription(payment.pceen, offer, payment)
     helpers.log_action(
-        f"Added {subscription} to {offer}, with {payment} via Lydia VALIDATE"
+        f"Added {subscription!r} to {offer!r}, with {payment!r} via Lydia VALIDATE"
     )
     flask.flash(_("Paiement validé !"), "success")
     return helpers.redirect_to_next()

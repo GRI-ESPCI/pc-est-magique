@@ -44,7 +44,7 @@ def register() -> typing.RouteReturn:
             rental = Rental(pceen=flask.g.pceen, room=room, start=start, end=end)
             db.session.add(rental)
             db.session.commit()
-            helpers.log_action(f"Added {rental} for period {start} – {end}")
+            helpers.log_action(f"Added {rental!r} for period {start} – {end}")
             helpers.run_script("gen_dhcp.py")  # Update DHCP rules
             flask.flash(_("Chambre enregistrée avec succès !"), "success")
             # OK
@@ -61,7 +61,7 @@ def register() -> typing.RouteReturn:
             room.current_rental.end = datetime.date.today()  # = not current
             db.session.commit()
             helpers.log_action(
-                f"Rented {room}, formerly occupied by {old_pceen}", warning=True
+                f"Rented {room!r}, formerly occupied by {old_pceen!r}", warning=True
             )
             email.send_room_transferred_email(old_pceen)
             return _register_room()
@@ -93,7 +93,7 @@ def modify() -> typing.RouteReturn:
             rental.end = form.end.data
             db.session.commit()
             helpers.log_action(
-                f"Modified {rental}: {form.start.data} – {form.end.data}"
+                f"Modified {rental!r}: {form.start.data} – {form.end.data}"
             )
             flask.flash(_("Location modifiée avec succès !"), "success")
         else:
@@ -124,7 +124,7 @@ def terminate() -> typing.RouteReturn:
         rental = flask.g.pceen.current_rental
         rental.end = form.end.data
         db.session.commit()
-        helpers.log_action(f"Terminated {rental} (end date {form.end.data})")
+        helpers.log_action(f"Terminated {rental!r} (end date {form.end.data})")
         return helpers.redirect_to_next()
 
     return flask.render_template(

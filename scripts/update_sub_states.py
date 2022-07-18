@@ -76,11 +76,13 @@ def main() -> None:
                         ),
                     )
                     db.session.add(ban)
-                    helpers.log_action(f"Subscription of {pceen} expired, added {ban}")
+                    helpers.log_action(
+                        f"Subscription of {pceen!r} expired, added {ban!r}"
+                    )
                     db.session.commit()
 
             pceen.sub_state = sub_state
             db.session.commit()  # On commit à chaque fois, au cas où
-            helpers.log_action(f"Sub state of {pceen} changed to {sub_state}")
+            helpers.log_action(f"Sub state of {pceen!r} changed to {sub_state!r}")
             if pceen.has_a_room:
                 email.send_state_change_email(pceen, pceen.sub_state)
