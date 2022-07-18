@@ -15,7 +15,7 @@
 
 {% block scripts %}
 {{ super() }}
-{% if has_permission(PermissionType.write, PermissionScope.permission, ref=album) %}
+{% if has_permission(PermissionType.write, PermissionScope.album, elem=album) %}
 <script src="{{ url_for("static", filename="js/photos/edit-form.js") }}" defer></script>
 {% endif %}
 {% for filename in [
@@ -71,7 +71,7 @@
                 {% endif %}
             </p>
         </div>
-        {% if has_permission(PermissionType.write, PermissionScope.permission, ref=album) %}
+        {% if has_permission(PermissionType.write, PermissionScope.album, elem=album) %}
         <div class="col col-auto d-flex align-items-center"
              title="{{ _("Miniature actuelle") if album.featured
                    else _("Nouvelle miniature de la collection") }}">
@@ -127,7 +127,7 @@
     </div>
 </div>
 
-{% if has_permission(PermissionType.write, PermissionScope.permission, ref=album) %}
+{% if has_permission(PermissionType.write, PermissionScope.album, elem=album) %}
 <form action="?" method="post" role="form" id="modify-form"
       {{ "" if "edit" in request.args else "hidden" }}>
     {{ album_form.hidden_tag() }}

@@ -52,7 +52,7 @@
                     {{ macros.s(collection.nb_photos, _("photo")) }}
                 </p>
                 <a href="{{ url }}" class="btn btn-primary">Voir les albums</a>
-                {% if has_permission(PermissionType.write, PermissionScope.permission, ref=collection) %}
+                {% if has_permission(PermissionType.write, PermissionScope.collection, elem=collection) %}
                 <a href="{{ url }}?edit" class="btn btn-pc5 ms-3"
                    title={{ _("Modifier") }}>
                     <svg class="bi flex-shrink-0 text-secondary"
