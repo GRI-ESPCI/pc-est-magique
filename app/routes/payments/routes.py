@@ -7,7 +7,7 @@ from flask_babel import _
 
 from app import context, db
 from app.enums import PaymentStatus, SubState
-from app.models import Offer, Payment
+from app.models import Offer, Payment, PermissionScope, PermissionType
 from app.routes.payments import bp, forms
 from app.routes.payments.utils import add_subscription
 from app.utils import helpers, lydia, typing
@@ -26,6 +26,7 @@ def create_first_offer() -> None:
 @bp.route("")
 @bp.route("/")
 @context.intrarez_setup_only
+@context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def main() -> typing.RouteReturn:
     """Subscriptions informations page."""
     subscriptions = sorted(
@@ -40,6 +41,7 @@ def main() -> typing.RouteReturn:
 
 @bp.route("/pay")
 @context.intrarez_setup_only
+@context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def pay() -> typing.RouteReturn:
     """Payment page."""
     if flask.g.pceen.sub_state == SubState.subscribed:
@@ -56,6 +58,7 @@ def pay() -> typing.RouteReturn:
 @bp.route("/pay/<method>/", methods=["GET", "POST"])
 @bp.route("/pay/<method>/<offer>", methods=["GET", "POST"])
 @context.intrarez_setup_only
+@context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def pay_(method: str, offer: str | None = None) -> typing.RouteReturn:
     """Payment page."""
     if flask.g.pceen.sub_state == SubState.subscribed:
@@ -97,6 +100,7 @@ def pay_(method: str, offer: str | None = None) -> typing.RouteReturn:
 
 @bp.route("/add_payment/<offer>")
 @context.intrarez_setup_only
+@context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def add_payment(offer: str = None) -> typing.RouteReturn:
     """Add an arbitrary payment by a GRI."""
     if not flask.g.doas:
@@ -238,6 +242,7 @@ def lydia_callback_cancel() -> typing.RouteReturn:
 
 @bp.route("/lydia/success")
 @context.intrarez_setup_only
+@context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def lydia_success() -> typing.RouteReturn:
     """Route the user is sent back by Lydia after paying."""
     if flask.g.pceen.sub_state == SubState.subscribed:
@@ -266,6 +271,7 @@ def lydia_success() -> typing.RouteReturn:
 
 @bp.route("/lydia/fail")
 @context.intrarez_setup_only
+@context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def lydia_fail() -> typing.RouteReturn:
     """Route the user is sent back by Lydia after cancelling payment."""
     flask.flash(_("Paiement annulé"), "danger")
@@ -274,6 +280,7 @@ def lydia_fail() -> typing.RouteReturn:
 
 @bp.route("/lydia/validate/<payment_id>")
 @context.intrarez_setup_only
+@context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def lydia_validate(payment_id: int) -> typing.RouteReturn:
     """Route to register a payment done but not validated (callback error)."""
     if not payment_id.isdigit():

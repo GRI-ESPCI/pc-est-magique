@@ -29,10 +29,12 @@
 <tr>
     <th scope="row" class="ps-4">{{ _("Email") }}</th>
     <td class="text-break">
-        <a href="mailto:{{ pceen.email }}" class="text-dark">
-            {{ pceen.email }}
-        </a>
+        <a href="mailto:{{ pceen.email }}" class="text-dark">{{ pceen.email }}</a>
     </td>
+</tr>
+<tr>
+    <th scope="row" class="ps-4">{{ _("Rôles") }}</th>
+    <td>{{ pceen.roles | join(", ") }}</td>
 </tr>
 {% endblock %}
 

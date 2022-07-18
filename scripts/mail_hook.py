@@ -40,7 +40,7 @@ except ImportError:
 
 
 def report_mail() -> None:
-    """ "Get mail, process it into an Embed and send it to Discord."""
+    """Get mail, process it into an Embed and send it to Discord."""
     # Parse email contents from stdin
     mail = email.message_from_file(sys.stdin, policy=email.policy.default)
     if not mail:

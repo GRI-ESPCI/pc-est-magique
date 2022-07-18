@@ -6,7 +6,7 @@ import flask
 from flask_babel import _
 
 from app import context, db
-from app.models import Room, Rental
+from app.models import Room, Rental, PermissionScope, PermissionType
 from app.routes.rooms import bp, email, forms
 from app.utils import helpers, typing
 
@@ -23,6 +23,7 @@ def create_rez_rooms() -> None:
 
 @bp.route("/register", methods=["GET", "POST"])
 @context.intrarez_setup_only
+@context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def register() -> typing.RouteReturn:
     """Room register page."""
     room = flask.g.pceen.current_room
@@ -81,6 +82,7 @@ def register() -> typing.RouteReturn:
 
 @bp.route("/modify", methods=["GET", "POST"])
 @context.intrarez_setup_only
+@context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def modify() -> typing.RouteReturn:
     """Rental modification page."""
     form = forms.RentalModificationForm()
@@ -105,6 +107,7 @@ def modify() -> typing.RouteReturn:
 
 @bp.route("/terminate", methods=["GET", "POST"])
 @context.intrarez_setup_only
+@context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def terminate() -> typing.RouteReturn:
     """Room terminate page."""
     room = flask.g.pceen.current_room

@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+# v2.1.1 (2022-07-18)
+
+### Changed
+
+  * Index profile card: number of devices replaced by roles list.
+
+### Fixed
+
+  * Fixed missing permissions restrictions:
+      * Rooms / devices / payments routes: restrict access to ``read``/``intrarez`` permission;
+      * Photos routes: restrict collection / album / photo modification to corresponding ``write`` permission ;
+  * Fix corresponding information shown:
+      * Profile page: only show room and device cards in ``read``/``intrarez`` permission;
+      * Photos pages: show edit buttons and load edit forms only if ``write``/``photos`` permission.
+
+
 # v2.1.0 (2022-07-17)
 
 ### Added

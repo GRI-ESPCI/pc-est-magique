@@ -22,7 +22,7 @@ from app.utils import helpers, typing
 
 
 @bp.route("/pceens", methods=["GET", "POST"])
-@context.gris_only
+@context.permission_only(PermissionType.write, PermissionScope.pceen)
 def pceens() -> typing.RouteReturn:
     """PCéens list page."""
     roles_form = forms.AddRemoveRoleForm()
@@ -63,7 +63,7 @@ def pceens() -> typing.RouteReturn:
 
 
 @bp.route("/roles", methods=["GET", "POST"])
-@context.permission_only(PermissionType.read, PermissionScope.role)
+@context.permission_only(PermissionType.write, PermissionScope.role)
 def roles() -> typing.RouteReturn:
     """Roles list page."""
     form = forms.AddRemovePermissionForm()

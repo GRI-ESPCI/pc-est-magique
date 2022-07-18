@@ -8,13 +8,14 @@ from flask import g
 from flask_babel import _
 
 from app import db, context
-from app.models import Device
+from app.models import Device, PermissionScope, PermissionType
 from app.routes.devices import bp, forms
 from app.utils import helpers, typing
 
 
 @bp.route("/register", methods=["GET", "POST"])
 @context.intrarez_setup_only
+@context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def register() -> typing.RouteReturn:
     """Device register page."""
     form = forms.DeviceRegistrationForm()
@@ -52,6 +53,7 @@ def register() -> typing.RouteReturn:
 @bp.route("/modify", methods=["GET", "POST"])
 @bp.route("/modify/<device_id>", methods=["GET", "POST"])
 @context.intrarez_setup_only
+@context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def modify(device_id: str | None = None) -> typing.RouteReturn:
     """Rental modification page."""
     device = None
@@ -87,6 +89,7 @@ def modify(device_id: str | None = None) -> typing.RouteReturn:
 
 @bp.route("/transfer", methods=["GET", "POST"])
 @context.intrarez_setup_only
+@context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def transfer() -> typing.RouteReturn:
     """Device transfer page."""
     form = forms.DeviceTransferForm()
@@ -136,6 +139,7 @@ def transfer() -> typing.RouteReturn:
 
 @bp.route("/error")
 @context.intrarez_setup_only
+@context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def error() -> typing.RouteReturn:
     """Device error page."""
     if g.intrarez_setup:

@@ -16,11 +16,11 @@
 </tr>
 <tr>
     <th scope="row" class="ps-4">{{ _("Ma chambre") }}</th>
-    <td>{{ pceen.current_room.num }}</td>
+    <td>{{ pceen.current_room.num if pceen.current_room else "N/A" }}</td>
 </tr>
 <tr>
-    <th scope="row" class="ps-4">{{ _("Nombre d'appareils") }}</th>
-    <td>{{ len(pceen.devices) }}</td>
+    <th scope="row" class="ps-4">{{ _("Mes rôles") }}</th>
+    <td>{{ pceen.roles | join(", ") }}</td>
 </tr>
 {% endblock %}
 

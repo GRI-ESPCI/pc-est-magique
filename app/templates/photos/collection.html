@@ -3,8 +3,9 @@
 
 {% block scripts %}
 {{ super() }}
-<script src="{{ url_for("static", filename="js/photos/edit-form.js") }}"
-        defer></script>
+{% if has_permission(PermissionType.write, PermissionScope.permission, ref=collection) %}
+<script src="{{ url_for("static", filename="js/photos/edit-form.js") }}" defer></script>
+{% endif %}
 {% endblock %}
 
 {% block app_content %}
@@ -42,6 +43,7 @@
                 {% endif %}
             </p>
         </div>
+        {% if has_permission(PermissionType.write, PermissionScope.permission, ref=collection) %}
         <div class="col col-auto me-3 d-flex align-items-center">
             <button class="btn btn-pc5 p-2" type="button" role="button"
                     title="{{ _("Modifier la collection") }}"
@@ -52,6 +54,7 @@
                 </svg>
             </button>
         </div>
+        {% endif %}
     </div>
     {% if collection.description %}
     <div class="row mb-4 fst-italic">
@@ -80,6 +83,7 @@
     </div>
 </div>
 
+{% if has_permission(PermissionType.write, PermissionScope.permission, ref=collection) %}
 <form action="?" method="post" role="form" id="modify-form"
       {{ "" if "edit" in request.args else "hidden" }}>
     {{ form.hidden_tag() }}
@@ -131,6 +135,7 @@
         </div>
     </div>
 </form>
+{% endif %}
 
 <div class="row row-cols g-2">
     {% for album in albums %}
@@ -171,6 +176,7 @@
                     {{ macros.s(album.nb_photos, _("photo")) }}
                 </p>
                 <a href="{{ url }}" class="btn btn-primary">Voir les photos</a>
+                {% if has_permission(PermissionType.write, PermissionScope.permission, ref=album) %}
                 <a href="{{ url }}?edit" class="btn btn-pc5 ms-3"
                    title={{ _("Modifier") }}>
                     <svg class="bi flex-shrink-0 text-secondary"
@@ -178,6 +184,7 @@
                         {{ macros.bootstrap_icon("pencil") }}
                     </svg>
                 </a>
+                {% endif %}
             </div>
           </div>
     </div>

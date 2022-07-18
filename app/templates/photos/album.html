@@ -15,8 +15,10 @@
 
 {% block scripts %}
 {{ super() }}
+{% if has_permission(PermissionType.write, PermissionScope.permission, ref=album) %}
+<script src="{{ url_for("static", filename="js/photos/edit-form.js") }}" defer></script>
+{% endif %}
 {% for filename in [
-    "js/photos/edit-form.js",
     "bower_components/lightgallery/dist/lightgallery.umd.js",
     "bower_components/lightgallery/dist/plugins/zoom/lg-zoom.umd.js",
     "bower_components/lightgallery/dist/plugins/thumbnail/lg-thumbnail.umd.js",
@@ -69,6 +71,7 @@
                 {% endif %}
             </p>
         </div>
+        {% if has_permission(PermissionType.write, PermissionScope.permission, ref=album) %}
         <div class="col col-auto d-flex align-items-center"
              title="{{ _("Miniature actuelle") if album.featured
                    else _("Nouvelle miniature de la collection") }}">
@@ -95,6 +98,7 @@
                 </svg>
             </button>
         </div>
+        {% endif %}
     </div>
     {% if album.description %}
     <div class="row mb-4 fst-italic">
@@ -123,6 +127,7 @@
     </div>
 </div>
 
+{% if has_permission(PermissionType.write, PermissionScope.permission, ref=album) %}
 <form action="?" method="post" role="form" id="modify-form"
       {{ "" if "edit" in request.args else "hidden" }}>
     {{ album_form.hidden_tag() }}
@@ -174,6 +179,7 @@
         </div>
     </div>
 </form>
+{% endif %}
 
 <div class="row row-cols g-2 justify-content-center" id="lightgallery">
     {% for photo in photos %}

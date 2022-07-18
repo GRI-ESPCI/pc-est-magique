@@ -10,8 +10,10 @@
 <div class="row row-cols row-cols-xl-3 gy-4 gx-1">
     {% with pceen = g.pceen, doas = None %}
     <div class="col">{% include "cards/account.html" %}</div>
+    {% if has_permission(PermissionType.read, PermissionScope.intrarez) %}
     <div class="col">{% include "cards/room.html" %}</div>
     <div class="col">{% include "cards/device.html" %}</div>
+    {% endif %}
     {% endwith %}
 </div>
 

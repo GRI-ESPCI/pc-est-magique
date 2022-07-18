@@ -10,6 +10,11 @@ Rien pour l'instant
 Seules les fonctionnalités majeures sont listées ici ; voir
 [`CHANGELOG.md`](CHANGELOG.md) pour les détails.
 
+### 2.1
+
+* Authentification (création de compte et connexion) via le SSO de l'ESPCI.
+* Accès effectif aux photos.
+
 ### 2.0
 
 * Factorisation du site de l'IntraRez (anciennement sur 
