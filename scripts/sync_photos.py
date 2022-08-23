@@ -24,7 +24,7 @@ import sqlalchemy.orm
 try:
     from app import db
     from app.models import Collection, Album, Photo
-    from app.utils import metadata
+    from app.utils import loggers, metadata
 except ImportError:
     sys.stderr.write(
         "ERREUR - Ce script peut uniquement être appelé depuis Flask :\n"
@@ -36,11 +36,10 @@ except ImportError:
     sys.exit(1)
 
 
+@loggers.log_exception(reraise=True)
 def main() -> None:
     print("Syncing photos...")
-    collections = {
-        collection.dir_name: collection for collection in Collection.query.all()
-    }
+    collections = {collection.dir_name: collection for collection in Collection.query.all()}
 
     n_collections_before = len(collections)
     n_albums_before = sum(len(collec.albums.all()) for collec in collections.values())
@@ -62,10 +61,7 @@ def main() -> None:
                 try:
                     collection = collections[collection_dir]
                 except KeyError:
-                    raise LookupError(
-                        f"Collection {collection_dir} not "
-                        "existing (but not detected before!?)"
-                    )
+                    raise LookupError(f"Collection {collection_dir} not " "existing (but not detected before!?)")
                 sync_albums(collection, dirnames)
 
             case ["", collection_dir, album_dir]:
@@ -73,15 +69,9 @@ def main() -> None:
                     collection = collections[collection_dir]
                     album = collection.albums.filter_by(dir_name=album_dir).one()
                 except KeyError:
-                    raise LookupError(
-                        f"Collection {collection_dir} not "
-                        "existing (but not detected before!?)"
-                    )
+                    raise LookupError(f"Collection {collection_dir} not " "existing (but not detected before!?)")
                 except sqlalchemy.orm.exc.NoResultFound:
-                    raise LookupError(
-                        f"Album {collection_dir}/{album_dir} not "
-                        "existing (but not detected before!?)"
-                    )
+                    raise LookupError(f"Album {collection_dir}/{album_dir} not " "existing (but not detected before!?)")
                 sync_photos(album, filenames)
 
             case ["", _, _, "_thumbs"]:
@@ -194,10 +184,7 @@ def sync_photos(album: Album, filenames: list[str]) -> None:
             _, ext = os.path.splitext(file_name)
             if ext.lower() not in [".jpg", ".jpeg", ".png"]:
                 if not ext.lower().endswith(".gz"):
-                    print(
-                        f"    WARNING: Bad file type: {file_name} "
-                        "(only .jpg, .jpeg or .png accepted)"
-                    )
+                    print(f"    WARNING: Bad file type: {file_name} " "(only .jpg, .jpeg or .png accepted)")
                 continue
             # Check metadata
             full_path = os.path.join(album.full_path, file_name)

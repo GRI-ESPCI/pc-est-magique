@@ -27,6 +27,7 @@ from flask_babel import _
 try:
     from app.email import send_email
     from app.models import PCeen
+    from app.utils import loggers
 except ImportError:
     sys.stderr.write(
         "ERREUR - Ce script peut uniquement être appelé depuis Flask :\n"
@@ -57,6 +58,7 @@ def send_on_setup_email(pceen: PCeen) -> None:
     )
 
 
+@loggers.log_exception(reraise=True)
 def main() -> None:
     pceens = PCeen.query.all()
     n_rez = len(pceens)

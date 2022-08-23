@@ -14,7 +14,7 @@ import sys
 try:
     from app import db, __version__
     from app.models import Role, Permission, PermissionScope, PermissionType
-    from app.utils import helpers, typing
+    from app.utils import helpers, loggers, typing
 
 except ImportError:
     sys.stderr.write(
@@ -98,6 +98,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
     }
 
 
+@loggers.log_exception(reraise=True)
 def main():
     perms = {}
     for slug, perm_dict in permissions().items():
@@ -123,7 +124,5 @@ def main():
         db.session.add(role)
 
     db.session.commit()
-    helpers.log_action(
-        f"Updated permissions and roles to those in 'update_roles.py' in v{__version__}"
-    )
+    helpers.log_action(f"Updated permissions and roles to those in 'update_roles.py' in v{__version__}")
     print("Modifications effectuées.")

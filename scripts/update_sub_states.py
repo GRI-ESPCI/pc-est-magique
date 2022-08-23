@@ -22,9 +22,9 @@ from flask_babel import _
 
 try:
     from app import db
-    from app.models import PCeen, Ban, SubState
+    from app.models import PCeen, Ban, SubState, PermissionScope, PermissionType
     from app.routes.payments import email
-    from app.utils import helpers
+    from app.utils import helpers, loggers
 except ImportError:
     sys.stderr.write(
         "ERREUR - Ce script peut uniquement être appelé depuis Flask :\n"
@@ -36,12 +36,19 @@ except ImportError:
     sys.exit(1)
 
 
+@loggers.log_exception(reraise=True)
 def main() -> None:
     pceens = PCeen.query.all()
     in_a_week = datetime.date.today() + datetime.timedelta(days=7)
 
     for pceen in pceens:
         print(f"{pceen.full_name} : ", end="")
+        if not pceen.has_permission(PermissionType.read, PermissionScope.intrarez):
+            print("pas d'accès IntraRez")
+            continue
+
+        if not pceen.sub_state:
+            pceen.add_first_subscription()
 
         sub_state = pceen.compute_sub_state()
         if pceen.sub_state == sub_state:
@@ -76,9 +83,7 @@ def main() -> None:
                         ),
                     )
                     db.session.add(ban)
-                    helpers.log_action(
-                        f"Subscription of {pceen!r} expired, added {ban!r}"
-                    )
+                    helpers.log_action(f"Subscription of {pceen!r} expired, added {ban!r}")
                     db.session.commit()
 
             pceen.sub_state = sub_state

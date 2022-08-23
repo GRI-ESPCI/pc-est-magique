@@ -14,6 +14,7 @@ import sys
 
 try:
     from app.models import Photo
+    from app.utils import loggers
     from app.utils.helpers import print_progressbar
 except ImportError:
     sys.stderr.write(
@@ -26,6 +27,7 @@ except ImportError:
     sys.exit(1)
 
 
+@loggers.log_exception(reraise=True)
 def main() -> None:
     photos = Photo.query.all()
     n = len(photos)

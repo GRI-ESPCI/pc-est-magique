@@ -19,6 +19,7 @@ import flask
 
 try:
     from app.models import Room
+    from app.utils import loggers
 except ImportError:
     sys.stderr.write(
         "ERREUR - Ce script peut uniquement être appelé depuis Flask :\n"
@@ -30,6 +31,7 @@ except ImportError:
     sys.exit(1)
 
 
+@loggers.log_exception(reraise=True)
 def main() -> None:
     rules = ""
 
@@ -58,8 +60,7 @@ def main() -> None:
     file = os.getenv("DHCP_HOSTS_FILE") or ""
     if not os.path.isfile(file):
         raise FileNotFoundError(
-            f"Le ficher d'hôtes DHCP '{file}' n'existe "
-            "pas (variable d'environment DHCP_HOSTS_FILE)"
+            f"Le ficher d'hôtes DHCP '{file}' n'existe " "pas (variable d'environment DHCP_HOSTS_FILE)"
         )
 
     with open(file, "w") as fp:

@@ -28,7 +28,7 @@ import sys
 try:
     from app import db, __version__
     from app.models import Offer
-    from app.utils import helpers, typing
+    from app.utils import helpers, loggers, typing
 except ImportError:
     sys.stderr.write(
         "ERREUR - Ce script peut uniquement être appelé depuis Flask :\n"
@@ -52,10 +52,8 @@ def offers() -> dict[str, dict[str, typing.Any]]:
         "_first": dict(
             name_fr="Offre de bienvenue",
             name_en="Welcoming offer",
-            description_fr="Un mois d'accès à Internet offert à votre "
-            "première connexion !",
-            description_en="One month of free Internet access  when you "
-            "connect for the first time!",
+            description_fr="Un mois d'accès à Internet offert à votre première connexion !",
+            description_en="One month of free Internet access  when you connect for the first time!",
             price=0.0,
             months=0,
             days=0,
@@ -107,6 +105,7 @@ def offers() -> dict[str, dict[str, typing.Any]]:
     }
 
 
+@loggers.log_exception(reraise=True)
 def main():
     for slug, offer_dict in offers().items():
         offer = Offer.query.get(slug)
@@ -139,7 +138,5 @@ def main():
             db.session.add(offer)
 
     db.session.commit()
-    helpers.log_action(
-        f"Updated offers to those in 'update_offers.py' in v{__version__}"
-    )
+    helpers.log_action(f"Updated offers to those in 'update_offers.py' in v{__version__}")
     print("Modifications effectuées.")

@@ -1,10 +1,12 @@
 """PC est magique - Custom Flask Loggers"""
 
+import functools
 import os
 import logging
 from logging import StreamHandler
 from logging.handlers import TimedRotatingFileHandler
 import threading
+import traceback
 import typing
 
 import flask
@@ -41,9 +43,7 @@ class DiscordHandler(StreamHandler):
     def emit(self, record: logging.LogRecord) -> requests.Response:
         """Method called to make this handler send a record."""
         content = self.format(record)
-        webhook = DiscordWebhook(
-            url=self.webhook, content=content, rate_limit_retry=True
-        )
+        webhook = DiscordWebhook(url=self.webhook, content=content, rate_limit_retry=True)
         # Send in a separate thread
         app = typing.cast(PCEstMagiqueApp, flask.current_app._get_current_object())
         threading.Thread(target=_execute_webhook, args=(app, webhook)).start()
@@ -120,9 +120,7 @@ class DiscordErrorFormatter(DiscordFormatter):
             except AttributeError:
                 pass
 
-        return (
-            f"{self.role_mention}ALED ça a planté ! (chez {remote_ip})\n" f"```{msg}```"
-        )
+        return f"{self.role_mention}ALED ça a planté ! (chez {remote_ip})\n" f"```{msg}```"
 
 
 # Custom formatter
@@ -162,18 +160,14 @@ def configure_logging(app: PCEstMagiqueApp) -> None:
         # Alert messages for errors
         discord_errors_handler = DiscordHandler(app.config["ERROR_WEBHOOK"])
         discord_errors_handler.setLevel(logging.ERROR)
-        discord_errors_handler.setFormatter(
-            DiscordErrorFormatter(app.config.get("GRI_ROLE_ID"))
-        )
+        discord_errors_handler.setFormatter(DiscordErrorFormatter(app.config.get("GRI_ROLE_ID")))
         app.logger.addHandler(discord_errors_handler)
 
     if app.config["LOGGING_WEBHOOK"]:
         # Logging messages for actions
         discord_actions_handler = DiscordHandler(app.config["LOGGING_WEBHOOK"])
         discord_actions_handler.setLevel(logging.DEBUG if app.debug else logging.INFO)
-        discord_actions_handler.setFormatter(
-            DiscordLoggingFormatter(app.config.get("GRI_ROLE_ID"))
-        )
+        discord_actions_handler.setFormatter(DiscordLoggingFormatter(app.config.get("GRI_ROLE_ID")))
         app.actions_logger.addHandler(discord_actions_handler)
 
     # File logging
@@ -193,3 +187,25 @@ def configure_logging(app: PCEstMagiqueApp) -> None:
     # Start logs
     app.logger.setLevel(logging.INFO)
     app.actions_logger.setLevel(logging.INFO)
+
+
+def log_exception(reraise: bool = False) -> typing.Callable[[typing.Callable], typing.Callable]:
+    """Decorator: logs exceptions raised in protected function.
+
+    Args:
+        reraise: If True, re-raises the exception once logged.
+    """
+
+    def decorator(func):
+        @functools.wraps(func)
+        def decorated_func(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception:
+                flask.current_app.logger.error(traceback.format_exc())
+                if reraise:
+                    raise
+
+        return decorated_func
+
+    return decorator
