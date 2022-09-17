@@ -34,9 +34,7 @@ def register() -> typing.RouteReturn:
             )
             db.session.add(device)
             db.session.commit()
-            helpers.log_action(
-                f"Registered {device!r} ({mac_address}, type '{device.type}')"
-            )
+            helpers.log_action(f"Registered {device!r} ({mac_address}, type '{device.type}')")
             helpers.run_script("gen_dhcp.py")  # Update DHCP rules
             flask.flash(_("Appareil enregistré avec succès !"), "success")
             # OK
@@ -45,9 +43,7 @@ def register() -> typing.RouteReturn:
                 return helpers.ensure_safe_redirect("main.connect_check", hello=True)
             return helpers.redirect_to_next()
 
-    return flask.render_template(
-        "devices/register.html", title=_("Enregistrer l'appareil"), form=form
-    )
+    return flask.render_template("devices/register.html", title=_("Enregistrer l'appareil"), form=form)
 
 
 @bp.route("/modify", methods=["GET", "POST"])
@@ -58,7 +54,7 @@ def modify(device_id: str | None = None) -> typing.RouteReturn:
     """Rental modification page."""
     device = None
     if device_id is None:
-        device = flask.g.pceen.current_device
+        device = context.g.pceen.current_device
     elif device_id.isdigit():
         device = Device.query.get(device_id)
 
@@ -82,9 +78,7 @@ def modify(device_id: str | None = None) -> typing.RouteReturn:
         helpers.log_action(f"Modified {device!r} (type '{device.type}')")
         return helpers.redirect_to_next()
 
-    return flask.render_template(
-        "devices/modify.html", title=_("Modifier un appareil"), device=device, form=form
-    )
+    return flask.render_template("devices/modify.html", title=_("Modifier un appareil"), device=device, form=form)
 
 
 @bp.route("/transfer", methods=["GET", "POST"])

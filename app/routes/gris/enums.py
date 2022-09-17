@@ -11,7 +11,7 @@ __all__ = ["PermissionType", "PermissionScope"]
 
 
 class PermissionType(enum.Enum):
-    """ "The type of a permission."""
+    """The type of a permission."""
 
     def __repr__(self) -> str:
         return f"<{type(self).__name__}.{self.name}>"
@@ -31,7 +31,7 @@ class _PSParams(NamedTuple):
 
 
 class PermissionScope(enum.Enum):
-    """ "The scope of a permission.
+    """The scope of a permission.
 
     Attrs:
         allow_elem (bool): If this scope allows specific permissions.

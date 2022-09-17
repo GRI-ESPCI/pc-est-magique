@@ -81,9 +81,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.jinja_env.trim_blocks = True
     app.jinja_env.lstrip_blocks = True
     app.jinja_env.globals.update(**__builtins__)
-    app.jinja_env.globals.update(
-        **{name: getattr(enums, name) for name in enums.__all__}
-    )
+    app.jinja_env.globals.update(**{name: getattr(enums, name) for name in enums.__all__})
     app.jinja_env.globals["__version__"] = __version__
     app.jinja_env.globals["copyright"] = in_app_copyright
     app.jinja_env.globals["babel"] = flask_babel
@@ -165,10 +163,10 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
             remote_ip = flask.request.headers.get("X-Real-Ip", "<unknown IP>")
             user = "<anonymous>"
             try:
-                if flask.g.logged_in:
-                    user = repr(flask.g.logged_in_user)
-                    if flask.g.doas:
-                        user += f" AS {flask.g.pceen!r}"
+                if context.g.logged_in:
+                    user = repr(context.g.logged_in_user)
+                    if context.g.doas:
+                        user += f" AS {context.g.pceen!r}"
             except AttributeError:
                 pass
             msg += f" to {remote_ip} ({user})"
@@ -188,9 +186,7 @@ from app import models
 @babel.localeselector
 def _get_locale() -> str | None:
     """Get the application language preferred by the remote user."""
-    locale = flask.request.accept_languages.best_match(
-        flask.current_app.config["LANGUAGES"]
-    )
+    locale = flask.request.accept_languages.best_match(flask.current_app.config["LANGUAGES"])
     if flask.g.logged_in and locale != flask.g.logged_in_user.locale:
         # Do not use flask.g.pceen here, it would override user locale
         # by the locale of a GRI using doas

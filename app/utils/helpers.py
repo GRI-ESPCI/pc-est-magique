@@ -24,14 +24,10 @@ def log_action(message: str, warning: bool = False) -> None:
     current_app = flask.current_app
     if not isinstance(current_app, PCEstMagiqueApp):
         raise RuntimeError("Current app is not an PCEstMagiqueApp!?!")
-    current_app.actions_logger.log(
-        logging.WARNING if warning else logging.INFO, message
-    )
+    current_app.actions_logger.log(logging.WARNING if warning else logging.INFO, message)
 
 
-def safe_redirect(
-    endpoint: str, **params: str | bool | None
-) -> typing.RouteReturn | None:
+def safe_redirect(endpoint: str, **params: str | bool | None) -> typing.RouteReturn | None:
     """Redirect to a specific page, except if we are already here.
 
     Avoids infinite redirection loops caused by redirecting to the
@@ -71,9 +67,7 @@ def safe_redirect(
     return flask.redirect(flask.url_for(endpoint, **params))
 
 
-def ensure_safe_redirect(
-    endpoint: str, **params: str | bool | None
-) -> typing.RouteReturn:
+def ensure_safe_redirect(endpoint: str, **params: str | bool | None) -> typing.RouteReturn:
     """Like :func:`.safe_redirect`, but raises an exception if cannot redirect.
 
     Args:
@@ -136,9 +130,7 @@ def run_script(name: str) -> None:
     name = name.removesuffix(".py")
     file = os.path.join("scripts", f"{name}.py")
     if not os.path.isfile(file):
-        raise FileNotFoundError(
-            f"Script '{name}' not found (should be '{os.path.abspath(file)}')"
-        )
+        raise FileNotFoundError(f"Script '{name}' not found (should be '{os.path.abspath(file)}')")
     script = importlib.import_module(f"scripts.{name}")
     script.main()
 

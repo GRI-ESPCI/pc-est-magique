@@ -56,10 +56,7 @@ def register(app: PCEstMagiqueApp) -> None:
         compilés dans app/static/css/compiled/*.css.
         """
         if which("sass") is None:
-            raise RuntimeError(
-                "La commande 'sass' n'est pas installée. "
-                "Impossible de compiler le SCSS."
-            )
+            raise RuntimeError("La commande 'sass' n'est pas installée. " "Impossible de compiler le SCSS.")
 
         source_folder = "app/static/scss/"
         compiled_folder = "app/static/css/compiled/"

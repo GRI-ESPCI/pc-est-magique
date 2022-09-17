@@ -127,24 +127,18 @@ def run_script() -> typing.RouteReturn:
             output=output,
             title=_("Exécuter un script"),
         )
-    return flask.render_template(
-        "gris/run_script.html", form=form, output=None, title=_("Exécuter un script")
-    )
+    return flask.render_template("gris/run_script.html", form=form, output=None, title=_("Exécuter un script"))
 
 
 @bp.route("/monitoring_ds")
 @context.gris_only
 def monitoring_ds() -> typing.RouteReturn:
     """Integration of Darkstat network monitoring."""
-    return flask.render_template(
-        "gris/monitoring_ds.html", title=_("Darkstat network monitoring")
-    )
+    return flask.render_template("gris/monitoring_ds.html", title=_("Darkstat network monitoring"))
 
 
 @bp.route("/monitoring_bw")
 @context.gris_only
 def monitoring_bw() -> typing.RouteReturn:
     """Integration of Bandwidthd network monitoring."""
-    return flask.render_template(
-        "gris/monitoring_bw.html", title=_("Bandwidthd network monitoring")
-    )
+    return flask.render_template("gris/monitoring_bw.html", title=_("Bandwidthd network monitoring"))

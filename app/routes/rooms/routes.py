@@ -26,7 +26,7 @@ def create_rez_rooms() -> None:
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def register() -> typing.RouteReturn:
     """Room register page."""
-    room = flask.g.pceen.current_room
+    room = context.g.pceen.current_room
     if room:
         # Already a room: abort
         flask.flash(_("Vous avez déjà une location en cours !"), "warning")
@@ -41,7 +41,7 @@ def register() -> typing.RouteReturn:
         def _register_room() -> typing.RouteReturn:
             start = form.start.data
             end = form.end.data
-            rental = Rental(pceen=flask.g.pceen, room=room, start=start, end=end)
+            rental = Rental(pceen=context.g.pceen, room=room, start=start, end=end)
             db.session.add(rental)
             db.session.commit()
             helpers.log_action(f"Added {rental!r} for period {start} – {end}")
@@ -60,9 +60,7 @@ def register() -> typing.RouteReturn:
             old_pceen = room.current_rental.pceen
             room.current_rental.end = datetime.date.today()  # = not current
             db.session.commit()
-            helpers.log_action(
-                f"Rented {room!r}, formerly occupied by {old_pceen!r}", warning=True
-            )
+            helpers.log_action(f"Rented {room!r}, formerly occupied by {old_pceen!r}", warning=True)
             email.send_room_transferred_email(old_pceen)
             return _register_room()
 
@@ -87,22 +85,18 @@ def modify() -> typing.RouteReturn:
     """Rental modification page."""
     form = forms.RentalModificationForm()
     if form.validate_on_submit():
-        rental = flask.g.pceen.current_rental
+        rental = context.g.pceen.current_rental
         if rental:
             rental.start = form.start.data
             rental.end = form.end.data
             db.session.commit()
-            helpers.log_action(
-                f"Modified {rental!r}: {form.start.data} – {form.end.data}"
-            )
+            helpers.log_action(f"Modified {rental!r}: {form.start.data} – {form.end.data}")
             flask.flash(_("Location modifiée avec succès !"), "success")
         else:
             flask.flash(_("Pas de location en cours !"), "danger")
         return helpers.redirect_to_next()
 
-    return flask.render_template(
-        "rooms/modify.html", title=_("Mettre à jour ma location"), form=form
-    )
+    return flask.render_template("rooms/modify.html", title=_("Mettre à jour ma location"), form=form)
 
 
 @bp.route("/terminate", methods=["GET", "POST"])
@@ -110,18 +104,18 @@ def modify() -> typing.RouteReturn:
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def terminate() -> typing.RouteReturn:
     """Room terminate page."""
-    room = flask.g.pceen.current_room
+    room = context.g.pceen.current_room
     if not room:
         # No current rental: go to register
         return helpers.ensure_safe_redirect(
             "rooms.register",
-            doas=flask.g.doas,
+            doas=context.g.doas,
             next=flask.request.args.get("next"),
         )
 
     form = forms.RentalTransferForm()
     if form.validate_on_submit():
-        rental = flask.g.pceen.current_rental
+        rental = context.g.pceen.current_rental
         rental.end = form.end.data
         db.session.commit()
         helpers.log_action(f"Terminated {rental!r} (end date {form.end.data})")

@@ -21,22 +21,17 @@ def modify_account() -> typing.RouteReturn:
     """PC est magique account modification page."""
     form = forms.AccountModificationForm()
     if form.validate_on_submit():
-        pceen = flask.g.pceen
+        pceen = context.g.pceen
         pceen.nom = form.nom.data.title()
         pceen.prenom = form.prenom.data.title()
         pceen.promo = form.promo.data
         pceen.email = form.email.data
         db.session.commit()
-        helpers.log_action(
-            f"Modified account {pceen!r} ({pceen.prenom} {pceen.nom} "
-            f"{pceen.promo}, {pceen.email})"
-        )
+        helpers.log_action(f"Modified account {pceen!r} ({pceen.prenom} {pceen.nom} " f"{pceen.promo}, {pceen.email})")
         flask.flash(_("Compte modifié avec succès !"), "success")
         return helpers.redirect_to_next()
 
-    return flask.render_template(
-        "profile/modify_account.html", title=_("Mettre à jour mon compte"), form=form
-    )
+    return flask.render_template("profile/modify_account.html", title=_("Mettre à jour mon compte"), form=form)
 
 
 @bp.route("/update_password", methods=["GET", "POST"])
@@ -45,7 +40,7 @@ def update_password() -> typing.RouteReturn:
     """PC est magique password update page."""
     form = forms.PasswordUpdateForm()
     if form.validate_on_submit():
-        pceen = flask.g.pceen
+        pceen = context.g.pceen
         if pceen.check_password(form.current_password.data):
             pceen.set_password(form.password.data)
             db.session.commit()
@@ -55,6 +50,4 @@ def update_password() -> typing.RouteReturn:
         else:
             flask.flash(_("Mot de passe actuel incorrect"), "danger")
 
-    return flask.render_template(
-        "profile/update_password.html", title=_("Modifier mon mot de passe"), form=form
-    )
+    return flask.render_template("profile/update_password.html", title=_("Modifier mon mot de passe"), form=form)

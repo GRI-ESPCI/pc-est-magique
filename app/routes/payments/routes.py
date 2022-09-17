@@ -29,9 +29,7 @@ def create_first_offer() -> None:
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def main() -> typing.RouteReturn:
     """Subscriptions informations page."""
-    subscriptions = sorted(
-        flask.g.pceen.subscriptions, key=lambda sub: sub.start, reverse=True
-    )
+    subscriptions = sorted(context.g.pceen.subscriptions, key=lambda sub: sub.start, reverse=True)
     return flask.render_template(
         "payments/main.html",
         title=_("Mon abonnement Internet"),
@@ -44,14 +42,12 @@ def main() -> typing.RouteReturn:
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def pay() -> typing.RouteReturn:
     """Payment page."""
-    if flask.g.pceen.sub_state == SubState.subscribed:
+    if context.g.pceen.sub_state == SubState.subscribed:
         flask.flash(_("Vous avez déjà un abonnement en cours !"), "warning")
         return helpers.redirect_to_next()
 
     offers = Offer.query.filter_by(visible=True).order_by(Offer.price).all()
-    return flask.render_template(
-        "payments/pay.html", title=_("Paiement"), offers=offers
-    )
+    return flask.render_template("payments/pay.html", title=_("Paiement"), offers=offers)
 
 
 @bp.route("/pay/<method>", methods=["GET", "POST"])
@@ -61,7 +57,7 @@ def pay() -> typing.RouteReturn:
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def pay_(method: str, offer: str | None = None) -> typing.RouteReturn:
     """Payment page."""
-    if flask.g.pceen.sub_state == SubState.subscribed:
+    if context.g.pceen.sub_state == SubState.subscribed:
         flask.flash(_("Vous avez déjà un abonnement en cours !"), "warning")
         return helpers.redirect_to_next()
 
@@ -74,7 +70,7 @@ def pay_(method: str, offer: str | None = None) -> typing.RouteReturn:
     if method in methods:
         offer = Offer.query.get(offer)
         if offer and offer.visible and offer.active:
-            if method == "magic" and not flask.g.doas:
+            if method == "magic" and not context.g.doas:
                 flask.abort(403)
             if method == "lydia":
                 form = forms.LydiaPaymentForm()
@@ -83,7 +79,7 @@ def pay_(method: str, offer: str | None = None) -> typing.RouteReturn:
                         phone = form.phone.data.replace("+33", "0").replace(" ", "")
                     else:
                         phone = None
-                    lydia_url = lydia.get_payment_url(flask.g.pceen, offer, phone)
+                    lydia_url = lydia.get_payment_url(context.g.pceen, offer, phone)
                     return flask.redirect(lydia_url)
             else:
                 form = None
@@ -103,10 +99,10 @@ def pay_(method: str, offer: str | None = None) -> typing.RouteReturn:
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def add_payment(offer: str = None) -> typing.RouteReturn:
     """Add an arbitrary payment by a GRI."""
-    if not flask.g.doas:
+    if not context.g.doas:
         flask.abort(403)
 
-    pceen = flask.g.pceen
+    pceen = context.g.pceen
     if pceen.sub_state == SubState.subscribed:
         flask.flash(_("Vous avez déjà un abonnement en cours !"), "warning")
         return helpers.redirect_to_next()
@@ -125,7 +121,7 @@ def add_payment(offer: str = None) -> typing.RouteReturn:
         created=datetime.datetime.now(),
         payed=datetime.datetime.now(),
         status=PaymentStatus.manual,
-        gri=flask.g.logged_in_user,
+        gri=context.g.logged_in_user,
     )
     db.session.add(payment)
 
@@ -189,9 +185,7 @@ def lydia_callback_confirm() -> typing.RouteReturn:
         return f"No offer for price {payment.amount}", 404
 
     subscription = add_subscription(pceen, offer, payment)
-    helpers.log_action(
-        f"Added {subscription!r} to {offer!r}, with {payment!r} via Lydia CONFIRM"
-    )
+    helpers.log_action(f"Added {subscription!r} to {offer!r}, with {payment!r} via Lydia CONFIRM")
     return "", 204
 
 
@@ -245,16 +239,12 @@ def lydia_callback_cancel() -> typing.RouteReturn:
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def lydia_success() -> typing.RouteReturn:
     """Route the user is sent back by Lydia after paying."""
-    if flask.g.pceen.sub_state == SubState.subscribed:
+    if context.g.pceen.sub_state == SubState.subscribed:
         flask.flash(_("Paiement validé !"), "success")
         return helpers.redirect_to_next(next=None)
 
     try:
-        payment = next(
-            payment
-            for payment in flask.g.pceen.payments
-            if payment.status == PaymentStatus.waiting
-        )
+        payment = next(payment for payment in context.g.pceen.payments if payment.status == PaymentStatus.waiting)
     except StopIteration:
         flask.flash(_("Pas de paiement détecté"), "warning")
         return helpers.redirect_to_next(next=None)
@@ -308,8 +298,6 @@ def lydia_validate(payment_id: int) -> typing.RouteReturn:
         return f"No offer for price {payment.amount}", 404
 
     subscription = add_subscription(payment.pceen, offer, payment)
-    helpers.log_action(
-        f"Added {subscription!r} to {offer!r}, with {payment!r} via Lydia VALIDATE"
-    )
+    helpers.log_action(f"Added {subscription!r} to {offer!r}, with {payment!r} via Lydia VALIDATE")
     flask.flash(_("Paiement validé !"), "success")
     return helpers.redirect_to_next()

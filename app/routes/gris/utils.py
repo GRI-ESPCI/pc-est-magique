@@ -48,9 +48,7 @@ def add_remove_role(action: str, pceen_id: str, role_id: str) -> tuple[str | dic
         return f"PCeen #{pceen_id} already has role #{role_id}", 409
     if action == "remove" and role not in pceen.roles:
         return f"PCeen #{pceen_id} does not has role #{role_id}", 409
-    if not context.has_permission(
-        type=PermissionType.write, scope=PermissionScope.role, elem=role
-    ):
+    if not context.has_permission(type=PermissionType.write, scope=PermissionScope.role, elem=role):
         return "Unauthorized (you nasty cheater)", 403
     # Proceed
     try:
@@ -72,9 +70,7 @@ def add_remove_role(action: str, pceen_id: str, role_id: str) -> tuple[str | dic
         return f"Unexpected error: {exc}", 500
 
 
-def add_perm(
-    role_id: str, perm_id: str, type_name: str, scope_name: str, ref_id: str
-) -> tuple[str | dict, int]:
+def add_perm(role_id: str, perm_id: str, type_name: str, scope_name: str, ref_id: str) -> tuple[str | dict, int]:
     """Process a permisson add request, or return an error.
 
     Args:
@@ -103,9 +99,7 @@ def add_perm(
     if not role:
         return f"Invalid role '{role_id}'", 404
     # Check rights
-    if not context.has_permission(
-        type=PermissionType.write, scope=PermissionScope.role, elem=role
-    ):
+    if not context.has_permission(type=PermissionType.write, scope=PermissionScope.role, elem=role):
         return "Unauthorized (you nasty cheater)", 403
     # Check request refer to existing objects
     if perm_id:
@@ -175,9 +169,7 @@ def remove_perm(role_id: str, perm_id: str) -> tuple[str | dict, int]:
     if not perm:
         return f"Invalid perm '{perm_id}'", 404
     # Check request is acceptable
-    if not context.has_permission(
-        type=PermissionType.write, scope=PermissionScope.role, elem=role
-    ):
+    if not context.has_permission(type=PermissionType.write, scope=PermissionScope.role, elem=role):
         return "Unauthorized (you nasty cheater)", 403
     if role not in perm.roles:
         return f"This permission does not exist", 409

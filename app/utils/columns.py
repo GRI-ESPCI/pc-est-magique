@@ -80,18 +80,12 @@ def column(sa_type, *, primary_key=False, nullable=False, default=None, unique=F
 def _relationship(table_dot_back_populates: str, **kwargs) -> Relationship:
     match table_dot_back_populates.split("."):
         case table, back_populates:
-            return sqlalchemy.orm.relationship(
-                table, back_populates=back_populates, **kwargs
-            )
+            return sqlalchemy.orm.relationship(table, back_populates=back_populates, **kwargs)
         case _:
-            raise RuntimeError(
-                f"Value '{table_dot_back_populates}' must be of form 'Table.column'"
-            )
+            raise RuntimeError(f"Value '{table_dot_back_populates}' must be of form 'Table.column'")
 
 
-def one_to_many(
-    table_dot_back_populates: str, **kwargs
-) -> "Relationship":  # [list[typing.Any]]":
+def one_to_many(table_dot_back_populates: str, **kwargs) -> "Relationship":  # [list[typing.Any]]":
     """Constructs a one-to-many relationship to an other table.
 
     Args:
@@ -102,9 +96,7 @@ def one_to_many(
     return _relationship(table_dot_back_populates, **kwargs)
 
 
-def many_to_one(
-    table_dot_back_populates: str, **kwargs
-) -> "Relationship":  # [typing.Any]":
+def many_to_one(table_dot_back_populates: str, **kwargs) -> "Relationship":  # [typing.Any]":
     """Constructs a many-to-one relationship to an other table.
 
     Args:
@@ -115,9 +107,7 @@ def many_to_one(
     return _relationship(table_dot_back_populates, **kwargs)
 
 
-def many_to_many(
-    table_dot_back_populates: str, secondary: type | str, **kwargs
-) -> "Relationship":  # [typing.Any]":
+def many_to_many(table_dot_back_populates: str, secondary: type | str, **kwargs) -> "Relationship":  # [typing.Any]":
     """Constructs a many-to-many relationship to an other table.
 
     Args:

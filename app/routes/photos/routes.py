@@ -18,13 +18,9 @@ def main() -> typing.RouteReturn:
     collections = [
         collection
         for collection in Collection.query.all()
-        if context.has_permission(
-            collection.view_permission_type, PermissionScope.collection, elem=collection
-        )
+        if context.has_permission(collection.view_permission_type, PermissionScope.collection, elem=collection)
     ]
-    return flask.render_template(
-        "photos/main.html", collections=collections, title=_("Photos")
-    )
+    return flask.render_template("photos/main.html", collections=collections, title=_("Photos"))
 
 
 @bp.route("<collection_dir>", methods=["GET", "POST"])
@@ -36,31 +32,23 @@ def collection(collection_dir: str) -> typing.RouteReturn:
         flask.abort(404)
 
     # Restrict access and filter albums to display based on permissions
-    if context.has_permission(
-        PermissionType.write, PermissionScope.collection, elem=collection
-    ):
+    if context.has_permission(PermissionType.write, PermissionScope.collection, elem=collection):
         # Write permission: show all albums
         albums = collection.albums.all()
-    elif context.has_permission(
-        PermissionType.read, PermissionScope.collection, elem=collection
-    ):
+    elif context.has_permission(PermissionType.read, PermissionScope.collection, elem=collection):
         # Read permission: show visible albums + hidden albums for which
         # we have a specific write permission
         albums = collection.albums.filter_by(visible=True).all() + [
             album
             for album in collection.albums.filter_by(visible=False).all()
-            if context.has_permission(
-                PermissionType.write, PermissionScope.album, elem=album
-            )
+            if context.has_permission(PermissionType.write, PermissionScope.album, elem=album)
         ]
     else:
         # No permission on collection: check if albums-specific permissions
         albums = [
             album
             for album in collection.albums.all()
-            if context.has_permission(
-                album.view_permission_type, PermissionScope.album, elem=album
-            )
+            if context.has_permission(album.view_permission_type, PermissionScope.album, elem=album)
         ]
     if not albums:
         # Nothing to show here
@@ -69,9 +57,7 @@ def collection(collection_dir: str) -> typing.RouteReturn:
 
     form = forms.EditCollectionForm()
     if form.validate_on_submit():
-        if not context.has_permission(
-            PermissionType.write, PermissionScope.collection, elem=collection
-        ):
+        if not context.has_permission(PermissionType.write, PermissionScope.collection, elem=collection):
             flask.abort(403)
         collection.name = form.name.data
         collection.description = form.description.data
@@ -102,9 +88,7 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
         flask.abort(404)
 
     # Restrict access
-    context.check_permission(
-        album.view_permission_type, PermissionScope.album, elem=album
-    )
+    context.check_permission(album.view_permission_type, PermissionScope.album, elem=album)
     ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]
     if not ip:
         flask.flash("IP non détectable, impossible d'accéder aux photos", "danger")
@@ -114,9 +98,7 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
     photo_form = forms.EditPhotoForm()
     album_form = forms.EditAlbumForm()
     if album_form.validate_on_submit():
-        if not context.has_permission(
-            PermissionType.write, PermissionScope.album, elem=album
-        ):
+        if not context.has_permission(PermissionType.write, PermissionScope.album, elem=album):
             flask.abort(403)
 
         if album_form.submit.data:
@@ -138,9 +120,7 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
         db.session.commit()
 
     elif photo_form.validate_on_submit():
-        if not context.has_permission(
-            PermissionType.write, PermissionScope.album, elem=album
-        ):
+        if not context.has_permission(PermissionType.write, PermissionScope.album, elem=album):
             flask.abort(403)
 
         photo = album.photos.filter_by(file_name=photo_form.photo_name.data).first()
@@ -165,9 +145,7 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
             # Didn't (so clicked on star): mark photo as featured
             photo.album.featured_photo.featured = False
             photo.featured = True
-            flask.flash(
-                _("Cette photo est maintenant la miniature de l'album !"), "success"
-            )
+            flask.flash(_("Cette photo est maintenant la miniature de l'album !"), "success")
             db.session.commit()
 
     photos = album.photos.order_by(Photo.timestamp).all()
@@ -209,9 +187,7 @@ def photo(collection_dir: str, album_dir: str, photo_file: str) -> typing.RouteR
         flask.abort(404)
 
     # Restrict access
-    context.check_permission(
-        album.view_permission_type, PermissionScope.album, elem=album
-    )
+    context.check_permission(album.view_permission_type, PermissionScope.album, elem=album)
     ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]
     if not ip:
         flask.flash("IP non détectable, impossible d'accéder aux photos", "danger")

@@ -16,8 +16,7 @@ from app.utils import helpers
 ENTER_THIS_YEAR_PROMO: int = datetime.date.today().year - 1882 + 1
 #: Mapping of ESPCI LDAP services names to promotions currently in school.
 PROMOTIONS_SERVICES: dict[str, int] = {
-    f"promo{promo}": promo
-    for promo in range(ENTER_THIS_YEAR_PROMO - 4, ENTER_THIS_YEAR_PROMO + 1)
+    f"promo{promo}": promo for promo in range(ENTER_THIS_YEAR_PROMO - 4, ENTER_THIS_YEAR_PROMO + 1)
 }
 
 
@@ -46,9 +45,7 @@ def process_attributes(attributes: SAMLAttributes) -> tuple[str, str, str, int |
         attributes["mail"][0],
     )
     promos = [
-        PROMOTIONS_SERVICES[service]
-        for service in attributes["authorizedService"]
-        if service in PROMOTIONS_SERVICES
+        PROMOTIONS_SERVICES[service] for service in attributes["authorizedService"] if service in PROMOTIONS_SERVICES
     ]
     promo = max(promos) if promos else None
     return prenom, nom, email, promo

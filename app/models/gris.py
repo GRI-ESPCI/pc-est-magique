@@ -34,9 +34,7 @@ class _PCeen_Role_AT(Model):
 class _Role_Permission_AT(Model):
     __tablename__ = "_role_permission_at"
     _role_id: Column[int] = column(sa.ForeignKey("role.id"), primary_key=True)
-    _permission_id: Column[int] = column(
-        sa.ForeignKey("permission.id"), primary_key=True
-    )
+    _permission_id: Column[int] = column(sa.ForeignKey("permission.id"), primary_key=True)
 
 
 class Role(Model):
@@ -47,12 +45,8 @@ class Role(Model):
     index: Column[int] = column(sa.Integer(), nullable=False, default=1000)
     color: Column[str] = column(sa.String(6), nullable=True)
 
-    pceens: Relationship[list[models.PCeen]] = many_to_many(
-        "PCeen.roles", secondary=_PCeen_Role_AT
-    )
-    permissions: Relationship[list[Permission]] = many_to_many(
-        "Permission.roles", secondary=_Role_Permission_AT
-    )
+    pceens: Relationship[list[models.PCeen]] = many_to_many("PCeen.roles", secondary=_PCeen_Role_AT)
+    permissions: Relationship[list[Permission]] = many_to_many("Permission.roles", secondary=_Role_Permission_AT)
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -88,9 +82,7 @@ class Permission(Model):
     scope: Column[PermissionScope] = column(my_enum(PermissionScope), nullable=False)
     ref_id: Column[int] = column(sa.Integer(), nullable=True)
 
-    roles: Relationship[list[Role]] = many_to_many(
-        "Role.permissions", secondary=_Role_Permission_AT
-    )
+    roles: Relationship[list[Role]] = many_to_many("Role.permissions", secondary=_Role_Permission_AT)
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -98,9 +90,7 @@ class Permission(Model):
             ref = self.ref or "<all>"
         except ValueError:
             ref = f"[#{self.ref_id}]"
-        return (
-            f"<Permission #{self.id} ({self.type.name} / " f"{self.scope.name}:{ref})>"
-        )
+        return f"<Permission #{self.id} ({self.type.name} / " f"{self.scope.name}:{ref})>"
 
     @property
     def ref(self) -> Model | None:
@@ -127,9 +117,7 @@ class Permission(Model):
         except ValueError:
             return f"{self.type.name} / [OLD {self.scope.name} #{self.ref_id}]"
 
-    def grants_for(
-        self, type: PermissionType, scope: PermissionScope, elem: Model = None
-    ) -> bool:
+    def grants_for(self, type: PermissionType, scope: PermissionScope, elem: Model = None) -> bool:
         """Check whether this permission grants given type and scope.
 
         Args:
@@ -148,9 +136,7 @@ class Permission(Model):
         )
 
     @classmethod
-    def get_or_create(
-        cls, type_: PermissionType, scope: PermissionScope, ref_id: int | None = None
-    ) -> Permission:
+    def get_or_create(cls, type_: PermissionType, scope: PermissionScope, ref_id: int | None = None) -> Permission:
         perm = cls.query.filter_by(scope=scope, type=type_, ref_id=ref_id).first()
         if not perm:
             perm = cls(scope=scope, type=type_, ref_id=ref_id)

@@ -29,10 +29,7 @@ def get_payment_url(pceen: PCeen, offer: Offer, phone: str | None) -> str:
         payment = next(
             payment
             for payment in pceen.payments
-            if (
-                payment.status == PaymentStatus.waiting
-                and payment.amount == offer.price
-            )
+            if (payment.status == PaymentStatus.waiting and payment.amount == offer.price)
         )
     except StopIteration:
         # No payment waiting, create one
@@ -84,20 +81,12 @@ def create_payment(pceen: PCeen, offer: Offer, phone: str | None) -> str:
             "order_ref": payment.id,
             "message": _("Offre Internet à la Rez :") + f" {offer.name}",
             "notify_collector": "no",
-            "confirm_url": flask.url_for(
-                "payments.lydia_callback_confirm", _external=True
-            ),
-            "cancel_url": flask.url_for(
-                "payments.lydia_callback_cancel", _external=True
-            ),
+            "confirm_url": flask.url_for("payments.lydia_callback_confirm", _external=True),
+            "cancel_url": flask.url_for("payments.lydia_callback_cancel", _external=True),
             "display_confirmation": "no",
-            "expire_url": flask.url_for(
-                "payments.lydia_callback_cancel", _external=True
-            ),
+            "expire_url": flask.url_for("payments.lydia_callback_cancel", _external=True),
             "end_mobile_url": flask.url_for("payments.lydia_success", _external=True),
-            "browser_success_url": flask.url_for(
-                "payments.lydia_success", _external=True
-            ),
+            "browser_success_url": flask.url_for("payments.lydia_success", _external=True),
             "browser_fail_url": flask.url_for("payments.lydia_fail", _external=True),
         },
     )
@@ -109,9 +98,7 @@ def create_payment(pceen: PCeen, offer: Offer, phone: str | None) -> str:
         db.session.commit()
         return build_payment_url(payment.lydia_uuid, method="lydia" if phone else "cb")
     else:
-        raise RuntimeError(
-            f"Lydia Request Do Failed: {rep.request.body} >>> {rep.text}"
-        )
+        raise RuntimeError(f"Lydia Request Do Failed: {rep.request.body} >>> {rep.text}")
 
 
 def update_payment(payment: Payment) -> None:
@@ -133,18 +120,14 @@ def update_payment(payment: Payment) -> None:
         },
     )
     if not rep or "error" in rep.json():
-        raise RuntimeError(
-            f"Lydia Request Check Failed: {rep.request.body} >>> {rep.text}"
-        )
+        raise RuntimeError(f"Lydia Request Check Failed: {rep.request.body} >>> {rep.text}")
 
     if not check_signature(
         rep.json().get("signature"),
         amount=format(float(payment.amount), ".2f"),
         request_uuid=payment.lydia_uuid,
     ):
-        flask.flash(
-            _("Signature invalide, impossible de valider le paiement"), "danger"
-        )
+        flask.flash(_("Signature invalide, impossible de valider le paiement"), "danger")
         return
 
     state = rep.json().get("state")

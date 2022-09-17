@@ -4,6 +4,7 @@ from ipaddress import IPv4Address
 import functools
 import re
 import subprocess
+from typing import TYPE_CHECKING, Any
 
 import flask
 from flask import g
@@ -11,61 +12,59 @@ from flask_babel import _
 import flask_login
 
 from app.models import Model, Device, PCeen, PermissionType, PermissionScope
+from app.routes.auth.utils import grant_rezident_role
 from app.utils import helpers, typing
+
+if TYPE_CHECKING:
+
+    class _RequestContext:
+        #: The caller's IP. Should never be ``None``, except if there is a problem with Nginx
+        #: and that the current user is GRI.
+        remote_ip: str | None
+        #: Whether the request comes from the internal Rez network (and not from the Internet).
+        internal: bool
+        #: The caller's MAC address. Defined only if :attr:`.internal` is ``True``, else ``None``.
+        mac: str | None
+        #: Shorthand for :attr:`flask_login.current_user.is_authenticated`.
+        logged_in: bool
+        #: Shorthand for :attr:`flask_login.current_user`.
+        #: Warning: ignores doas mechanism; please use :attr:`.pceen` instead. (default ``None``)
+        logged_in_user: PCeen | None
+        #: If ``True``, the logged in user is a GRI that is doing an action as another PCéen.
+        doas: bool
+        #: The PCéen the request is made as: ``None`` if not :attr:`.logged_in`,
+        #: the controlled PCéen if :attr:`.doas`, or :attr:`.logged_in_user`.
+        pceen: PCeen | None
+        #: Whether the current user is logged in and is a GRI.
+        is_gri: bool
+        #: Whether the current is logged in and has a rolling rental.
+        has_a_room: bool
+        #: The :class:`~.models.Device` of the current request, if registered.
+        #: ``None`` if attr:`.internal` is ``False``.
+        device: Device | None
+        #: Whether the current user is logged in and that :attr:`.g.device` is defined and owned by the user.
+        own_device: bool
+        #: ``True``, except if:
+        #:    * The user is not logged in;
+        #:    * The user is logged in but do not have a room;
+        #:    * The user is logged in, has a room but connects from the internal network from a device not registered;
+        #:    * The user is logged in, has a room and connects from the internal network from a device registered
+        #:      but not owned by him.
+        intrarez_setup: bool
+        #: The endpoint of the page that the user must visit first to regularize its situation
+        #: (see :func:`.intrarez_setup_only`).  Defined only if attr:`.intrarez_setup` is ``False``.
+        redemption_endpoint: str
+        #: The query parameters for attr:`.redemption_endpoint`, if applicable.
+        redemption_params: dict[str, Any]
+
+    #: salut
+    g: _RequestContext
 
 
 def create_request_context() -> typing.RouteReturn | None:
     """Make checks about current request and define custom ``g`` properties.
 
     Intended to be registered by :func:`before_request`.
-
-    Defines:
-      * :attr:`flask.g.remote_ip` (default ``None``):
-            The caller's IP. Should never be ``None``, except if there is
-            a problem with Nginx and that the current user is GRI.
-      * :attr:`flask.g.internal` (default ``False``):
-            ``True`` if the request comes from the internal Rez network,
-            ``False`` if it comes from the Internet.
-      * :attr:`flask.g.mac` (default ``None``):
-            The caller's MAC address. Defined only if
-            :attr:`flask.g.internal` is ``True``.
-      * :attr:`flask.g.logged_in` (default ``False``):
-            Shorthand for :attr:`flask_login.current_user.is_authenticated`.
-      * :attr:`flask.g.logged_in_user` (default ``None``):
-            Shorthand for :attr:`flask_login.current_user`. Warning: ignores
-            doas mechanism; please use :attr:`flask.g.pceen` instead.
-      * :attr:`flask.g.doas` (default ``False``):
-            If ``True``, the logged in user is a GRI that is doing an action
-            as another pceen.
-      * :attr:`flask.g.pceen` (default ``None``):
-            The pceen the request is made as: ``None`` if not
-            :attr:`flask.g.logged_in`, the controlled pceen if
-            :attr:`~flask.g.doas`, or :attr:`flask.g.logged_in_user`.
-      * :attr:`flask.g.is_gri` (default ``False``):
-            ``True`` if the user is logged in and is a GRI.
-      * :attr:`flask.g.has_a_room` (default ``False``):
-            ``True`` if the user is logged in and has a current rental.
-      * :attr:`flask.g.device` (default ``None``):
-            The :class:`~.models.Device` of the current request, if
-            registered. Not defined if attr:`flask.g.internal` is ``False``.
-      * :attr:`flask.g.own_device` (default ``False``):
-            ``True`` if the user is logged in and that :attr:`flask.g.device`
-            is defined and owned by the user.
-      * :attr:`flask.g.intrarez_setup` (default ``True``):
-            ``False`` if either:
-              * The user is not logged in;
-              * The user is logged in but do not have a room;
-              * The user is logged in, has a room but connects from
-                the internal network from a device not registered;
-              * The user is logged in, has a room and connects from the
-                internal network from a device registered but not owned
-                by him.
-      * :attr:`flask.g.redemption_endpoint` (default ``None``):
-            The endpoint of the page that the user must visit first to
-            regularize its situation (see :func:`.intrarez_setup_only`).
-            Defined only if attr:`flask.g.intrarez_setup` is ``False``.
-      * :attr:`flask.g.redemption_params` (default ``{}``):
-            The query parameters for attr:`flask.g.redemption_endpoint`.
     """
     # Defaults
     g.remote_ip = None
@@ -84,9 +83,7 @@ def create_request_context() -> typing.RouteReturn | None:
     g.redemption_params = {}
 
     # Get user
-    current_user = typing.cast(
-        flask_login.AnonymousUserMixin | PCeen, flask_login.current_user
-    )
+    current_user = typing.cast(flask_login.AnonymousUserMixin | PCeen, flask_login.current_user)
     g.logged_in = current_user.is_authenticated
     if g.logged_in:
         g.logged_in_user = typing.cast(PCeen, current_user)
@@ -108,18 +105,13 @@ def create_request_context() -> typing.RouteReturn | None:
             # Not authorized to do things as other pceens!
             new_args = flask.request.args.copy()
             del new_args["doas"]
-            return flask.redirect(
-                flask.url_for(flask.request.endpoint or "main.index", **new_args)
-            )
+            return flask.redirect(flask.url_for(flask.request.endpoint or "main.index", **new_args))
 
     # Check maintenance
     if flask.current_app.config["MAINTENANCE"]:
         if g.is_gri:
             flask.flash(
-                _(
-                    "Le site est en mode maintenance : seuls les GRI "
-                    "peuvent y accéder."
-                ),
+                _("Le site est en mode maintenance : seuls les GRI peuvent y accéder."),
                 "warning",
             )
         else:
@@ -166,6 +158,10 @@ def create_request_context() -> typing.RouteReturn | None:
         if g.device:
             g.device.update_last_seen()
         else:
+            if not g.pceen.has_permission(PermissionType.read, PermissionScope.intrarez):
+                # Internal connection from a new device: grant access to IntraRez
+                grant_rezident_role(g.pceen)
+
             if g.intrarez_setup:
                 # Internal but device not registered: must register
                 g.intrarez_setup = False
@@ -173,6 +169,7 @@ def create_request_context() -> typing.RouteReturn | None:
                 g.redemption_params = {"mac": g.mac}
                 if not g.doas:
                     g.redemption_params["hello"] = True
+
             # Last check need a device
             return None
 
@@ -222,9 +219,7 @@ def _get_mac(remote_ip) -> str | None:
     output = subprocess.run(["/sbin/arp", "-a"], capture_output=True)
     # arp -a liste toutes les correspondances IP - mac connues
     # résultat : lignes "domain (ip) at mac_address ..."
-    match = re.search(
-        rf"^.*? \({remote_ip}\) at ([0-9a-f:]{{17}}).*", output.stdout.decode(), re.M
-    )
+    match = re.search(rf"^.*? \({remote_ip}\) at ([0-9a-f:]{{17}}).*", output.stdout.decode(), re.M)
     if match:
         return match.group(1)
     else:
@@ -239,8 +234,7 @@ _Route = typing.Callable[_RP, typing.RouteReturn]
 def intrarez_setup_only(route: _Route) -> _Route:
     """Route function decorator to restrict route to all-good users.
 
-    Redirects user to :attr:`flask.g.redemption_endpoint` if
-    :attr:`flask.g.intrarez_setup` is ``False``.
+    Redirects user to :attr:`.g.redemption_endpoint` if :attr:`.g.intrarez_setup` is ``False``.
 
     Args:
         route: The route function to restrict access to.
@@ -254,10 +248,7 @@ def intrarez_setup_only(route: _Route) -> _Route:
         if g.intrarez_setup:
             return route(*args, **kwargs)
         else:
-            return (
-                helpers.safe_redirect(g.redemption_endpoint, **g.redemption_params)
-                or route()
-            )
+            return helpers.safe_redirect(g.redemption_endpoint, **g.redemption_params) or route()
 
     return new_route
 
@@ -265,8 +256,7 @@ def intrarez_setup_only(route: _Route) -> _Route:
 def internal_only(route: _Route) -> _Route:
     """Route function decorator to restrict route to internal network.
 
-    Aborts with a 401 Unauthorized if the request comes from the Internet
-    (:attr:`flask.g.internal` is ``False``).
+    Aborts with a 401 Unauthorized if the request comes from the Internet (:attr:`.g.internal` is ``False``).
 
     Args:
         route: The route function to restrict access to.
@@ -289,8 +279,7 @@ def internal_only(route: _Route) -> _Route:
 def logged_in_only(route: _Route) -> _Route:
     """Route function decorator to restrict route to logged in users.
 
-    Redirects user to "auth.auth_needed" if :attr:`flask.g.logged_in`
-    is ``False``.
+    Redirects user to "auth.auth_needed" if :attr:`.g.logged_in` is ``False``.
 
     Args:
         route: The route function to restrict access to.
@@ -304,9 +293,7 @@ def logged_in_only(route: _Route) -> _Route:
         if g.logged_in:
             return route(*args, **kwargs)
         else:
-            flask.flash(
-                _("Veuillez vous authentifier pour accéder " "à cette page."), "warning"
-            )
+            flask.flash(_("Veuillez vous authentifier pour accéder à cette page."), "warning")
             return helpers.ensure_safe_redirect("auth.auth_needed")
 
     return new_route
@@ -315,7 +302,7 @@ def logged_in_only(route: _Route) -> _Route:
 def gris_only(route: _Route) -> _Route:
     """Route function decorator to restrict route to logged in GRIs.
 
-    Aborts with a 403 if :attr:`flask.g.is_gri` is ``False``.
+    Aborts with a 403 if :attr:`.g.is_gri` is ``False``.
 
     Args:
         route: The route function to restrict access to.
@@ -332,17 +319,13 @@ def gris_only(route: _Route) -> _Route:
             flask.abort(403)  # 403 Not Authorized
             raise  # never reached, just to tell the type checker
         else:
-            flask.flash(
-                _("Veuillez vous authentifier pour accéder " "à cette page."), "warning"
-            )
+            flask.flash(_("Veuillez vous authentifier pour accéder à cette page."), "warning")
             return helpers.ensure_safe_redirect("auth.login")
 
     return new_route
 
 
-def has_permission(
-    type: PermissionType, scope: PermissionScope, elem: Model | None = None
-) -> bool | None:
+def has_permission(type: PermissionType, scope: PermissionScope, elem: Model | None = None) -> bool | None:
     """Check if the current user (if logged in) has a specific permission.
 
     Args:
@@ -359,9 +342,7 @@ def has_permission(
     return g.pceen.has_permission(type=type, scope=scope, elem=elem)
 
 
-def check_permission(
-    type: PermissionType, scope: PermissionScope, elem: Model | None = None
-) -> None:
+def check_permission(type: PermissionType, scope: PermissionScope, elem: Model | None = None) -> None:
     """Ensure that the current user (if logged in) has a specific permission.
 
     Aborts with a redirection to the login page if not logged in;
@@ -373,18 +354,13 @@ def check_permission(
     """
     permission = has_permission(type=type, scope=scope, elem=elem)
     if permission is None:
-        flask.flash(
-            _("Veuillez vous authentifier pour accéder à cette page."), "warning"
-        )
+        flask.flash(_("Veuillez vous authentifier pour accéder à cette page."), "warning")
         flask.abort(helpers.ensure_safe_redirect("auth.login"))
     elif not permission:
         flask.abort(403)  # 403 Not Authorized
 
 
-PSE = (
-    tuple[PermissionType, PermissionScope]
-    | tuple[PermissionType, PermissionScope, Model | None]
-)
+PSE = tuple[PermissionType, PermissionScope] | tuple[PermissionType, PermissionScope, Model | None]
 
 
 def check_any_permission(*pses: PSE) -> None:
@@ -471,8 +447,8 @@ def capture() -> typing.RouteReturn | None:
         return helpers.safe_redirect("main.index")
     if _address_in_range(remote_ip, "10.0.8.0", "10.0.255.255"):
         # 10.0.8-255.0-255: Banned (IP stores ban ID)
-        a, b, c, d = flask.g.remote_ip.split(".")
-        flask.g._ban = (int(c) - 8) * 256 + int(d)
+        a, b, c, d = g.remote_ip.split(".")
+        g._ban = (int(c) - 8) * 256 + int(d)
         return helpers.safe_redirect("main.banned")
 
     return helpers.safe_redirect("main.index")

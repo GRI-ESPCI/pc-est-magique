@@ -78,8 +78,7 @@ def send_email(
         body=text_body,
         html=html_body,
         extra_headers={
-            "List-Unsubscribe": f"<mailto: {sender_mail}?subject=Unsubscribe: "
-            f"{', '.join(recipients_f.keys())}>"
+            "List-Unsubscribe": f"<mailto: {sender_mail}?subject=Unsubscribe: " f"{', '.join(recipients_f.keys())}>"
         },
     )
 

@@ -18,9 +18,7 @@ from app.utils.validators import (
 class LoginForm(FlaskForm):
     """WTForm used to log users in."""
 
-    login = wtforms.StringField(
-        _l("Nom d'utilisateur / Adresse e-mail"), validators=[DataRequired()]
-    )
+    login = wtforms.StringField(_l("Nom d'utilisateur / Adresse e-mail"), validators=[DataRequired()])
     password = wtforms.PasswordField(_l("Mot de passe"), validators=[DataRequired()])
     remember_me = wtforms.BooleanField(_l("Rester connecté"))
     submit = wtforms.SubmitField(_l("Connexion"))
@@ -30,9 +28,7 @@ class RegistrationForm(FlaskForm):
     """WTForm used to register users."""
 
     nom = wtforms.StringField(_l("Nom"), validators=[DataRequired(), Length(max=64)])
-    prenom = wtforms.StringField(
-        _l("Prénom"), validators=[DataRequired(), Length(max=64)]
-    )
+    prenom = wtforms.StringField(_l("Prénom"), validators=[DataRequired(), Length(max=64)])
     promo = html5.IntegerField(_l("Promotion"), validators=[Optional()])
     email = html5.EmailField(
         _l("Adresse e-mail"),
@@ -56,9 +52,7 @@ class ResetPasswordRequestForm(FlaskForm):
 class ResetPasswordForm(FlaskForm):
     """WTForm used to reset a user password."""
 
-    password = wtforms.PasswordField(
-        _l("Nouveau mot de passe"), validators=[DataRequired()]
-    )
+    password = wtforms.PasswordField(_l("Nouveau mot de passe"), validators=[DataRequired()])
     password2 = wtforms.PasswordField(
         _l("Nouveau mot de passe (validation)"),
         validators=[DataRequired(), EqualTo("password")],

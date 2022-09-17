@@ -22,26 +22,17 @@ from app.utils import captcha, helpers, typing
 @context.logged_in_only
 def index() -> typing.RouteReturn:
     """PC est magique home page."""
-    if (
-        context.has_permission(PermissionType.read, PermissionScope.intrarez)
-        and not flask.g.intrarez_setup
-    ):
-        return helpers.safe_redirect(
-            flask.g.redemption_endpoint, **flask.g.redemption_params
-        )
+    if context.has_permission(PermissionType.read, PermissionScope.intrarez) and not context.g.intrarez_setup:
+        return helpers.safe_redirect(context.g.redemption_endpoint, **context.g.redemption_params)
 
     if context.has_permission(PermissionType.read, PermissionScope.photos):
-        photos_infos = namedtuple(
-            "PhotosInfos", ["nb_collections", "nb_albums", "nb_photos"]
-        )(
+        photos_infos = namedtuple("PhotosInfos", ["nb_collections", "nb_albums", "nb_photos"])(
             len(Collection.query.all()),
             len(Album.query.all()),
             len(Photo.query.all()),
         )
 
-    return flask.render_template(
-        "main/index.html", title=_("Accueil"), photos_infos=photos_infos
-    )
+    return flask.render_template("main/index.html", title=_("Accueil"), photos_infos=photos_infos)
 
 
 @bp.route("/contact", methods=["GET", "POST"])
@@ -51,7 +42,7 @@ def contact() -> typing.RouteReturn:
     if form.validate_on_submit():
         if not captcha.verify_captcha():
             flask.flash(
-                _("Le captcha n'a pas pu être vérifié. " "Veuillez réessayer."),
+                _("Le captcha n'a pas pu être vérifié. Veuillez réessayer."),
                 "danger",
             )
         else:
@@ -90,9 +81,7 @@ def legal() -> typing.RouteReturn:
 @bp.route("/changelog")
 def changelog() -> typing.RouteReturn:
     """PC est magique changelog page."""
-    return flask.render_template(
-        "main/changelog.html", title=_("Notes de mise à jour"), datetime=datetime
-    )
+    return flask.render_template("main/changelog.html", title=_("Notes de mise à jour"), datetime=datetime)
 
 
 @bp.route("/connect_check")
@@ -105,24 +94,19 @@ def connect_check() -> typing.RouteReturn:
 @bp.route("/banned")
 def banned() -> typing.RouteReturn:
     """Page shown when the Rezident is banned."""
-    flask.g._ban = 1
     try:
-        ban = Ban.query.get(flask.g._ban)
+        ban = Ban.query.get(context.g._ban)
     except AttributeError:
         return helpers.redirect_to_next()
-    return flask.render_template(
-        "main/banned.html", ban=ban, title=_("Accès à Internet restreint")
-    )
+    return flask.render_template("main/banned.html", ban=ban, title=_("Accès à Internet restreint"))
 
 
 @bp.route("/home")
 def rickroll() -> typing.RouteReturn:
     """The old good days..."""
-    if flask.g.logged_in:
+    if context.g.logged_in:
         with open("logs/rickrolled.log", "a") as fh:
-            fh.write(
-                f"{datetime.datetime.now()}: rickrolled " f"{flask.g.pceen.full_name}\n"
-            )
+            fh.write(f"{datetime.datetime.now()}: rickrolled " f"{context.g.pceen.full_name}\n")
     return flask.redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
 

@@ -82,10 +82,7 @@ class Photo(Model):
     @property
     def src_with_token(self) -> str:
         """The online query to the photo's with md5 args."""
-        ip = (
-            flask.request.headers.get("X-Real-Ip")
-            or flask.current_app.config["FORCE_IP"]
-        )
+        ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]
         token_args = self.album.get_access_token(ip)
         return f"{self.src}?{token_args}"
 
@@ -97,10 +94,7 @@ class Photo(Model):
     @property
     def thumb_src_with_token(self) -> str:
         """The online query to the photo's thumbnail with md5 args."""
-        ip = (
-            flask.request.headers.get("X-Real-Ip")
-            or flask.current_app.config["FORCE_IP"]
-        )
+        ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]
         token_args = self.album.get_access_token(ip)
         return f"{self.thumb_src}?{token_args}"
 
@@ -244,9 +238,7 @@ class Collection(Model):
     @property
     def nb_photos(self) -> int:
         """The total number of photos in the collection."""
-        return sum(
-            album.nb_photos for album in self.albums.filter_by(visible=True).all()
-        )
+        return sum(album.nb_photos for album in self.albums.filter_by(visible=True).all())
 
 
 from app import models

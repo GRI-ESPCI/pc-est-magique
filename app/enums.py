@@ -11,7 +11,7 @@ __all__ = ["PermissionType", "PermissionScope", "SubState", "PaymentStatus"]
 
 
 class PermissionType(enum.Enum):
-    """ "The type of a permission."""
+    """The type of a permission."""
 
     def __repr__(self) -> str:
         return f"<{type(self).__name__}.{self.name}>"
@@ -95,7 +95,7 @@ class PermissionScope(enum.Enum):
 
 
 class SubState(enum.Enum):
-    """ "The subscription state of a PCeen."""
+    """The subscription state of a PCeen."""
 
     subscribed = enum.auto()
     trial = enum.auto()
@@ -103,7 +103,7 @@ class SubState(enum.Enum):
 
 
 class PaymentStatus(enum.Enum):
-    """ "The status of a Payment."""
+    """The status of a Payment."""
 
     manual = enum.auto()
     creating = enum.auto()

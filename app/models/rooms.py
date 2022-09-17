@@ -83,9 +83,7 @@ class Room(Model):
         rooms = []
         for floor, max_door in doors_per_floor.items():
             for door in range(1, max_door + 1):
-                rooms.append(
-                    cls(num=100 * floor + door, floor=floor, base_ip=f"{floor}.{door}")
-                )
+                rooms.append(cls(num=100 * floor + door, floor=floor, base_ip=f"{floor}.{door}"))
         return rooms
 
 

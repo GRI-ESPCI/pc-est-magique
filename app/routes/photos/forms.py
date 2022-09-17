@@ -12,16 +12,10 @@ class EditPhotoForm(FlaskForm):
     """WTForm used to edit a photo."""
 
     photo_name = wtforms.StringField(_l("Nom du fichier"), validators=[DataRequired()])
-    caption = wtforms.StringField(
-        _l("Légende (optionnel)"), validators=[Optional(), Length(max=280)]
-    )
-    author_str = wtforms.StringField(
-        _l("Auteur (optionnel)"), validators=[Optional(), Length(max=64)]
-    )
+    caption = wtforms.StringField(_l("Légende (optionnel)"), validators=[Optional(), Length(max=280)])
+    author_str = wtforms.StringField(_l("Auteur (optionnel)"), validators=[Optional(), Length(max=64)])
     date = html5.DateField(_l("Date (optionnel)"), validators=[Optional()])
-    time = html5.TimeField(
-        _l("Heure (optionnel)"), format="%H:%M:%S", validators=[Optional()]
-    )
+    time = html5.TimeField(_l("Heure (optionnel)"), format="%H:%M:%S", validators=[Optional()])
     lat = html5.DecimalField(
         _l("Latitude (optionnel)"),
         validators=[Optional(), NumberRange(min=-90, max=90)],
@@ -36,12 +30,8 @@ class EditPhotoForm(FlaskForm):
 class EditAlbumForm(FlaskForm):
     """WTForm used to edit an album."""
 
-    name = wtforms.StringField(
-        _l("Nom de l'album"), validators=[DataRequired(), Length(max=120)]
-    )
-    description = wtforms.StringField(
-        _l("Description (optionnel)"), validators=[Optional(), Length(max=280)]
-    )
+    name = wtforms.StringField(_l("Nom de l'album"), validators=[DataRequired(), Length(max=120)])
+    description = wtforms.StringField(_l("Description (optionnel)"), validators=[Optional(), Length(max=280)])
     start = html5.DateField(_l("Date de début (optionnel)"), validators=[Optional()])
     end = html5.DateField(_l("Date de fin (optionnel)"), validators=[Optional()])
     visible = wtforms.BooleanField(_l("Album visible"))
@@ -51,12 +41,8 @@ class EditAlbumForm(FlaskForm):
 class EditCollectionForm(FlaskForm):
     """WTForm used to edit a collection."""
 
-    name = wtforms.StringField(
-        _l("Nom de la collection"), validators=[DataRequired(), Length(max=120)]
-    )
-    description = wtforms.StringField(
-        _l("Description (optionnel)"), validators=[Optional(), Length(max=280)]
-    )
+    name = wtforms.StringField(_l("Nom de la collection"), validators=[DataRequired(), Length(max=120)])
+    description = wtforms.StringField(_l("Description (optionnel)"), validators=[Optional(), Length(max=280)])
     start = html5.DateField(_l("Date de début (optionnel)"), validators=[Optional()])
     end = html5.DateField(_l("Date de fin (optionnel)"), validators=[Optional()])
     visible = wtforms.BooleanField(_l("Collection visible"))

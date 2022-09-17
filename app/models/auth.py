@@ -66,15 +66,9 @@ class PCeen(flask_login.UserMixin, Model):
     bans: Relationship[list[models.Ban]] = one_to_many("Ban.pceen")
     devices: Relationship[list[models.Device]] = one_to_many("Device.pceen")
     rentals: Relationship[list[models.Rental]] = one_to_many("Rental.pceen")
-    subscriptions: Relationship[list[models.Subscription]] = one_to_many(
-        "Subscription.pceen"
-    )
-    payments: Relationship[list[models.Payment]] = one_to_many(
-        "Payment.pceen", foreign_keys="Payment._pceen_id"
-    )
-    payments_created: Relationship[list[models.Payment]] = one_to_many(
-        "Payment.gri", foreign_keys="Payment._gri_id"
-    )
+    subscriptions: Relationship[list[models.Subscription]] = one_to_many("Subscription.pceen")
+    payments: Relationship[list[models.Payment]] = one_to_many("Payment.pceen", foreign_keys="Payment._pceen_id")
+    payments_created: Relationship[list[models.Payment]] = one_to_many("Payment.gri", foreign_keys="Payment._gri_id")
     photos: Relationship[list[models.Photo]] = one_to_many("Photo.author")
 
     def __repr__(self) -> str:
@@ -95,9 +89,7 @@ class PCeen(flask_login.UserMixin, Model):
         """The set of all permissions this PCeen has."""
         return set().union(*(role.permissions for role in self.roles))
 
-    def has_permission(
-        self, type: PermissionType, scope: PermissionScope, elem: Model = None
-    ) -> bool:
+    def has_permission(self, type: PermissionType, scope: PermissionScope, elem: Model = None) -> bool:
         """Check whether this PCeen has a given permission.
 
         Args:
@@ -157,9 +149,7 @@ class PCeen(flask_login.UserMixin, Model):
         making the request (connection from outside/GRIs list), it is
         included in this list.
         """
-        all = sorted(
-            self.devices, key=lambda device: device.last_seen_time, reverse=True
-        )
+        all = sorted(self.devices, key=lambda device: device.last_seen_time, reverse=True)
         if flask.g.internal and self == flask.g.pceen:
             # Really connected from current device: exclude it from other
             return all[1:]
@@ -234,7 +224,7 @@ class PCeen(flask_login.UserMixin, Model):
             return SubState.subscribed
 
     def add_first_subscription(self) -> None:
-        """ "Add subscription to first offer (free month).
+        """Add subscription to first offer (free month).
 
         The subscription starts the day the PCeen registered its first
         device (usually today), and ends today.
@@ -327,9 +317,7 @@ class PCeen(flask_login.UserMixin, Model):
             pceen exists, else ``None``.
         """
         try:
-            id = jwt.decode(
-                token, flask.current_app.config["SECRET_KEY"], algorithms=["HS256"]
-            )["reset_password"]
+            id = jwt.decode(token, flask.current_app.config["SECRET_KEY"], algorithms=["HS256"])["reset_password"]
         except Exception:
             return
         return cls.query.get(id)

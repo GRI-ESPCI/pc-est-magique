@@ -6,7 +6,7 @@ import flask
 from flask_babel import _
 from werkzeug.exceptions import HTTPException
 
-from app import db
+from app import context, db
 from app.routes.errors import bp
 from app.utils import typing
 
@@ -49,9 +49,7 @@ def not_found_error(error: HTTPException) -> typing.RouteReturn:
     err_descr = error.description
     flask.current_app.logger.warning(f"{err_name} -- {flask.request}")
     return (
-        flask.render_template(
-            "errors/404.html", err_name=err_name, err_descr=err_descr, title=err_name
-        ),
+        flask.render_template("errors/404.html", err_name=err_name, err_descr=err_descr, title=err_name),
         404,
     )
 
@@ -70,9 +68,7 @@ def service_unavailable_error(error: HTTPException) -> typing.RouteReturn:
     else:
         flask.current_app.logger.error(f"{err_name} -- {flask.request}")
     return (
-        flask.render_template(
-            "errors/503.html", err_name=err_name, err_descr=err_descr, title=err_name
-        ),
+        flask.render_template("errors/503.html", err_name=err_name, err_descr=err_descr, title=err_name),
         503,
     )
 
@@ -89,7 +85,7 @@ def other_error(error: Exception) -> typing.RouteReturn:
         err_name = "Python Exception"
         err_descr = "A Python exception stopped the execution of the request."
         try:
-            is_gri = flask.g.is_gri
+            is_gri = context.g.is_gri
         except AttributeError:
             # Very early error
             is_gri = False
@@ -97,14 +93,10 @@ def other_error(error: Exception) -> typing.RouteReturn:
             # GRI: show traceback
             tb_str = str(flask.escape(traceback.format_exc()))
             tb = flask.Markup(tb_str.replace("\n", "<br/>").replace(" ", "&nbsp;"))
-            err_descr = "[debug mode - traceback below]" + flask.Markup(
-                flask.render_template("errors/_tb.html", tb=tb)
-            )
+            err_descr = "[debug mode - traceback below]" + flask.Markup(flask.render_template("errors/_tb.html", tb=tb))
         flask.current_app.logger.error(traceback.format_exc())
     db.session.rollback()
     return (
-        flask.render_template(
-            "errors/other.html", err_name=err_name, err_descr=err_descr, title=err_name
-        ),
+        flask.render_template("errors/other.html", err_name=err_name, err_descr=err_descr, title=err_name),
         code,
     )

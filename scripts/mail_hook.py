@@ -45,10 +45,7 @@ def report_mail() -> None:
     mail = email.message_from_file(sys.stdin, policy=email.policy.default)
     if not mail:
         # Not a real mail (no headers)
-        print(
-            "Pas de mail dans l'entrée standard (normal si exécution "
-            "manuelle, ce script n'est pas fait pour ça)."
-        )
+        print("Pas de mail dans l'entrée standard (normal si exécution " "manuelle, ce script n'est pas fait pour ça).")
         return
 
     # Extract email parts
@@ -88,16 +85,12 @@ def report_mail() -> None:
     # Send webhook
     url = flask.current_app.config["MAIL_WEBHOOK"]
     role_id = flask.current_app.config["GRI_ROLE_ID"]
-    webhook = DiscordWebhook(
-        url, content=f"<@&{role_id}> Nouveau mail !", rate_limit_retry=True
-    )
+    webhook = DiscordWebhook(url, content=f"<@&{role_id}> Nouveau mail !", rate_limit_retry=True)
     webhook.add_embed(embed)
     response = webhook.execute()
 
     if not response:
-        raise RuntimeError(
-            f"Discord API responded with {response.code}: {response.text}"
-        )
+        raise RuntimeError(f"Discord API responded with {response.code}: {response.text}")
 
     print(f"Mail de {sender} transmis.")
 

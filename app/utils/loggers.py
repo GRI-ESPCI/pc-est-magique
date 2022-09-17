@@ -189,7 +189,9 @@ def configure_logging(app: PCEstMagiqueApp) -> None:
     app.actions_logger.setLevel(logging.INFO)
 
 
-def log_exception(reraise: bool = False) -> typing.Callable[[typing.Callable], typing.Callable]:
+def log_exception(
+    reraise: bool = False,
+) -> typing.Callable[[typing.Callable], typing.Callable]:
     """Decorator: logs exceptions raised in protected function.
 
     Args:

@@ -44,9 +44,7 @@ def scripts_list() -> list[tuple[str, str]]:
 class ChoseScriptForm(FlaskForm):
     """WTForm used to chose a script to execute."""
 
-    script = wtforms.SelectField(
-        _l("Script"), choices=scripts_list(), validators=[DataRequired()]
-    )
+    script = wtforms.SelectField(_l("Script"), choices=scripts_list(), validators=[DataRequired()])
     submit = wtforms.SubmitField(_l("Exécuter"))
 
 
@@ -78,11 +76,7 @@ class BanForm(FlaskForm):
     hours = html5.IntegerField(_l("Heures"), validators=[Optional()])
     days = html5.IntegerField(_l("Jours"), validators=[Optional()])
     months = html5.IntegerField(_l("Mois"), validators=[Optional()])
-    reason = wtforms.TextField(
-        _l("Motif court"), validators=[DataRequired(), Length(max=32)]
-    )
-    message = wtforms.TextAreaField(
-        _l("Message détaillé"), validators=[Optional(), Length(max=2000)]
-    )
+    reason = wtforms.TextField(_l("Motif court"), validators=[DataRequired(), Length(max=32)])
+    message = wtforms.TextAreaField(_l("Message détaillé"), validators=[Optional(), Length(max=2000)])
     submit = wtforms.SubmitField(_l("Bannez-moi ça les modos || Mettre à jour le ban"))
     unban = wtforms.SubmitField(_l("Mettre fin au ban"))

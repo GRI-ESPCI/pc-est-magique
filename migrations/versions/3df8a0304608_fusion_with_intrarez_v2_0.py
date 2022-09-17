@@ -34,9 +34,7 @@ def upgrade():
         sa.Column("name_en", sa.String(length=64), nullable=False),
         sa.Column("description_fr", sa.String(length=2000), nullable=True),
         sa.Column("description_en", sa.String(length=2000), nullable=True),
-        sa.Column(
-            "price", sa.Numeric(precision=6, scale=2, asdecimal=False), nullable=True
-        ),
+        sa.Column("price", sa.Numeric(precision=6, scale=2, asdecimal=False), nullable=True),
         sa.Column("months", sa.Integer(), nullable=False),
         sa.Column("days", sa.Integer(), nullable=False),
         sa.Column("visible", sa.Boolean(), nullable=False),
@@ -85,9 +83,7 @@ def upgrade():
         "payment",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("_pceen_id", sa.Integer(), nullable=False),
-        sa.Column(
-            "amount", sa.Numeric(precision=6, scale=2, asdecimal=False), nullable=False
-        ),
+        sa.Column("amount", sa.Numeric(precision=6, scale=2, asdecimal=False), nullable=False),
         sa.Column("created", sa.DateTime(), nullable=False),
         sa.Column("payed", sa.DateTime(), nullable=True),
         sa.Column(
@@ -178,15 +174,11 @@ def upgrade():
     # ### end Alembic commands ###
     # Create a temporary "_permission_scope" type, convert and drop the "old" type
     tmp_type.create(op.get_bind(), checkfirst=False)
-    op.execute(
-        "ALTER TABLE permission ALTER COLUMN scope TYPE _permission_scope USING scope::text::_permission_scope"
-    )
+    op.execute("ALTER TABLE permission ALTER COLUMN scope TYPE _permission_scope USING scope::text::_permission_scope")
     old_type.drop(op.get_bind(), checkfirst=False)
     # Create and convert to the "new" scope type
     new_type.create(op.get_bind(), checkfirst=False)
-    op.execute(
-        "ALTER TABLE permission ALTER COLUMN scope TYPE permission_scope USING scope::text::permission_scope"
-    )
+    op.execute("ALTER TABLE permission ALTER COLUMN scope TYPE permission_scope USING scope::text::permission_scope")
     tmp_type.drop(op.get_bind(), checkfirst=False)
 
 
@@ -206,13 +198,9 @@ def downgrade():
     op.execute("DELETE FROM permission WHERE scope='intrarez'")
     # Create a temporary "_permission_scope" type, convert and drop the "new" type
     tmp_type.create(op.get_bind(), checkfirst=False)
-    op.execute(
-        "ALTER TABLE permission ALTER COLUMN scope TYPE _permission_scope USING scope::text::_permission_scope"
-    )
+    op.execute("ALTER TABLE permission ALTER COLUMN scope TYPE _permission_scope USING scope::text::_permission_scope")
     new_type.drop(op.get_bind(), checkfirst=False)
     # Create and convert to the "old" scope type
     old_type.create(op.get_bind(), checkfirst=False)
-    op.execute(
-        "ALTER TABLE permission ALTER COLUMN scope TYPE permission_scope USING scope::text::permission_scope"
-    )
+    op.execute("ALTER TABLE permission ALTER COLUMN scope TYPE permission_scope USING scope::text::permission_scope")
     tmp_type.drop(op.get_bind(), checkfirst=False)

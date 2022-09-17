@@ -14,15 +14,13 @@ from app.utils import helpers, typing
 @bp.route("/auth_needed")
 def auth_needed() -> typing.RouteReturn:
     """Authentification needed page."""
-    return flask.render_template(
-        "auth/auth_needed.html", title=_("Connexion nécessaire")
-    )
+    return flask.render_template("auth/auth_needed.html", title=_("Connexion nécessaire"))
 
 
 @bp.route("/register")
 def register() -> typing.RouteReturn:
     """PC est magique manual registration method choice page."""
-    if flask.g.logged_in:
+    if context.g.logged_in:
         return helpers.redirect_to_next()
 
     return flask.render_template("auth/register.html", title=_("Nouveau compte"))
@@ -32,7 +30,7 @@ def register() -> typing.RouteReturn:
 @context.internal_only
 def register_rezident() -> typing.RouteReturn:
     """PC est magique Rezident registration page."""
-    if flask.g.logged_in:
+    if context.g.logged_in:
         return helpers.redirect_to_next()
 
     form = forms.RegistrationForm()
@@ -49,23 +47,20 @@ def register_rezident() -> typing.RouteReturn:
         db.session.add(pceen)
         db.session.commit()
         helpers.log_action(
-            f"Internal -> Registered account {pceen!r} ({pceen.prenom} {pceen.nom} "
-            f"{pceen.promo}, {pceen.email})"
+            f"Internal -> Registered account {pceen!r} ({pceen.prenom} {pceen.nom} " f"{pceen.promo}, {pceen.email})"
         )
         flask.flash(_("Compte créé avec succès !"), "success")
         flask_login.login_user(pceen, remember=False)
         email.send_account_registered_email(pceen)
         return helpers.redirect_to_next()
 
-    return flask.render_template(
-        "auth/register_rezident.html", title=_("Nouveau compte Rezident"), form=form
-    )
+    return flask.render_template("auth/register_rezident.html", title=_("Nouveau compte Rezident"), form=form)
 
 
 @bp.route("/login", methods=["GET", "POST"])
 def login() -> typing.RouteReturn:
     """PC est magique login page."""
-    if flask.g.logged_in:
+    if context.g.logged_in:
         return helpers.redirect_to_next()
 
     form = forms.LoginForm()
@@ -91,12 +86,12 @@ def login() -> typing.RouteReturn:
 @bp.route("/logout")
 def logout() -> typing.RouteReturn:
     """PC est magique logout page."""
-    if flask.g.logged_in:
+    if context.g.logged_in:
         flask_login.logout_user()
-        flask.g.logged_in = False
-        flask.g.logged_in_user = None
-        flask.g.pceen = None
-        flask.g.is_gri = False
+        context.g.logged_in = False
+        context.g.logged_in_user = None
+        context.g.pceen = None
+        context.g.is_gri = False
         flask.flash(_("Vous avez été déconnecté."), "success")
 
     return helpers.redirect_to_next()
@@ -105,7 +100,7 @@ def logout() -> typing.RouteReturn:
 @bp.route("/reset_password_request", methods=["GET", "POST"])
 def reset_password_request() -> typing.RouteReturn:
     """PC est magique password reset request page."""
-    if flask.g.logged_in:
+    if context.g.logged_in:
         return helpers.redirect_to_next()
 
     form = forms.ResetPasswordRequestForm()
@@ -123,15 +118,13 @@ def reset_password_request() -> typing.RouteReturn:
         )
         return helpers.ensure_safe_redirect("auth.login")
 
-    return flask.render_template(
-        "auth/reset_password_request.html", title=_("Mot de passe oublié"), form=form
-    )
+    return flask.render_template("auth/reset_password_request.html", title=_("Mot de passe oublié"), form=form)
 
 
 @bp.route("/reset_password/<token>", methods=["GET", "POST"])
 def reset_password(token) -> typing.RouteReturn:
     """PC est magique password reset page (link sent by mail)."""
-    if flask.g.logged_in:
+    if context.g.logged_in:
         flask.flash(_("Ce lien n'est pas utilisable en étant authentifié."), "warning")
         return helpers.redirect_to_next()
 
@@ -148,6 +141,4 @@ def reset_password(token) -> typing.RouteReturn:
         flask.flash(_("Le mot de passe a été réinitialisé avec succès."), "success")
         return helpers.ensure_safe_redirect("auth.login")
 
-    return flask.render_template(
-        "auth/reset_password.html", title=_("Nouveau mot de passe"), form=form
-    )
+    return flask.render_template("auth/reset_password.html", title=_("Nouveau mot de passe"), form=form)

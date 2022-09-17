@@ -48,9 +48,7 @@ def setup_saml_authentication() -> None:
     if not idp_response and app_config["SAML_IDP_METADATA_FALLBACK_URL"]:
         idp_response = requests.get(app_config["SAML_IDP_METADATA_FALLBACK_URL"])
     if not idp_response:
-        raise RuntimeError(
-            f"Could not retrieve IdP metadata ({idp_response.status_code}): {idp_response.text}"
-        )
+        raise RuntimeError(f"Could not retrieve IdP metadata ({idp_response.status_code}): {idp_response.text}")
     _idp_metadata = idp_response.text
 
     # Create and configure SAML client
@@ -107,9 +105,7 @@ def setup_saml_authentication() -> None:
 @bp.route("/metadata")
 def metadata() -> typing.RouteReturn:
     """SAML public metadata of our SP (service provider), to be read by the IdP (identity provider)."""
-    metadata_str = saml2.metadata.create_metadata_string(
-        configfile=None, config=_saml_client.config
-    )
+    metadata_str = saml2.metadata.create_metadata_string(configfile=None, config=_saml_client.config)
     return metadata_str, {"Content-Type": "text/xml"}
 
 
