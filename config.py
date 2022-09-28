@@ -30,7 +30,7 @@ def get_or_die(name: str) -> str:
 class Config:
     """PC est magique Flask Web App Configuration."""
 
-    SECRET_KEY = os.environ.get("SECRET_KEY")
+    SECRET_KEY = get_or_die("SECRET_KEY")
 
     LANGUAGES = ["fr", "en"]
 
@@ -82,3 +82,15 @@ class Config:
         NETLOCS = NETLOCS.split(";")
 
     MAINTENANCE = bool(os.environ.get("MAINTENANCE"))
+
+    PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+
+    USERS_PER_PAGE = int(os.environ.get("USERS_PER_PAGE"))
+    ITEMS_PER_PAGE = int(os.environ.get("ITEMS_PER_PAGE"))
+
+    # Default values for global settings
+    MAX_DAILY_ALCOHOLIC_DRINKS_PER_USER = int(os.environ.get("MAX_DAILY_ALCOHOLIC_DRINKS_PER_USER"))
+    QUICK_ACCESS_ITEM_ID = int(os.environ.get("QUICK_ACCESS_ITEM_ID"))
+
+    ENV = "production"
+    DEBUG = False

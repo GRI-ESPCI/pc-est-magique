@@ -1,0 +1,31 @@
+{# Bar card - used variables: photos_infos #}
+{% extends "cards/base.html" %}
+
+{% block card_title %}
+{{ _("Bar") }} {{ macros.badge() }}
+{% endblock %}
+
+{% block card_icon %}
+{{ macros.bootstrap_icon("cup") }}
+{% endblock %}
+
+{% block card_table %}
+<tr>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("Solde") }}</th>
+    <td>{{ babel.format_currency(pceen.bar_balance, "EUR") }}</td>
+</tr>
+<tr>
+    <th scope="row" class="ps-4">{{ _("Limite d'alcool") }}</th>
+    <td>0/4 aujourd’hui</td>
+</tr>
+<tr>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("Photos") }}</th>
+    <td>{{ photos_infos.nb_photos }}</td>
+</tr>
+{% endblock %}
+
+{% block card_footer %}
+<a href="{{ url_for("bar.user", username=pceen.username) }}" class="btn btn-outline-dark">
+    {{ _("Voir ma consommation") }}
+</a>
+{% endblock %}

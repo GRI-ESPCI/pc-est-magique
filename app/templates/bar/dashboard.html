@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+<div class="row mt-3">
+  <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mb-3">
+    <div class="card shadow bg-primary text-white">
+      <div class="card-body">
+        <div class="media">
+          <i class="material-icons align-self-center md-48 mr-3">group</i>
+          <div class="media-body">
+            <h5 class="card-title mt-0" id="daily-clients">{{ nb_daily_clients }}</h5>
+            <h6 class="card-subtitle">Daily clients</h6>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mb-3">
+    <div class="card shadow bg-primary text-white">
+      <div class="card-body">
+        <div class="media">
+          <i class="material-icons align-self-center md-48 mr-3">local_bar</i>
+          <div class="media-body">
+            <h5 class="card-title mt-0" id="daily-alcohol-qty">{{ alcohol_qty }} liters</h5>
+            <h6 class="card-subtitle">Daily alcohol</h6>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mb-3">
+    <div class="card shadow bg-primary text-white">
+      <div class="card-body">
+        <div class="media">
+          <i class="material-icons align-self-center md-48 mr-3">euro_symbol</i>
+          <div class="media-body">
+            <h5 class="card-title mt-0" id="daily-revenue">{{ '%0.2f' % daily_revenue | float }}€</h5>
+            <h6 class="card-subtitle">Daily revenue</h6>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-primary">
+  <div class="card-body">
+    <canvas id="transactions-chart" width="600" height="400" aria-label="transactions-chart" role="img"></canvas>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script>
+// Update daily statistics cards 30s
+setInterval(function() {
+  $.get('{{ url_for('main.get_daily_statistics')}}', {
+  }).done(function(response) {
+    $('#daily-clients').html(response['nb_daily_clients']);
+    $('#daily-alcohol-qty').html(parseFloat(Math.round(response['alcohol_qty'] * 100) / 100).toFixed(2) + ' liters');
+    $('#daily-revenue').html(parseFloat(Math.round(response['daily_revenue'] * 100) / 100).toFixed(2) + '€');
+  });
+}, 1000 * 60 * 0.5);
+
+// Update transactions chart
+function updateChart(chart, chartData, xLabel) {
+  chart.data = chartData;
+  chart.update();
+  chart.options.scales.xAxes[0].scaleLabel.labelString = xLabel;
+}
+
+// Global parameters:
+Chart.defaults.global.responsive = true;
+
+// Define the chart data
+var chartDataMonth = {
+  labels: [{% for item in days_labels %}"{{ item }}", {% endfor %}],
+  datasets: [{
+      label: 'Total',
+      fill: false,
+      backgroundColor: "#dc3545",
+      borderColor: "#dc3545",
+      data: [{% for item in clients_this_month %}{{ '%0.2f'| format(item|float) }}, {% endfor %}],
+  },
+  {
+      label: 'Alcohol',
+      fill: false,
+      backgroundColor: "#007bff",
+      borderColor: "#007bff",
+      data: [{% for item in clients_alcohol_this_month %}{{ '%0.2f'| format(item|float) }}, {% endfor %}],
+  }]
+};
+
+// Get chart canvas
+var ctx = document.querySelector('#transactions-chart').getContext('2d');
+// Create the chart using the chart canvas
+var transactionsChart = new Chart(ctx, {
+  type: 'line',
+  data: chartDataMonth,
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    tooltips: {
+      mode: 'index',
+      intersect: false
+    },
+    hover: {
+      mode: 'nearest',
+      intersect: true
+    },
+    scales: {
+      xAxes: [{
+        display: true,
+        scaleLabel: {
+          display: true,
+          labelString: 'Day'
+        }
+      }],
+      yAxes: [{
+        display: true,
+        scaleLabel: {
+          display: true,
+          labelString: 'Clients'
+        }
+      }]
+    }
+  }
+});
+</script>
+{% endblock %}

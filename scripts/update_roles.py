@@ -30,31 +30,14 @@ except ImportError:
 def permissions() -> dict[str, dict[str, typing.Any]]:
     """Permissions à définir. Modifier cette fonction pour modifier les permissions."""
     return {
-        "access_photos": dict(
-            type=PermissionType.read,
-            scope=PermissionScope.photos,
-            ref_id=None,
-        ),
-        "access_intrarez": dict(
-            type=PermissionType.read,
-            scope=PermissionScope.intrarez,
-            ref_id=None,
-        ),
-        "manage_pceens": dict(
-            type=PermissionType.all,
-            scope=PermissionScope.pceen,
-            ref_id=None,
-        ),
-        "manage_roles": dict(
-            type=PermissionType.all,
-            scope=PermissionScope.role,
-            ref_id=None,
-        ),
-        "manage_collections": dict(
-            type=PermissionType.all,
-            scope=PermissionScope.collection,
-            ref_id=None,
-        ),
+        "access_photos": dict(type=PermissionType.read, scope=PermissionScope.photos, ref_id=None),
+        "access_intrarez": dict(type=PermissionType.read, scope=PermissionScope.intrarez, ref_id=None),
+        "access_bar": dict(type=PermissionType.read, scope=PermissionScope.bar, ref_id=None),
+        "access_bar_stats": dict(type=PermissionType.read, scope=PermissionScope.bar_stats, ref_id=None),
+        "manage_pceens": dict(type=PermissionType.all, scope=PermissionScope.pceen, ref_id=None),
+        "manage_roles": dict(type=PermissionType.all, scope=PermissionScope.role, ref_id=None),
+        "manage_collections": dict(type=PermissionType.all, scope=PermissionScope.collection, ref_id=None),
+        "manage_bar": dict(type=PermissionType.all, scope=PermissionScope.bar, ref_id=None),
     }
 
 
@@ -72,6 +55,8 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["manage_pceens"],
                 perms["manage_roles"],
                 perms["manage_collections"],
+                perms["manage_bar"],
+                perms["access_bar_stats"],
             ],
         ),
         "Rezident": dict(  # NE PAS RENOMMER - nom utilisé dans app/routes/auth/utils.py
@@ -86,6 +71,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
             color="64b9e9",
             permissions=[
                 perms["access_photos"],
+                perms["access_bar"],
             ],
         ),
         "Alumni": dict(
@@ -93,6 +79,14 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
             color="152f4e",
             permissions=[
                 perms["access_photos"],
+            ],
+        ),
+        "Barman": dict(
+            index=20,
+            color="000000",
+            permissions=[
+                perms["manage_bar"],
+                perms["access_bar_stats"],
             ],
         ),
     }

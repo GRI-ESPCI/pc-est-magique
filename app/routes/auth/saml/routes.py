@@ -97,9 +97,12 @@ def setup_saml_authentication() -> None:
         ],
     }
     config = saml2.config.Config()
-    config.load(settings)
-    config.allow_unknown_attributes = True
-    _saml_client = saml2.client.Saml2Client(config=config)
+    try:
+        config.load(settings)
+        config.allow_unknown_attributes = True
+        _saml_client = saml2.client.Saml2Client(config=config)
+    except Exception:
+        ("SAML connection unavailable", "danger")
 
 
 @bp.route("/metadata")

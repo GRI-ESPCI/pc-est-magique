@@ -21,7 +21,7 @@ Model = typing.cast(type[type], db.Model)  # type checking hack
 
 
 class Device(Model):
-    """A device of a PCCeen."""
+    """A device of a PCéen."""
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
     _pceen_id: Column[int] = column(sa.ForeignKey("pceen.id"), nullable=False)

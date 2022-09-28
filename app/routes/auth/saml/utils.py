@@ -8,8 +8,9 @@ from flask_babel import _
 
 from app import db
 from app.models import PCeen
-from app.routes.auth.utils import new_username, grant_student_role, grant_promotion_role
+from app.routes.auth.utils import new_username
 from app.utils import helpers
+from app.utils.roles import grant_student_role, grant_promotion_role
 
 
 #: Promotion that is entered / will enter to ESPCI the current year.

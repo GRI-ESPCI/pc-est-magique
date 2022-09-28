@@ -3,8 +3,7 @@
 
 {% block scripts %}
 {{ super() }}
-<script src={{ url_for("static", filename="js/tooltips.js") }}
-        defer></script>
+<script src={{ url_for("static", filename="js/tooltips.js") }} defer></script>
 {% endblock %}
 
 {% block app_content %}

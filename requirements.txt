@@ -34,7 +34,7 @@ MarkupSafe==2.0.1
 Pillow==9.0.1
 plum-py==0.7.3
 premailer==3.10.0
-pyinotify==0.9.6
+# pyinotify==0.9.6
 PyJWT==2.1.0
 pyOpenSSL==22.0.0
 pysaml2==6.5.2

@@ -7,8 +7,9 @@ from flask_babel import _
 from app import context, db
 from app.routes.auth import bp, forms, email
 from app.models import PCeen
-from app.routes.auth.utils import new_username, grant_rezident_role
+from app.routes.auth.utils import new_username
 from app.utils import helpers, typing
+from app.utils.roles import grant_rezident_role
 
 
 @bp.route("/auth_needed")

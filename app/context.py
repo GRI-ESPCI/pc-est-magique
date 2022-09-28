@@ -1,4 +1,4 @@
-""""PC est magique - Custom request context"""
+"""PC est magique - Custom request context"""
 
 from ipaddress import IPv4Address
 import functools
@@ -12,8 +12,8 @@ from flask_babel import _
 import flask_login
 
 from app.models import Model, Device, PCeen, PermissionType, PermissionScope
-from app.routes.auth.utils import grant_rezident_role
 from app.utils import helpers, typing
+from app.utils.roles import grant_rezident_role
 
 if TYPE_CHECKING:
 

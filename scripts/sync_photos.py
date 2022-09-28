@@ -50,7 +50,7 @@ def main() -> None:
     )
 
     print("Scanning files on disk...\n")
-    base = flask.current_app.config["PHOTOS_BASE_PATH"]
+    base: str = flask.current_app.config["PHOTOS_BASE_PATH"]
     for dirpath, dirnames, filenames in os.walk(base):
         relative_path = dirpath.removeprefix(base)
         match relative_path.split(os.sep):
@@ -58,6 +58,9 @@ def main() -> None:
                 sync_collections(collections, dirnames)
 
             case ["", collection_dir]:
+                if collection_dir.startswith("_"):
+                    print(f"Skipping dir starting with underscore: {collection_dir}")
+                    continue
                 try:
                     collection = collections[collection_dir]
                 except KeyError:
@@ -65,6 +68,9 @@ def main() -> None:
                 sync_albums(collection, dirnames)
 
             case ["", collection_dir, album_dir]:
+                if collection_dir.startswith("_") or album_dir.startswith("_"):
+                    print(f"Skipping dir starting with underscore: {collection_dir}/{album_dir}")
+                    continue
                 try:
                     collection = collections[collection_dir]
                     album = collection.albums.filter_by(dir_name=album_dir).one()

@@ -25,6 +25,7 @@ def index() -> typing.RouteReturn:
     if context.has_permission(PermissionType.read, PermissionScope.intrarez) and not context.g.intrarez_setup:
         return helpers.safe_redirect(context.g.redemption_endpoint, **context.g.redemption_params)
 
+    photos_infos = None
     if context.has_permission(PermissionType.read, PermissionScope.photos):
         photos_infos = namedtuple("PhotosInfos", ["nb_collections", "nb_albums", "nb_photos"])(
             len(Collection.query.all()),
@@ -165,3 +166,15 @@ def photo(collection_dir: str, album_dir: str, photo_file: str) -> typing.RouteR
         return flask.send_file(os.path.join(album_dir, "_thumbs", photo_file))
     else:
         return flask.send_file(os.path.join(album_dir, photo_file))
+
+
+@bp.route("/bar_avatar/<promo>/<username>")
+def bar_avatar(promo: str, username: str) -> typing.RouteReturn:
+    """Serve bar avatar (fallback if no Nginx, should NOT bu used!)"""
+    dir = os.path.join(
+        flask.current_app.config["PHOTOS_BASE_PATH"],
+        "bar_avatars",
+        promo,
+        username,
+    )
+    return flask.send_file(dir)

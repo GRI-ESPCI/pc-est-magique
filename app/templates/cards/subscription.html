@@ -2,11 +2,11 @@
 {% extends "cards/base.html" %}
 
 {% block card_title %}
-{{ _("Mon abonnement") }}
+{{ _("Accès Internet") }}
 {% endblock %}
 
 {% block card_icon %}
-{{ macros.bootstrap_icon("coin") }}     <!-- COIN COIN -->
+{{ macros.bootstrap_icon("wifi") }}
 {% endblock %}
 
 
@@ -14,7 +14,7 @@
 {% if pceen.sub_state == SubState.subscribed %}
 
 <tr>
-    <th scope="row" class="ps-4">{{ _("État") }}</th>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("État") }}</th>
     <td>
         <div class="m-auto position-relative pe-3">
             {{ _("Abonné(e)") }}
@@ -27,18 +27,18 @@
     </td>
 </tr>
 <tr>
-    <th scope="row" class="ps-4">{{ _("Jusqu'au") }}</th>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("Jusqu'au") }}</th>
     <td>{{ moment(pceen.current_subscription.end).format("LL") }}</td>
 </tr>
 <tr>
-    <th scope="row" class="ps-4">{{ _("Coupure le") }}</th>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("Coupure le") }}</th>
     <td>{{ moment(pceen.current_subscription.cut_day).format("LL") }}</td>
 </tr>
 
 {% elif pceen.sub_state == SubState.trial %}
 
 <tr>
-    <th scope="row" class="ps-4">{{ _("État") }}</th>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("État") }}</th>
     <td>
         <div class="m-auto position-relative pe-3">
             {{ _("Mois offert") }}
@@ -56,18 +56,18 @@
     </td>
 </tr>
 <tr>
-    <th scope="row" class="ps-4">{{ _("Depuis le") }}</th>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("Depuis le") }}</th>
     <td>{{ moment(pceen.current_subscription.end).format("LL") }}</td>
 </tr>
 <tr>
-    <th scope="row" class="ps-4">{{ _("Coupure le") }}</th>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("Coupure le") }}</th>
     <td>{{ moment(pceen.current_subscription.cut_day).format("LL") }}</td>
 </tr>
 
 {% else %}
 
 <tr>
-    <th scope="row" class="ps-4">{{ _("État") }}</th>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("État") }}</th>
     <td>
         <div class="m-auto position-relative pe-3">
             {{ _("Paiement nécessaire") }}
@@ -80,11 +80,11 @@
     </td>
 </tr>
 <tr>
-    <th scope="row" class="ps-4">{{ _("Depuis le") }}</th>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("Depuis le") }}</th>
     <td>{{ moment(pceen.old_subscriptions[0].cut_day).format("LL") }}</td>
 </tr>
 <tr>
-    <th scope="row" class="ps-4">{{ _("Accès Internet") }}</th>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("Accès Internet") }}</th>
     <td>{{ _("Suspendu") }}</td>
 </tr>
 

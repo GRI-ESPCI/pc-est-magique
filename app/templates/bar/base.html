@@ -1,0 +1,176 @@
+{% block doc -%}
+<!doctype html>
+<html lang="en">
+{%- block html %}
+  <head>
+    {%- block head %}
+    {%- block metas %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="ESPCI Student Bar">
+    <meta name="author" content="Samuel Diebolt">
+    {%- endblock metas %}
+    <title>{% block title %}{% if title %}{{ title }} - ESPCI Bar{% else %}Welcome to ESPCI Bar{% endif %}{% endblock title %}</title>
+
+    {%- block styles %}
+    <!-- Bootstrap 4.2.1 core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <!-- Material Design icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Custom styles and favicon -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    {%- endblock styles %}
+    {%- endblock head %}
+  </head>
+  <body {% block body_attribs %}{% endblock body_attribs %}>
+    {% block body -%}
+    {% block navbar %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <a class="navbar-brand" href="{% if current_user.is_admin or current_user.is_bartender or current_user.is_observer %}{{ url_for('main.dashboard') }}{% elif current_user.is_anonymous %}{{ url_for('auth.login') }}{% else %}{{ url_for('main.user', username=current_user.username) }}{% endif %}">ESPCI Bar</a>
+      {% if not current_user.is_anonymous %}
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-main" aria-controls="navbar-main" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="material-icons align-middle">menu</i>
+      </button>
+      {% if current_user.is_admin or current_user.is_bartender or current_user.is_observer %}
+      <div class="collapse navbar-collapse navbar-main">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item{% if (request.path == '/dashboard' or request.path == '/') %} active{% endif %}">
+            <a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
+          </li>
+          {% if current_user.is_admin or current_user.is_bartender %}
+          <li class="nav-item{% if (request.path == '/inventory') %} active{% endif %}">
+            <a class="nav-link" href="{{ url_for('main.inventory')}}">Inventory</a>
+          </li>
+          <li class="nav-item{% if (request.path == '/transactions') %} active{% endif %}">
+            <a class="nav-link" href="{{ url_for('main.transactions') }}">Transactions</a>
+          </li>
+          <li class="nav-item dropdown{% if (request.path == '/tools' or request.path == '/auth/register' or request.path == '/global_settings') %} active{% endif %}">
+            <a class="nav-link dropdown-toggle" href="#" id="dropdownTools" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tools</a>
+            <div class="dropdown-menu" aria-labelledby="dropdownTools">
+              <a class="dropdown-item" href="{{ url_for('auth.register') }}">Add user</a>
+              {% if current_user.is_admin %}
+              <a class="dropdown-item" href="{{ url_for('main.global_settings')}}">Settings</a>
+              {% endif %}
+            </div>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+      {% endif %}
+      <div class="collapse navbar-collapse navbar-main">
+        {% if current_user.is_admin or current_user.is_bartender %}
+        <form class="form-inline my-2 my-lg-0 ml-auto" method="get" action="{{ url_for('main.search') }}">
+          <div class="input-group mr-2">
+          {{ g.search_form.q(size=20, class_='form-control', placeholder=g.search_form.q.label.text) }}
+          <div class="input-group-append">
+            <a class="btn btn-{% if request.path != '/scanqrcode' %}outline-{% endif %}primary" href="{{ url_for('main.scanqrcode') }}" role="button" style="height:38px;"><i class="material-icons align-middle">camera_alt</i></a>
+          </div>
+          </div>
+        </form>
+        {% endif %}
+        <ul class="navbar-nav{% if not current_user.is_admin and not current_user.is_bartender %} ml-auto{% endif %}">
+          <li class="nav-item{% if request.path == '/user/'+current_user.username or request.path == '/edit_profile/'+current_user.username %} active{% endif %}">
+            <a class="nav-link" href="{{ url_for('main.user', username=current_user.username) }}">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-nowrap" href="{{ url_for('auth.logout') }}">Sign out</a>
+          </li>
+        </ul>
+      </div>
+      {% endif %}
+    </nav>
+    {%- endblock navbar %}
+    {% block content -%}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div style="position: fixed; top:60px; right: 10px;z-index:99999;">
+      {% for category, message in messages %}
+      <div class="toast bg-{{ category }} text-white" data-delay="10000" style="width:400px;">
+        <div class="toast-header">
+          <i class="material-icons mr-auto">announcement</i>
+          <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="toast-body text-left">
+          {{ message }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <div class="container">
+      {# application content needs to be provided in the app_content block #}
+      {% block app_content %}{% endblock %}
+
+      <footer class="footer mt-auto pt-5 text-center">
+        <div class="container">
+          <span class="text-muted">© 2018–2019 by Samuel Diebolt</span>
+        </div>
+      </footer>
+    </div>
+
+    {% block modals %}
+    {% if current_user.is_admin or current_user.is_bartender %}
+    <!-- User deposit modal -->
+    <div class="modal fade" id="deposit-modal" tabindex="-1" role="dialog" aria-labelledby="deposit-modal-label" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deposit-modal-label">Deposit</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <i class="material-icons align-middle">close</i>
+            </button>
+          </div>
+          <div class="modal-body">
+            Accept <span class="name"></span>'s deposit?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+            <a class="btn btn-primary" href="#" role="button">Yes</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% endblock %}
+    {%- endblock content %}
+
+    {% block scripts %}
+    <!--  Bootstrap 4.2.1 core Javascript, Popper and jQuery -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    {{ moment.include_moment() }}
+
+    <!-- Graphs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+
+    <script>
+    {%- if current_user.is_admin or current_user.is_bartender -%}
+    // Populate deposit modal with user name and url
+    $('#deposit-modal').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget) // Button that triggered the modal
+      var name = button.data('name') // Extract info from data-* attributes
+      var url = button.data('url') // Extract info from data-* attributes
+      var modal = $(this)
+      modal.find('.modal-footer a').attr('href', url)
+      modal.find('.modal-body .name').text(name)
+    })
+    {% endif -%}
+
+    $(document).ready(function() {
+      $('.toast').toast('show');
+    });
+    </script>
+    {%- endblock scripts %}
+    {%- endblock body %}
+  </body>
+{%- endblock html %}
+</html>
+{% endblock doc -%}

@@ -166,15 +166,17 @@ class Album(Model):
             A tuple of the md5-hashed base64-encoded token and the expire
             timestamp to pass to the server.
         """
-        if expires is None:
-            expires = datetime.datetime.now() + datetime.timedelta(
-                seconds=flask.current_app.config["PHOTOS_EXPIRES_DELAY"]
-            )
-        expires_ts = int(expires.timestamp())
-        secret = flask.current_app.config["PHOTOS_SECRET_KEY"]
-        md5 = hashlib.md5(f"{expires_ts}{self.src}{ip} {secret}".encode())
-        b64 = base64.urlsafe_b64encode(md5.digest()).replace(b"=", b"")
-        return f"md5={b64.decode()}&expires={expires_ts}"
+        return get_nginx_access_token(self.src, ip, expires)
+
+
+def get_nginx_access_token(resource: str, ip: str, expires: datetime.datetime | None = None):
+    if expires is None:
+        expires = datetime.datetime.now() + datetime.timedelta(seconds=flask.current_app.config["PHOTOS_EXPIRES_DELAY"])
+    expires_ts = int(expires.timestamp())
+    secret = flask.current_app.config["PHOTOS_SECRET_KEY"]
+    md5 = hashlib.md5(f"{expires_ts}{resource}{ip} {secret}".encode())
+    b64 = base64.urlsafe_b64encode(md5.digest()).replace(b"=", b"")
+    return f"md5={b64.decode()}&expires={expires_ts}"
 
 
 class Collection(Model):

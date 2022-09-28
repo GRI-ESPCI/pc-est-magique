@@ -25,21 +25,17 @@
             "css/compiled/custom-bootstrap.css",
             "css/custom.css",
         ] %}
-        <link href="{{ url_for("static", filename=filename) }}"
-              rel="stylesheet" />
+        <link href="{{ url_for("static", filename=filename) }}" rel="stylesheet" />
         {% endfor %}
         {% endblock styles %}
         {% block favicon %}
         <!-- Favicon: Depending if anonymous, logged_in or GRI -->
         {% if g.is_gri %}
-        <link href="{{ url_for("static", filename="favicon_gri.png") }}"
-              rel="icon" />
+        <link href="{{ url_for("static", filename="favicon_gri.png") }}" rel="icon" />
         {% elif g.logged_in %}
-        <link href="{{ url_for("static", filename="favicon_user.png") }}"
-              rel="icon" />
+        <link href="{{ url_for("static", filename="favicon_user.png") }}" rel="icon" />
         {% else %}
-        <link href="{{ url_for("static", filename="favicon.png") }}"
-              rel="icon" />
+        <link href="{{ url_for("static", filename="favicon.png") }}" rel="icon" />
         {% endif %}
         {% endblock favicon %}
         {% block scripts %}
@@ -62,10 +58,8 @@
         {% block body %}
         {% block navbar %}
         <nav class="navbar navbar-expand-md navbar-light mb-4 py-0
-                    bg-{{ "danger" if hasattr(g, "_ban")
-                        or (hasattr(g, "pceen") and g.pceen.is_banned)
-                        else "primary" }}
-                    border-bottom border-2 border-secondary">
+            bg-{{ "danger" if hasattr(g, "_ban") or (hasattr(g, "pceen") and g.pceen.is_banned) else "primary" }}
+            border-bottom border-2 border-secondary">
         <div class="container-fluid ps-0">
             <a class="navbar-brand p-0" href="{{ url_for("main.index") }}">
                 <img src="{{ url_for("static",
@@ -113,7 +107,7 @@
                     <li class="nav-item">
                         <a class="btn btn-outline-secondary mx-2 my-1 position-relative"
                            href="{{ url_for("payments.main") }}">
-                            {{ _("Abonnement") }}
+                            {{ _("Internet") }}
                         </a>
                     </li>
                     {% endif %}
@@ -122,6 +116,14 @@
                         <a class="btn btn-outline-secondary mx-2 my-1 position-relative"
                            href="{{ url_for("photos.main") }}">
                             {{ _("Photos") }}
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if has_permission(PermissionType.read, PermissionScope.photos) %}
+                    <li class="nav-item">
+                        <a class="btn btn-outline-secondary mx-2 my-1 position-relative"
+                           href="{{ url_for("bar.user", username=g.pceen.username) }}">
+                            {{ _("Bar") }}
                         </a>
                     </li>
                     {% endif %}

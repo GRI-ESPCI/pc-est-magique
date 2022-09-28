@@ -91,7 +91,7 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
     context.check_permission(album.view_permission_type, PermissionScope.album, elem=album)
     ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]
     if not ip:
-        flask.flash("IP non détectable, impossible d'accéder aux photos", "danger")
+        flask.flash(_("IP non détectable, impossible d'accéder aux photos"), "danger")
         flask.abort(403)
     # Access OK
 
