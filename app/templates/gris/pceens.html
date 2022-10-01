@@ -200,8 +200,7 @@
                 </span>
                 <span class="ms-auto">
                     <button type="button" class="btn p-0 me-1 d-inline-block"
-                            {% if pceen.current_room
-                                  or pceen.old_rentals %}
+                            {% if pceen.current_room or pceen.old_rentals %}
                             data-bs-target="#mo-room-{{ pceen.id }}"
                             data-bs-toggle="modal"
                             {% else %} disabled

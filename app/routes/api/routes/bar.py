@@ -7,10 +7,9 @@ from flask_babel import _, format_currency
 from sqlalchemy import extract
 
 from app import context, db
-from app.enums import BarTransactionType
-from app.models import PCeen, BarItem, BarTransaction, GlobalSetting, PermissionScope, PermissionType
-from app.routes.bar.utils import can_buy, month_year_iter, BarSettings
-from app.utils import helpers, typing
+from app.models import PCeen, BarItem, BarTransaction, PermissionScope, PermissionType
+from app.routes.bar.utils import can_buy, month_year_iter
+from app.utils.global_settings import Settings
 
 sbp = flask.Blueprint("bar", __name__)
 
@@ -180,38 +179,38 @@ def revert_transaction(transaction_id: str):
     return {}, 204
 
 
-@sbp.route("/quick_access_item", methods=["PATCH"])
+@sbp.route("/quick_access_item/<item_id>", methods=["PATCH"])
 @context.permission_only(PermissionType.write, PermissionScope.bar)
-def set_quick_access_item():
+def set_quick_access_item(item_id: str):
     """Set the quick access item."""
-    # Get arguments
-    item_name = flask.request.args.get("item_name", None, type=str)
+    if not item_id.isdigit():
+        flask.abort(400, "Field 'item_id' missing or invalid integer")
+    item: BarItem | None = BarItem.query.get(int(item_id))
+    if not item:
+        flask.abort(404, f"Item #{item_id} does not exist")
 
-    # Get item
-    item = BarItem.query.filter_by(name=item_name).first_or_404()
-
-    # Get quick access item id
-    BarSettings.quick_access_item = item
-
-    # Update the quick access item id
-    quick_access_item_id = GlobalSetting.query.filter_by(key="QUICK_ACCESS_ITEM_ID").first()
-    quick_access_item_id.value = item.id
+    Settings.quick_access_item = item
     db.session.commit()
 
-    return flask.redirect(flask.request.referrer)
+    flask.flash(_("Article %(item)s supprimé.", item=item.name), "success")
+    return {}, 201
 
 
-@sbp.route("/item", methods=["DELETE"])
+@sbp.route("/item/<item_id>", methods=["DELETE"])
 @context.permission_only(PermissionType.write, PermissionScope.bar)
-def delete_item():
+def delete_item(item_id: str):
     """Delete an item from the inventory."""
-    item_name = flask.request.args.get("item_name", None, type=str)
+    if not item_id.isdigit():
+        flask.abort(400, "Field 'item_id' missing or invalid integer")
+    item: BarItem | None = BarItem.query.get(int(item_id))
+    if not item:
+        flask.abort(404, f"Item #{item_id} does not exist")
 
-    item = BarItem.query.filter_by(name=item_name).first_or_404()
-    db.session.delete(item)
+    item.archived = True
     db.session.commit()
-    flask.flash("The item " + item_name + " has been deleted.", "primary")
-    return flask.redirect(flask.request.referrer)
+
+    flask.flash(_("Article %(item)s supprimé.", item=item.name), "success")
+    return {}, 201
 
 
 @sbp.route("/top_up/<pceen_id>", methods=["POST"])

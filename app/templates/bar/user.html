@@ -1,14 +1,5 @@
 {% extends "bar/base.html" %}
 
-{% block scripts %}
-{{ super() }}
-<script src="{{ url_for("static", filename="js/api.js") }}" defer></script>
-{% endblock %}
-
-{% block navbar %}
-{{ super() }}
-{% endblock %}
-
 {% block bar_app_content %}
 {% with theme = "muted" if not pceen.bar_deposit
     else ("danger" if pceen.bar_balance <= 1

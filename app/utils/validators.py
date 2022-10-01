@@ -6,7 +6,7 @@ import flask
 import wtforms
 from flask_babel import lazy_gettext as _l
 
-from app.models import PCeen, Room, Ban
+from app.models import PCeen, Room, Ban, BarItem
 from app.utils.typing import JinjaStr
 
 
@@ -143,3 +143,18 @@ class PhoneNumber(CustomValidator):
     def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
         num = field.data.replace("+33", "0").replace(" ", "")
         return num.isdigit() and len(num) == 10 and num.startswith("0")
+
+
+class NewBarItemName(CustomValidator):
+    message = _l("Il existe déjà un article avec ce nom.")
+
+    def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
+        item = BarItem.query.filter_by(archived=False, name=field.data).first()
+        return (item is None) or (str(item.id) == form.id.data)
+
+
+class ValidBarItemID(CustomValidator):
+    message = _l("Item ID invalide.")
+
+    def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
+        return field.data.isdigit() and bool(BarItem.query.get(int(field.data)))

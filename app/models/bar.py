@@ -10,13 +10,7 @@ from sqlalchemy.orm import Query
 
 from app import db
 from app.enums import BarTransactionType
-from app.utils.columns import (
-    column,
-    many_to_one,
-    one_to_many,
-    Column,
-    Relationship,
-)
+from app.utils.columns import column, many_to_one, one_to_many, Column, Relationship
 
 
 Model = typing.cast(type[type], db.Model)  # type checking hack
@@ -28,7 +22,7 @@ class BarItem(db.Model):
     __tablename__ = "bar_item"
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
-    name: Column[str] = column(sa.String(64), unique=True, nullable=False)
+    name: Column[str] = column(sa.String(64), nullable=False)
 
     price: Column[float] = column(sa.Numeric(6, 2, asdecimal=False), nullable=False)
 
@@ -37,6 +31,7 @@ class BarItem(db.Model):
     quantity: Column[int] = column(sa.Integer(), nullable=True)
 
     favorite_index: Column[int] = column(sa.Integer(), nullable=False, default=0)
+    archived: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
 
     transactions: Relationship[Query[models.BarTransaction]] = one_to_many("BarTransaction.item", lazy="dynamic")
 
@@ -174,20 +169,6 @@ class BarDailyData(db.Model):
             db.session.flush()
             return data
         return cls._FakeBarDailyData(pceen=pceen, date=date)
-
-
-class GlobalSetting(db.Model):
-    """App global settings model."""
-
-    id: Column[int] = column(sa.Integer(), primary_key=True)
-
-    name: Column[str] = column(sa.String(128), nullable=False)
-    key: Column[str] = column(sa.String(64), nullable=False)
-    value: Column[int] = column(sa.Integer(), default=0)
-
-    def __repr__(self) -> str:
-        """Returns repr(self)."""
-        return f"<GlobalSetting #{self.id}: {self.key}>"
 
 
 from app import models

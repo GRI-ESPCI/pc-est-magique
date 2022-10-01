@@ -1,15 +1,9 @@
-function post_and_reload(url, form) {
-  // event.preventDefault();
-  // form.role_id.value = event.target.querySelector("input[name='role_id']").value;
-  // form.type_name.value = event.target.querySelector("input[name='type_name']:checked").value;
-  // form.scope_name.value = event.target.querySelector("input[name='scope_name']:checked").value;
-  // form.ref_id.value = event.target.querySelector("select[name='ref_id']").value;
-  console.log(url);
+function post_and_reload(url, form, method = "POST") {
   if (form) body = new FormData(form);
   else body = null;
 
   fetch(url, {
-    method: "POST",
+    method: method,
     body: body,
   }).then((response) => {
     if (response.ok) {

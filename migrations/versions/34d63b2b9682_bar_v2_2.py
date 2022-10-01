@@ -28,12 +28,12 @@ def upgrade():
         sa.Column("quantity", sa.Integer(), nullable=True),
         sa.Column("favorite_index", sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("name"),
     )
     op.create_table(
         "global_setting",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("name", sa.String(length=128), nullable=False),
+        sa.Column("name_fr", sa.String(length=128), nullable=False),
+        sa.Column("name_en", sa.String(length=128), nullable=False),
         sa.Column("key", sa.String(length=64), nullable=False),
         sa.Column("value", sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint("id"),

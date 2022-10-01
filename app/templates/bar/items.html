@@ -1,0 +1,191 @@
+{% extends "bar/base.html" %}
+{% import "_form.html" as wtf %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for("static", filename="js/bar/items.js") }}" defer></script>
+{% endblock %}
+
+{% block bar_app_content %}
+<!-- Items sorting -->
+<div class="container my-1">
+    <div class="btn-toolbar justify-content-between" role="toolbar">
+        <div class="btn-group" role="group">
+            <a class="btn btn-outline-primary{% if sort == "name" and way == "asc" %} active{% endif %}"
+               href="{{ url_for("bar.items", q=query, sort="name", way="asc") }}" role="button">
+                <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                    {{ macros.bootstrap_icon("sort-alpha-down") }}
+                </svg>
+            </a>
+            <a class="btn btn-outline-primary{% if sort == "name" and way == "desc" %} active{% endif %}"
+               href="{{ url_for("bar.items", q=query, sort="name", way="desc") }}" role="button">
+                <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                    {{ macros.bootstrap_icon("sort-alpha-up") }}
+                </svg>
+            </a>
+            <a class="btn btn-outline-primary{% if sort == "quantity" and way == "asc" %} active{% endif %}"
+               href="{{ url_for("bar.items", q=query, sort="quantity", way="asc") }}" role="button">
+                <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                    {{ macros.bootstrap_icon("sort-numeric-down") }}
+                </svg>
+            </a>
+            <a class="btn btn-outline-primary{% if sort == "quantity" and way == "desc" %} active{% endif %}"
+               href="{{ url_for("bar.items", q=query, sort="quantity", way="desc") }}" role="button">
+                <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                    {{ macros.bootstrap_icon("sort-numeric-up") }}
+                </svg>
+            </a>
+        </div>
+        <div class="my-auto d-none d-md-inline"><h1 class="fs-3 mb-0 mt-auto">{{ _("Articles en stock") }}</h1></div>
+        <div class="btn-group" role="group" aria-label="Results">
+            <button type="button" class="btn btn-primary">
+                {{ _("Total :") }}
+                <span class="badge bg-secondary badge-light">{{ paginator.total }}</span>
+            </button>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#edit-item-modal">
+                <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                    {{ macros.bootstrap_icon("plus-circle") }}
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive mt-4">
+    <table class="table table-striped table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>{{ _("Nom") }}</th>
+                <th>{{ _("Quantité") }}</th>
+                <th>{{ _("Prix") }}</th>
+                <th>{{ _("Alcoolisé") }}</th>
+                <th>{{ _("Priorité") }}</th>
+                <th>{{ _("Modifier") }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in paginator.items %}
+            <tr class="table-{% if item.is_quantifiable and item.quantity <= 0 %}danger{% elif item.id == quick_access_item.id %}success{% endif %}">
+                <td>{{ item.name }}</td>
+                <td>{% if item.is_quantifiable %}{{ item.quantity }}{% else %}{{ _("N/A") }}{% endif %}</td>
+                <td>{{ babel.format_currency(item.price, "EUR") }}</td>
+                <td>
+                    {% if item.is_alcohol %}
+                    <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                        {{ macros.bootstrap_icon("check2") }}
+                    </svg>
+                    {% endif %}
+                </td>
+                <td>{% if item.favorite_index %}{{ item.favorite_index }}{% else %}-{% endif %}</td>
+                <td>
+                    <div class="btn-group" role="group" aria-label="Item actions">
+                        <button class="btn btn-success{% if item == quick_access_item %} disabled{% endif %}"
+                                onclick="post_and_reload('{{
+                                    url_for("api.bar.set_quick_access_item", item_id=item.id)
+                                }}', null, 'PATCH');">
+                            <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                                {{ macros.bootstrap_icon("star-fill" if item == quick_access_item else "star") }}
+                            </svg>
+                        </button>
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#edit-item-modal"
+                                data-item-id="{{ item.id }}" data-item-name="{{ item.name }}"
+                                data-quantity="{{ item.quantity if item.is_quantifiable else "" }}"
+                                data-price="{{ item.price }}"
+                                data-is-alcohol="{{ item.is_alcohol }}" data-favorite-index="{{ item.favorite_index }}">
+                            <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                                {{ macros.bootstrap_icon("pencil") }}
+                            </svg>
+                        </button>
+                        <button type="button" class="btn btn-danger"
+                                onclick="confirm('Supprimer l\'article ?') && post_and_reload('{{
+                                    url_for("api.bar.delete_item", item_id=item.id)
+                                }}', null, 'DELETE');">
+                            <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                                {{ macros.bootstrap_icon("trash") }}
+                            </svg>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+    {% for page in paginator.iter_pages() %}
+        <li class="page-item{% if page == paginator.page %} active{% endif %}{%if not page %} disabled{% endif %}">
+            <a class="page-link" href="{{ url_for("bar.search", q=query, page=page, sort=sort, way=way) }}">
+                {% if page %}{{ page }}{% else %}<span class=ellipsis>…</span>{% endif %}
+            </a>
+        </li>
+    {% endfor %}
+    </ul>
+</nav>
+
+<!-- Item edit modal -->
+<div class="modal fade" id="edit-item-modal" tabindex="-1" aria-labelledby="edit-item-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="edit-item-modal-label">
+                {{ _("Nouvel article || Modifier : _name_") }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _("Fermer") }}"></button>
+        </div>
+        <form action="" method="post" role="form">
+            <div class="modal-body container">
+                {{ form.hidden_tag() }}
+                <div class="row mb-3"><div class="col">
+                    <div class="form-floating">
+                        {{ wtf.form_field(form.name, maxlength=64) }}
+                    </div>
+                </div></div>
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-4">
+                        <div class="form-check form-switch">
+                            {{ wtf.form_field(form.is_quantifiable) }}
+                        </div>
+                    </div>
+                    <div class="col-8">
+                        <div class="form-floating text-muted" id="quantityInput">
+                            {{ wtf.form_field(form.quantity, min=0, disabled=True) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col">
+                        <div class="form-floating">
+                            {{ wtf.form_field(form.price, type="number", step=0.01, min=0) }}
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-check form-switch">
+                            {{ wtf.form_field(form.is_alcohol) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="row d-flex align-items-center mb-3">
+                    <div class="col-4">
+                        <div class="form-check form-switch">
+                            {{ wtf.form_field(form.is_favorite) }}
+                        </div>
+                    </div>
+                    <div class="col-8">
+                        <div class="form-floating text-muted" id="favoriteIndexInput">
+                            {{ wtf.form_field(form.favorite_index, min=0, disabled=True) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Annuler") }}</button>
+                {{ wtf.form_field(form.submit) }}
+            </div>
+        </form>
+    </div>
+    </div>
+</div>
+
+{% endblock %}

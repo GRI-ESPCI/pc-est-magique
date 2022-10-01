@@ -11,24 +11,23 @@ from unidecode import unidecode
 
 from app import context, db
 from app.models import PCeen, BarItem, BarTransaction, GlobalSetting, PermissionScope, PermissionType, Role, Permission
-from app.models.photos import get_nginx_access_token
 from app.routes.bar import bp
-from app.routes.bar.forms import AddOrEditItemForm, SearchForm, GlobalSettingsForm
-from app.routes.bar.utils import get_items_descriptions, month_year_iter, BarSettings
-from app.utils import helpers, typing
+from app.routes.bar.forms import AddOrEditItemForm, GlobalSettingsForm
+from app.routes.bar.utils import get_avatar_token_args, get_items_descriptions
+from app.utils import helpers
+from app.utils.global_settings import Settings
 
 
 @bp.before_app_first_request
 def retrieve_bar_settings():
-    settings = {setting.key: setting.value for setting in GlobalSetting.query.all()}
-    BarSettings.max_daily_alcoholic_drinks_per_user = settings.get("MAX_DAILY_ALCOHOLIC_DRINKS_PER_USER", 4)
-    BarSettings._quick_access_item_id = settings.get("QUICK_ACCESS_ITEM_ID", 0)
+    # Call getter for all settings to load cache
+    Settings.max_daily_alcoholic_drinks_per_user
+    Settings.quick_access_item
 
 
-@bp.route("/")
-@bp.route("/dashboard")
+@bp.route("/stats")
 @context.permission_only(PermissionType.read, PermissionScope.bar_stats)
-def dashboard():
+def stats():
     # Get current day start
     today = datetime.datetime.today()
     current_year = today.year
@@ -122,16 +121,13 @@ def search():
     way = flask.request.args.get("way", "asc", type=str)
     query = flask.request.args.get("q", type=str)
 
-    # If the query is empty, flask.redirect to the index page
     if not query:
         return helpers.ensure_safe_redirect("bar.me")
 
-    # Get users corresponding to the query
     pceen = PCeen.query.filter_by(username=query).one_or_none()
     if pceen and pceen.has_permission(PermissionType.read, PermissionScope.bar):
         return helpers.ensure_safe_redirect("bar.user", username=pceen.username)
 
-    # Sort users alphabetically
     paginator = (
         PCeen.query.join(PCeen.roles)
         .join(Role.permissions)
@@ -148,15 +144,21 @@ def search():
         .paginate(page, flask.current_app.config["USERS_PER_PAGE"], True)
     )
 
-    # If only one user, flask.redirect to his profile
     if paginator.total == 1:
         return helpers.ensure_safe_redirect("bar.user", username=paginator.items[0].username)
 
     return flask.render_template(
-        "bar/search.html", title="Search", paginator=paginator, query=query, sort=sort, way=way
+        "bar/search.html",
+        title=_("Recherche – Bar"),
+        paginator=paginator,
+        query=query,
+        sort=sort,
+        way=way,
+        avatar_token_args=get_avatar_token_args(),
     )
 
 
+@bp.route("/")
 @bp.route("/me")
 @context.permission_only(PermissionType.read, PermissionScope.bar)
 def me():
@@ -175,11 +177,7 @@ def user(username: str):
 
 
 def _user(pceen: PCeen):
-    """Render the user profile page.
-
-    Keyword arguments:
-    username -- the user's username
-    """
+    """Render the user profile page."""
     # Get pceen transactions
     page = flask.request.args.get("page", 1, type=int)
     transactions = pceen.bar_transactions_made.order_by(BarTransaction.date.desc()).paginate(page, 5, True)
@@ -188,13 +186,7 @@ def _user(pceen: PCeen):
     item_descriptions = dict(get_items_descriptions(pceen))
 
     # Get quick access item
-    quick_access_item = BarSettings.quick_access_item
-
-    # Avatar access
-    ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]
-    if not ip:
-        flask.flash(_("IP non détectable, impossible d'afficher les avatars"), "danger")
-    # Access OK
+    quick_access_item = Settings.quick_access_item
 
     return flask.render_template(
         "bar/user.html",
@@ -203,8 +195,8 @@ def _user(pceen: PCeen):
         item_descriptions=item_descriptions,
         quick_access_item=quick_access_item,
         transactions=transactions,
-        avatar_token_args=get_nginx_access_token("%bar_avatars%", ip) if ip else None,
-        max_daily_alcoholic_drinks_per_user=BarSettings.max_daily_alcoholic_drinks_per_user,
+        avatar_token_args=get_avatar_token_args(),
+        max_daily_alcoholic_drinks_per_user=Settings.max_daily_alcoholic_drinks_per_user,
     )
 
 
@@ -225,89 +217,68 @@ def transactions():
     return flask.render_template("bar/transactions.html", title="Transactions", transactions=transactions, sort=sort)
 
 
-@bp.route("/items")
+@bp.route("/items", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.bar)
 def items():
     """Render the items page."""
+    form = AddOrEditItemForm()
+    if form.is_submitted():
+        if form.validate():
+            favorite_index = form.favorite_index.data if form.is_favorite.data else 0
+            quantity = (form.quantity.data or 0) if form.is_quantifiable.data else None
+            if form.id.data:
+                # Edit existing item
+                item: BarItem = BarItem.query.get(form.id.data)
+                item.name = form.name.data
+                item.is_quantifiable = form.is_quantifiable.data
+                item.quantity = quantity
+                item.price = form.price.data
+                item.is_alcohol = form.is_alcohol.data
+                item.favorite_index = favorite_index
+                flask.flash(_("Article %(item)s modifié.", item=item.name), "success")
+            else:
+                # Create item
+                item = BarItem(
+                    name=form.name.data,
+                    is_quantifiable=form.is_quantifiable.data,
+                    quantity=quantity,
+                    price=form.price.data,
+                    is_alcohol=form.is_alcohol.data,
+                    favorite_index=favorite_index,
+                )
+                db.session.add(item)
+                flask.flash(_("Article %(item)s créé.", item=item.name), "success")
+            db.session.commit()
+
+        else:
+            for field, messages in form.errors.items():
+                flask.flash(f"{form._fields[field].label.text} : {messages[0]}", "danger")
+
     # Get arguments
     page = flask.request.args.get("page", 1, type=int)
-    sort = flask.request.args.get("sort", "asc", type=str)
-
-    # Get quick access item
-    quick_access_item = BarSettings.quick_access_item
+    sort = flask.request.args.get("sort", "name", type=str)
+    way = flask.request.args.get("way", "asc", type=str)
 
     # Sort items alphabetically
-    if sort == "asc":
-        inventory = BarItem.query.order_by(BarItem.name.asc()).paginate(
-            page, flask.current_app.config["ITEMS_PER_PAGE"], True
+    paginator = (
+        BarItem.query.filter(~BarItem.archived)
+        .order_by(
+            (BarItem.quantity.desc() if way == "desc" else BarItem.quantity.asc())
+            if sort == "quantity"
+            else (BarItem.name.desc() if way == "desc" else BarItem.name.asc())
         )
-    else:
-        inventory = BarItem.query.order_by(BarItem.name.desc()).paginate(
-            page, flask.current_app.config["ITEMS_PER_PAGE"], True
-        )
-
-    return flask.render_template(
-        "bar/inventory.html", title="Inventory", inventory=inventory, sort=sort, quick_access_item=quick_access_item
+        .paginate(page, flask.current_app.config["ITEMS_PER_PAGE"], True)
     )
 
-
-@bp.route("/add_item", methods=["GET", "POST"])
-@context.permission_only(PermissionType.write, PermissionScope.bar)
-def add_item():
-    """Add an item to the inventory."""
-    form = AddOrEditItemForm()
-    if form.validate_on_submit():
-        quantity = form.quantity.data
-        if quantity is None:
-            quantity = 0
-        item = BarItem(
-            name=form.name.data,
-            quantity=quantity,
-            price=form.price.data,
-            is_alcohol=form.is_alcohol.data,
-            is_quantifiable=form.is_quantifiable.data,
-            is_favorite=form.is_favorite.data,
-        )
-        db.session.add(item)
-        db.session.commit()
-        flask.flash("The item " + item.name + " was successfully added.", "primary")
-        return helpers.ensure_safe_redirect("bar.inventory")
-    return flask.render_template("bar/add_item.html", title="Add item", form=form)
-
-
-@bp.route("/edit_item/<item_name>", methods=["GET", "POST"])
-@context.permission_only(PermissionType.write, PermissionScope.bar)
-def edit_item(item_name):
-    """Render the item editing page.
-
-    Keyword arguments:
-    item_name -- the item's name
-    """
-    item = BarItem.query.filter_by(name=item_name).first_or_404()
-    form = AddOrEditItemForm(item.name)
-    if form.validate_on_submit():
-        quantity = form.quantity.data
-        if quantity is None:
-            quantity = 0
-        item.name = form.name.data
-        if item.is_quantifiable:
-            item.quantity = quantity
-        item.price = form.price.data
-        item.is_alcohol = form.is_alcohol.data
-        item.is_quantifiable = form.is_quantifiable.data
-        item.is_favorite = form.is_favorite.data
-        db.session.commit()
-        flask.flash("Your changes have been saved.", "primary")
-        return helpers.ensure_safe_redirect("bar.inventory")
-    elif flask.request.method == "GET":
-        form.name.data = item.name
-        if item.is_quantifiable:
-            form.quantity.data = item.quantity
-        form.price.data = item.price
-        form.is_alcohol.data = item.is_alcohol
-        form.is_quantifiable.data = item.is_quantifiable
-        form.is_favorite.data = item.is_favorite
-    return flask.render_template("bar/edit_item.html", title="Edit item", form=form)
+    return flask.render_template(
+        "bar/items.html",
+        title=_("Articles – Bar"),
+        paginator=paginator,
+        sort=sort,
+        way=way,
+        quick_access_item=Settings.quick_access_item,
+        form=form,
+    )
 
 
 @bp.route("/global_settings", methods=["GET", "POST"])

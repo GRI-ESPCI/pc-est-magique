@@ -47,15 +47,16 @@
                     </a>
                 </li>
                 {% endif %}
-                {% if has_permission(PermissionType.read, PermissionScope.bar) %}
+                {% if has_permission(PermissionType.write, PermissionScope.bar)
+                   or has_permission(PermissionType.read, PermissionScope.bar_stats) %}
                 <li class="nav-item">
-                    <a class="btn btn-outline-secondary mx-2 my-1 position-relative"
-                       {% if has_permission(PermissionType.write, PermissionScope.bar) %}
-                       href="{{ url_for("bar.dashboard") }}"
-                       {% else %}
-                       href="{{ url_for("bar.me") }}"
-                       {% endif %}
-                    >
+                    <a class="btn btn-outline-secondary mx-2 my-1 position-relative" href="{{ url_for("bar.stats") }}">
+                        {{ _("Bar") }}
+                    </a>
+                </li>
+                {% elif has_permission(PermissionType.read, PermissionScope.bar) %}
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2 my-1 position-relative" href="{{ url_for("bar.me") }}">
                         {{ _("Bar") }}
                     </a>
                 </li>

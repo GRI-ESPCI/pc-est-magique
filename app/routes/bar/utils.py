@@ -2,25 +2,14 @@
 
 from __future__ import annotations
 
-import datetime
 import typing
 
 import flask
 from flask_babel import _
-from app.enums import BarTransactionType
 
-from app.models import BarItem, BarTransaction, PCeen
-
-
-class BarSettings:
-    max_daily_alcoholic_drinks_per_user: int
-    _quick_access_item_id: BarItem
-
-    class _QuickAccessItemDescriptor:
-        def __get__(self, obj: None, objtype=None):
-            return BarItem.query.get(BarSettings._quick_access_item_id)
-
-    quick_access_item = _QuickAccessItemDescriptor()
+from app.models import BarItem, PCeen
+from app.models.photos import get_nginx_access_token
+from app.utils.global_settings import Settings
 
 
 def month_year_iter(start_month, start_year, end_month, end_year):
@@ -42,10 +31,14 @@ def _pceen_can_buy_anything(pceen: PCeen, flash: bool) -> bool:
 
 
 def _pceen_can_buy_alcohol(pceen: PCeen, flash: bool) -> bool:
-    if pceen.current_bar_daily_data.alcohol_bought_count >= BarSettings.max_daily_alcoholic_drinks_per_user:
+    if pceen.current_bar_daily_data.alcohol_bought_count >= Settings.max_daily_alcoholic_drinks_per_user:
         if flash:
             flask.flash(
-                _("%(pceen)s has reached the limit of %(limit)s drinks per night.", pceen=pceen.full_name, limit=limit),
+                _(
+                    "%(pceen)s has reached the limit of %(limit)s drinks per night.",
+                    pceen=pceen.full_name,
+                    limit=Settings.max_daily_alcoholic_drinks_per_user,
+                ),
                 "danger",
             )
         return False
@@ -109,6 +102,16 @@ def get_items_descriptions(pceen: PCeen) -> typing.Iterator[tuple[BarItem, tuple
             limit_message = _("Limite d'alcool quotidienne atteinte")
         elif not _item_can_be_bought(item, False):
             can_be_bought = False
-            limit_message = _("Article épuisé (voir onglet Inventaire)")
+            limit_message = _("Article épuisé (modifiable sur la page Articles)")
 
         yield item, (can_be_bought, limit_message, first_no_favorite)
+
+
+def get_avatar_token_args():
+    # Avatar access
+    ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]
+    if not ip:
+        flask.flash(_("IP non détectable, impossible d'afficher les avatars"), "danger")
+    # Access OK
+
+    return get_nginx_access_token("%bar_avatars%", ip) if ip else None
