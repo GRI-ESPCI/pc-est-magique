@@ -1,110 +1,92 @@
-{% extends "base.html" %}
+{% extends "bar/base.html" %}
 
-{% block app_content %}
-
-<!-- Transactions sorting -->
+{% block bar_app_content %}
+<!-- Items sorting -->
 <div class="container my-1">
-  <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Item sorting">
-    <div class="btn-group" role="group" aria-label="Alphabet sorting">
-      <a class="btn btn-outline-primary{% if sort == 'asc' %} active{% endif %}" href="{{ url_for('main.transactions', sort='asc') }}" data-original-title="Sort By Alphabet" role="button"><i class="material-icons align-middle">arrow_downward</i></a>
-      <a class="btn btn-outline-primary{% if sort == 'desc' %} active{% endif %}" href="{{ url_for('main.transactions', sort='desc') }}" data-original-title="Sort By Alphabet" role="button"><i class="material-icons align-middle">arrow_upward</i></a>
+    <div class="btn-toolbar justify-content-between" role="toolbar">
+        <div class="btn-group" role="group">
+            <a class="btn btn-outline-primary{% if sort == "date" and way == "desc" %} active{% endif %}"
+               href="{{ url_for("bar.transactions", sort="date", way="desc") }}" role="button">
+                <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                    {{ macros.bootstrap_icon("sort-down") }}
+                </svg>
+            </a>
+            <a class="btn btn-outline-primary{% if sort == "date" and way == "asc" %} active{% endif %}"
+               href="{{ url_for("bar.transactions", sort="date", way="asc") }}" role="button">
+                <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                    {{ macros.bootstrap_icon("sort-up") }}
+                </svg>
+            </a>
+        </div>
+        <div class="my-auto d-none d-md-inline"><h1 class="fs-3 mb-0 mt-auto">{{ _("Transactions") }}</h1></div>
+        <div class="btn-group" role="group" aria-label="Results">
+            <button type="button" class="btn btn-primary">
+                {{ _("Total :") }}
+                <span class="badge bg-secondary badge-light">{{ paginator.total }}</span>
+            </button>
+        </div>
     </div>
-  </div>
 </div>
 
-<div style="margin-top:10px"></div>
-
-<div class="table-responsive">
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Bartender</th>
-        <th>Client</th>
-        <th>Type</th>
-        <th>Balance</th>
-        <th>Date</th>
-        <th>Revert</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      {% for transaction in transactions.items %}
-      <tr {% if transaction.is_reverted or 'Revert' in transaction.type %}class="table-danger"{% endif %}>
-        <th class="align-middle" {% if transaction.is_reverted %}style="text-decoration: line-through;"{% endif %}>{{ transaction.id }}</th>
-        <td class="align-middle" {% if transaction.is_reverted %}style="text-decoration: line-through;"{% endif %}>{{ transaction.barman }}</td>
-        <td class="align-middle" {% if transaction.is_reverted %}style="text-decoration: line-through;"{% endif %}>{{ transaction.client.username }}</td>
-        <td class="align-middle text-nowrap" {% if transaction.is_reverted %}style="text-decoration: line-through;"{% endif %}>{{ transaction.type }}</td>
-        <td class="align-middle" {% if transaction.is_reverted %}style="text-decoration: line-through;"{% endif %}>{% if transaction.balance_change %}{{ '%0.2f' | format(transaction.balance_change) }}€{% endif %}</td>
-        <td class="align-middle text-nowrap" {% if transaction.is_reverted %}style="text-decoration: line-through;"{% endif %}>{{ moment(transaction.date).format('lll') }}</td>
-        <td class="align-middle">
-          <div class="btn-group" role="group" aria-label="Revert transaction">
-            <button type="button" class="btn btn-danger{% if transaction.is_reverted or 'Revert' in transaction.type %} disabled{% endif %}" data-toggle="modal" data-target="#revert-transaction-modal" data-name="{{ transaction.id }}" data-url="{{ url_for('main.revert_transaction', transaction_id=transaction.id) }}">
-              <i class="material-icons align-middle">fast_rewind</i>
-            </button>
-          </div>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<div class="table-responsive mt-4">
+    <table class="table table-striped table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>{{ _("Client&middot;e") }}</th>
+                <th>{{ _("Barman / barmaid") }}</th>
+                <th>{{ _("Type") }}</th>
+                <th>{{ _("Article") }}</th>
+                <th>{{ _("Balance") }}</th>
+                <th>{{ _("Date") }}</th>
+                <th>{{ _("Annuler") }}</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for transaction in paginator.items %}
+            <tr {% if transaction.is_reverted %}class="table-danger text-decoration-line-through"{% endif %}>
+                <th class="align-middle">{{ transaction.id }}</th>
+                <td class="align-middle text-nowrap">{{ transaction.client.full_name }}</td>
+                <td class="align-middle text-nowrap">{{ transaction.barman.full_name }}</td>
+                {% if transaction.type == BarTransactionType.pay_item %}
+                <td class="align-middle">{{ _("Conso") }}</td>
+                <td class="align-middle text-nowrap">{{ transaction.item.name }}</td>
+                {% else %}
+                <td class="align-middle" colspan="2">{{ _("Recharge") }}</td>
+                {% endif %}
+                <td class="align-middle">{% if transaction.balance_change and not transaction.is_reverted %}
+                    {{ babel.format_currency(transaction.balance_change, "EUR") }}
+                {% endif %}</td>
+                <td class="align-middle text-nowrap">{{ moment(transaction.date).format('lll') }}</td>
+                <td class="align-middle">
+                    <div class="btn-group" role="group" aria-label="Revert transaction">
+                    <a role="button"
+                        class="btn btn-sm btn-danger{% if transaction.is_reverted %} disabled{% endif %}"
+                        onclick="confirm('Annuler la transaction ?') && post_and_reload('{{
+                            url_for("api.bar.revert_transaction", transaction_id=transaction.id) }}');"
+                    >
+                        <svg class="bi flex-shrink-0" width="20" height="20" role="img">
+                            {{ macros.bootstrap_icon("caret-left-fill") }}
+                        </svg>
+                    </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 <nav aria-label="Page navigation">
-  <ul class="pagination justify-content-center">
-    {%- for page in transactions.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
-    <li class="page-item{% if page == transactions.page %} active{% endif %}{%if not page %} disabled{% endif %}">
-      <a class="page-link" href="{{ url_for('main.transactions', page=page) }}">
-        {% if page %}
-        {{ page }}
-        {% else %}
-        <span class=ellipsis>…</span>
-        {% endif %}
-      </a>
-      {%- endfor %}
-    </li>
-  </ul>
+    <ul class="pagination justify-content-center">
+    {% for page in paginator.iter_pages() %}
+        <li class="page-item{% if page == paginator.page %} active{% endif %}{%if not page %} disabled{% endif %}">
+            <a class="page-link" href="{{ url_for("bar.transactions", page=page, sort=sort, way=way) }}">
+                {% if page %}{{ page }}{% else %}<span class=ellipsis>…</span>{% endif %}
+            </a>
+        </li>
+    {% endfor %}
+    </ul>
 </nav>
-{% endblock %}
 
-{% block modals %}
-{{ super () }}
-
-<!-- Revert transaction modal -->
-<div class="modal fade" id="revert-transaction-modal" tabindex="-1" role="dialog" aria-labelledby="revert-transaction-modal-label" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="revert-transaction-modal-label">Revert transaction</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <i class="material-icons align-middle">close</i>
-        </button>
-      </div>
-      <div class="modal-body">
-        Revert transaction #<span class="name"></span>?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-        <a class="btn btn-primary" href="#" role="button">Yes</a>
-      </div>
-    </div>
-  </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
-{{ super () }}
-
-<!-- Populate revert transaction modal -->
-<script>
-// Populate item deletion modal with item name and url
-$('#revert-transaction-modal').on('show.bs.modal', function (event) {
-  var button = $(event.relatedTarget) // Button that triggered the modal
-  var name = button.data('name') // Extract info from data-* attributes
-  var url = button.data('url') // Extract info from data-* attributes
-  var modal = $(this)
-  modal.find('.modal-footer a').attr('href', url)
-  modal.find('.modal-body .name').text(name)
-})
-</script>
 {% endblock %}

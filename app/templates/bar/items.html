@@ -12,25 +12,25 @@
     <div class="btn-toolbar justify-content-between" role="toolbar">
         <div class="btn-group" role="group">
             <a class="btn btn-outline-primary{% if sort == "name" and way == "asc" %} active{% endif %}"
-               href="{{ url_for("bar.items", q=query, sort="name", way="asc") }}" role="button">
+               href="{{ url_for("bar.items", sort="name", way="asc") }}" role="button">
                 <svg class="bi flex-shrink-0" width="24" height="24" role="img">
                     {{ macros.bootstrap_icon("sort-alpha-down") }}
                 </svg>
             </a>
             <a class="btn btn-outline-primary{% if sort == "name" and way == "desc" %} active{% endif %}"
-               href="{{ url_for("bar.items", q=query, sort="name", way="desc") }}" role="button">
+               href="{{ url_for("bar.items", sort="name", way="desc") }}" role="button">
                 <svg class="bi flex-shrink-0" width="24" height="24" role="img">
                     {{ macros.bootstrap_icon("sort-alpha-up") }}
                 </svg>
             </a>
             <a class="btn btn-outline-primary{% if sort == "quantity" and way == "asc" %} active{% endif %}"
-               href="{{ url_for("bar.items", q=query, sort="quantity", way="asc") }}" role="button">
+               href="{{ url_for("bar.items", sort="quantity", way="asc") }}" role="button">
                 <svg class="bi flex-shrink-0" width="24" height="24" role="img">
                     {{ macros.bootstrap_icon("sort-numeric-down") }}
                 </svg>
             </a>
             <a class="btn btn-outline-primary{% if sort == "quantity" and way == "desc" %} active{% endif %}"
-               href="{{ url_for("bar.items", q=query, sort="quantity", way="desc") }}" role="button">
+               href="{{ url_for("bar.items", sort="quantity", way="desc") }}" role="button">
                 <svg class="bi flex-shrink-0" width="24" height="24" role="img">
                     {{ macros.bootstrap_icon("sort-numeric-up") }}
                 </svg>
@@ -116,7 +116,7 @@
     <ul class="pagination justify-content-center">
     {% for page in paginator.iter_pages() %}
         <li class="page-item{% if page == paginator.page %} active{% endif %}{%if not page %} disabled{% endif %}">
-            <a class="page-link" href="{{ url_for("bar.search", q=query, page=page, sort=sort, way=way) }}">
+            <a class="page-link" href="{{ url_for("bar.items", page=page, sort=sort, way=way) }}">
                 {% if page %}{{ page }}{% else %}<span class=ellipsis>…</span>{% endif %}
             </a>
         </li>

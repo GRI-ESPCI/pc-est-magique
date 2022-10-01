@@ -180,7 +180,7 @@ def _user(pceen: PCeen):
     """Render the user profile page."""
     # Get pceen transactions
     page = flask.request.args.get("page", 1, type=int)
-    transactions = pceen.bar_transactions_made.order_by(BarTransaction.date.desc()).paginate(page, 5, True)
+    transactions_paginator = pceen.bar_transactions_made.order_by(BarTransaction.date.desc()).paginate(page, 5, True)
 
     # Get inventory
     item_descriptions = dict(get_items_descriptions(pceen))
@@ -194,7 +194,7 @@ def _user(pceen: PCeen):
         pceen=pceen,
         item_descriptions=item_descriptions,
         quick_access_item=quick_access_item,
-        transactions=transactions,
+        paginator=transactions_paginator,
         avatar_token_args=get_avatar_token_args(),
         max_daily_alcoholic_drinks_per_user=Settings.max_daily_alcoholic_drinks_per_user,
     )
@@ -206,15 +206,17 @@ def transactions():
     """Render the transactions page."""
     # Get arguments
     page = flask.request.args.get("page", 1, type=int)
-    sort = flask.request.args.get("sort", "desc", type=str)
+    sort = flask.request.args.get("sort", "date", type=str)
+    way = flask.request.args.get("way", "desc", type=str)
 
     # Sort transactions alphabetically
-    order_clause = BarTransaction.id.asc() if sort == "asc" else BarTransaction.id.desc()
-    transactions = BarTransaction.query.order_by(order_clause).paginate(
-        page, flask.current_app.config["ITEMS_PER_PAGE"], True
-    )
+    paginator = BarTransaction.query.order_by(
+        BarTransaction.date.desc() if way == "desc" else BarTransaction.date.asc()
+    ).paginate(page, flask.current_app.config["ITEMS_PER_PAGE"], True)
 
-    return flask.render_template("bar/transactions.html", title="Transactions", transactions=transactions, sort=sort)
+    return flask.render_template(
+        "bar/transactions.html", title=_("Transactions – Bar"), paginator=paginator, sort=sort, way=way
+    )
 
 
 @bp.route("/items", methods=["GET", "POST"])
