@@ -106,28 +106,6 @@ def get_daily_statistics():
     )
 
 
-@sbp.route("/user_products")
-@context.permission_only(PermissionType.write, PermissionScope.bar)
-def get_user_products():
-    """Return the list of products that a user can buy."""
-    # Get user
-    pceen = PCeen.query.filter_by(username=flask.request.args["username"]).first()
-    if not pceen:
-        flask.abort(404)
-
-    # Get inventory
-    inventory = BarItem.query.order_by(BarItem.name.asc()).all()
-
-    # Get favorite items
-    favorite_inventory = BarItem.query.filter_by(is_favorite=True).order_by(BarItem.name.asc()).all()
-
-    pay_template = flask.render_template(
-        "bar/_user_products.html", pceen=pceen, inventory=inventory, favorite_inventory=favorite_inventory
-    )
-
-    return {"html": pay_template}, 200
-
-
 @sbp.route("/deposit/<pceen_id>", methods=["POST"])
 @context.permission_only(PermissionType.write, PermissionScope.bar)
 def post_deposit(pceen_id: str):
@@ -195,18 +173,7 @@ def revert_transaction(transaction_id: str):
             _("%(pceen)s's balance would be negative if this transaction were reverted.", pceen=client.full_name),
         )
 
-    # Revert client balance
-    client.bar_balance -= transaction.balance_change
-
-    # Revert item quantity
-    if transaction.item and transaction.item.is_quantifiable:
-        transaction.item.quantity += 1
-
-    # BarTransaction is now reverted: it won't ever be 'unreverted'
-    transaction.is_reverted = True
-    transaction.revert_date = datetime.datetime.utcnow()
-    transaction.reverter = context.g.pceen
-
+    transaction.revert(reverter=context.g.pceen)
     db.session.commit()
 
     flask.flash(_("La transaction #%(transaction_id)s a bien été annulée.", transaction_id=transaction.id), "primary")
@@ -264,10 +231,8 @@ def top_up(pceen_id: str):
     except ValueError:
         flask.abort(400, "Field 'amount' missing, invalid float or <= 0")
 
-    pceen.bar_balance += amount
-
-    transaction = BarTransaction(
-        _client_id=pceen.id, _barman_id=context.g.pceen.id, type=BarTransactionType.top_up, balance_change=amount
+    transaction = BarTransaction.create_from_top_up(
+        client=pceen, barman=context.g.pceen, amount=amount, date=datetime.datetime.utcnow()
     )
     db.session.add(transaction)
     db.session.commit()
@@ -299,17 +264,8 @@ def pay(pceen_id: str, item_id: str):
     if not can_buy(pceen, item, flash=True):
         flask.abort(422, "Cannot buy item")
 
-    pceen.bar_balance -= item.price
-    if item.is_quantifiable:
-        item.quantity -= 1
-
-    transaction = BarTransaction(
-        _client_id=pceen.id,
-        _item_id=item.id,
-        _barman_id=context.g.pceen.id,
-        date=datetime.datetime.utcnow(),
-        type=BarTransactionType.pay_item,
-        balance_change=-item.price,
+    transaction = BarTransaction.create_from_item_bought(
+        client=pceen, barman=context.g.pceen, item=item, date=datetime.datetime.utcnow()
     )
     db.session.add(transaction)
     db.session.commit()

@@ -11,6 +11,7 @@ import flask
 from flask_babel import _
 import flask_login
 import sqlalchemy as sa
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Query
 from werkzeug import security as wzs
 
@@ -62,7 +63,7 @@ class PCeen(flask_login.UserMixin, Model):
     # Bar info
     bar_nickname: Column[str | None] = column(sa.String(128), nullable=True)
     bar_balance: Column[float | None] = column(sa.Float(), default=0.0, nullable=True)
-    bar_deposit: Column[bool | None] = column(sa.Boolean(), default=True)
+    bar_deposit: Column[bool | None] = column(sa.Boolean(), default=False, nullable=True)
 
     photos: Relationship[list[models.Photo]] = one_to_many("Photo.author")
     roles: Relationship[list[models.Role]] = many_to_many(
@@ -87,6 +88,7 @@ class PCeen(flask_login.UserMixin, Model):
     bar_transactions_reverted: Relationship[Query[models.BarTransaction]] = one_to_many(
         "BarTransaction.reverter", foreign_keys="BarTransaction._reverter_id", lazy="dynamic"
     )
+    bar_daily_data: Relationship[Query[models.BarDailyData]] = one_to_many("BarDailyData.pceen", lazy="dynamic")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -96,10 +98,10 @@ class PCeen(flask_login.UserMixin, Model):
         """Human-readible description of the PCeen."""
         return f"{self.full_name} {self.promo or '(no promo)'}"
 
-    @property
+    @hybrid_property
     def full_name(self) -> str:
         """The pceens's first + last names."""
-        return f"{self.prenom} {self.nom}"
+        return self.prenom + " " + self.nom
 
     @property
     def permissions(self) -> set[models.Permission]:
@@ -275,6 +277,13 @@ class PCeen(flask_login.UserMixin, Model):
     def is_banned(self) -> bool:
         """Whether the PCeen is currently under a ban."""
         return self.current_ban is not None
+
+    @property
+    def current_bar_daily_data(self) -> models.BarDailyData:
+        """Current readonly Bar daily data of the PCeen."""
+        return models.BarDailyData.from_pceen_and_timestamp(
+            pceen=self, timestamp=datetime.datetime.utcnow(), create=False
+        )
 
     def set_password(self, password: str) -> None:
         """Save or modify pceen password.

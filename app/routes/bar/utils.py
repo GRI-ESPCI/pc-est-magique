@@ -42,25 +42,7 @@ def _pceen_can_buy_anything(pceen: PCeen, flash: bool) -> bool:
 
 
 def _pceen_can_buy_alcohol(pceen: PCeen, flash: bool) -> bool:
-    # Get current day start
-    today = datetime.datetime.today()
-    current_day_start = datetime.datetime.combine(today, datetime.time(hour=6))
-    if today.hour < 6:
-        current_day_start -= datetime.timedelta(days=1)
-
-    # Get user daily alcoholic drinks
-    nb_alcoholic_drinks = (
-        pceen.bar_transactions_made.join(BarTransaction.item)
-        .filter(
-            ~BarTransaction.is_reverted,
-            BarTransaction.type == BarTransactionType.pay_item,
-            BarTransaction.date > current_day_start,
-            BarItem.is_alcohol,
-        )
-        .count()
-    )
-    limit = BarSettings.max_daily_alcoholic_drinks_per_user
-    if nb_alcoholic_drinks >= limit:
+    if pceen.current_bar_daily_data.alcohol_bought_count >= BarSettings.max_daily_alcoholic_drinks_per_user:
         if flash:
             flask.flash(
                 _("%(pceen)s has reached the limit of %(limit)s drinks per night.", pceen=pceen.full_name, limit=limit),
@@ -93,29 +75,40 @@ def can_buy(pceen: PCeen, item: BarItem | None, flash: bool = False) -> str | bo
                 _("%(pceen)s doesn't have enough funds to buy %(item)s.", pceen=pceen.full_name, item=item.name),
                 "danger",
             )
+        return False
 
     if item.is_alcohol and not _pceen_can_buy_alcohol(pceen, flash):
         return False
 
-    return True  # Valid
+    return True
 
 
-def get_items_descriptions(pceen: PCeen) -> typing.Iterator[tuple[BarItem, bool]]:
+def get_items_descriptions(pceen: PCeen) -> typing.Iterator[tuple[BarItem, tuple[bool, str, bool]]]:
     balance = pceen.bar_balance
     can_buy_anything = _pceen_can_buy_anything(pceen, False)
     can_buy_alcohol = can_buy_anything and _pceen_can_buy_alcohol(pceen, False)
 
-    for item in BarItem.query.order_by(BarItem.name.asc()).all():
+    no_favorites_seen = True
+    for item in BarItem.query.order_by(BarItem.favorite_index.desc(), BarItem.name.asc()).all():
         item: BarItem
         can_be_bought = True
+        limit_message = ""
+        first_no_favorite = False
+        if no_favorites_seen and not item.favorite_index:
+            no_favorites_seen = False
+            first_no_favorite = True
 
         if not can_buy_anything:
             can_be_bought = False
+            limit_message = _("Caution non validée, consommation interdite")
         elif balance < item.price:
             can_be_bought = False
+            limit_message = _("Fonds insuffisants")
         elif not can_buy_alcohol and item.is_alcohol:
             can_be_bought = False
+            limit_message = _("Limite d'alcool quotidienne atteinte")
         elif not _item_can_be_bought(item, False):
             can_be_bought = False
+            limit_message = _("Article épuisé (voir onglet Inventaire)")
 
-        yield item, can_be_bought
+        yield item, (can_be_bought, limit_message, first_no_favorite)

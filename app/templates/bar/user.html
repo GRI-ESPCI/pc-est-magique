@@ -1,17 +1,15 @@
-{% extends "base.html" %}
-
-{% block styles %}
-{{ super() }}
-<link href="{{ url_for("static", filename="css/style.css") }}" rel="stylesheet" />
-{% endblock %}
+{% extends "bar/base.html" %}
 
 {% block scripts %}
 {{ super() }}
 <script src="{{ url_for("static", filename="js/api.js") }}" defer></script>
 {% endblock %}
 
-{% block app_content %}
+{% block navbar %}
+{{ super() }}
+{% endblock %}
 
+{% block bar_app_content %}
 {% with theme = "muted" if not pceen.bar_deposit
     else ("danger" if pceen.bar_balance <= 1
     else ("warning" if pceen.bar_balance <= 5
@@ -32,45 +30,58 @@
         <hr />
         <div class="btn-toolbar justify-content-between mb-2" role="toolbar">
             {% if pceen.bar_deposit %}
-            <div class="btn-group" role="group" aria-label="User actions">
+            <div class="d-inline-flex" role="group" aria-label="User actions">
 
                 <button type="button" class="btn user-card-btn btn btn-success" data-bs-toggle="modal" data-bs-target="#top-up-modal">
                     <svg class="bi flex-shrink-0" width="24" height="24" role="img">{{ macros.bootstrap_icon("credit-card") }}</svg>
                     <span class="d-none d-sm-inline">{{ _("Recharger") }}</span>
                 </button>
 
-                <div class="dropdown">
+                <div class="dropdown mx-1">
                     <button class="btn btn-{{ theme }} dropdown-toggle d-inline-block" type="button"
                             data-bs-toggle="dropdown" {% if not pceen.bar_deposit %} disabled{% endif %}>
                         <svg class="bi flex-shrink-0" width="24" height="24" role="img">{{ macros.bootstrap_icon("cart-plus") }}</svg>
                         <span class="d-none d-sm-inline">{{ _("Payer") }}</span>
                     </button>
                     <ul class="dropdown-menu">
-                        {% for item, can_be_bought in items_buyable.items() %}
-                        <li><a class="dropdown-item{% if not can_be_bought %} disabled{% endif %}" role="button"
+                        <!-- <li><h6 class="dropdown-header">{{ _("Favoris") }}</h6></li> -->
+                        {% for item, (can_be_bought, limit_message, first_not_favorite) in item_descriptions.items() %}
+                        {% if first_not_favorite %}
+                        <li><hr class="dropdown-divider"></li>
+                        <!-- <li><h6 class="dropdown-header">{{ _("Autres articles") }}</h6></li> -->
+                        {% endif %}
+                        <li{% if not can_be_bought %} data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="{{ limit_message }}"{% endif %}>
+                            <a class="dropdown-item{% if not can_be_bought %} disabled{% endif %}" role="button"
                                 {% if can_be_bought %}
                                 onclick="post_and_reload('{{ url_for("api.bar.pay", pceen_id=pceen.id, item_id=item.id) }}');"
                                 {% endif %}
                             >
-                            {{ item.name }} ({{ babel.format_currency(item.price, "EUR") }}{% if item.is_quantifiable %}, x{{ item.quantity }}{% endif %})
-                        </a></li>
+                                {{ item.name }} ({{ babel.format_currency(item.price, "EUR") }}{% if item.is_quantifiable %}, x{{ item.quantity }}{% endif %})
+                            </a>
+                        </li>
                         {% endfor %}
                     </ul>
                 </div>
 
-                <button class="user-card-btn quick-access-item btn btn-outline-{{ theme }}" role="button"
-                    {% if quick_access_item and items_buyable[quick_access_item] %}
-                    onclick="post_and_reload('{{ url_for("api.bar.pay", pceen_id=pceen.id, item_id=quick_access_item.id) }}');"
-                    {% else %}
-                    disabled
-                    {% endif %}
-                >
-                    <svg class="bi flex-shrink-0" width="24" height="24" role="img">
-                        {{ macros.bootstrap_icon("emoji-heart-eyes-fill") if quick_access_item and items_buyable[quick_access_item]
-                           else macros.bootstrap_icon("emoji-frown") }}
-                    </svg>
-                    {{ quick_access_item.name or _("Pas de favori") }}
-                </button>
+                {% with can_be_bought, limit_message, _ffi = item_descriptions.get(quick_access_item,
+                    (False, _("Modifiable depuis l'onglet Paramètres"))) %}
+                {% if not can_be_bought %}
+                <div data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="{{ limit_message }}">
+                {% endif %}
+                    <button class="user-card-btn quick-access-item btn btn-outline-{{ theme }}" role="button"
+                        {% if can_be_bought %}onclick="post_and_reload('{{
+                            url_for("api.bar.pay", pceen_id=pceen.id, item_id=quick_access_item.id)
+                        }}');"{% else %}disabled{% endif %}
+                    >
+                        <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                            {{ macros.bootstrap_icon("emoji-heart-eyes-fill" if can_be_bought else "emoji-frown") }}
+                        </svg>
+                        {{ quick_access_item.name or _("Pas de favori") }}
+                    </button>
+                {% if not can_be_bought %}
+                </div>
+                {% endif %}
+                {% endwith %}
 
             </div>
             {% else %}
@@ -84,8 +95,11 @@
             </div>
             {% endif %}
 
-            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#nickname-modal" title="Modifier le surnom">
-                <svg class="bi flex-shrink-0" width="24" height="24" role="img">{{ macros.bootstrap_icon("pencil") }}</svg>
+            <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                    data-bs-target="#nickname-modal" title="{{ _("Modifier le surnom") }}">
+                <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                    {{ macros.bootstrap_icon("pencil") }}
+                </svg>
             </button>
         </div>
         {% endif %}
@@ -94,19 +108,12 @@
     <div class="card-body">
         <div class="row align-items-center">
             <div class="col-md-4 col-lg-3 mb-4" align="center">
-                <img src="/bar_avatar/{{ pceen.promo }}/{{ pceen.username }}.jpeg?{{ avatar_token_args }}"
-                     onerror="this.onerror=null; this.src='{{ url_for("static", filename="img/bar_avatar_placeholder.png") }}'" height="200px">
+                <img {% include "bar/_avatar_args.html" %}>
             </div>
 
             <div class="table-responsive-sm col-md-8 col-lg-9">
             <table class="table table-striped">
             <tbody>
-                <tr>
-                    <td title="{{ _("Nom") }}"><svg class="bi flex-shrink-0" width="24" height="24" role="img">
-                        {{ macros.bootstrap_icon("person-fill") }}
-                    </svg></td>
-                    <td>{{ pceen.username }}</td>
-                </tr>
                 <tr>
                     <td title="{{ _("Rôle") }}"><svg class="bi flex-shrink-0" width="24" height="24" role="img">
                         {{ macros.bootstrap_icon("info-circle-fill") }}
@@ -139,11 +146,11 @@
                     <td title="{{ _("Solde actuel") }}"><svg class="bi flex-shrink-0" width="24" height="24" role="img">
                         {{ macros.bootstrap_icon("piggy-bank-fill") }}
                     </svg></td>
-                    <td class="container"><div class="row align-middle"><div class="col col-auto">
+                    <td class="container"><div class="row align-middle"><div class="col col-4 col-sm-3 col-lg-2">
                         {{ babel.format_currency(pceen.bar_balance or 0, "EUR") }}
                         </div><div class="col">
-                        <div class="progress" class="border border-danger" style="height: 23px;">
-                            <div class="progress-bar bg-{{ theme }} border border-success" role="progressbar"
+                        <div class="progress bg-muted border border-{{ theme }}" style="height: 24px;">
+                            <div class="progress-bar bg-{{ theme }}" role="progressbar"
                                  aria-valuenow="{{ pceen.bar_balance }}" aria-valuemin="0" aria-valuemax="100"
                                  style="width: {{ pceen.bar_balance }}%; max-width: 100%">
                             </div>
@@ -151,6 +158,27 @@
                     </div>
                     </div>
                     </td>
+                </tr>
+                <tr>
+                    {% with alcohol_bought_count = pceen.current_bar_daily_data.alcohol_bought_count%}
+                    <td title="{{ _("Limite d'alcool aujourd’hui") }}">
+                        <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                            {{ macros.bootstrap_icon("cup-fill") }}
+                        </svg>
+                    </td>
+                    <td class="container"><div class="row align-middle"><div class="col col-4 col-sm-3 col-lg-2">
+                        {{ alcohol_bought_count }}/{{ max_daily_alcoholic_drinks_per_user }}
+                        </div><div class="col">
+                            <div class="progress bg-success" style="height: 24px;">
+                                <div class="progress-bar bg-danger" role="progressbar"
+                                aria-valuenow="{{ pceen.bar_balance }}" aria-valuemin="0" aria-valuemax="100"
+                                style="width: {{ alcohol_bought_count * 25 }}%; max-width: 100%">
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    </td>
+                    {% endwith %}
                 </tr>
             </tbody>
             </table>
@@ -168,7 +196,7 @@
                     <th>#</th>
                     <th>{{ _("Barman / barmaid") }}</th>
                     <th>{{ _("Type") }}</th>
-                    <th>{{ _("Item") }}</th>
+                    <th>{{ _("Article") }}</th>
                     <th>{{ _("Balance") }}</th>
                     <th>{{ _("Date") }}</th>
                     {% if current_user_is_barman %}<th>{{ _("Annuler") }}</th>{% endif %}

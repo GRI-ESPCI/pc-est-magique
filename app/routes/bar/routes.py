@@ -6,9 +6,11 @@ import datetime
 import flask
 from flask_babel import _
 from sqlalchemy import extract
+import sqlalchemy
+from unidecode import unidecode
 
 from app import context, db
-from app.models import PCeen, BarItem, BarTransaction, GlobalSetting, PermissionScope, PermissionType
+from app.models import PCeen, BarItem, BarTransaction, GlobalSetting, PermissionScope, PermissionType, Role, Permission
 from app.models.photos import get_nginx_access_token
 from app.routes.bar import bp
 from app.routes.bar.forms import AddOrEditItemForm, SearchForm, GlobalSettingsForm
@@ -116,44 +118,42 @@ def search():
     """Render search page."""
     # Get arguments
     page = flask.request.args.get("page", 1, type=int)
-    sort = flask.request.args.get("sort", "asc", type=str)
+    sort = flask.request.args.get("sort", "name", type=str)
+    way = flask.request.args.get("way", "asc", type=str)
     query = flask.request.args.get("q", type=str)
 
     # If the query is empty, flask.redirect to the index page
     if not query:
-        return helpers.ensure_safe_redirect("bar.dashboard")
-
-    # Get inventory
-    inventory = BarItem.query.order_by(BarItem.name.asc()).all()
-
-    # Get favorite items
-    favorite_inventory = BarItem.query.filter_by(is_favorite=True).order_by(BarItem.name.asc()).all()
-
-    # Get quick access item
-    quick_access_item = BarSettings.quick_access_item
+        return helpers.ensure_safe_redirect("bar.me")
 
     # Get users corresponding to the query
-    query_text = context.g.search_form.q.data
-    final_query = wooshee_im_yellow + PCeen.query.whooshee_search(query_text)
-    total = final_query.count()
+    pceen = PCeen.query.filter_by(username=query).one_or_none()
+    if pceen and pceen.has_permission(PermissionType.read, PermissionScope.bar):
+        return helpers.ensure_safe_redirect("bar.user", username=pceen.username)
 
     # Sort users alphabetically
-    order_clause = PCeen.nom.desc() if sort == "desc" else PCeen.nom.asc()
-    users = final_query.order_by(order_clause).paginate(page, flask.current_app.config["USERS_PER_PAGE"], True)
+    paginator = (
+        PCeen.query.join(PCeen.roles)
+        .join(Role.permissions)
+        .filter(
+            Permission.type == PermissionType.read,
+            Permission.scope == PermissionScope.bar,
+            sqlalchemy.func.lower(sqlalchemy.func.unaccent(PCeen.full_name)).contains(unidecode(query).lower()),
+        )
+        .order_by(
+            (PCeen.promo.desc() if way == "desc" else PCeen.promo.asc())
+            if sort == "promo"
+            else (PCeen.full_name.desc() if way == "desc" else PCeen.full_name.asc())
+        )
+        .paginate(page, flask.current_app.config["USERS_PER_PAGE"], True)
+    )
 
     # If only one user, flask.redirect to his profile
-    if total == 1:
-        return helpers.ensure_safe_redirect("bar.user", username=users.items[0].username)
+    if paginator.total == 1:
+        return helpers.ensure_safe_redirect("bar.user", username=paginator.items[0].username)
 
     return flask.render_template(
-        "bar/search.html",
-        title="Search",
-        users=users,
-        sort=sort,
-        inventory=inventory,
-        total=total,
-        favorite_inventory=favorite_inventory,
-        quick_access_item=quick_access_item,
+        "bar/search.html", title="Search", paginator=paginator, query=query, sort=sort, way=way
     )
 
 
@@ -185,7 +185,7 @@ def _user(pceen: PCeen):
     transactions = pceen.bar_transactions_made.order_by(BarTransaction.date.desc()).paginate(page, 5, True)
 
     # Get inventory
-    items_buyable = dict(get_items_descriptions(pceen))
+    item_descriptions = dict(get_items_descriptions(pceen))
 
     # Get quick access item
     quick_access_item = BarSettings.quick_access_item
@@ -200,10 +200,11 @@ def _user(pceen: PCeen):
         "bar/user.html",
         title=_("%(name)s – Profil Bar", name=pceen.full_name),
         pceen=pceen,
-        items_buyable=items_buyable,
+        item_descriptions=item_descriptions,
         quick_access_item=quick_access_item,
         transactions=transactions,
         avatar_token_args=get_nginx_access_token("%bar_avatars%", ip) if ip else None,
+        max_daily_alcoholic_drinks_per_user=BarSettings.max_daily_alcoholic_drinks_per_user,
     )
 
 
@@ -224,10 +225,10 @@ def transactions():
     return flask.render_template("bar/transactions.html", title="Transactions", transactions=transactions, sort=sort)
 
 
-@bp.route("/inventory")
+@bp.route("/items")
 @context.permission_only(PermissionType.write, PermissionScope.bar)
-def inventory():
-    """Render the inventory page."""
+def items():
+    """Render the items page."""
     # Get arguments
     page = flask.request.args.get("page", 1, type=int)
     sort = flask.request.args.get("sort", "asc", type=str)

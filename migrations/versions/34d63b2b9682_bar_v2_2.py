@@ -26,7 +26,7 @@ def upgrade():
         sa.Column("is_alcohol", sa.Boolean(), nullable=False),
         sa.Column("is_quantifiable", sa.Boolean(), nullable=False),
         sa.Column("quantity", sa.Integer(), nullable=True),
-        sa.Column("is_favorite", sa.Boolean(), nullable=False),
+        sa.Column("favorite_index", sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("name"),
     )

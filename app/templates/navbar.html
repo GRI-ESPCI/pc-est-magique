@@ -1,0 +1,77 @@
+
+<nav class="navbar navbar-expand-md navbar-light mb-4 py-0 border-bottom border-2 border-secondary
+            bg-{{ "danger" if hasattr(g, "_ban") or (hasattr(g, "pceen") and g.pceen.is_banned) else "primary" }}">
+    <div class="container-fluid ps-0">
+        <a class="navbar-brand p-0" href="{{ url_for("main.index") }}">
+            <img src="{{ url_for("static", filename="img/gri_80x80.png") }}" class="d-inline-block m-0" alt="GRI"
+                 width="80" height="80" />
+            <span class="align-text-top">/&nbsp;<strong>PC est magique</strong></span>
+            {% if config.get("BRANCH") %}
+            <span class="badge rounded-pill bg-warning text-dark ms-2">{{ config["BRANCH"] }}</span>
+            {% endif %}
+        </a>
+        <button class="navbar-toggler m-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbar_content"
+                aria-controls="navbar_content" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar navbar-collapse" id="navbar_content">
+            <ul class="navbar-nav mx-auto flex-row flex-wrap justify-content-end">
+                {% if g.is_gri %}{% include "gris/menu.html" %}{% endif %}
+            </ul>
+            <ul class="navbar-nav flex-row flex-wrap justify-content-end">
+                {% if not g.logged_in %}
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2 my-1" href="{{ url_for("auth.login") }}">
+                        {{ _("Connexion") }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2 my-1" href="{{ url_for("auth.register") }}">
+                        {{ _("Créer un compte") }}
+                    </a>
+                </li>
+                {% else %}      {# Utilisateur connecté #}
+                {% if has_permission(PermissionType.read, PermissionScope.intrarez) %}
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2 my-1 position-relative"
+                       href="{{ url_for("payments.main") }}">
+                        {{ _("Internet") }}
+                    </a>
+                </li>
+                {% endif %}
+                {% if has_permission(PermissionType.read, PermissionScope.photos) %}
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2 my-1 position-relative"
+                       href="{{ url_for("photos.main") }}">
+                        {{ _("Photos") }}
+                    </a>
+                </li>
+                {% endif %}
+                {% if has_permission(PermissionType.read, PermissionScope.bar) %}
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2 my-1 position-relative"
+                       {% if has_permission(PermissionType.write, PermissionScope.bar) %}
+                       href="{{ url_for("bar.dashboard") }}"
+                       {% else %}
+                       href="{{ url_for("bar.me") }}"
+                       {% endif %}
+                    >
+                        {{ _("Bar") }}
+                    </a>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2 my-1" href="{{ url_for("profile.main") }}">
+                        {{ _("Profil") }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2 my-1" href="{{ url_for("auth.logout") }}">
+                        {{ _("Déconnexion") }}
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
