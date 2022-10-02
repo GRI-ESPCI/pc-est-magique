@@ -4,13 +4,13 @@ from calendar import monthrange
 import datetime
 
 import flask
-from flask_babel import _
-from sqlalchemy import extract
+from flask_babel import _, format_date
 import sqlalchemy
 from unidecode import unidecode
 
 from app import context, db
 from app.models import PCeen, BarItem, BarTransaction, GlobalSetting, PermissionScope, PermissionType, Role, Permission
+from app.models.bar import BarDailyData
 from app.routes.bar import bp
 from app.routes.bar.forms import AddOrEditItemForm, GlobalSettingsForm
 from app.routes.bar.utils import get_avatar_token_args, get_items_descriptions
@@ -28,86 +28,87 @@ def retrieve_bar_settings():
 @bp.route("/stats")
 @context.permission_only(PermissionType.read, PermissionScope.bar_stats)
 def stats():
-    # Get current day start
-    today = datetime.datetime.today()
-    current_year = today.year
-    current_month = today.month
-    current_day_start = datetime.datetime.combine(today, datetime.time(hour=6))
-    if today.hour < 6:
-        current_day_start -= datetime.timedelta(days=1)
+    # Get arguments
+    date = flask.request.args.get("date", type=datetime.date.fromisoformat)
+    is_today = False
+    if not date:
+        is_today = True
+        timestamp = datetime.datetime.utcnow()
+        date = timestamp.date()
+        if timestamp.hour < 4:  # 4h UTC = 5-6h Paris
+            date -= datetime.timedelta(days=1)
 
     # Daily clients
-    nb_daily_clients = PCeen.query.filter(
-        PCeen.bar_transactions_made.any(BarTransaction.date > current_day_start)
-    ).count()
+    daily_data: list[BarDailyData] = BarDailyData.query.filter(
+        BarDailyData.date == date, BarDailyData.total_spent != 0
+    ).all()
 
     # Daily alcohol consumption
-    alcohol_qty = (
-        BarTransaction.query.filter(
-            BarTransaction.date > current_day_start,
-            BarTransaction.type.like("Pay%"),
-            BarTransaction.item.has(is_alcohol=True),
-            BarTransaction.is_reverted == False,
-        ).count()
-        * 0.25
-    )
+    alcohol_qty = sum(data.alcohol_bought_count for data in daily_data)
 
     # Daily revenue
-    daily_transactions = BarTransaction.query.filter(
-        BarTransaction.date > current_day_start,
-        BarTransaction.type.like("Pay%"),
-        BarTransaction.is_reverted == False,
-    ).all()
-    daily_revenue = sum([abs(t.balance_change) for t in daily_transactions])
+    daily_revenue = sum(data.total_spent for data in daily_data)
+
+    days_range = range(1, monthrange(date.year, date.month)[1] + 1)
 
     # Compute number of clients this month
     clients_this_month = [
-        len(
-            set(
-                t.client_id
-                for t in BarTransaction.query.filter(
-                    extract("day", BarTransaction.date) == day,
-                    extract("month", BarTransaction.date) == current_month,
-                    extract("year", BarTransaction.date) == current_year,
-                    BarTransaction.type.like("Pay%"),
-                    BarTransaction.is_reverted == False,
-                ).all()
-            )
-        )
-        for day in range(1, 32)
+        PCeen.query.join(PCeen.bar_transactions_made)
+        .filter(BarDailyData.date == date.replace(day=day), BarDailyData.total_spent != 0)
+        .count()
+        for day in days_range
+        if day <= date.day
     ]
 
     clients_alcohol_this_month = [
-        len(
-            set(
-                t.client_id
-                for t in BarTransaction.query.filter(
-                    extract("day", BarTransaction.date) == day,
-                    extract("month", BarTransaction.date) == current_month,
-                    extract("year", BarTransaction.date) == current_year,
-                    BarTransaction.type.like("Pay%"),
-                    BarTransaction.item.has(is_alcohol=True),
-                    BarTransaction.is_reverted == False,
-                ).all()
-            )
-        )
-        for day in range(1, 32)
+        PCeen.query.join(PCeen.bar_transactions_made)
+        .filter(BarDailyData.date == date.replace(day=day), BarDailyData.alcohol_bought_count > 0)
+        .count()
+        for day in days_range
+        if day <= date.day
     ]
 
-    # Generate days labels
-    days_labels = [
-        "%.2d" % current_month + "/" + "%.2d" % day for day in range(1, monthrange(current_year, current_month)[1] + 1)
+    revenues_this_month = [
+        db.session.query(sqlalchemy.func.sum(BarDailyData.total_spent))
+        .filter(BarDailyData.date == date.replace(day=day))
+        .scalar()
+        for day in days_range
+        if day <= date.day
     ]
+
+    # Client total moula
+    (total_balances_sum,) = db.session.query(sqlalchemy.func.sum(PCeen.bar_balance)).first()
+
+    # Best customer
+    customers_consumption_this_month = (
+        db.session.query(BarDailyData._pceen_id, sqlalchemy.func.sum(BarDailyData.total_spent))
+        .filter(
+            sqlalchemy.extract("year", BarDailyData.date) == date.year,
+            sqlalchemy.extract("month", BarDailyData.date) == date.month,
+        )
+        .group_by(BarDailyData._pceen_id)
+        .all()
+    )
+
+    best_customer_name = "Sylvain Gilat"
+    if customers_consumption_this_month:
+        best_customer_id, _sum = max(customers_consumption_this_month, key=lambda tup: tup[1])
+        best_customer_name = PCeen.query.get(best_customer_id).full_name
 
     return flask.render_template(
-        "bar/dashboard.html",
-        title="Dashboard",
-        clients_this_month=clients_this_month,
-        clients_alcohol_this_month=clients_alcohol_this_month,
-        days_labels=days_labels,
-        nb_daily_clients=nb_daily_clients,
+        "bar/stats.html",
+        title=_("Stats – Bar"),
+        date=date,
+        is_today=is_today,
+        clients_this_month=",".join(str(nb) for nb in clients_this_month),
+        clients_alcohol_this_month=",".join(str(nb) for nb in clients_alcohol_this_month),
+        revenues_this_month=",".join(str(nb) for nb in revenues_this_month),
+        days_labels=",".join(format_date(date.replace(day=day), "medium") for day in days_range),
+        nb_daily_clients=len(daily_data),
         alcohol_qty=alcohol_qty,
         daily_revenue=daily_revenue,
+        best_customer_name=best_customer_name,
+        total_balances_sum=total_balances_sum,
     )
 
 

@@ -72,7 +72,7 @@ Seules les fonctionnalités majeures sont listées ici ; voir
 * Autres packages Linux : ``postgresql postfix git npm xmlsec1``, plus pour le
   déploiement : ``supervisor nginx`` ;
 * Package npm : ``bower sass``
-    * Package Bower : ``bootstrap moment webping-js lightgallery``
+    * Package Bower : ``bootstrap chartjs moment webping-js lightgallery``
 * Packages Python : Voir [`requirements.txt`](requirements.txt), plus pour le
   déploiement : ``gunicorn pymysql cryptography`` ;
 * Pour le déploiement : un utilisateur Linux ``pc-est-magique`` dédié.

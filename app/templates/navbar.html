@@ -47,8 +47,7 @@
                     </a>
                 </li>
                 {% endif %}
-                {% if has_permission(PermissionType.write, PermissionScope.bar)
-                   or has_permission(PermissionType.read, PermissionScope.bar_stats) %}
+                {% if has_permission(PermissionType.read, PermissionScope.bar_stats) %}
                 <li class="nav-item">
                     <a class="btn btn-outline-secondary mx-2 my-1 position-relative" href="{{ url_for("bar.stats") }}">
                         {{ _("Bar") }}

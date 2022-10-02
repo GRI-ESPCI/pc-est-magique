@@ -17,6 +17,7 @@
     ],
     "dependencies": {
         "bootstrap": "latest",
+        "chartjs": "latest",
         "moment": "latest",
         "web-pingjs": "latest",
         "lightgallery": "latest"
