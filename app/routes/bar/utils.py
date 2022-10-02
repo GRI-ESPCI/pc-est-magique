@@ -1,13 +1,16 @@
 """PC est magique - Bar Utils"""
 
 from __future__ import annotations
+import datetime
+import io
 
 import typing
 
 import flask
 from flask_babel import _
+import xlsxwriter
 
-from app.models import BarItem, PCeen
+from app.models import BarItem, PCeen, BarTransaction, BarTransactionType
 from app.models.photos import get_nginx_access_token
 from app.utils.global_settings import Settings
 
@@ -115,3 +118,39 @@ def get_avatar_token_args():
     # Access OK
 
     return get_nginx_access_token("%bar_avatars%", ip) if ip else None
+
+
+def get_export_data(start: datetime.date, end: datetime.date) -> str:
+    output = io.BytesIO()
+    workbook = xlsxwriter.Workbook(output, {"in_memory": True})
+    worksheet = workbook.add_worksheet()
+
+    transactions: list[BarTransaction] = BarTransaction.query.filter(
+        BarTransaction.date.between(start, end),
+        BarTransaction.type == BarTransactionType.pay_item,
+        BarTransaction.is_reverted == False,
+    ).all()
+
+    header = ["id", "date", "barman", "client", "item", "type", "balance"]
+
+    for col, header in enumerate(header):
+        worksheet.write(0, col, header)
+
+    row = 1
+    for transaction in transactions:
+        worksheet.write(row, 0, transaction.id)
+        worksheet.write(row, 1, str(transaction.date))
+        worksheet.write(row, 2, transaction.barman.full_name)
+        worksheet.write(row, 3, transaction.client.full_name)
+        # Item may not be available
+        try:
+            worksheet.write(row, 4, transaction.item.name)
+        except AttributeError:
+            worksheet.write(row, 4, "Error")
+        worksheet.write(row, 5, transaction.type.name)
+        worksheet.write(row, 6, f"{transaction.balance_change}€")
+        row += 1
+
+    workbook.close()
+    output.seek(0)
+    return output.read()

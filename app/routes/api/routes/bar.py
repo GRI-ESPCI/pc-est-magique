@@ -64,47 +64,6 @@ def get_yearly_transactions():
     )
 
 
-@sbp.route("/daily_statistics")
-@context.permission_only(PermissionType.read, PermissionScope.bar_stats)
-def get_daily_statistics():
-    """Return daily statistics."""
-    # Get current day start
-    today = datetime.datetime.today()
-    yesterday = today - datetime.timedelta(days=1)
-    if today.hour < 6:
-        current_day_start = datetime.datetime(year=yesterday.year, month=yesterday.month, day=yesterday.day, hour=6)
-    else:
-        current_day_start = datetime.datetime(year=today.year, month=today.month, day=today.day, hour=6)
-
-    # Daily clients
-    nb_daily_clients = PCeen.query.filter(
-        PCeen.bar_transactions_made.any(BarTransaction.date > current_day_start)
-    ).count()
-
-    # Daily alcohol consumption
-    alcohol_qty = (
-        BarTransaction.query.filter(BarTransaction.date > current_day_start)
-        .filter(BarTransaction.type.like("Pay%"))
-        .filter(BarTransaction.item.has(is_alcohol=True))
-        .filter_by(is_reverted=False)
-        .count()
-        * 0.25
-    )
-
-    # Daily revenue
-    daily_transactions = (
-        BarTransaction.query.filter(BarTransaction.date > current_day_start)
-        .filter(BarTransaction.type.like("Pay%"))
-        .filter_by(is_reverted=False)
-        .all()
-    )
-    daily_revenue = sum([abs(t.balance_change) for t in daily_transactions])
-
-    return flask.jsonify(
-        {"nb_daily_clients": nb_daily_clients, "alcohol_qty": alcohol_qty, "daily_revenue": daily_revenue}
-    )
-
-
 @sbp.route("/deposit/<pceen_id>", methods=["POST"])
 @context.permission_only(PermissionType.write, PermissionScope.bar)
 def post_deposit(pceen_id: str):

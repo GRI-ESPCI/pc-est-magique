@@ -2,18 +2,30 @@
 
 from calendar import monthrange
 import datetime
+import os
+from typing import NamedTuple
 
 import flask
 from flask_babel import _, format_date
 import sqlalchemy
 from unidecode import unidecode
+import werkzeug.datastructures
 
 from app import context, db
-from app.models import PCeen, BarItem, BarTransaction, GlobalSetting, PermissionScope, PermissionType, Role, Permission
-from app.models.bar import BarDailyData
+from app.models import (
+    PCeen,
+    BarItem,
+    BarTransaction,
+    GlobalSetting,
+    PermissionScope,
+    PermissionType,
+    Role,
+    Permission,
+    BarDailyData,
+)
 from app.routes.bar import bp
-from app.routes.bar.forms import AddOrEditItemForm, GlobalSettingsForm
-from app.routes.bar.utils import get_avatar_token_args, get_items_descriptions
+from app.routes.bar.forms import AddOrEditItemForm, GlobalSettingsForm, DataExport
+from app.routes.bar.utils import get_avatar_token_args, get_export_data, get_items_descriptions
 from app.utils import helpers
 from app.utils.global_settings import Settings
 
@@ -284,21 +296,78 @@ def items():
     )
 
 
-@bp.route("/global_settings", methods=["GET", "POST"])
+class ExportWeek(NamedTuple):
+    start: datetime.date
+    end: datetime.date
+    filename: str
+    url: str
+
+
+@bp.route("/export", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.bar)
-def global_settings():
+def export():
+    """Render the data export page."""
+    form = DataExport()
+    if form.validate_on_submit():
+        response = flask.Response()
+        response.status_code = 200
+        response.data = get_export_data(form.start.data, form.end.data)
+        filename = form.filename.data or f"export_{form.start.data.isoformat()}_{form.end.data.isoformat()}.xlsx"
+        response.headers = werkzeug.datastructures.Headers(
+            {
+                "Pragma": "public",  # required,
+                "Expires": "0",
+                "Cache-Control": "must-revalidate, post-check=0, pre-check=0",
+                "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "Content-Disposition": f'attachment; filename="{filename}";',
+                "Content-Transfer-Encoding": "binary",
+                "Content-Length": len(response.data),
+            }
+        )
+        return response
+
+    today = datetime.date.today()
+    week_start = today - datetime.timedelta(days=today.weekday())
+
+    weeks = [ExportWeek(start=week_start, end=today, filename="current_week.xlsx", url="")]
+    for i in range(4):
+        week_start -= datetime.timedelta(days=7)
+        week_start_iso = week_start.isocalendar()
+        weeks.append(
+            ExportWeek(
+                start=week_start,
+                end=week_start + datetime.timedelta(days=6),
+                filename=f"week{week_start_iso.week}-{week_start_iso.year}.xlsx",
+                url="",
+            )
+        )
+
+    return flask.render_template("bar/export.html", title=_("Export de données – Bar"), form=form, weeks=weeks)
+
+
+@bp.route("/settings", methods=["GET", "POST"])
+@context.permission_only(PermissionType.write, PermissionScope.bar)
+def settings():
     """Render the global settings page."""
+    max_daily_alcoholic_drink_per_user = GlobalSetting.query.filter_by(key="MAX_DAILY_ALCOHOLIC_DRINKS_PER_USER").one()
     form = GlobalSettingsForm()
     if form.validate_on_submit():
-        settings = GlobalSetting.query.all()
-        for index, s in enumerate(settings):
-            s.value = form.value.data[index]
-        db.session.commit()
-        flask.flash("Global settings successfully updated.", "primary")
-        return helpers.ensure_safe_redirect("bar.global_settings")
-    else:
-        settings = GlobalSetting.query.all()
-        for index, s in enumerate(settings):
-            form.value.append_entry(s.value)
-            form.value.entries[index].label.text = s.name
-    return flask.render_template("bar/global_settings.html", title="Global settings", form=form)
+        Settings.max_daily_alcoholic_drinks_per_user = form.max_daily_alcoholic_drinks_per_user.data
+        if form.delete_background_image.data:
+            try:
+                os.remove(os.path.join("app", "static", "img", "bar_background.png"))
+            except FileNotFoundError:
+                pass
+
+        if form.background_image.data:
+            with open(os.path.join("app", "static", "img", "bar_background.png"), "wb") as fh:
+                fh.write(form.background_image.data.read())
+
+        flask.flash(_("Paramètres mis à jour."), "success")
+
+    return flask.render_template(
+        "bar/settings.html",
+        title=_("Paramètres – Bar"),
+        form=form,
+        max_daily_alcoholic_drink_per_user=max_daily_alcoholic_drink_per_user,
+    )

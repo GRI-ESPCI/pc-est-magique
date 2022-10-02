@@ -1,6 +1,7 @@
 """PC est magique - Custom Flask Forms Validators"""
 
 import datetime
+from typing import Any, Callable
 
 import flask
 import wtforms
@@ -48,6 +49,18 @@ class EqualTo(wtforms.validators.EqualTo):
         if message is None:
             message = _l("Valeur différente du champ précédent.")
         super().__init__(fieldname, message)
+
+
+class CompareFields(CustomValidator):
+    def __init__(self, comparator: Callable[[Any, Any], bool], fieldname: str, message: JinjaStr | None = None) -> None:
+        self.comparator = comparator
+        self.fieldname = fieldname
+        if message is None:
+            message = _l("Valeur incohérente avec le champ %(field)s.", field=fieldname)
+        super().__init__(message)
+
+    def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
+        return self.comparator(field.data, getattr(form, self.fieldname).data)
 
 
 class MacAddress(wtforms.validators.MacAddress):

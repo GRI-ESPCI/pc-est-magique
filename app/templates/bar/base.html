@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 
+{% block body_attribs %}
+{{ super() }}
+style="background-size: 100%; background-repeat: repeat-y; background-image: url('{{
+    url_for("static", filename="img/bar_background.png")
+}}');"
+{% endblock %}
+
 {% block app_content %}
 {% with current_user_is_barman = has_permission(PermissionType.write, PermissionScope.bar) %}
 

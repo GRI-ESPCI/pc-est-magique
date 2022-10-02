@@ -1,11 +1,12 @@
 """PC est magique - Bar Forms"""
 
+import operator
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, FloatField, IntegerField, BooleanField, FieldList, HiddenField
+from wtforms import StringField, SubmitField, FloatField, IntegerField, BooleanField, HiddenField, DateField, FileField
 from wtforms.validators import DataRequired, Optional, NumberRange, Length
 
-from app.utils.validators import NewBarItemName, ValidBarItemID
+from app.utils.validators import CompareFields, NewBarItemName, PastDate, ValidBarItemID
 
 
 class AddOrEditItemForm(FlaskForm):
@@ -24,14 +25,26 @@ class AddOrEditItemForm(FlaskForm):
     submit = SubmitField(_l("Valider"))
 
 
+class DataExport(FlaskForm):
+    """Data export form."""
+
+    start = DateField("", validators=[DataRequired(), PastDate()])
+    end = DateField(
+        "",
+        validators=[
+            DataRequired(),
+            CompareFields(operator.ge, "start", _l("Doit être postérieur à la date de début !")),
+        ],
+    )
+    filename = StringField(_l("Nom du fichier"), validators=[Optional()])
+    submit = SubmitField(_l("Télécharger"))
+
+
 class GlobalSettingsForm(FlaskForm):
     """Global settings form."""
 
-    value = FieldList(IntegerField(_l("Key")))
-    submit = SubmitField(_l("Submit"))
+    max_daily_alcoholic_drinks_per_user = IntegerField("", validators=[DataRequired(), NumberRange(min=0)])
+    background_image = FileField("", validators=[Optional()])
+    delete_background_image = BooleanField(_l("Supprimer l'image actuelle"))
 
-    def __init__(self, *args, **kwargs):
-        """Populate form with existing values."""
-        super(GlobalSettingsForm, self).__init__l(*args, **kwargs)
-        if "obj" in kwargs and kwargs["obj"] is not None:
-            self.value.label.text = kwargs["obj"].key
+    submit = SubmitField(_l("Sauvegarder"))

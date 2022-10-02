@@ -8,7 +8,7 @@ from app import db
 Model = typing.cast(type[type], db.Model)  # type checking hack
 
 
-from app.enums import PaymentStatus, PermissionScope, PermissionType, SubState
+from app.enums import PaymentStatus, PermissionScope, PermissionType, SubState, BarTransactionType
 
 from app.models.auth import PCeen
 from app.models.bar import BarItem, BarTransaction, BarDailyData

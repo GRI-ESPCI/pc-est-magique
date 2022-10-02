@@ -1,0 +1,41 @@
+{% extends "bar/base.html" %}
+{% import "_form.html" as wtf %}
+
+{% block bar_app_content %}
+<div class="container my-1">
+    <div class="btn-toolbar justify-content-center" role="toolbar">
+        <div class="my-auto d-none d-md-inline"><h1 class="fs-3 mb-0 mt-auto">{{ _("Paramètres") }}</h1></div>
+    </div>
+</div>
+
+<form action="" method="POST" enctype="multipart/form-data">
+    <div class="table-responsive mt-4">
+        <table class="table table-striped table-bordered align-middle bar-table">
+            {{ form.hidden_tag() }}
+            <thead>
+                <tr>
+                    <th>{{ _("Paramètre") }}</th>
+                    <th>{{ _("Valeur") }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ max_daily_alcoholic_drink_per_user.name }}</td>
+                    <td>{{ wtf.form_field(form.max_daily_alcoholic_drinks_per_user, type="number", min="0", value=max_daily_alcoholic_drink_per_user.value) }}</td>
+                </tr>
+                <tr>
+                    <td>{{ _("Image de fond") }}</td>
+                    <td class="d-flex align-items-center">
+                        <div>{{ wtf.form_field(form.background_image, type="file", accept="image/*") }}</div>
+                        <div class="form-check form-switch">{{ wtf.form_field(form.delete_background_image) }}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="text-center mt-3">
+        {{ wtf.form_field(form.submit) }}
+    </div>
+</form>
+
+{% endblock %}
