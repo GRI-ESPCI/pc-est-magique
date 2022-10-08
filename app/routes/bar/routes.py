@@ -24,9 +24,9 @@ from app.models import (
     BarDailyData,
 )
 from app.routes.bar import bp
-from app.routes.bar.forms import AddOrEditItemForm, GlobalSettingsForm, DataExport
-from app.routes.bar.utils import get_avatar_token_args, get_export_data, get_items_descriptions
-from app.utils import helpers
+from app.routes.bar.forms import AddOrEditItemForm, GlobalSettingsForm, DataExport, EditBarUserForm
+from app.routes.bar.utils import get_avatar_token_args, get_export_data, get_items_descriptions, save_bar_avatar
+from app.utils import helpers, roles
 from app.utils.global_settings import Settings
 
 
@@ -172,13 +172,25 @@ def search():
 
 
 @bp.route("/")
+@context.any_permission_only(
+    (PermissionType.read, PermissionScope.bar),
+    (PermissionType.read, PermissionScope.bar_stats),
+)
+def main():
+    return helpers.ensure_safe_redirect(
+        "bar.stats" if context.has_permission(PermissionType.read, PermissionScope.bar_stats) else "bar.me"
+    )
+
+
 @bp.route("/me")
 @context.permission_only(PermissionType.read, PermissionScope.bar)
 def me():
+    if context.has_permission(PermissionType.write, PermissionScope.bar):
+        return helpers.ensure_safe_redirect("bar.user", username=context.g.pceen.username, next=None)
     return _user(context.g.pceen)
 
 
-@bp.route("/user/<username>")
+@bp.route("/user/<username>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.bar)
 def user(username: str):
     # Get user
@@ -186,10 +198,35 @@ def user(username: str):
     if not pceen or not pceen.has_permission(PermissionType.read, PermissionScope.bar):
         flask.abort(404)
 
-    return _user(pceen)
+    form = EditBarUserForm()
+    if form.validate_on_submit():
+        if form.nickname.data != pceen.bar_nickname:
+            pceen.bar_nickname = form.nickname.data
+            db.session.commit()
+            flask.flash(_("Le surnom de %(name)s a bien été modifié", name=pceen.full_name), "success")
+
+        if pceen.has_permission(PermissionType.write, PermissionScope.bar):
+            if not form.is_barman.data:
+                roles.revoke_barman_role(pceen)
+                db.session.commit()
+                flask.flash(_("%(name)s n'est maintenant plus barman / barmaid", name=pceen.full_name), "warning")
+        elif form.is_barman.data:
+            roles.grant_barman_role(pceen)
+            db.session.commit()
+            flask.flash(_("%(name)s est maintenant barmaid / barmaid", name=pceen.full_name), "warning")
+
+        if form.avatar.data:
+            try:
+                save_bar_avatar(pceen, form.avatar.data)
+            except Exception as exc:
+                flask.flash(_("Erreur lors de la transformation de la photo : %(exc)s", exc=exc.stderr.decode()))
+            else:
+                flask.flash(_("L'avatar de %(name)s a bien été modifié", name=pceen.full_name), "success")
+
+    return _user(pceen, form=form)
 
 
-def _user(pceen: PCeen):
+def _user(pceen: PCeen, form: EditBarUserForm | None = None):
     """Render the user profile page."""
     # Get pceen transactions
     page = flask.request.args.get("page", 1, type=int)
@@ -209,7 +246,7 @@ def _user(pceen: PCeen):
         quick_access_item=quick_access_item,
         paginator=transactions_paginator,
         avatar_token_args=get_avatar_token_args(),
-        max_daily_alcoholic_drinks_per_user=Settings.max_daily_alcoholic_drinks_per_user,
+        form=form,
     )
 
 

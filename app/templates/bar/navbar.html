@@ -65,7 +65,8 @@
     </div>
 
     <div class="col col-auto ps-2">
-        <a class="btn btn-sm btn-outline-secondary text-light p-0 m-0" href="{{ url_for("bar.me") }}">
+        <a class="btn btn-sm btn-outline-secondary text-light p-0 m-0"
+           href="{{ url_for("bar.user", username=g.pceen.username) }}">
             <svg class="bi flex-shrink-0" width="24" height="24" role="img">
                 {{ macros.bootstrap_icon("person-circle") }}
             </svg>

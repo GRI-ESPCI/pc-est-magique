@@ -14,56 +14,6 @@ from app.utils.global_settings import Settings
 sbp = flask.Blueprint("bar", __name__)
 
 
-@sbp.route("/yearly_transactions")
-@context.permission_only(PermissionType.read, PermissionScope.bar_stats)
-def get_yearly_transactions():
-    """Return transaction from last 12 months."""
-    # Get current day, month, year
-    today = datetime.datetime.today()
-    current_year = today.year
-    current_month = today.month
-
-    # Get last 12 months range
-    if current_month == 12:
-        previous_year = current_year
-    else:
-        previous_year = current_year - 1
-    previous_month = (current_month - 12) % 12
-
-    # Get money spent and topped up last 12 months
-    paid_per_month = []
-    topped_per_month = []
-    for (y, m) in month_year_iter(previous_month + 1, previous_year, current_month + 1, current_year):
-        transactions_paid_y = BarTransaction.query.filter(
-            extract("month", BarTransaction.date) == m,
-            extract("year", BarTransaction.date) == y,
-            BarTransaction.type.like("Pay%"),
-            BarTransaction.is_reverted == False,
-        ).all()
-        transactions_topped_y = BarTransaction.query.filter(
-            extract("month", BarTransaction.date) == m,
-            extract("year", BarTransaction.date) == y,
-            BarTransaction.type.like("Top up"),
-            BarTransaction.is_reverted == False,
-        ).all()
-        paid_per_month.append(0)
-        for t in transactions_paid_y:
-            paid_per_month[-1] -= t.balance_change
-        topped_per_month.append(0)
-        for t in transactions_topped_y:
-            topped_per_month[-1] += t.balance_change
-
-    # Generate months labels
-    months_labels = [
-        "%.2d" % m[1] + "/" + str(m[0])
-        for m in list(month_year_iter(previous_month + 1, previous_year, current_month + 1, current_year))
-    ]
-
-    return flask.jsonify(
-        {"paid_per_month": paid_per_month, "topped_per_month": topped_per_month, "months_labels": months_labels}
-    )
-
-
 @sbp.route("/deposit/<pceen_id>", methods=["POST"])
 @context.permission_only(PermissionType.write, PermissionScope.bar)
 def post_deposit(pceen_id: str):
@@ -86,27 +36,6 @@ def post_deposit(pceen_id: str):
     return {}, 204
 
 
-@sbp.route("/nickname/<pceen_id>", methods=["POST"])
-@context.permission_only(PermissionType.write, PermissionScope.bar)
-def post_nickname(pceen_id: str):
-    """Set a user nickname."""
-    if not pceen_id.isdigit():
-        flask.abort(400, "Field 'pceen_id' missing or invalid integer")
-    pceen: PCeen | None = PCeen.query.get(int(pceen_id))
-    if not pceen or not pceen.has_permission(PermissionType.read, PermissionScope.bar):
-        flask.abort(404, f"PCeen #{pceen_id} does not exist or has no access to the Bar module")
-
-    nickname = flask.request.form.get("nickname")
-    if nickname is None:
-        flask.abort(400, "Field 'nickname' missing")
-
-    pceen.bar_nickname = nickname
-    db.session.commit()
-
-    flask.flash(_("Le surnom de %(name)s a bien été modifié", name=pceen.full_name), "success")
-    return {}, 204
-
-
 @sbp.route("/revert_transaction/<transaction_id>", methods=["POST"])
 @context.permission_only(PermissionType.write, PermissionScope.bar)
 def revert_transaction(transaction_id: str):
@@ -119,7 +48,6 @@ def revert_transaction(transaction_id: str):
         flask.abort(404, f"Transaction #{transaction} does not exist")
 
     # Transactions that are already reverted can't be reverted again
-    transaction = BarTransaction.query.filter_by(id=transaction_id).first_or_404()
     if transaction.is_reverted:
         flask.abort(422, f"Transaction #{transaction} has already been reverted.")
 

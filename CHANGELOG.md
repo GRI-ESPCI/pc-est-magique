@@ -5,6 +5,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+# v2.2.0 (2022-10-15)
+
+Fusion of the ESPCI Bar site (https://github.com/GRI-ESPCI/espci-bar-web-app) into this project.
+
+_This project had no versioning and no changelog._
+
+### Added
+
+  * New Bar module:
+    * Tables ``BarItem``, ``BarTransaction``, ``BarDailyData``;
+    * Columns ``PCeen.bar_nickname``, ``PCeen.bar_deposit`` and ``PCeen.bar_balance``;
+    * Blueprint ``bar`` with 9 new routes;
+    * Corresponding templates;
+    * Main page info card.
+  * New generic API system:
+    * Blueprint ``api``;
+    * Sub-blueprint ``api.bar`` with 6 new routes.
+  * New "global settings" system:
+    * Table ``GlobalSetting``;
+    * ``app.utils.global_settings`` module.
+
+
 # v2.1.3 (2022-09-17)
 
 ### Changed

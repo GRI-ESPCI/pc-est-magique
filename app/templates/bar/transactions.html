@@ -20,7 +20,7 @@
         </div>
         <div class="my-auto d-none d-md-inline"><h1 class="fs-3 mb-0 mt-auto">{{ _("Transactions") }}</h1></div>
         <div class="btn-group" role="group" aria-label="Results">
-            <button type="button" class="btn btn-primary">
+            <button type="button" class="btn btn-primary pe-none">
                 {{ _("Total :") }}
                 <span class="badge bg-secondary badge-light">{{ paginator.total }}</span>
             </button>
@@ -46,8 +46,16 @@
             {% for transaction in paginator.items %}
             <tr {% if transaction.is_reverted %}class="table-danger text-decoration-line-through"{% endif %}>
                 <th class="align-middle">{{ transaction.id }}</th>
-                <td class="align-middle text-nowrap">{{ transaction.client.full_name }}</td>
-                <td class="align-middle text-nowrap">{{ transaction.barman.full_name }}</td>
+                <td class="align-middle text-nowrap">
+                    <a href="{{ url_for("bar.user", username=transaction.client.username) }}" class="text-secondary">
+                        {{ transaction.client.full_name }}
+                    </a>
+                </td>
+                <td class="align-middle text-nowrap">
+                    <a href="{{ url_for("bar.user", username=transaction.barman.username) }}" class="text-secondary">
+                        {{ transaction.barman.full_name }}
+                    </a>
+                </td>
                 {% if transaction.type == BarTransactionType.pay_item %}
                 <td class="align-middle">{{ _("Conso") }}</td>
                 <td class="align-middle text-nowrap">{{ transaction.item.name }}</td>

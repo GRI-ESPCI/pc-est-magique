@@ -57,12 +57,15 @@ class PCeen(flask_login.UserMixin, Model):
     locale: Column[str | None] = column(sa.String(8), nullable=True)
     is_gri: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
     sub_state: Column[SubState] = column(Enum(SubState), nullable=True)
+
+    # Login info
+    activated: Column[bool] = column(sa.Boolean(), nullable=False, default=True)
     _password_hash: Column[str] = column(sa.String(128), nullable=True)
     espci_sso_enabled: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
 
     # Bar info
     bar_nickname: Column[str | None] = column(sa.String(128), nullable=True)
-    bar_balance: Column[float | None] = column(sa.Float(), default=0.0, nullable=True)
+    bar_balance: Column[float | None] = column(sa.Numeric(6, 2, asdecimal=False), default=0.0, nullable=True)
     bar_deposit: Column[bool | None] = column(sa.Boolean(), default=False, nullable=True)
 
     photos: Relationship[list[models.Photo]] = one_to_many("Photo.author")
@@ -135,6 +138,14 @@ class PCeen(flask_login.UserMixin, Model):
                 return True
         # No permission granted
         return False
+
+    @classmethod
+    def with_permission_query(cls, type: PermissionType, scope: PermissionScope) -> Query:
+        return (
+            cls.query.join(PCeen.roles)
+            .join(models.Role.permissions)
+            .filter(models.Permission.type == type, models.Permission.scope == scope)
+        )
 
     @property
     def first_seen(self) -> datetime.datetime:

@@ -85,6 +85,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.jinja_env.globals["__version__"] = __version__
     app.jinja_env.globals["copyright"] = in_app_copyright
     app.jinja_env.globals["babel"] = flask_babel
+    app.jinja_env.globals["Settings"] = global_settings.Settings
 
     # Register blueprints
     # ! Keep imports here to avoid circular import issues !
@@ -184,6 +185,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
 # Import application models
 # ! Keep at the bottom to avoid circular import issues !
 from app import models
+from app.utils import global_settings
 
 
 # Set up locale

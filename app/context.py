@@ -402,7 +402,7 @@ def check_all_permissions(*pses: PSE) -> None:
 def permission_only(
     type: PermissionType, scope: PermissionScope, elem: Model | None = None
 ) -> typing.Callable[[_Route], _Route]:
-    """Route function decorator to restrict route to a specific permission.
+    """Route function decorator to restrict route to users with a specific permission.
 
     Decorator version of :func:`.check_permission`.
 
@@ -417,6 +417,29 @@ def permission_only(
         @functools.wraps(route)
         def new_route(*args: _RP.args, **kwargs: _RP.kwargs) -> typing.RouteReturn:
             check_permission(type=type, scope=scope, elem=elem)
+            return route(*args, **kwargs)
+
+        return new_route
+
+    return decorator
+
+
+def any_permission_only(*pses: PSE) -> typing.Callable[[_Route], _Route]:
+    """Route function decorator to restrict route to users with at least one of specific permissions.
+
+    Decorator version of :func:`.check_any_permission`.
+
+    Args:
+        pses: Passed to :func:`.check_any_permission`.
+
+    Returns:
+        The decorator to apply to protect the route.
+    """
+
+    def decorator(route: _Route) -> _Route:
+        @functools.wraps(route)
+        def new_route(*args: _RP.args, **kwargs: _RP.kwargs) -> typing.RouteReturn:
+            check_any_permission(*pses)
             return route(*args, **kwargs)
 
         return new_route

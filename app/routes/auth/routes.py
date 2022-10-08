@@ -67,17 +67,20 @@ def login() -> typing.RouteReturn:
     form = forms.LoginForm()
     if form.validate_on_submit():
         # Check user / password
-        pceen = (
-            PCeen.query.filter_by(username=form.login.data).first()
-            or PCeen.query.filter_by(email=form.login.data).first()
+        pceen: PCeen = (
+            PCeen.query.filter_by(username=form.login.data).one_or_none()
+            or PCeen.query.filter_by(email=form.login.data).one_or_none()
         )
         if pceen is None:
-            flask.flash(_("Nom d'utilisateur inconnu"), "danger")
+            flask.flash(_("Utilisateur inconnu"), "danger")
         elif not pceen.check_password(form.password.data):
             flask.flash(_("Mot de passe incorrect"), "danger")
         else:
             # OK
             flask_login.login_user(pceen, remember=form.remember_me.data)
+            if not pceen.activated:
+                pceen.activated = True
+                db.session.commit()
             flask.flash(_("Connecté !"), "success")
             return helpers.redirect_to_next()
 

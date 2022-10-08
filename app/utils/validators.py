@@ -7,7 +7,7 @@ import flask
 import wtforms
 from flask_babel import lazy_gettext as _l
 
-from app.models import PCeen, Room, Ban, BarItem
+from app.models import PCeen, Room, Ban, BarItem, PermissionType, PermissionScope
 from app.utils.typing import JinjaStr
 
 

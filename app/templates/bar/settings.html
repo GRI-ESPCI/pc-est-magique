@@ -21,14 +21,21 @@
             <tbody>
                 <tr>
                     <td>{{ max_daily_alcoholic_drink_per_user.name }}</td>
-                    <td>{{ wtf.form_field(form.max_daily_alcoholic_drinks_per_user, type="number", min="0", value=max_daily_alcoholic_drink_per_user.value) }}</td>
+                    <td>{{ wtf.form_field(form.max_daily_alcoholic_drinks_per_user, type="number", min="0",
+                           value=max_daily_alcoholic_drink_per_user.value) }}</td>
                 </tr>
                 <tr>
                     <td>{{ _("Image de fond") }}</td>
-                    <td class="d-flex align-items-center">
-                        <div>{{ wtf.form_field(form.background_image, type="file", accept="image/*") }}</div>
-                        <div class="form-check form-switch">{{ wtf.form_field(form.delete_background_image) }}</div>
-                    </td>
+                    <td class="container"><div class="row row-cols-1 row-cols-md-2 d-flex align-items-center gy-2">
+                        <div class="col">{{ wtf.form_field(
+                            form.background_image, type="file", accept="image/*", class="form-control"
+                        ) }}</div>
+                        <div class="col">
+                            <div class="form-check form-switch ms-3">
+                                {{ wtf.form_field(form.delete_background_image) }}
+                            </div>
+                        </div>
+                    </div></td>
                 </tr>
             </tbody>
         </table>

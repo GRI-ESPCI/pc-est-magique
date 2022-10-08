@@ -3,6 +3,8 @@
 from __future__ import annotations
 import datetime
 import io
+import os
+import subprocess
 
 import typing
 
@@ -154,3 +156,30 @@ def get_export_data(start: datetime.date, end: datetime.date) -> str:
     workbook.close()
     output.seek(0)
     return output.read()
+
+
+def save_bar_avatar(pceen: PCeen, data: typing.BinaryIO) -> None:
+    """Save and corp avatar to local data drive."""
+    dir = os.path.join(flask.current_app.config["PHOTOS_BASE_PATH"], "bar_avatars", str(pceen.promo))
+    if not os.path.isdir(dir):
+        os.mkdir(dir)
+
+    filepath = os.path.join(dir, pceen.username)
+    with open(filepath, "wb") as fh:
+        fh.write(data.read())
+
+    subprocess.run(
+        [
+            "convert",
+            filepath,  # Take the picture,
+            "-resize",
+            "160x200^",  # Fill a 160x200 box,
+            "-gravity",
+            "center",  # Refer to image center,
+            "-extent",
+            "160x200",  # Then crop overflow
+            f"{filepath}.jpeg",
+        ],
+        capture_output=True,
+        check=True,
+    )

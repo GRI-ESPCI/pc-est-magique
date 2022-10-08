@@ -12,12 +12,18 @@ Seules les fonctionnalités majeures sont listées ici ; voir
 
 ### 2.1
 
+* Intégration du site du Bar (anciennement sur 
+  https://bar.pc-est-magique.fr, https://github.com/GRI-ESPCI/espci-bar-web-app) 
+  comme module de PC est magique.
+
+### 2.1
+
 * Authentification (création de compte et connexion) via le SSO de l'ESPCI.
 * Accès effectif aux photos.
 
 ### 2.0
 
-* Factorisation du site de l'IntraRez (anciennement sur 
+* Intégration du site de l'IntraRez (anciennement sur 
   https://intrarez.pc-est-magique.fr, https://github.com/GRI-ESPCI/intrarez) 
   comme module ce site plus global.
 * Ajout du module de photos.

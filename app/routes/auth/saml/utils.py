@@ -78,6 +78,7 @@ def reconciliate_account(pceen: PCeen, attributes: SAMLAttributes) -> None:
         grant_student_role(pceen)
         grant_promotion_role(pceen, promo)
     pceen.espci_sso_enabled = True
+    pceen.activated = True
     db.session.commit()
     helpers.log_action(
         f"ESPCI SSO -> Matched account {pceen!r} with ESPCI account, updated it ({pceen.prenom} {pceen.nom} "

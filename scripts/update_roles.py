@@ -59,14 +59,14 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["access_bar_stats"],
             ],
         ),
-        "Rezident": dict(  # NE PAS RENOMMER - nom utilisé dans app/routes/auth/utils.py
+        "Rezident": dict(  # NE PAS RENOMMER - nom utilisé dans app/utils/roles.py
             index=10,
             color="d5c0a9",
             permissions=[
                 perms["access_intrarez"],
             ],
         ),
-        "Élève": dict(  # NE PAS RENOMMER - nom utilisé dans app/routes/auth/utils.py
+        "Élève": dict(  # NE PAS RENOMMER - nom utilisé dans app/utils/roles.py
             index=10,
             color="64b9e9",
             permissions=[
@@ -81,7 +81,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["access_photos"],
             ],
         ),
-        "Barman": dict(
+        "Barman": dict(  # NE PAS RENOMMER - nom utilisé dans app/utils/roles.py
             index=20,
             color="000000",
             permissions=[

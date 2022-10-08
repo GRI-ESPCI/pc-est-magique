@@ -1,6 +1,7 @@
 """PC est magique - Gris Pages Routes"""
 
 import contextlib
+import enum
 import io
 import traceback
 import sys
@@ -10,7 +11,7 @@ from flask_babel import _
 
 from app import context
 from app.routes.gris import bp, forms
-from app.models import PCeen, Role, PermissionScope, PermissionType
+from app.models import PCeen, Role, Permission, PermissionScope, PermissionType
 from app.routes.gris.utils import (
     add_perm,
     add_remove_role,
@@ -21,10 +22,23 @@ from app.routes.gris.utils import (
 from app.utils import helpers, typing
 
 
+class PCeensViewEnum(enum.Enum):
+    active = enum.auto()
+    rez = enum.auto()
+    bar = enum.auto()
+    all = enum.auto()
+
+
 @bp.route("/pceens", methods=["GET", "POST"])
+@bp.route("/pceens/<view>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.pceen)
-def pceens() -> typing.RouteReturn:
+def pceens(view: str = "active") -> typing.RouteReturn:
     """PCéens list page."""
+    try:
+        view = PCeensViewEnum[view]
+    except KeyError:
+        flask.abort(404)
+
     roles_form = forms.AddRemoveRoleForm()
     ban_form = forms.BanForm()
 
@@ -52,11 +66,33 @@ def pceens() -> typing.RouteReturn:
             message=ban_form.message.data,
         )
 
+    query = PCeen.query
+    match view:
+        case PCeensViewEnum.active:
+            query = query.filter(PCeen.activated == True)
+        case PCeensViewEnum.rez:
+            query = (
+                query.join(PCeen.roles)
+                .join(Role.permissions)
+                .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.intrarez)
+            )
+        case PCeensViewEnum.bar:
+            query = (
+                query.join(PCeen.roles)
+                .join(Role.permissions)
+                .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.bar)
+            )
+        case PCeensViewEnum.all:
+            pass
+
+    pceens = query.all()
+
     return flask.render_template(
         "gris/pceens.html",
         roles_form=roles_form,
         ban_form=ban_form,
-        pceens=PCeen.query.all(),
+        view=view.name,
+        pceens=pceens,
         roles=Role.query.all(),
         title=_("Gestion des PCéens"),
     )

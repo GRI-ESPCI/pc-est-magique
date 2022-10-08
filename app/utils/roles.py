@@ -40,3 +40,25 @@ def grant_rezident_role(pceen: PCeen) -> None:
     if rezident_role not in pceen.roles:
         pceen.roles.append(rezident_role)
         flask.flash(_("Accès aux modules IntraRez débloqué !"), "success")
+
+
+def grant_barman_role(pceen: PCeen) -> None:
+    """Add the role allowing to manage Bar to a PCéen.
+
+    Args:
+        pceen: The PCéen to add the role to.
+    """
+    barman_role = Role.query.filter_by(name="Barman").one()
+    if barman_role not in pceen.roles:
+        pceen.roles.append(barman_role)
+
+
+def revoke_barman_role(pceen: PCeen) -> None:
+    """Remove the role allowing to manage Bar from a PCéen.
+
+    Args:
+        pceen: The PCéen to add the role to.
+    """
+    barman_role = Role.query.filter_by(name="Barman").one()
+    if barman_role in pceen.roles:
+        pceen.roles.remove(barman_role)

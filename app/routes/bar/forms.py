@@ -9,6 +9,16 @@ from wtforms.validators import DataRequired, Optional, NumberRange, Length
 from app.utils.validators import CompareFields, NewBarItemName, PastDate, ValidBarItemID
 
 
+class EditBarUserForm(FlaskForm):
+    """Bar user editing form."""
+
+    nickname = StringField(_l("Surnom"), validators=[Optional(), Length(max=128)])
+    is_barman = BooleanField(_l("Barman / barmaid"))
+    avatar = FileField("", validators=[Optional()])
+
+    submit = SubmitField(_l("Valider"))
+
+
 class AddOrEditItemForm(FlaskForm):
     """Item editing form."""
 

@@ -1,4 +1,5 @@
 {% extends "bar/base.html" %}
+{% import "_form.html" as wtf %}
 
 {% block bar_app_content %}
 {% with theme = "muted" if not pceen.bar_deposit
@@ -87,7 +88,7 @@
             {% endif %}
 
             <button type="button" class="btn btn-warning" data-bs-toggle="modal"
-                    data-bs-target="#nickname-modal" title="{{ _("Modifier le surnom") }}">
+                    data-bs-target="#edit-user-modal" title="{{ _("Modifier le surnom") }}">
                 <svg class="bi flex-shrink-0" width="24" height="24" role="img">
                     {{ macros.bootstrap_icon("pencil") }}
                 </svg>
@@ -107,17 +108,17 @@
             <tbody>
                 <tr>
                     <td title="{{ _("Rôle") }}"><svg class="bi flex-shrink-0" width="24" height="24" role="img">
-                        {{ macros.bootstrap_icon("info-circle-fill") }}
+                        {{ macros.bootstrap_icon("shield-lock-fill") }}
                     </svg></td>
                     <td>
-                        {% if has_permission(PermissionType.write, PermissionScope.pceen) %}
-                        {{ _("GRI") }}
-                        {% elif current_user_is_barman %}
-                        {{ _("Barman(maid)") }}
-                        {% elif has_permission(PermissionType.read, PermissionScope.bar_stats) %}
+                        {% if pceen.is_gri %}
+                        {{ _("GRI tout-puissant") }}
+                        {% elif pceen.has_permission(PermissionType.write, PermissionScope.bar) %}
+                        {{ _("Barman / barmaid") }}
+                        {% elif pceen.has_permission(PermissionType.read, PermissionScope.bar_stats) %}
                         {{ _("Observateur") }}
                         {% else %}
-                        {{ _("Client(e)") }}
+                        {{ _("Client&middot;e") }}
                         {% endif %}
                     </td>
                 </tr>
@@ -146,9 +147,7 @@
                                  style="width: {{ pceen.bar_balance }}%; max-width: 100%">
                             </div>
                         </div>
-                    </div>
-                    </div>
-                    </td>
+                    </div></div></td>
                 </tr>
                 <tr>
                     {% with alcohol_bought_count = pceen.current_bar_daily_data.alcohol_bought_count%}
@@ -158,7 +157,7 @@
                         </svg>
                     </td>
                     <td class="container"><div class="row align-middle"><div class="col col-4 col-sm-3 col-lg-2">
-                        {{ alcohol_bought_count }}/{{ max_daily_alcoholic_drinks_per_user }}
+                        {{ alcohol_bought_count }}/{{ Settings.max_daily_alcoholic_drinks_per_user }}
                         </div><div class="col">
                             <div class="progress bg-success" style="height: 24px;">
                                 <div class="progress-bar bg-danger" role="progressbar"
@@ -166,9 +165,7 @@
                                 style="width: {{ alcohol_bought_count * 25 }}%; max-width: 100%">
                             </div>
                         </div>
-                    </div>
-                    </div>
-                    </td>
+                    </div></div></td>
                     {% endwith %}
                 </tr>
             </tbody>
@@ -197,7 +194,11 @@
                 {% for transaction in paginator.items %}
                 <tr {% if transaction.is_reverted %}class="table-danger text-decoration-line-through"{% endif %}>
                     <th class="align-middle">{{ transaction.id }}</th>
-                    <td class="align-middle text-nowrap">{{ transaction.barman.full_name }}</td>
+                    <td class="align-middle text-nowrap">
+                        <a href="{{ url_for("bar.user", username=transaction.barman.username) }}" class="text-secondary">
+                            {{ transaction.barman.full_name }}
+                        </a>
+                    </td>
                     {% if transaction.type == BarTransactionType.pay_item %}
                     <td class="align-middle">{{ _("Conso") }}</td>
                     <td class="align-middle text-nowrap">{{ transaction.item.name }}</td>
@@ -245,23 +246,33 @@
 
 {% if current_user_is_barman %}
 
-<!-- User nickname modal -->
-<div class="modal fade" id="nickname-modal" tabindex="-1" role="dialog" aria-labelledby="nickname-modal-label"
+<!-- User edit modal -->
+<div class="modal fade" id="edit-user-modal" tabindex="-1" role="dialog" aria-labelledby="edit-user-modal-label"
 aria-hidden="true">
 <div class="modal-dialog modal-dialog-centered" role="document">
 <div class="modal-content">
-    <form onsubmit="post_and_reload('{{ url_for("api.bar.post_nickname", pceen_id=pceen.id) }}', this);"
-          method="dialog">
+    <form action="{{ url_for("bar.user", username=pceen.username) }}" method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
         <div class="modal-header">
-            <h5 class="modal-title" id="nickname-modal-label">
-                {{ _("Modifier le surnom de %(name)s", name=pceen.full_name) }}
+            <h5 class="modal-title" id="edit-user-modal-label">
+                {{ _("Modifier les infos Bar de %(name)s", name=pceen.full_name) }}
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <div class="form-floating">
-                <input class="form-control" name="nickname" type="text" value="{{ pceen.bar_nickname or "" }}">
-                <label class="form-label" for="nickname">{{ _("Surnom") }}</label>
+            <div class="form-floating mb-3">
+                {{ wtf.form_field(form.nickname, value=pceen.bar_nickname or "") }}
+            </div>
+            <div class="form-check form-switch mb-3 ms-1">
+                {{ wtf.form_field(
+                    form.is_barman, checked=pceen.has_permission(PermissionType.write, PermissionScope.bar),
+                ) }}
+            </div>
+            <div>
+                <label for="avatar" class="form-label ms-1">
+                    {{ _("Nouvel avatar (sera recadré en 160x200 px) :") }}
+                </label>
+                {{ wtf.form_field(form.avatar, type="file", accept="image/*", class="form-control") }}
             </div>
         </div>
         <div class="modal-footer">

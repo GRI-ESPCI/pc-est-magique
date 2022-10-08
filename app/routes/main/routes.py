@@ -168,13 +168,13 @@ def photo(collection_dir: str, album_dir: str, photo_file: str) -> typing.RouteR
         return flask.send_file(os.path.join(album_dir, photo_file))
 
 
-@bp.route("/bar_avatar/<promo>/<username>")
-def bar_avatar(promo: str, username: str) -> typing.RouteReturn:
+@bp.route("/bar_avatar/<promo>/<filename>")
+def bar_avatar(promo: str, filename: str) -> typing.RouteReturn:
     """Serve bar avatar (fallback if no Nginx, should NOT bu used!)"""
-    dir = os.path.join(
+    filepath = os.path.join(
         flask.current_app.config["PHOTOS_BASE_PATH"],
         "bar_avatars",
         promo,
-        username,
+        filename,
     )
-    return flask.send_file(dir)
+    return flask.send_file(filepath)
