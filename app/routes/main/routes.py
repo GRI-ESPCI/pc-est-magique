@@ -170,7 +170,7 @@ def photo(collection_dir: str, album_dir: str, photo_file: str) -> typing.RouteR
 
 @bp.route("/bar_avatar/<promo>/<filename>")
 def bar_avatar(promo: str, filename: str) -> typing.RouteReturn:
-    """Serve bar avatar (fallback if no Nginx, should NOT bu used!)"""
+    """Serve bar avatar (fallback if no Nginx, should NOT be used!)"""
     filepath = os.path.join(
         flask.current_app.config["PHOTOS_BASE_PATH"],
         "bar_avatars",

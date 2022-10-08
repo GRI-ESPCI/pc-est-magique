@@ -64,18 +64,18 @@ update:
 	# Get last version
 	git pull
 	# Update dependencies
-	.venv/bin/pip install -r requirements.txt
+	env/bin/pip install -r requirements.txt
 	npm install
 	./node_modules/bower/bin/bower install
 	# Upgrade application
 	@echo "Stopping application before critical updates..."
-	# sudo supervisorctl stop pc-est-magique
-	.venv/bin/flask db upgrade
-	.venv/bin/flask translate compile
-	.venv/bin/flask sass compile
+	sudo supervisorctl stop pc-est-magique
+	env/bin/flask db upgrade
+	env/bin/flask translate compile
+	env/bin/flask sass compile
 	@echo "Compressing static files..."
 	find app/static -name "*.gz" -type f -delete
 	gzip -krf app/static
 	@echo "Starting application..."
-	# sudo supervisorctl start pc-est-magique
+	sudo supervisorctl start pc-est-magique
 	@echo "Update live!"

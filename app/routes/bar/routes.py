@@ -154,7 +154,7 @@ def search():
             if sort == "promo"
             else (PCeen.full_name.desc() if way == "desc" else PCeen.full_name.asc())
         )
-        .paginate(page, flask.current_app.config["USERS_PER_PAGE"], True)
+        .paginate(page, flask.current_app.config["BAR_USERS_PER_PAGE"], True)
     )
 
     if paginator.total == 1:
@@ -262,7 +262,7 @@ def transactions():
     # Sort transactions alphabetically
     paginator = BarTransaction.query.order_by(
         BarTransaction.date.desc() if way == "desc" else BarTransaction.date.asc()
-    ).paginate(page, flask.current_app.config["ITEMS_PER_PAGE"], True)
+    ).paginate(page, flask.current_app.config["BAR_ITEMS_PER_PAGE"], True)
 
     return flask.render_template(
         "bar/transactions.html", title=_("Transactions – Bar"), paginator=paginator, sort=sort, way=way
@@ -319,7 +319,7 @@ def items():
             if sort == "quantity"
             else (BarItem.name.desc() if way == "desc" else BarItem.name.asc())
         )
-        .paginate(page, flask.current_app.config["ITEMS_PER_PAGE"], True)
+        .paginate(page, flask.current_app.config["BAR_ITEMS_PER_PAGE"], True)
     )
 
     return flask.render_template(

@@ -1,3 +1,5 @@
+"""PC est magique roles granting / revoking utilities."""
+
 import flask
 from flask_babel import _
 

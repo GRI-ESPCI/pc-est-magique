@@ -139,14 +139,6 @@ class PCeen(flask_login.UserMixin, Model):
         # No permission granted
         return False
 
-    @classmethod
-    def with_permission_query(cls, type: PermissionType, scope: PermissionScope) -> Query:
-        return (
-            cls.query.join(PCeen.roles)
-            .join(models.Role.permissions)
-            .filter(models.Permission.type == type, models.Permission.scope == scope)
-        )
-
     @property
     def first_seen(self) -> datetime.datetime:
         """The first time the pceen registered a device, or now."""

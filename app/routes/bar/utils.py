@@ -13,8 +13,8 @@ from flask_babel import _
 import xlsxwriter
 
 from app.models import BarItem, PCeen, BarTransaction, BarTransactionType
-from app.models.photos import get_nginx_access_token
 from app.utils.global_settings import Settings
+from app.utils.nginx import get_nginx_access_token
 
 
 def month_year_iter(start_month, start_year, end_month, end_year):

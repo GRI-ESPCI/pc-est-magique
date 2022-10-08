@@ -66,6 +66,9 @@ class Config:
     GOOGLE_RECAPTCHA_SITEKEY = os.environ.get("GOOGLE_RECAPTCHA_SITEKEY")
     GOOGLE_RECAPTCHA_SECRET = os.environ.get("GOOGLE_RECAPTCHA_SECRET")
 
+    BAR_USERS_PER_PAGE = int(os.environ.get("BAR_USERS_PER_PAGE"))
+    BAR_ITEMS_PER_PAGE = int(os.environ.get("BAR_ITEMS_PER_PAGE"))
+
     SAML_IDP_METADATA_URL = get_or_die("SAML_IDP_METADATA_URL")
     SAML_IDP_METADATA_FALLBACK_URL = os.environ.get("SAML_IDP_METADATA_FALLBACK_URL")
     SAML_CERTIFICATE_PRIVATE_KEY_FILE = os.environ.get("SAML_CERTIFICATE_PRIVATE_KEY_FILE")
@@ -82,15 +85,3 @@ class Config:
         NETLOCS = NETLOCS.split(";")
 
     MAINTENANCE = bool(os.environ.get("MAINTENANCE"))
-
-    PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
-
-    USERS_PER_PAGE = int(os.environ.get("USERS_PER_PAGE"))
-    ITEMS_PER_PAGE = int(os.environ.get("ITEMS_PER_PAGE"))
-
-    # Default values for global settings
-    MAX_DAILY_ALCOHOLIC_DRINKS_PER_USER = int(os.environ.get("MAX_DAILY_ALCOHOLIC_DRINKS_PER_USER"))
-    QUICK_ACCESS_ITEM_ID = int(os.environ.get("QUICK_ACCESS_ITEM_ID"))
-
-    ENV = "production"
-    DEBUG = False
