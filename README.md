@@ -10,7 +10,7 @@ Rien pour l'instant
 Seules les fonctionnalités majeures sont listées ici ; voir
 [`CHANGELOG.md`](CHANGELOG.md) pour les détails.
 
-### 2.1
+### 2.2
 
 * Intégration du site du Bar (anciennement sur 
   https://bar.pc-est-magique.fr, https://github.com/GRI-ESPCI/espci-bar-web-app) 
