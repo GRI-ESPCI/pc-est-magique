@@ -119,7 +119,7 @@ def get_avatar_token_args():
         flask.flash(_("IP non détectable, impossible d'afficher les avatars"), "danger")
     # Access OK
 
-    return get_nginx_access_token("%bar_avatars%", ip) if ip else None
+    return get_nginx_access_token("/bar_avatars", ip) if ip else None
 
 
 def get_export_data(start: datetime.date, end: datetime.date) -> str:
@@ -178,7 +178,7 @@ def save_bar_avatar(pceen: PCeen, data: typing.BinaryIO) -> None:
             "center",  # Refer to image center,
             "-extent",
             "160x200",  # Then crop overflow
-            f"{filepath}.jpeg",
+            f"{filepath}.jpg",
         ],
         capture_output=True,
         check=True,

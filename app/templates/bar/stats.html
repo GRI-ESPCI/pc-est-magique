@@ -61,7 +61,7 @@
                     </svg>
                 </div>
                 <div class="col">
-                    <h5 class="card-title mt-0">{{ babel.format_currency(daily_revenue, "EUR") }}</h5>
+                    <h5 class="card-title mt-0">{{ babel.format_currency(daily_revenue or 0, "EUR") }}</h5>
                     <h6 class="card-subtitle">{{ _("Recette totale") }} {{ date_descr }}</h6>
                 </div>
             </div></div>
