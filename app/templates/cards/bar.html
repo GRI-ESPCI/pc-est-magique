@@ -12,7 +12,7 @@
 {% block card_table %}
 <tr>
     <th scope="row" class="ps-4 text-nowrap">{{ _("Mon solde") }}</th>
-    <td>{{ babel.format_currency(pceen.bar_balance, "EUR") }}</td>
+    <td>{{ babel.format_currency(pceen.bar_balance or 0, "EUR") }}</td>
 </tr>
 <tr>
     <th scope="row" class="ps-4">{{ _("Limite d'alcool") }}</th>

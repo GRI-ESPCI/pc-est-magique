@@ -29,7 +29,7 @@ def month_year_iter(start_month, start_year, end_month, end_year):
 def _pceen_can_buy_anything(pceen: PCeen, flash: bool) -> bool:
     if not pceen.bar_deposit:
         if flash:
-            flask.flash(_("%(pceen)s hasn't given a deposit.", pceen=pceen.full_name), "danger")
+            flask.flash(_("%(pceen)s n'a pas fourni de caution.", pceen=pceen.full_name), "danger")
         return False
 
     return True
@@ -40,7 +40,7 @@ def _pceen_can_buy_alcohol(pceen: PCeen, flash: bool) -> bool:
         if flash:
             flask.flash(
                 _(
-                    "%(pceen)s has reached the limit of %(limit)s drinks per night.",
+                    "%(pceen)s a atteint la limite de %(limit)s boissons alcoolisées par jour.",
                     pceen=pceen.full_name,
                     limit=Settings.max_daily_alcoholic_drinks_per_user,
                 ),
@@ -54,7 +54,7 @@ def _pceen_can_buy_alcohol(pceen: PCeen, flash: bool) -> bool:
 def _item_can_be_bought(item: BarItem, flash: bool) -> bool:
     if item.is_quantifiable and item.quantity <= 0:
         if flash:
-            flask.flash(_("No %(item)s left.", item=item.name), "danger")
+            flask.flash(_("Article %(item)s épuisé.", item=item.name), "danger")
         return False
 
     return True
@@ -70,7 +70,7 @@ def can_buy(pceen: PCeen, item: BarItem | None, flash: bool = False) -> str | bo
     if pceen.bar_balance < item.price:
         if flash:
             flask.flash(
-                _("%(pceen)s doesn't have enough funds to buy %(item)s.", pceen=pceen.full_name, item=item.name),
+                _("%(pceen)s n'a pas assez d'argent pour acheter %(item)s.", pceen=pceen.full_name, item=item.name),
                 "danger",
             )
         return False

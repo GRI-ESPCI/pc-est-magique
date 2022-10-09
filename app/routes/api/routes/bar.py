@@ -56,7 +56,7 @@ def revert_transaction(transaction_id: str):
     if client.bar_balance < transaction.balance_change:
         flask.abort(
             422,
-            _("%(pceen)s's balance would be negative if this transaction were reverted.", pceen=client.full_name),
+            f"{client.full_name}'s balance would be negative if this transaction were reverted.",
         )
 
     transaction.revert(reverter=context.g.pceen)

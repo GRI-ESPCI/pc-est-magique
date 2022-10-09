@@ -1,10 +1,10 @@
 @import "../bower_components/bootstrap/scss/functions";
 
 // Écraser les variables bootstrap ici
-$primary:   #64b9e9;        // PC2 (bleu clair)
-$secondary: #152f4e;        // PC1 (bleu foncé)
+$primary: #64b9e9; // PC2 (bleu clair)
+$secondary: #152f4e; // PC1 (bleu foncé)
 // $warning:   #ff585d;        // PC4 (pêche)
-$danger:    #e40046;        // PC3 (framboise)
+$danger: #e40046; // PC3 (framboise)
 // $info:      #d5c0a9;        // PC5 (panais)
 
 // Add PC colors
@@ -13,7 +13,7 @@ $custom-colors: (
   "pc2": #64b9e9,
   "pc3": #e40046,
   "pc4": #ff585d,
-  "pc5": #d5c0a9
+  "pc5": #d5c0a9,
 );
 
 @import "../bower_components/bootstrap/scss/variables";
@@ -22,6 +22,7 @@ $custom-colors: (
 $theme-colors: map-merge($theme-colors, $custom-colors);
 $utilities-bg-colors: $theme-colors;
 
+@import "../bower_components/bootstrap/scss/maps";
 @import "../bower_components/bootstrap/scss/mixins";
 @import "../bower_components/bootstrap/scss/utilities";
 
@@ -29,17 +30,13 @@ $utilities-bg-colors: $theme-colors;
 $utilities: map-merge(
   $utilities,
   (
-    "color": map-merge(
-      map-get($utilities, "color"),
-      (
-        values: map-merge(
-          map-get(map-get($utilities, "color"), "values"),
-          (
-            $theme-colors
-          ),
-        ),
+    "color":
+      map-merge(
+        map-get($utilities, "color"),
+        (
+          values: map-merge(map-get(map-get($utilities, "color"), "values"), ($theme-colors)),
+        )
       ),
-    ),
   )
 );
 

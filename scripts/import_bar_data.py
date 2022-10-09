@@ -243,5 +243,9 @@ class Importer:
 
 @loggers.log_exception(reraise=True)
 def main():
+    if input("Really run this script? IT SHOULD ONLY BE RUN ONCE. (yes/no) > ").lower() != "yes":
+        print("Mission aborted")
+        return
+
     Importer().run()
     print("Import succeed!")

@@ -78,7 +78,7 @@
                     </svg>
                 </div>
                 <div class="col">
-                    <h5 class="card-title mt-0">{{ babel.format_currency(total_balances_sum, "EUR") }}</h5>
+                    <h5 class="card-title mt-0">{{ babel.format_currency(total_balances_sum or 0, "EUR") }}</h5>
                     <h6 class="card-subtitle">{{ _("Moula totale des clients") }}</h6>
                 </div>
             </div></div>

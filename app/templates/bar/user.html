@@ -82,7 +82,7 @@
                         onclick="confirm('{{ _("Accepter la caution de %(name)s ?", name=pceen.full_name) }}')
                                  && post_and_reload('{{ url_for("api.bar.post_deposit", pceen_id=pceen.id) }}');"
                         >
-                    {{ _("Caution") }}
+                    {{ _("Valider le dépôt de caution") }}
                 </button>
             </div>
             {% endif %}

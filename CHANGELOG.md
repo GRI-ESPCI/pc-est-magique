@@ -39,7 +39,8 @@ _This project had no versioning and no changelog._
   * Moved role-granting utilities to new module ``app.utils.roles``;
   * Moved Nginx token handling to new module ``app.utils.nginx``;
   * Moved roles / permissions add / remove utilities to ``api.gris`` sub-blueprint;
-  * Moved main navbar and footer to specific templates ``main/navbar.html``/``main/footer.html``.
+  * Moved main navbar and footer to specific templates ``main/navbar.html``/``main/footer.html``;
+  * Bumped to Bootstrap 5.0.
 
 ### Fixed
 

@@ -76,6 +76,9 @@ update:
 	@echo "Compressing static files..."
 	find app/static -name "*.gz" -type f -delete
 	gzip -krf app/static
+	@echo "Running update scripts..."
+	env/bin/flask script update_offers
+	env/bin/flask script update_roles
 	@echo "Starting application..."
 	sudo supervisorctl start pc-est-magique
 	@echo "Update live!"

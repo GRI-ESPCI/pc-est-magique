@@ -60,7 +60,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
             ],
         ),
         "Rezident": dict(  # NE PAS RENOMMER - nom utilisé dans app/utils/roles.py
-            index=10,
+            index=20,
             color="d5c0a9",
             permissions=[
                 perms["access_intrarez"],
@@ -82,10 +82,24 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
             ],
         ),
         "Barman": dict(  # NE PAS RENOMMER - nom utilisé dans app/utils/roles.py
-            index=20,
+            index=15,
             color="000000",
             permissions=[
                 perms["manage_bar"],
+                perms["access_bar_stats"],
+            ],
+        ),
+        "Client Bar": dict(
+            index=15,
+            color="000000",
+            permissions=[
+                perms["access_bar"],
+            ],
+        ),
+        "Observateur Bar": dict(
+            index=15,
+            color="000000",
+            permissions=[
                 perms["access_bar_stats"],
             ],
         ),
