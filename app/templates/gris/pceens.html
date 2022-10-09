@@ -344,7 +344,7 @@
                 </button>
             </td>
             <td><a href="{{ url_for('bar.user', username=pceen.username) }}" class="text-secondary">
-                    {{ babel.format_currency(pceen.bar_balance, "EUR") }}
+                    {{ babel.format_currency(pceen.bar_balance or 0, "EUR") }}
                 </a>
             </td>
             {% endif %}
