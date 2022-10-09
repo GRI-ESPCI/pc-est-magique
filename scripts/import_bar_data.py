@@ -122,7 +122,6 @@ class Importer:
             pceen.bar_deposit = bar_user.deposit
             if not pceen._password_hash:
                 pceen._password_hash = bar_user.password_hash
-            pceen.activated = False
 
             if pceen.promo and pceen.promo > 136:
                 self._grant_role(self.student_role, pceen)
