@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2022-10-09 03:54+0200\n"
-"PO-Revision-Date: 2022-10-09 19:02+0100\n"
+"POT-Creation-Date: 2022-10-15 00:15+0200\n"
+"PO-Revision-Date: 2022-10-15 01:02+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -82,7 +82,7 @@ msgstr "Remember me"
 #: app/templates/auth/register_rezident.html:41
 #: app/templates/auth/reset_password.html:29
 #: app/templates/auth/reset_password_request.html:26
-#: app/templates/navbar.html:24
+#: app/templates/bar/welcome.html:48 app/templates/navbar.html:24
 msgid "Connexion"
 msgstr "Sign in"
 
@@ -281,60 +281,81 @@ msgstr "Search – Bar"
 msgid "Le surnom de %(name)s a bien été modifié"
 msgstr "%(name)s's nickname has been modified"
 
-#: app/routes/bar/routes.py:212
+#: app/routes/bar/routes.py:213
 #, python-format
 msgid "%(name)s n'est maintenant plus barman / barmaid"
 msgstr "%(name)s is no longer barman / barmaid"
 
-#: app/routes/bar/routes.py:216
+#: app/routes/bar/routes.py:218
 #, python-format
 msgid "%(name)s est maintenant barmaid / barmaid"
 msgstr "%(name)s is now barman / barmaid"
 
-#: app/routes/bar/routes.py:222
+#: app/routes/bar/routes.py:224
 #, python-format
 msgid "Erreur lors de la transformation de la photo : %(exc)s"
 msgstr "Error during picture transformation: %(exc)s"
 
-#: app/routes/bar/routes.py:224
+#: app/routes/bar/routes.py:226
 #, python-format
 msgid "L'avatar de %(name)s a bien été modifié"
 msgstr "%(name)s's avatar has been modified"
 
-#: app/routes/bar/routes.py:243
+#: app/routes/bar/routes.py:245
 #, python-format
 msgid "%(name)s – Profil Bar"
 msgstr "%(name)s – Bar Profile"
 
-#: app/routes/bar/routes.py:268
+#: app/routes/bar/routes.py:270
 msgid "Transactions – Bar"
 msgstr "Transactions – Bar"
 
-#: app/routes/bar/routes.py:290
+#: app/routes/bar/routes.py:292
 #, python-format
 msgid "Article %(item)s modifié."
 msgstr "Item %(item)s edited."
 
-#: app/routes/bar/routes.py:302
+#: app/routes/bar/routes.py:304
 #, python-format
 msgid "Article %(item)s créé."
 msgstr "Item %(item)s created."
 
-#: app/routes/bar/routes.py:327
+#: app/routes/bar/routes.py:329
 msgid "Articles – Bar"
 msgstr "Items – Bar"
 
-#: app/routes/bar/routes.py:382
+#: app/routes/bar/routes.py:384
 msgid "Export de données – Bar"
 msgstr "Data export – Bar"
 
-#: app/routes/bar/routes.py:403
+#: app/routes/bar/routes.py:405
 msgid "Paramètres mis à jour."
 msgstr "Settings updated."
 
-#: app/routes/bar/routes.py:407
+#: app/routes/bar/routes.py:409
 msgid "Paramètres – Bar"
 msgstr "Settings – Bar"
+
+#: app/routes/bar/routes.py:421
+msgid ""
+"Bonjour, camarade ! Ton compte du Bar a été migré dans ton compte PC est "
+"magique. Profite bien !"
+msgstr ""
+"Hello, comrade! Your Bar account has been migrated into your PC est "
+"magique account. Enjoy!"
+
+#: app/routes/bar/routes.py:427
+msgid ""
+"Les comptes du Bar ont été migrés dans PC est magique. En revanche, pas "
+"de trace du tien... Pas de panique, il n'est pas perdu ! Contacte "
+"simplement un GRI."
+msgstr ""
+"Bar accounts have been migrated into PC est magique. However, no trace of"
+" yours... No need to panic, it is not lost! Simply contact a GRI."
+
+#: app/routes/bar/routes.py:435
+msgid "Migration du site du Bar"
+msgstr "Bar site migration"
 
 #: app/routes/bar/utils.py:32
 #, python-format
@@ -1473,6 +1494,70 @@ msgstr "Top up %(name)s's account"
 #: app/templates/bar/user.html:302
 msgid "Montant en euros"
 msgstr "Amount in euros"
+
+#: app/templates/bar/welcome.html:17
+msgid "Le site du Bar fait maintenant partie intégrante de PC est magique !"
+msgstr "Bar site is now an integral part of PC est magique!"
+
+#: app/templates/bar/welcome.html:19
+msgid "Pas de panique, rien ne change."
+msgstr "Don't panic, nothing changes."
+
+#: app/templates/bar/welcome.html:22
+msgid "Amis barmen, il y a même quelques nouvelles fonctionnalités au passage !"
+msgstr "Barmen friends, the're even some new features by the way!"
+
+#: app/templates/bar/welcome.html:34
+msgid "J'ai déjà un compte PC est magique / IntraRez"
+msgstr "I already have a PC est magique / IntraRez account"
+
+#: app/templates/bar/welcome.html:44
+msgid ""
+"Si tout va bien, tes données Bar ont été automatiquement importées dans "
+"ton compte !"
+msgstr ""
+"If everything went good, your Bar data have automatically been imported "
+"into your account!"
+
+#: app/templates/bar/welcome.html:60
+msgid "J'avais un compte du Bar uniquement, avec mon adresse ESPCI"
+msgstr "I only had a Bar account, with my ESPCI address"
+
+#: app/templates/bar/welcome.html:70
+msgid ""
+"Ton compte a été importé automatiquement ! Tu peux t'y connecter "
+"directement grâce à ton compte ESPCI (aucun partage de données)"
+msgstr ""
+"Your account has been automatically imported! You can connect directly "
+"through your ESPCI account (no data shared)"
+
+#: app/templates/bar/welcome.html:75
+msgid "Connexion<br/>ESPCI"
+msgstr "ESPCI<br/>login"
+
+#: app/templates/bar/welcome.html:87
+msgid "J'avais un compte du Bar uniquement"
+msgstr "I only had a Bar account"
+
+#: app/templates/bar/welcome.html:97
+msgid ""
+"Ton compte a été importé automatiquement, avec les mêmes identifiant et "
+"mot de passe !"
+msgstr ""
+"Your account has been automatically imported, with same login and "
+"password!"
+
+#: app/templates/bar/welcome.html:101
+msgid "Connexion<br/>manuelle"
+msgstr "Manual<br/>login"
+
+#: app/templates/bar/welcome.html:121
+msgid "En cas de pépin, n'hésite pas à"
+msgstr "If any problem, do not hesitate to "
+
+#: app/templates/bar/welcome.html:122
+msgid "contacter les GRI"
+msgstr "contact GRI"
 
 #: app/templates/cards/account.html:5 app/templates/devices/register.html:10
 #: app/templates/devices/transfer.html:10

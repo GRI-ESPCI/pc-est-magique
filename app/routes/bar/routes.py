@@ -410,3 +410,26 @@ def settings():
         form=form,
         max_daily_alcoholic_drink_per_user=max_daily_alcoholic_drink_per_user,
     )
+
+
+@bp.route("/welcome")
+def welcome():
+    """Render the (one-shot) welcome page."""
+    if context.g.logged_in:
+        if context.has_permission(PermissionType.read, PermissionScope.bar):
+            flask.flash(
+                _("Bonjour, camarade ! Ton compte du Bar a été migré dans ton compte PC est magique. Profite bien !"),
+                "success",
+            )
+            return helpers.ensure_safe_redirect("bar.main")
+
+        flask.flash(
+            _(
+                "Les comptes du Bar ont été migrés dans PC est magique. En revanche, pas de trace du tien... "
+                "Pas de panique, il n'est pas perdu ! Contacte simplement un GRI."
+            ),
+            "danger",
+        )
+        return helpers.ensure_safe_redirect("main.index")
+
+    return flask.render_template("bar/welcome.html", title=_("Migration du site du Bar"))
