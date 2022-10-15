@@ -4,7 +4,7 @@ See github.com/GRI-ESPCI/pc-est-magique for informations.
 """
 
 __title__ = "pc-est-magique"
-__author__ = "Loïc Simon, Louis Grandvaux & other GRIs"
+__author__ = "Loïc Simon, Samuel Diebolt, Louis Grandvaux & other GRIs"
 __license__ = "MIT"
 __copyright__ = "2021-2022 GRIs – ESPCI Paris - PSL"
 __all__ = ["create_app"]
@@ -85,11 +85,14 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.jinja_env.globals["__version__"] = __version__
     app.jinja_env.globals["copyright"] = in_app_copyright
     app.jinja_env.globals["babel"] = flask_babel
+    app.jinja_env.globals["Settings"] = global_settings.Settings
 
     # Register blueprints
     # ! Keep imports here to avoid circular import issues !
     from app.routes import (
+        api,
         auth,
+        bar,
         devices,
         errors,
         gris,
@@ -104,6 +107,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.register_blueprint(errors.bp)
     app.register_blueprint(main.bp)
     app.register_blueprint(auth.bp)
+    app.register_blueprint(api.bp, url_prefix="/api")
     app.register_blueprint(saml.bp, url_prefix="/saml")
     app.register_blueprint(devices.bp, url_prefix="/devices")
     app.register_blueprint(rooms.bp, url_prefix="/rooms")
@@ -111,6 +115,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.register_blueprint(photos.bp, url_prefix="/photos")
     app.register_blueprint(payments.bp, url_prefix="/payments")
     app.register_blueprint(profile.bp, url_prefix="/profile")
+    app.register_blueprint(bar.bp, url_prefix="/bar")
 
     # Configure logging
     loggers.configure_logging(app)
@@ -180,6 +185,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
 # Import application models
 # ! Keep at the bottom to avoid circular import issues !
 from app import models
+from app.utils import global_settings
 
 
 # Set up locale

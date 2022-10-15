@@ -5,6 +5,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+# v2.2.0 (2022-10-15)
+
+Fusion of the ESPCI Bar site (https://github.com/GRI-ESPCI/espci-bar-web-app) into this project.
+
+_This project had no versioning and no changelog._
+
+### Added
+
+  * New Bar module:
+    * Tables ``BarItem``, ``BarTransaction``, ``BarDailyData`` and enum ``BarTransactionType``;
+    * Columns ``PCeen.bar_nickname``, ``PCeen.bar_deposit`` and ``PCeen.bar_balance``;
+    * Blueprint ``bar`` with 9 new routes;
+    * Corresponding templates;
+    * Main page info card;
+    * Nginx location ``/bar_avatars`` to securely serve users avatars (stored in photos directory);
+    * New roles and permissions creation in script ``update_roles.py``:
+    * One-shot script ``import_bar_data`` to import current Bar data in new tables.
+  * New generic API system:
+    * Blueprint ``api``;
+    * Sub-blueprint ``api.bar`` with 6 new routes;
+    * New ``js/api.js`` functions.
+  * New "global settings" system:
+    * Table ``GlobalSetting``;
+    * ``app.utils.global_settings`` module;
+    * New Babel global variable ``Settings``;
+  * Split PCéens management page into 4 different views;  
+  * New column ``PCeen.activated`` denoting accounts that logged in at least once (not created automatically);
+  * New permissions routes context manager ``context.any_permission_only``. 
+
+### Changed
+
+  * Moved role-granting utilities to new module ``app.utils.roles``;
+  * Moved Nginx token handling to new module ``app.utils.nginx``;
+  * Moved roles / permissions add / remove utilities to ``api.gris`` sub-blueprint;
+  * Moved main navbar and footer to specific templates ``main/navbar.html``/``main/footer.html``;
+  * Bumped to Bootstrap 5.0.
+
+### Fixed
+
+  * SAML identity provider fallback mechanism did not worked.
+
+
 # v2.1.3 (2022-09-17)
 
 ### Changed

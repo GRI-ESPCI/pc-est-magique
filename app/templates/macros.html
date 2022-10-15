@@ -66,9 +66,10 @@
     Args:
         elem (int): The element counted.
         name (str): The name that refers it.
+        include_elem (bool): Print the item name.
 
     Output "{elem} {name}" if elem == 1, else "{elem} {name}s".
 -->
-{% macro s(elem, name) %}
-    {{ elem }} {{ name }}{% if elem != 1 %}s{% endif %}
+{% macro s(elem, name, include_elem=True) %}
+{% if include_elem %}{{ elem }} {% endif %}{{ name }}{% if elem != 1 %}s{% endif %}
 {% endmacro %}

@@ -30,7 +30,7 @@ def get_or_die(name: str) -> str:
 class Config:
     """PC est magique Flask Web App Configuration."""
 
-    SECRET_KEY = os.environ.get("SECRET_KEY")
+    SECRET_KEY = get_or_die("SECRET_KEY")
 
     LANGUAGES = ["fr", "en"]
 
@@ -46,6 +46,7 @@ class Config:
     MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS") is not None
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
+    MAIL_SUPPRESS_SEND = os.environ.get("MAIL_SUPPRESS_SEND")
     ADMINS = os.environ.get("ADMINS", "").split(";")
 
     ERROR_WEBHOOK = os.environ.get("ERROR_WEBHOOK")
@@ -65,6 +66,9 @@ class Config:
 
     GOOGLE_RECAPTCHA_SITEKEY = os.environ.get("GOOGLE_RECAPTCHA_SITEKEY")
     GOOGLE_RECAPTCHA_SECRET = os.environ.get("GOOGLE_RECAPTCHA_SECRET")
+
+    BAR_USERS_PER_PAGE = int(os.environ.get("BAR_USERS_PER_PAGE"))
+    BAR_ITEMS_PER_PAGE = int(os.environ.get("BAR_ITEMS_PER_PAGE"))
 
     SAML_IDP_METADATA_URL = get_or_die("SAML_IDP_METADATA_URL")
     SAML_IDP_METADATA_FALLBACK_URL = os.environ.get("SAML_IDP_METADATA_FALLBACK_URL")

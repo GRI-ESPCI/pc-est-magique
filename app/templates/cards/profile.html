@@ -11,15 +11,15 @@
 
 {% block card_table %}
 <tr>
-    <th scope="row" class="ps-4">{{ _("Mon compte") }}</th>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("Mon compte") }}</th>
     <td>{{ pceen.username }}</td>
 </tr>
 <tr>
-    <th scope="row" class="ps-4">{{ _("Ma chambre") }}</th>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("Ma chambre") }}</th>
     <td>{{ pceen.current_room.num if pceen.current_room else "N/A" }}</td>
 </tr>
 <tr>
-    <th scope="row" class="ps-4">{{ _("Mes rôles") }}</th>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("Mes rôles") }}</th>
     <td>{{ pceen.roles | join(", ") }}</td>
 </tr>
 {% endblock %}

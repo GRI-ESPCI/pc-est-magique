@@ -1,0 +1,98 @@
+{% extends "bar/base.html" %}
+
+{% block bar_app_content %}
+
+<div class="container">
+    <div class="row">
+        <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="User sorting">
+            <div class="btn-group" role="group" aria-label="Alphabet sorting">
+                <a class="btn btn-outline-primary{% if sort == "name" and way == "asc" %} active{% endif %}"
+                   href="{{ url_for("bar.search", q=query, sort="name", way="asc") }}" role="button">
+                    <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                        {{ macros.bootstrap_icon("sort-alpha-down") }}
+                    </svg>
+                </a>
+                <a class="btn btn-outline-primary{% if sort == "name" and way == "desc" %} active{% endif %}"
+                   href="{{ url_for("bar.search", q=query, sort="name", way="desc") }}" role="button">
+                    <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                        {{ macros.bootstrap_icon("sort-alpha-up") }}
+                    </svg>
+                </a>
+                <a class="btn btn-outline-primary{% if sort == "promo" and way == "asc" %} active{% endif %}"
+                   href="{{ url_for("bar.search", q=query, sort="promo", way="asc") }}" role="button">
+                    <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                        {{ macros.bootstrap_icon("sort-numeric-down") }}
+                    </svg>
+                </a>
+                <a class="btn btn-outline-primary{% if sort == "promo" and way == "desc" %} active{% endif %}"
+                   href="{{ url_for("bar.search", q=query, sort="promo", way="desc") }}" role="button">
+                    <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                        {{ macros.bootstrap_icon("sort-numeric-up") }}
+                    </svg>
+                </a>
+            </div>
+            <div class="my-auto d-none d-sm-inline"><h1 class="fs-3 mb-0 mt-auto">{{ _("Recherche") }}</h1></div>
+            <div class="btn-group" role="group" aria-label="Results">
+                <button type="button" class="btn btn-primary pe-none">
+                    {{ _("Résultats :") }}
+                    <span class="badge bg-secondary badge-light">{{ paginator.total }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        {% for pceen in paginator.items %}
+        <div class="col-xl-2 col-md-3 col-sm-4 col-6">
+            <div class="card mx-auto mb-4 shadow text-secondary border-secondary"
+                style="width: 160px;">
+                <a href="{{ url_for("bar.user", username=pceen.username) }}">
+                    <img class="card-img-top img-fluid" {% include "bar/_avatar_args.html" %} alt="{{ pceen.username }}">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title user-card-title">
+                        {{ pceen.prenom }} {{ pceen.nom }} {{ pceen.promo or _("(exté)") }}
+                    </h5>
+                </div>
+                <!-- <div class="card-footer">
+                    {% if pceen.bar_deposit %}
+                    <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Pay and quick access item">
+                    <div class="btn-group" role="group" aria-label="Pay">
+                        PAY
+                    </div>
+                        <div class="btn-group" role="group" aria-label="Quick access item">
+                        QAI
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Deposit">
+                        <div class="btn-group" role="group" aria-label="Deposit">
+                        DEP
+                        </div>
+                    </div>
+                    {% endif %}
+                </div> -->
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+    {% for page in paginator.iter_pages() %}
+        <li class="page-item{% if page == paginator.page %} active{% endif %}{%if not page %} disabled{% endif %}">
+            <a class="page-link" href="{{ url_for("bar.search", q=query, page=page, sort=sort, way=way) }}">
+                {% if page %}{{ page }}{% else %}<span class=ellipsis>…</span>{% endif %}
+            </a>
+        </li>
+    {% endfor %}
+    </ul>
+</nav>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+{% endblock %}

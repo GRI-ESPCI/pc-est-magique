@@ -1,0 +1,77 @@
+
+<nav class="navbar navbar-expand-md navbar-light mb-4 py-0 bg-secondary border border-secondary border-2 rounded-pill
+            text-center position-relative">
+<div class="container-fluid my-0">
+
+    <div class="col col-auto py-2 pe-2 ps-1 text-light">{{ _("Menu Bar") }}</div>
+
+    <div class="col bg-primary rounded-2 p-1">
+        <div class="container">
+        <div class="row">
+            <div class="col my-auto px-1">
+                <form action="{{ url_for("bar.search") }}" method="get" class="d-flex">
+                    <input type="text" name="q" class="form-control form-control-sm"
+                           placeholder="{{ _("Rechercher un utilisateur") }}">
+                    <input type="submit" class="btn btn-sm btn-secondary ms-1" value="{{ _("Go") }}">
+                </form>
+            </div>
+
+            <div class="col-auto px-1">
+                <button class="navbar-toggler btn btn-sm ms-auto" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#bar_navbar_content" aria-controls="bar_navbar_content"
+                        aria-expanded="false" aria-label="Toggle Bar navigation">
+                    <span class="navbar-toggler-icon p-0 m-0"></span>
+                </button>
+                <div class="collapse navbar navbar-collapse py-1" id="bar_navbar_content">
+                    <ul class="navbar-nav flex-row flex-wrap justify-content-end">
+                        <li class="nav-item">
+                            <a class="btn btn-sm btn-outline-secondary mx-1" href="{{ url_for("bar.stats") }}">
+                                {{ _("Stats") }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-sm btn-outline-secondary mx-1" href="{{ url_for("bar.items") }}">
+                                {{ _("Articles") }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-sm btn-outline-secondary mx-1" href="{{ url_for("bar.transactions") }}">
+                                {{ _("Transactions") }}
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <button type="button" class="btn btn-sm mx-1 btn-outline-secondary dropdown-toggle"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ _("Outils") }}
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="m_gri">
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for("bar.export") }}">
+                                        {{ _("Exports") }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for("bar.settings") }}">
+                                        {{ _("Paramètres") }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <div class="col col-auto ps-2">
+        <a class="btn btn-sm btn-outline-secondary text-light p-0 m-0"
+           href="{{ url_for("bar.user", username=g.pceen.username) }}">
+            <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                {{ macros.bootstrap_icon("person-circle") }}
+            </svg>
+        </a>
+    </div>
+
+</div>
+</nav>

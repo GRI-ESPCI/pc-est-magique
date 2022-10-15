@@ -1,0 +1,141 @@
+{% extends "bar/base.html" %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" defer></script>
+<script src="{{ url_for("static", filename="js/bar/stats.js") }}" defer></script>
+{% endblock %}
+
+{% block bar_app_content %}
+<div hidden id="data-storage"
+    data-days-labels="{{ days_labels }}"
+    data-clients-this-month="{{ clients_this_month }}"
+    data-clients-alcohol-this-month="{{ clients_alcohol_this_month }}"
+    data-revenues-this-month="{{ revenues_this_month }}"
+></div>
+
+{% with date_descr = _("aujourd’hui") if is_today else _("le ") + babel.format_date(date, "short") %}
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 mt-3">
+    <div class="col mb-3">
+        <div class="card shadow bg-info">
+        <div class="card-body">
+            <div class="container px-1"><div class="row">
+                <div class="col col-auto">
+                    <svg class="bi flex-shrink-0" width="48" height="48" role="img">
+                        {{ macros.bootstrap_icon("people-fill") }}
+                    </svg>
+                </div>
+                <div class="col">
+                    <h5 class="card-title mt-0">{{ nb_daily_clients }}</h5>
+                    <h6 class="card-subtitle">{{ macros.s(nb_daily_clients, "Client", False) }} {{ date_descr }}</h6>
+                </div>
+            </div></div>
+        </div>
+        </div>
+    </div>
+    <div class="col mb-3">
+        <div class="card shadow bg-info">
+        <div class="card-body">
+            <div class="container px-1"><div class="row">
+                <div class="col col-auto">
+                    <svg class="bi flex-shrink-0" width="48" height="48" role="img">
+                        {{ macros.bootstrap_icon("cup-fill") }}
+                    </svg>
+                </div>
+                <div class="col">
+                    <h5 class="card-title mt-0">{{ babel.format_decimal(alcohol_qty / 4) }}&nbsp;L</h5>
+                    <h6 class="card-subtitle">{{ _("Alcool vendu") }} {{ date_descr }}</h6>
+                </div>
+            </div></div>
+        </div>
+        </div>
+    </div>
+    <div class="col mb-3">
+        <div class="card shadow bg-info">
+        <div class="card-body">
+            <div class="container px-1"><div class="row">
+                <div class="col col-auto">
+                    <svg class="bi flex-shrink-0" width="48" height="48" role="img">
+                        {{ macros.bootstrap_icon("cash-stack") }}
+                    </svg>
+                </div>
+                <div class="col">
+                    <h5 class="card-title mt-0">{{ babel.format_currency(daily_revenue or 0, "EUR") }}</h5>
+                    <h6 class="card-subtitle">{{ _("Recette totale") }} {{ date_descr }}</h6>
+                </div>
+            </div></div>
+        </div>
+        </div>
+    </div>
+    <div class="col mb-3">
+        <div class="card shadow bg-info">
+        <div class="card-body">
+            <div class="container px-1"><div class="row">
+                <div class="col col-auto">
+                    <svg class="bi flex-shrink-0" width="48" height="48" role="img">
+                        {{ macros.bootstrap_icon("bank2") }}
+                    </svg>
+                </div>
+                <div class="col">
+                    <h5 class="card-title mt-0">{{ babel.format_currency(total_balances_sum or 0, "EUR") }}</h5>
+                    <h6 class="card-subtitle">{{ _("Moula totale des clients") }}</h6>
+                </div>
+            </div></div>
+        </div>
+        </div>
+    </div>
+    <div class="col mb-3">
+        <div class="card shadow bg-info">
+        <div class="card-body">
+            <div class="container px-1"><div class="row">
+                <div class="col col-auto">
+                    <svg class="bi flex-shrink-0" width="48" height="48" role="img">
+                        {{ macros.bootstrap_icon("star-fill") }}
+                    </svg>
+                </div>
+                <div class="col">
+                    <h5 class="card-title mt-0">{{ best_customer_name }}</h5>
+                    <h6 class="card-subtitle">{{ _("Meilleur client du mois") }}</h6>
+                </div>
+            </div></div>
+        </div>
+        </div>
+    </div>
+    <div class="col mb-3">
+        <div class="card shadow border border-info">
+        <div class="card-body">
+            <form action="" method="get">
+            <div class="container px-1"><div class="row">
+                <div class="col col-auto">
+                    <svg class="bi flex-shrink-0" width="48" height="48" role="img">
+                        {{ macros.bootstrap_icon("calendar-event-fill") }}
+                    </svg>
+                </div>
+                <div class="col my-auto d-flex">
+                    <!-- <label class="form-label my-auto" for="date">{{ _("Date&nbsp;:") }}</label> -->
+                    <input class="form-control me-2" type="date" id="date" name="date" value="{{ date.isoformat() }}">
+                    <button type="submit" class="btn btn-info">{{ _("Go") }}</button>
+                </div>
+            </div></div>
+            </form>
+        </div>
+        </div>
+    </div>
+</div>
+
+{% endwith %}
+
+<div class="card border-info mb-3">
+    <div class="card-body">
+        <canvas id="revenues-chart" width="600" height="400" aria-label="revenues-chart" role="img"></canvas>
+    </div>
+</div>
+
+<div class="card border-info">
+    <div class="card-body">
+        <canvas id="transactions-chart" width="600" height="400" aria-label="transactions-chart" role="img"></canvas>
+    </div>
+</div>
+
+{% endblock %}

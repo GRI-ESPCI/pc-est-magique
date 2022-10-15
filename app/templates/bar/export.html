@@ -1,0 +1,54 @@
+{% extends "bar/base.html" %}
+{% import "_form.html" as wtf %}
+
+{% block bar_app_content %}
+<div class="container my-1">
+    <div class="btn-toolbar justify-content-center" role="toolbar">
+        <div class="my-auto d-none d-md-inline"><h1 class="fs-3 mb-0 mt-auto">{{ _("Exporter les données") }}</h1></div>
+    </div>
+</div>
+
+<div class="table-responsive mt-4">
+    <table class="table table-striped table-bordered align-middle bar-table">
+        <thead>
+            <tr>
+                <th>{{ _("Début") }}</th>
+                <th>{{ _("Fin") }}</th>
+                <th>{{ _("Fichier") }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for week in weeks %}
+            <form action="" method="POST">
+                {{ form.hidden_tag() }}
+                <tr>
+                    <td class="align-middle text-nowrap">
+                        <input type="hidden" name="start" value="{{ week.start.isoformat() }}">
+                        {{ babel.format_date(week.start, "short") }}
+                    </td>
+                    <td class="align-middle text-nowrap">
+                        <input type="hidden" name="end" value="{{ week.end.isoformat() }}">
+                        {{ babel.format_date(week.end, "short") }}
+                    </td>
+                    <td class="align-middle text-nowrap">
+                        <input type="hidden" name="filename" value="{{ week.filename }}">
+                        <button type="submit" class="btn btn-link text-secondary">{{ week.filename }}</button>
+                    </td>
+                </tr>
+            </form>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <form action="" method="POST">
+                {{ form.hidden_tag() }}
+                <tr>
+                    <th>{{ wtf.form_field(form.start, type="date") }}</th>
+                    <th>{{ wtf.form_field(form.end, type="date") }}</th>
+                    <th><button type="submit" class="btn btn-primary">{{ _("Télécharger") }}</button></th>
+                </tr>
+            </form>
+        </tfoot>
+    </table>
+</div>
+
+{% endblock %}

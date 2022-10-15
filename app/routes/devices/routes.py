@@ -4,7 +4,6 @@ import datetime
 import random
 
 import flask
-from flask import g
 from flask_babel import _
 
 from app import db, context
@@ -26,7 +25,7 @@ def register() -> typing.RouteReturn:
             flask.flash(_("Cet appareil est déjà enregistré !"), "danger")
         else:
             device = Device(
-                pceen=g.pceen,
+                pceen=context.g.pceen,
                 name=form.nom.data,
                 mac_address=mac_address,
                 type=form.type.data,
@@ -92,7 +91,7 @@ def transfer() -> typing.RouteReturn:
         device = Device.query.filter_by(mac_address=form.mac.data).first()
         if not device:
             flask.flash(_("Cet appareil n'est pas encore enregistré !"), "danger")
-        elif device.pceen == g.pceen:
+        elif device.pceen == context.g.pceen:
             flask.flash(_("Cet appareil vous appartient déjà !"), "danger")
         elif device.pceen.is_banned:
             flask.flash(
@@ -106,7 +105,7 @@ def transfer() -> typing.RouteReturn:
             )
         else:
             old_pceen = device.pceen
-            device.pceen = g.pceen
+            device.pceen = context.g.pceen
             db.session.commit()
             helpers.log_action(f"Transferred {device!r}, formerly owned by {old_pceen!r}")
             helpers.run_script("gen_dhcp.py")  # Update DHCP rules
@@ -119,7 +118,7 @@ def transfer() -> typing.RouteReturn:
 
     mac = flask.request.args.get("mac", "")
     device = Device.query.filter_by(mac_address=mac).first()
-    if (not device) or (device.pceen == g.pceen):
+    if (not device) or (device.pceen == context.g.pceen):
         # Block accessing this form to transfer a non-existing device
         return helpers.redirect_to_next()
 
@@ -133,10 +132,9 @@ def transfer() -> typing.RouteReturn:
 
 @bp.route("/error")
 @context.intrarez_setup_only
-@context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def error() -> typing.RouteReturn:
     """Device error page."""
-    if g.intrarez_setup:
+    if context.g.intrarez_setup:
         # All good: no error, so out of here!
         return helpers.redirect_to_next()
 

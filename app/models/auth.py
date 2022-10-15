@@ -8,8 +8,11 @@ import typing
 
 import jwt
 import flask
+from flask_babel import _
 import flask_login
 import sqlalchemy as sa
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import Query
 from werkzeug import security as wzs
 
 from app import db
@@ -54,8 +57,16 @@ class PCeen(flask_login.UserMixin, Model):
     locale: Column[str | None] = column(sa.String(8), nullable=True)
     is_gri: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
     sub_state: Column[SubState] = column(Enum(SubState), nullable=True)
+
+    # Login info
+    activated: Column[bool] = column(sa.Boolean(), nullable=False, default=True)
     _password_hash: Column[str] = column(sa.String(128), nullable=True)
     espci_sso_enabled: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
+
+    # Bar info
+    bar_nickname: Column[str | None] = column(sa.String(128), nullable=True)
+    bar_balance: Column[float | None] = column(sa.Numeric(6, 2, asdecimal=False), default=0.0, nullable=True)
+    bar_deposit: Column[bool | None] = column(sa.Boolean(), default=False, nullable=True)
 
     photos: Relationship[list[models.Photo]] = one_to_many("Photo.author")
     roles: Relationship[list[models.Role]] = many_to_many(
@@ -71,6 +82,17 @@ class PCeen(flask_login.UserMixin, Model):
     payments_created: Relationship[list[models.Payment]] = one_to_many("Payment.gri", foreign_keys="Payment._gri_id")
     photos: Relationship[list[models.Photo]] = one_to_many("Photo.author")
 
+    bar_transactions_made: Relationship[Query[models.BarTransaction]] = one_to_many(
+        "BarTransaction.client", foreign_keys="BarTransaction._client_id", lazy="dynamic"
+    )
+    bar_transactions_cashed: Relationship[Query[models.BarTransaction]] = one_to_many(
+        "BarTransaction.barman", foreign_keys="BarTransaction._barman_id", lazy="dynamic"
+    )
+    bar_transactions_reverted: Relationship[Query[models.BarTransaction]] = one_to_many(
+        "BarTransaction.reverter", foreign_keys="BarTransaction._reverter_id", lazy="dynamic"
+    )
+    bar_daily_data: Relationship[Query[models.BarDailyData]] = one_to_many("BarDailyData.pceen", lazy="dynamic")
+
     def __repr__(self) -> str:
         """Returns repr(self)."""
         return f"<PCeen #{self.id} ('{self.username}')>"
@@ -79,10 +101,10 @@ class PCeen(flask_login.UserMixin, Model):
         """Human-readible description of the PCeen."""
         return f"{self.full_name} {self.promo or '(no promo)'}"
 
-    @property
+    @hybrid_property
     def full_name(self) -> str:
         """The pceens's first + last names."""
-        return f"{self.prenom} {self.nom}"
+        return self.prenom + " " + self.nom
 
     @property
     def permissions(self) -> set[models.Permission]:
@@ -95,8 +117,7 @@ class PCeen(flask_login.UserMixin, Model):
         Args:
             type: The permission type (.read, .write...).
             scope: The permission scope (.pceen, .album...).
-            elem: The database entry to check the permission for, if
-                applicable.
+            elem: The database entry to check the permission for, if applicable.
 
         Returns:
             If the permission is granted.
@@ -145,9 +166,8 @@ class PCeen(flask_login.UserMixin, Model):
 
         Sorted from most recently seen to latest seen.
 
-        *If the PCeen's "current_device" is not the device currently
-        making the request (connection from outside/GRIs list), it is
-        included in this list.
+        *If the PCeen's "current_device" is not the device currently making the request
+        (connection from outside/GRIs list), it is included in this list.
         """
         all = sorted(self.devices, key=lambda device: device.last_seen_time, reverse=True)
         if flask.g.internal and self == flask.g.pceen:
@@ -260,6 +280,13 @@ class PCeen(flask_login.UserMixin, Model):
     def is_banned(self) -> bool:
         """Whether the PCeen is currently under a ban."""
         return self.current_ban is not None
+
+    @property
+    def current_bar_daily_data(self) -> models.BarDailyData:
+        """Current readonly Bar daily data of the PCeen."""
+        return models.BarDailyData.from_pceen_and_timestamp(
+            pceen=self, timestamp=datetime.datetime.utcnow(), create=False
+        )
 
     def set_password(self, password: str) -> None:
         """Save or modify pceen password.

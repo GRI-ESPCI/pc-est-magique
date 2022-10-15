@@ -33,13 +33,12 @@ a[rel="external"]::after {
 
 /* Maintenance stripes overlay */
 .maintenance-stripes {
-  background: repeating-linear-gradient(
-    -45deg,
-    #000000,
-    #000000 25px,
-    #ffff00 25px,
-    #ffff00 50px
-  );
+  background: repeating-linear-gradient(-45deg, #000000, #000000 25px, #ffff00 25px, #ffff00 50px);
   opacity: 50%;
   z-index: 10;
+}
+
+/* Bar tables */
+.bar-table {
+  background-color: rgba(255, 255, 255, 0.7);
 }

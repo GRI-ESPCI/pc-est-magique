@@ -44,9 +44,12 @@ def setup_saml_authentication() -> None:
     app_config = flask.current_app.config
 
     # Get IdP (identity provider) metadata
-    idp_response = requests.get(app_config["SAML_IDP_METADATA_URL"])
+    try:
+        idp_response = requests.get(app_config["SAML_IDP_METADATA_URL"], timeout=60)
+    except Exception:
+        idp_response = None
     if not idp_response and app_config["SAML_IDP_METADATA_FALLBACK_URL"]:
-        idp_response = requests.get(app_config["SAML_IDP_METADATA_FALLBACK_URL"])
+        idp_response = requests.get(app_config["SAML_IDP_METADATA_FALLBACK_URL"], timeout=60)
     if not idp_response:
         raise RuntimeError(f"Could not retrieve IdP metadata ({idp_response.status_code}): {idp_response.text}")
     _idp_metadata = idp_response.text
@@ -97,9 +100,12 @@ def setup_saml_authentication() -> None:
         ],
     }
     config = saml2.config.Config()
-    config.load(settings)
-    config.allow_unknown_attributes = True
-    _saml_client = saml2.client.Saml2Client(config=config)
+    try:
+        config.load(settings)
+        config.allow_unknown_attributes = True
+        _saml_client = saml2.client.Saml2Client(config=config)
+    except Exception:
+        ("SAML connection unavailable", "danger")
 
 
 @bp.route("/metadata")

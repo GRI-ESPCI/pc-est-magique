@@ -10,6 +10,12 @@ Rien pour l'instant
 Seules les fonctionnalités majeures sont listées ici ; voir
 [`CHANGELOG.md`](CHANGELOG.md) pour les détails.
 
+### 2.2
+
+* Intégration du site du Bar (anciennement sur 
+  https://bar.pc-est-magique.fr, https://github.com/GRI-ESPCI/espci-bar-web-app) 
+  comme module de PC est magique.
+
 ### 2.1
 
 * Authentification (création de compte et connexion) via le SSO de l'ESPCI.
@@ -17,7 +23,7 @@ Seules les fonctionnalités majeures sont listées ici ; voir
 
 ### 2.0
 
-* Factorisation du site de l'IntraRez (anciennement sur 
+* Intégration du site de l'IntraRez (anciennement sur 
   https://intrarez.pc-est-magique.fr, https://github.com/GRI-ESPCI/intrarez) 
   comme module ce site plus global.
 * Ajout du module de photos.
@@ -72,7 +78,7 @@ Seules les fonctionnalités majeures sont listées ici ; voir
 * Autres packages Linux : ``postgresql postfix git npm xmlsec1``, plus pour le
   déploiement : ``supervisor nginx`` ;
 * Package npm : ``bower sass``
-    * Package Bower : ``bootstrap moment webping-js lightgallery``
+    * Package Bower : ``bootstrap chartjs moment webping-js lightgallery``
 * Packages Python : Voir [`requirements.txt`](requirements.txt), plus pour le
   déploiement : ``gunicorn pymysql cryptography`` ;
 * Pour le déploiement : un utilisateur Linux ``pc-est-magique`` dédié.

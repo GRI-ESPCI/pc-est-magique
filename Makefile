@@ -66,7 +66,7 @@ update:
 	# Update dependencies
 	env/bin/pip install -r requirements.txt
 	npm install
-	bower install
+	./node_modules/bower/bin/bower install
 	# Upgrade application
 	@echo "Stopping application before critical updates..."
 	sudo supervisorctl stop pc-est-magique
@@ -76,6 +76,9 @@ update:
 	@echo "Compressing static files..."
 	find app/static -name "*.gz" -type f -delete
 	gzip -krf app/static
+	@echo "Running update scripts..."
+	env/bin/flask script update_offers
+	env/bin/flask script update_roles
 	@echo "Starting application..."
 	sudo supervisorctl start pc-est-magique
 	@echo "Update live!"

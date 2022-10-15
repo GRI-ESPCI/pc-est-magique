@@ -1,0 +1,44 @@
+{# Bar card - used variables: photos_infos #}
+{% extends "cards/base.html" %}
+
+{% block card_title %}
+{{ _("Bar") }} {{ macros.badge() }}
+{% endblock %}
+
+{% block card_icon %}
+{{ macros.bootstrap_icon("cup") }}
+{% endblock %}
+
+{% block card_table %}
+<tr>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("Mon solde") }}</th>
+    <td>{{ babel.format_currency(pceen.bar_balance or 0, "EUR") }}</td>
+</tr>
+<tr>
+    <th scope="row" class="ps-4">{{ _("Limite d'alcool") }}</th>
+    <td>
+        {{ _(
+            "%(count)s/%(limit)s aujourd’hui",
+            count=pceen.current_bar_daily_data.alcohol_bought_count,
+            limit=Settings.max_daily_alcoholic_drinks_per_user,
+        ) }}
+    </td>
+</tr>
+<tr>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("Dépensé aujourd’hui") }}</th>
+    <td>{{ babel.format_currency(pceen.current_bar_daily_data.total_spent, "EUR") }}</td>
+</tr>
+{% endblock %}
+
+{% block card_footer %}
+<a href="{{ url_for("bar.user", username=pceen.username) }}" class="btn btn-outline-dark">
+    {{ _("Détails") }}
+</a>
+<div class="d-inline-block me-3" data-bs-toggle="tooltip" data-bs-placement="top"
+     title="{{ _("Fonctionnalité à venir - voir directement au Bar") }}">
+    <button class="ms-2 btn btn-outline-dark" disabled>
+        {{ _("Recharger") }}
+    </button>
+</div>
+
+{% endblock %}

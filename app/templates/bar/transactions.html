@@ -1,0 +1,100 @@
+{% extends "bar/base.html" %}
+
+{% block bar_app_content %}
+<!-- Items sorting -->
+<div class="container my-1">
+    <div class="btn-toolbar justify-content-between" role="toolbar">
+        <div class="btn-group" role="group">
+            <a class="btn btn-outline-primary{% if sort == "date" and way == "desc" %} active{% endif %}"
+               href="{{ url_for("bar.transactions", sort="date", way="desc") }}" role="button">
+                <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                    {{ macros.bootstrap_icon("sort-down") }}
+                </svg>
+            </a>
+            <a class="btn btn-outline-primary{% if sort == "date" and way == "asc" %} active{% endif %}"
+               href="{{ url_for("bar.transactions", sort="date", way="asc") }}" role="button">
+                <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                    {{ macros.bootstrap_icon("sort-up") }}
+                </svg>
+            </a>
+        </div>
+        <div class="my-auto d-none d-md-inline"><h1 class="fs-3 mb-0 mt-auto">{{ _("Transactions") }}</h1></div>
+        <div class="btn-group" role="group" aria-label="Results">
+            <button type="button" class="btn btn-primary pe-none">
+                {{ _("Total :") }}
+                <span class="badge bg-secondary badge-light">{{ paginator.total }}</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive mt-4">
+    <table class="table table-striped table-bordered align-middle bar-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>{{ _("Client&middot;e") }}</th>
+                <th>{{ _("Barman / barmaid") }}</th>
+                <th>{{ _("Type") }}</th>
+                <th>{{ _("Article") }}</th>
+                <th>{{ _("Balance") }}</th>
+                <th>{{ _("Date") }}</th>
+                <th>{{ _("Annuler") }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in paginator.items %}
+            <tr {% if transaction.is_reverted %}class="table-danger text-decoration-line-through"{% endif %}>
+                <th class="align-middle">{{ transaction.id }}</th>
+                <td class="align-middle text-nowrap">
+                    <a href="{{ url_for("bar.user", username=transaction.client.username) }}" class="text-secondary">
+                        {{ transaction.client.full_name }}
+                    </a>
+                </td>
+                <td class="align-middle text-nowrap">
+                    <a href="{{ url_for("bar.user", username=transaction.barman.username) }}" class="text-secondary">
+                        {{ transaction.barman.full_name }}
+                    </a>
+                </td>
+                {% if transaction.type == BarTransactionType.pay_item %}
+                <td class="align-middle">{{ _("Conso") }}</td>
+                <td class="align-middle text-nowrap">{{ transaction.item.name }}</td>
+                {% else %}
+                <td class="align-middle" colspan="2">{{ _("Recharge") }}</td>
+                {% endif %}
+                <td class="align-middle">{% if transaction.balance_change and not transaction.is_reverted %}
+                    {{ babel.format_currency(transaction.balance_change, "EUR") }}
+                {% endif %}</td>
+                <td class="align-middle text-nowrap">{{ moment(transaction.date).format('lll') }}</td>
+                <td class="align-middle">
+                    <div class="btn-group" role="group" aria-label="Revert transaction">
+                    <a role="button"
+                        class="btn btn-sm btn-danger{% if transaction.is_reverted %} disabled{% endif %}"
+                        onclick="confirm('Annuler la transaction ?') && post_and_reload('{{
+                            url_for("api.bar.revert_transaction", transaction_id=transaction.id) }}');"
+                    >
+                        <svg class="bi flex-shrink-0" width="20" height="20" role="img">
+                            {{ macros.bootstrap_icon("caret-left-fill") }}
+                        </svg>
+                    </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+    {% for page in paginator.iter_pages() %}
+        <li class="page-item{% if page == paginator.page %} active{% endif %}{%if not page %} disabled{% endif %}">
+            <a class="page-link" href="{{ url_for("bar.transactions", page=page, sort=sort, way=way) }}">
+                {% if page %}{{ page }}{% else %}<span class=ellipsis>…</span>{% endif %}
+            </a>
+        </li>
+    {% endfor %}
+    </ul>
+</nav>
+
+{% endblock %}

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2022-07-18 22:22+0200\n"
-"PO-Revision-Date: 2022-07-18 22:42+0100\n"
+"POT-Creation-Date: 2022-10-15 00:15+0200\n"
+"PO-Revision-Date: 2022-10-15 01:02+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -19,16 +19,45 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: app/context.py:119
+#: app/context.py:114
 msgid "Le site est en mode maintenance : seuls les GRI peuvent y accéder."
 msgstr "The site is under maintenance: only GRI can access it."
 
-#: app/context.py:308 app/context.py:336 app/context.py:377
+#: app/context.py:296 app/context.py:322 app/context.py:357
 msgid "Veuillez vous authentifier pour accéder à cette page."
 msgstr "Please log in to access to this page."
 
-#: app/routes/auth/email.py:17 app/routes/auth/routes.py:55
-#: app/routes/auth/saml/routes.py:172
+#: app/routes/api/routes/bar.py:35
+#, python-format
+msgid "La caution de %(name)s a bien été acceptée"
+msgstr "%(name)s's deposit has been approved"
+
+#: app/routes/api/routes/bar.py:65
+#, python-format
+msgid "La transaction #%(transaction_id)s a bien été annulée."
+msgstr "The transaction #%(transaction_id)s has been reverted."
+
+#: app/routes/api/routes/bar.py:82 app/routes/api/routes/bar.py:99
+#, python-format
+msgid "Article %(item)s supprimé."
+msgstr "Item %(item)s deleted."
+
+#: app/routes/api/routes/bar.py:127
+#, python-format
+msgid "%(amount)s ajoutés au solde de %(name)s"
+msgstr "%(amount)s added to %(name)s's balance"
+
+#: app/routes/api/routes/bar.py:160
+#, python-format
+msgid "Achat validé : %(item)s (%(amount)s). Annuler :"
+msgstr "Purchase validated: %(item)s (%(amount)s). Revert:"
+
+#: app/routes/api/routes/gris.py:141 app/routes/gris/utils.py:139
+msgid "Permission ajoutée"
+msgstr "Permission added"
+
+#: app/routes/auth/email.py:17 app/routes/auth/routes.py:53
+#: app/routes/auth/saml/routes.py:174
 msgid "Compte créé avec succès !"
 msgstr "Account successfully created!"
 
@@ -36,71 +65,74 @@ msgstr "Account successfully created!"
 msgid "Réinitialisation du mot de passe"
 msgstr "Password reset"
 
-#: app/routes/auth/forms.py:22
+#: app/routes/auth/forms.py:21
 msgid "Nom d'utilisateur / Adresse e-mail"
 msgstr "Username / Mail address"
 
-#: app/routes/auth/forms.py:24 app/routes/auth/forms.py:41
+#: app/routes/auth/forms.py:22 app/routes/auth/forms.py:37
 msgid "Mot de passe"
 msgstr "Password"
 
-#: app/routes/auth/forms.py:25
+#: app/routes/auth/forms.py:23
 msgid "Rester connecté"
 msgstr "Remember me"
 
-#: app/routes/auth/forms.py:26 app/routes/auth/routes.py:88
+#: app/routes/auth/forms.py:24 app/routes/auth/routes.py:87
 #: app/templates/auth/auth_needed.html:17 app/templates/auth/register.html:60
 #: app/templates/auth/register_rezident.html:41
 #: app/templates/auth/reset_password.html:29
 #: app/templates/auth/reset_password_request.html:26
-#: app/templates/base.html:102
+#: app/templates/bar/welcome.html:48 app/templates/navbar.html:24
 msgid "Connexion"
 msgstr "Sign in"
 
-#: app/routes/auth/forms.py:32 app/routes/main/forms.py:15
-#: app/routes/profile/forms.py:14 app/templates/cards/account.html:18
-#: app/templates/cards/device.html:87 app/templates/cards/device_modal.html:15
-#: app/templates/cards/offer.html:14 app/templates/gris/pceens.html:36
+#: app/routes/auth/forms.py:30 app/routes/bar/forms.py:25
+#: app/routes/bar/forms.py:26 app/routes/main/forms.py:15
+#: app/routes/profile/forms.py:14 app/templates/bar/items.html:58
+#: app/templates/cards/account.html:18 app/templates/cards/device.html:87
+#: app/templates/cards/device_modal.html:15 app/templates/cards/offer.html:14
+#: app/templates/gris/pceens.html:79
 msgid "Nom"
 msgstr "Name"
 
-#: app/routes/auth/forms.py:34 app/routes/profile/forms.py:16
+#: app/routes/auth/forms.py:31 app/routes/profile/forms.py:15
 #: app/templates/cards/account.html:22
 msgid "Prénom"
 msgstr "First name"
 
-#: app/routes/auth/forms.py:36 app/routes/profile/forms.py:18
-#: app/templates/cards/account.html:26
+#: app/routes/auth/forms.py:32 app/routes/profile/forms.py:16
+#: app/templates/bar/user.html:132 app/templates/cards/account.html:26
 msgid "Promotion"
 msgstr "Promotion"
 
-#: app/routes/auth/forms.py:38 app/routes/auth/forms.py:52
-#: app/routes/profile/forms.py:20 app/templates/gris/pceens.html:58
+#: app/routes/auth/forms.py:34 app/routes/auth/forms.py:48
+#: app/routes/profile/forms.py:18 app/templates/gris/pceens.html:99
 msgid "Adresse e-mail"
 msgstr "Mail address"
 
-#: app/routes/auth/forms.py:43
+#: app/routes/auth/forms.py:39
 msgid "Mot de passe (validation)"
 msgstr "Password (validation)"
 
-#: app/routes/auth/forms.py:46
+#: app/routes/auth/forms.py:42
 msgid "Créer mon compte"
 msgstr "Sign up"
 
-#: app/routes/auth/forms.py:53
+#: app/routes/auth/forms.py:49
 msgid "Envoyer le mail de réinitialisation"
 msgstr "Send reset mail"
 
-#: app/routes/auth/forms.py:60 app/routes/auth/routes.py:152
-#: app/routes/profile/forms.py:33
+#: app/routes/auth/forms.py:55 app/routes/auth/routes.py:148
+#: app/routes/profile/forms.py:28
 msgid "Nouveau mot de passe"
 msgstr "New password"
 
-#: app/routes/auth/forms.py:63 app/routes/profile/forms.py:36
+#: app/routes/auth/forms.py:57 app/routes/profile/forms.py:30
 msgid "Nouveau mot de passe (validation)"
 msgstr "New password (validation)"
 
-#: app/routes/auth/forms.py:66
+#: app/routes/auth/forms.py:60 app/routes/bar/forms.py:19
+#: app/routes/bar/forms.py:35
 msgid "Valider"
 msgstr "Validate"
 
@@ -108,32 +140,33 @@ msgstr "Validate"
 msgid "Connexion nécessaire"
 msgstr "Connection needed"
 
-#: app/routes/auth/routes.py:28
+#: app/routes/auth/routes.py:27
 msgid "Nouveau compte"
 msgstr "New account"
 
-#: app/routes/auth/routes.py:61
+#: app/routes/auth/routes.py:58
 msgid "Nouveau compte Rezident"
 msgstr "New Rezident account"
 
-#: app/routes/auth/routes.py:79
-msgid "Nom d'utilisateur inconnu"
+#: app/routes/auth/routes.py:75
+#, fuzzy
+msgid "Utilisateur inconnu"
 msgstr "Unknown username"
 
-#: app/routes/auth/routes.py:81
+#: app/routes/auth/routes.py:77
 msgid "Mot de passe incorrect"
 msgstr "Wrong password"
 
-#: app/routes/auth/routes.py:85 app/routes/auth/saml/routes.py:164
+#: app/routes/auth/routes.py:84 app/routes/auth/saml/routes.py:166
 #: app/templates/main/connect_check.html:54
 msgid "Connecté !"
 msgstr "Connected!"
 
-#: app/routes/auth/routes.py:100
+#: app/routes/auth/routes.py:99
 msgid "Vous avez été déconnecté."
 msgstr "You have been signed out."
 
-#: app/routes/auth/routes.py:117
+#: app/routes/auth/routes.py:116
 msgid ""
 "Un email a été envoyé avec les instructions pour réinitialiser le mot de "
 "passe. Pensez à vérifier vos spams."
@@ -141,38 +174,30 @@ msgstr ""
 "An email has been send with password reset instructions. Please check "
 "your spams."
 
-#: app/routes/auth/routes.py:127
+#: app/routes/auth/routes.py:125
 msgid "Mot de passe oublié"
 msgstr "Password Lost"
 
-#: app/routes/auth/routes.py:135
+#: app/routes/auth/routes.py:132
 msgid "Ce lien n'est pas utilisable en étant authentifié."
 msgstr "This link cannot be used by an authenticated user."
 
-#: app/routes/auth/routes.py:140
+#: app/routes/auth/routes.py:137
 msgid "Lien de réinitialisation invalide ou expiré."
 msgstr "Reset link invalid or expired."
 
-#: app/routes/auth/routes.py:148
+#: app/routes/auth/routes.py:145
 msgid "Le mot de passe a été réinitialisé avec succès."
 msgstr "Your password has been successfully reset."
 
-#: app/routes/auth/utils.py:43
-msgid "Accès aux modules élèves débloqué !"
-msgstr "Students modules access granted!"
-
-#: app/routes/auth/utils.py:69
-msgid "Accès aux modules IntraRez débloqué !"
-msgstr "IntraRez modules access granted!"
-
-#: app/routes/auth/saml/routes.py:149
+#: app/routes/auth/saml/routes.py:151
 #, python-format
 msgid ""
 "L'authentification SSO a échoué (%(exc)s). Merci de réessayer "
 "ultérieurement."
 msgstr "SSO authentication failed (%(exc)s). Please try again later."
 
-#: app/routes/auth/saml/routes.py:177
+#: app/routes/auth/saml/routes.py:179
 #, python-format
 msgid ""
 "Le compte %(mail)s n'a pas les droits requis pour accéder à ce site. "
@@ -181,7 +206,7 @@ msgstr ""
 "Account %(mail)s does not have required rights to access this "
 "site.Registration is restricted to students for now."
 
-#: app/routes/auth/saml/utils.py:71
+#: app/routes/auth/saml/utils.py:69
 #, python-format
 msgid ""
 "Compte mis à jour depuis les infos ESPCI (prénom : %(prenom)s, nom : "
@@ -190,71 +215,253 @@ msgstr ""
 "Account updated from ESPCI data (first name: %(prenom)s, last name: "
 "%(nom)s, promotion: %(promo)s)"
 
-#: app/routes/devices/forms.py:14 app/routes/devices/forms.py:29
-#: app/routes/devices/forms.py:41
+#: app/routes/bar/forms.py:15
+msgid "Surnom"
+msgstr "Nickname"
+
+#: app/routes/bar/forms.py:16 app/templates/bar/transactions.html:37
+#: app/templates/bar/user.html:117 app/templates/bar/user.html:185
+msgid "Barman / barmaid"
+msgstr "Barman/barmaid"
+
+#: app/routes/bar/forms.py:27 app/routes/bar/forms.py:31
+msgid "Quantifiable"
+msgstr "Quantifiable"
+
+#: app/routes/bar/forms.py:28 app/templates/bar/items.html:59
+msgid "Quantité"
+msgstr "Quantity"
+
+#: app/routes/bar/forms.py:29
+msgid "Prix (en euros)"
+msgstr "Price (in euros)"
+
+#: app/routes/bar/forms.py:30
+msgid "Article alcoolisé"
+msgstr "Item with alcohol"
+
+#: app/routes/bar/forms.py:32
+msgid "Favori"
+msgstr "Favorite"
+
+#: app/routes/bar/forms.py:33
+msgid "Priorité dans la liste"
+msgstr "Priority in items list"
+
+#: app/routes/bar/forms.py:46
+msgid "Doit être postérieur à la date de début !"
+msgstr "Must be posterior to start date!"
+
+#: app/routes/bar/forms.py:49 app/routes/photos/forms.py:14
+msgid "Nom du fichier"
+msgstr "File name"
+
+#: app/routes/bar/forms.py:50 app/templates/bar/export.html:47
+msgid "Télécharger"
+msgstr "Download"
+
+#: app/routes/bar/forms.py:58
+msgid "Supprimer l'image actuelle"
+msgstr "Delete current image"
+
+#: app/routes/bar/forms.py:60
+msgid "Sauvegarder"
+msgstr "Save"
+
+#: app/routes/bar/routes.py:112
+msgid "Stats – Bar"
+msgstr "Stats – Bar"
+
+#: app/routes/bar/routes.py:165
+msgid "Recherche – Bar"
+msgstr "Search – Bar"
+
+#: app/routes/bar/routes.py:206
+#, python-format
+msgid "Le surnom de %(name)s a bien été modifié"
+msgstr "%(name)s's nickname has been modified"
+
+#: app/routes/bar/routes.py:213
+#, python-format
+msgid "%(name)s n'est maintenant plus barman / barmaid"
+msgstr "%(name)s is no longer barman / barmaid"
+
+#: app/routes/bar/routes.py:218
+#, python-format
+msgid "%(name)s est maintenant barmaid / barmaid"
+msgstr "%(name)s is now barman / barmaid"
+
+#: app/routes/bar/routes.py:224
+#, python-format
+msgid "Erreur lors de la transformation de la photo : %(exc)s"
+msgstr "Error during picture transformation: %(exc)s"
+
+#: app/routes/bar/routes.py:226
+#, python-format
+msgid "L'avatar de %(name)s a bien été modifié"
+msgstr "%(name)s's avatar has been modified"
+
+#: app/routes/bar/routes.py:245
+#, python-format
+msgid "%(name)s – Profil Bar"
+msgstr "%(name)s – Bar Profile"
+
+#: app/routes/bar/routes.py:270
+msgid "Transactions – Bar"
+msgstr "Transactions – Bar"
+
+#: app/routes/bar/routes.py:292
+#, python-format
+msgid "Article %(item)s modifié."
+msgstr "Item %(item)s edited."
+
+#: app/routes/bar/routes.py:304
+#, python-format
+msgid "Article %(item)s créé."
+msgstr "Item %(item)s created."
+
+#: app/routes/bar/routes.py:329
+msgid "Articles – Bar"
+msgstr "Items – Bar"
+
+#: app/routes/bar/routes.py:384
+msgid "Export de données – Bar"
+msgstr "Data export – Bar"
+
+#: app/routes/bar/routes.py:405
+msgid "Paramètres mis à jour."
+msgstr "Settings updated."
+
+#: app/routes/bar/routes.py:409
+msgid "Paramètres – Bar"
+msgstr "Settings – Bar"
+
+#: app/routes/bar/routes.py:421
+msgid ""
+"Bonjour, camarade ! Ton compte du Bar a été migré dans ton compte PC est "
+"magique. Profite bien !"
+msgstr ""
+"Hello, comrade! Your Bar account has been migrated into your PC est "
+"magique account. Enjoy!"
+
+#: app/routes/bar/routes.py:427
+msgid ""
+"Les comptes du Bar ont été migrés dans PC est magique. En revanche, pas "
+"de trace du tien... Pas de panique, il n'est pas perdu ! Contacte "
+"simplement un GRI."
+msgstr ""
+"Bar accounts have been migrated into PC est magique. However, no trace of"
+" yours... No need to panic, it is not lost! Simply contact a GRI."
+
+#: app/routes/bar/routes.py:435
+msgid "Migration du site du Bar"
+msgstr "Bar site migration"
+
+#: app/routes/bar/utils.py:32
+#, python-format
+msgid "%(pceen)s n'a pas fourni de caution."
+msgstr "%(pceen)s hasn't given a deposit."
+
+#: app/routes/bar/utils.py:42
+#, python-format
+msgid "%(pceen)s a atteint la limite de %(limit)s boissons alcoolisées par jour."
+msgstr "%(pceen)s has reached the limit of %(limit)s alcohol drinks per night."
+
+#: app/routes/bar/utils.py:57
+#, python-format
+msgid "Article %(item)s épuisé."
+msgstr "No %(item)s left."
+
+#: app/routes/bar/utils.py:73
+#, python-format
+msgid "%(pceen)s n'a pas assez d'argent pour acheter %(item)s."
+msgstr "%(pceen)s doesn't have enough funds to buy %(item)s."
+
+#: app/routes/bar/utils.py:101
+msgid "Caution non validée, consommation interdite"
+msgstr "Deposit not approved, not allowed to buy"
+
+#: app/routes/bar/utils.py:104
+msgid "Fonds insuffisants"
+msgstr "Not enough funds"
+
+#: app/routes/bar/utils.py:107
+msgid "Limite d'alcool quotidienne atteinte"
+msgstr "Daily alcohol limit reached"
+
+#: app/routes/bar/utils.py:110
+msgid "Article épuisé (modifiable sur la page Articles)"
+msgstr "Item out of stock (can be modified on Items page)"
+
+#: app/routes/bar/utils.py:119
+msgid "IP non détectable, impossible d'afficher les avatars"
+msgstr "Unable to detect your IP, the avatars can't be shown"
+
+#: app/routes/devices/forms.py:13 app/routes/devices/forms.py:22
+#: app/routes/devices/forms.py:30
 msgid "Nom (optionnel)"
 msgstr "Name (optional)"
 
-#: app/routes/devices/forms.py:17 app/routes/devices/forms.py:32
-#: app/routes/devices/forms.py:44
+#: app/routes/devices/forms.py:14 app/routes/devices/forms.py:23
+#: app/routes/devices/forms.py:31
 msgid "Type (optionnel)"
 msgstr "Type (optional)"
 
-#: app/routes/devices/forms.py:20
+#: app/routes/devices/forms.py:15
 msgid "Adresse MAC*"
 msgstr "MAC address*"
 
-#: app/routes/devices/forms.py:22 app/routes/devices/routes.py:49
+#: app/routes/devices/forms.py:16 app/routes/devices/routes.py:45
 msgid "Enregistrer l'appareil"
 msgstr "Register device"
 
-#: app/routes/devices/forms.py:34 app/templates/cards/device.html:130
+#: app/routes/devices/forms.py:24 app/templates/cards/device.html:130
 #: app/templates/cards/device_modal.html:62
 msgid "Modifier l'appareil"
 msgstr "Edit device"
 
-#: app/routes/devices/forms.py:47 app/templates/cards/device.html:23
+#: app/routes/devices/forms.py:32 app/templates/cards/device.html:23
 #: app/templates/cards/device.html:56 app/templates/cards/device_modal.html:25
 msgid "Adresse MAC"
 msgstr "MAC address"
 
-#: app/routes/devices/forms.py:49 app/routes/devices/routes.py:134
+#: app/routes/devices/forms.py:33 app/routes/devices/routes.py:127
 msgid "Transférer l'appareil"
 msgstr "Transfer device"
 
-#: app/routes/devices/routes.py:26
+#: app/routes/devices/routes.py:25
 msgid "Cet appareil est déjà enregistré !"
 msgstr "This device is already registered!"
 
-#: app/routes/devices/routes.py:41
+#: app/routes/devices/routes.py:38
 msgid "Appareil enregistré avec succès !"
 msgstr "Device successfully registered!"
 
-#: app/routes/devices/routes.py:66
+#: app/routes/devices/routes.py:61
 msgid "Appareil inconnu !"
 msgstr "Unknown device!"
 
-#: app/routes/devices/routes.py:74
+#: app/routes/devices/routes.py:69
 msgid "Appareil modifié avec succès !"
 msgstr "Device successfully modified!"
 
-#: app/routes/devices/routes.py:79
+#: app/routes/devices/routes.py:74
 msgid "Action non implémentée"
 msgstr "Action not implemented"
 
-#: app/routes/devices/routes.py:86
+#: app/routes/devices/routes.py:80
 msgid "Modifier un appareil"
 msgstr "Edit a device"
 
-#: app/routes/devices/routes.py:100
+#: app/routes/devices/routes.py:93
 msgid "Cet appareil n'est pas encore enregistré !"
 msgstr "This device is not already registered!"
 
-#: app/routes/devices/routes.py:102
+#: app/routes/devices/routes.py:95
 msgid "Cet appareil vous appartient déjà !"
 msgstr "This device already belong to you!"
 
-#: app/routes/devices/routes.py:105
+#: app/routes/devices/routes.py:98
 msgid ""
 "Cet appareil appartient à un utilisateur banni. Son transfert est donc "
 "bloqué pour éviter les tentatives de contournement ; contactez-nous si la"
@@ -264,51 +471,51 @@ msgstr ""
 " transfer it to avoid ban bypass attempts; contact us if your request is "
 "legitimate."
 
-#: app/routes/devices/routes.py:119
+#: app/routes/devices/routes.py:112
 msgid "Appareil transféré avec succès !"
 msgstr "Device successfully transferred!"
 
-#: app/routes/devices/routes.py:155
+#: app/routes/devices/routes.py:147
 msgid "Hmm, ça n'a pas marché..."
 msgstr "Hmm, it didn't work..."
 
-#: app/routes/devices/routes.py:156
+#: app/routes/devices/routes.py:148
 msgid "Non, toujours pas..."
 msgstr "No, still not..."
 
-#: app/routes/devices/routes.py:157
+#: app/routes/devices/routes.py:149
 msgid "Ah ! Ah non, non plus..."
 msgstr "Oh! Oh no, no more..."
 
-#: app/routes/devices/routes.py:158
+#: app/routes/devices/routes.py:150
 msgid "Nan mais quand ça veut pas, ça veut pas..."
 msgstr "You know, when it won't, it won't..."
 
-#: app/routes/devices/routes.py:159
+#: app/routes/devices/routes.py:151
 msgid "Ça va sinon ?"
 msgstr "How are you, btw?"
 
-#: app/routes/devices/routes.py:160
+#: app/routes/devices/routes.py:152
 msgid "Il ne va plus se passer grand chose, hein, je pense."
 msgstr "No much more to come, I think."
 
-#: app/routes/devices/routes.py:161
+#: app/routes/devices/routes.py:153
 msgid "Après on sait jamais, sur un malentendu..."
 msgstr "But you never know, on a misunderstanding..."
 
-#: app/routes/devices/routes.py:162
+#: app/routes/devices/routes.py:154
 msgid "zzzzzzzzzzzzzzzzzzzzzzzzz"
 msgstr "zzzzzzzzzzzzzzzzzzzzzzzzz"
 
-#: app/routes/devices/routes.py:163
+#: app/routes/devices/routes.py:155
 msgid "Attention, je vais commencer à dire des choses aléatoires."
 msgstr "Careful, I'll start saying random things."
 
-#: app/routes/devices/routes.py:164
+#: app/routes/devices/routes.py:156
 msgid "Je vous aurai prévenu !"
 msgstr "I'll have warned you!"
 
-#: app/routes/devices/routes.py:176
+#: app/routes/devices/routes.py:168
 msgid "Détection d'appareil impossible"
 msgstr "Device detection impossible"
 
@@ -317,119 +524,115 @@ msgstr "Device detection impossible"
 msgid "Accès restreint"
 msgstr "Access restricted"
 
-#: app/routes/gris/forms.py:48
+#: app/routes/gris/forms.py:47
 msgid "Script"
 msgstr "Script"
 
-#: app/routes/gris/forms.py:50
+#: app/routes/gris/forms.py:48
 msgid "Exécuter"
 msgstr "Run"
 
-#: app/routes/gris/forms.py:77
+#: app/routes/gris/forms.py:75
 msgid "Illimité"
 msgstr "Unlimited"
 
-#: app/routes/gris/forms.py:78
+#: app/routes/gris/forms.py:76
 msgid "Heures"
 msgstr "Hours"
 
-#: app/routes/gris/forms.py:79
+#: app/routes/gris/forms.py:77
 msgid "Jours"
 msgstr "Days"
 
-#: app/routes/gris/forms.py:80
+#: app/routes/gris/forms.py:78
 msgid "Mois"
 msgstr "Months"
 
-#: app/routes/gris/forms.py:82
+#: app/routes/gris/forms.py:79
 msgid "Motif court"
 msgstr "Short reason"
 
-#: app/routes/gris/forms.py:85
+#: app/routes/gris/forms.py:80
 msgid "Message détaillé"
 msgstr "Detailed message"
 
-#: app/routes/gris/forms.py:87
+#: app/routes/gris/forms.py:81
 msgid "Bannez-moi ça les modos || Mettre à jour le ban"
 msgstr "Ban this person || Update ban"
 
-#: app/routes/gris/forms.py:88
+#: app/routes/gris/forms.py:82
 msgid "Mettre fin au ban"
 msgstr "Terminate ban"
 
-#: app/routes/gris/routes.py:61
+#: app/routes/gris/routes.py:97
 msgid "Gestion des PCéens"
 msgstr "Manage PCéens"
 
-#: app/routes/gris/routes.py:94
+#: app/routes/gris/routes.py:130
 msgid "Gestion des rôles"
 msgstr "Manage roles"
 
-#: app/routes/gris/routes.py:128 app/routes/gris/routes.py:131
+#: app/routes/gris/routes.py:164 app/routes/gris/routes.py:166
 #: app/templates/gris/menu.html:18
 msgid "Exécuter un script"
 msgstr "Run a script"
 
-#: app/routes/gris/routes.py:140
+#: app/routes/gris/routes.py:173
 msgid "Darkstat network monitoring"
 msgstr "Darkstat network monitoring"
 
-#: app/routes/gris/routes.py:149
+#: app/routes/gris/routes.py:180
 msgid "Bandwidthd network monitoring"
 msgstr "Bandwidthd network monitoring"
 
-#: app/routes/gris/utils.py:145
-msgid "Permission ajoutée"
-msgstr "Permission added"
-
-#: app/routes/gris/utils.py:286
+#: app/routes/gris/utils.py:278
 msgid "Le ban a été terminé."
 msgstr "The ban has been terminated."
 
-#: app/routes/gris/utils.py:293
+#: app/routes/gris/utils.py:285
 msgid "Le ban a bien été modifié."
 msgstr "The ban has been modified successfully."
 
-#: app/routes/gris/utils.py:298
+#: app/routes/gris/utils.py:290
 msgid "Ce PCéén est déjà banni !"
 msgstr "This PCéen is already banned!"
 
-#: app/routes/gris/utils.py:311
+#: app/routes/gris/utils.py:303
 msgid "Le mécréant a bien été banni."
 msgstr "The miscreant has been banned."
 
-#: app/routes/main/forms.py:17
+#: app/routes/main/forms.py:16
 msgid "Adresse e-mail (optionnel)"
 msgstr "Mail address (optional)"
 
-#: app/routes/main/forms.py:19
+#: app/routes/main/forms.py:17
 msgid "Titre"
 msgstr "Title"
 
-#: app/routes/main/forms.py:20
+#: app/routes/main/forms.py:18
 msgid "Message"
 msgstr "Message"
 
-#: app/routes/main/forms.py:21
+#: app/routes/main/forms.py:19
 msgid "Envoyer"
 msgstr "Send"
 
-#: app/routes/main/routes.py:43 app/templates/base.html:187
-#: app/templates/errors/401.html:29 app/templates/errors/403.html:26
-#: app/templates/errors/404.html:23 app/templates/errors/other.html:17
+#: app/routes/main/routes.py:36 app/templates/errors/401.html:29
+#: app/templates/errors/403.html:26 app/templates/errors/404.html:23
+#: app/templates/errors/other.html:17 app/templates/footer.html:19
 #: app/templates/mails_base.html:74
 msgid "Accueil"
 msgstr "Home"
 
-#: app/routes/main/routes.py:54
+#: app/routes/main/routes.py:46
 msgid "Le captcha n'a pas pu être vérifié. Veuillez réessayer."
 msgstr "The captcha could not be verified. Please try again."
 
-#: app/routes/main/routes.py:66
+#: app/routes/main/routes.py:58
 msgid "Message transmis !"
 msgstr "Message transmitted!"
 
-#: app/routes/main/routes.py:71
+#: app/routes/main/routes.py:63
 msgid ""
 "Oh non ! Le message n'a pas pu être transmis. N'hésitez pas à contacter "
 "un GRI aux coordonnées en bas de page.<br/>(Erreur : "
@@ -437,32 +640,32 @@ msgstr ""
 "O no! The message could not be transmitted. Please feel free to reach GRI"
 " at the contact information below.<br/>(Error: "
 
-#: app/routes/main/routes.py:81
+#: app/routes/main/routes.py:73
 msgid "Contact"
 msgstr "Contact"
 
-#: app/routes/main/routes.py:87 app/templates/base.html:209
+#: app/routes/main/routes.py:79 app/templates/footer.html:35
 msgid "Mentions légales"
 msgstr "Legal notice"
 
-#: app/routes/main/routes.py:94
+#: app/routes/main/routes.py:85
 msgid "Notes de mise à jour"
 msgstr "Changelog"
 
-#: app/routes/main/routes.py:102
+#: app/routes/main/routes.py:92
 msgid "Accès à Internet"
 msgstr "Internet Access"
 
-#: app/routes/main/routes.py:114
+#: app/routes/main/routes.py:102
 msgid "Accès à Internet restreint"
 msgstr "Internet access restricted"
 
-#: app/routes/main/routes.py:133
+#: app/routes/main/routes.py:118
 msgid "TEST"
 msgstr "TEST"
 
-#: app/routes/payments/email.py:21 app/routes/payments/routes.py:249
-#: app/routes/payments/routes.py:314
+#: app/routes/payments/email.py:21 app/routes/payments/routes.py:243
+#: app/routes/payments/routes.py:302
 msgid "Paiement validé !"
 msgstr "Payment validated!"
 
@@ -492,185 +695,185 @@ msgstr "Send a Lydia payment request"
 msgid "Payer par carte bancaire"
 msgstr "Pay with a credit card"
 
-#: app/routes/payments/routes.py:37
+#: app/routes/payments/routes.py:35
 msgid "Mon abonnement Internet"
 msgstr "My Internet subscription"
 
-#: app/routes/payments/routes.py:48 app/routes/payments/routes.py:65
-#: app/routes/payments/routes.py:111
+#: app/routes/payments/routes.py:46 app/routes/payments/routes.py:61
+#: app/routes/payments/routes.py:107
 msgid "Vous avez déjà un abonnement en cours !"
 msgstr "You already have an active subscription!"
 
-#: app/routes/payments/routes.py:53 app/templates/cards/payment.html:5
+#: app/routes/payments/routes.py:50 app/templates/cards/payment.html:5
 #: app/templates/payments/main.html:200 app/templates/payments/main.html:240
 #: app/templates/payments/main.html:287
 msgid "Paiement"
 msgstr "Payment"
 
-#: app/routes/payments/routes.py:69 app/templates/payments/pay.html:132
+#: app/routes/payments/routes.py:65 app/templates/payments/pay.html:132
 msgid "Payer avec Lydia"
 msgstr "Pay with Lydia"
 
-#: app/routes/payments/routes.py:70 app/templates/payments/pay.html:159
+#: app/routes/payments/routes.py:66 app/templates/payments/pay.html:159
 msgid "Payer par virement"
 msgstr "Pay by bank transfer"
 
-#: app/routes/payments/routes.py:71 app/templates/payments/pay.html:186
+#: app/routes/payments/routes.py:67 app/templates/payments/pay.html:186
 msgid "Payer en main propre"
 msgstr "Pay in person"
 
-#: app/routes/payments/routes.py:72 app/templates/payments/pay.html:96
+#: app/routes/payments/routes.py:68 app/templates/payments/pay.html:96
 msgid "Ajouter un paiement"
 msgstr "Add a payment"
 
-#: app/routes/payments/routes.py:259
+#: app/routes/payments/routes.py:249
 msgid "Pas de paiement détecté"
 msgstr "No payment detected"
 
-#: app/routes/payments/routes.py:277
+#: app/routes/payments/routes.py:267
 msgid "Paiement annulé"
 msgstr "Payment cancelled"
 
-#: app/routes/payments/routes.py:287 app/routes/payments/routes.py:293
+#: app/routes/payments/routes.py:277 app/routes/payments/routes.py:283
 msgid "Numéro de paiement invalide"
 msgstr "Invalid payment number"
 
-#: app/routes/payments/routes.py:296
+#: app/routes/payments/routes.py:286
 msgid "Paiement en attente, réessayer"
 msgstr "Payment pending, try again"
 
-#: app/routes/payments/routes.py:299
+#: app/routes/payments/routes.py:289
 msgid "Paiement invalide, réessayer"
 msgstr "Payment invalid, try again"
 
-#: app/routes/photos/forms.py:14
-msgid "Nom du fichier"
-msgstr "File name"
-
-#: app/routes/photos/forms.py:16
+#: app/routes/photos/forms.py:15
 msgid "Légende (optionnel)"
 msgstr "Caption (optional)"
 
-#: app/routes/photos/forms.py:19
+#: app/routes/photos/forms.py:16
 msgid "Auteur (optionnel)"
 msgstr "Author (optional)"
 
-#: app/routes/photos/forms.py:21
+#: app/routes/photos/forms.py:17
 msgid "Date (optionnel)"
 msgstr "Date (optional)"
 
-#: app/routes/photos/forms.py:23
+#: app/routes/photos/forms.py:18
 msgid "Heure (optionnel)"
 msgstr "Time (optional)"
 
-#: app/routes/photos/forms.py:26
+#: app/routes/photos/forms.py:20
 msgid "Latitude (optionnel)"
 msgstr "Latitute (optional)"
 
-#: app/routes/photos/forms.py:30
+#: app/routes/photos/forms.py:24
 msgid "Longitude (optionnel)"
 msgstr "Longitude (optional)"
 
-#: app/routes/photos/forms.py:33 app/templates/photos/album.html:249
+#: app/routes/photos/forms.py:27 app/templates/photos/album.html:249
 msgid "Modifier la photo"
 msgstr "Edit photo"
 
-#: app/routes/photos/forms.py:40
+#: app/routes/photos/forms.py:33
 msgid "Nom de l'album"
 msgstr "Album name"
 
-#: app/routes/photos/forms.py:43 app/routes/photos/forms.py:58
+#: app/routes/photos/forms.py:34 app/routes/photos/forms.py:45
 msgid "Description (optionnel)"
 msgstr "Description (optional)"
 
-#: app/routes/photos/forms.py:45 app/routes/photos/forms.py:60
+#: app/routes/photos/forms.py:35 app/routes/photos/forms.py:46
 msgid "Date de début (optionnel)"
 msgstr "Start date (optional)"
 
-#: app/routes/photos/forms.py:46 app/routes/photos/forms.py:61
+#: app/routes/photos/forms.py:36 app/routes/photos/forms.py:47
 msgid "Date de fin (optionnel)"
 msgstr "End date (optional)"
 
-#: app/routes/photos/forms.py:47
+#: app/routes/photos/forms.py:37
 msgid "Album visible"
 msgstr "Album visible"
 
-#: app/routes/photos/forms.py:48 app/templates/photos/album.html:93
+#: app/routes/photos/forms.py:38 app/templates/photos/album.html:93
 msgid "Modifier l'album"
 msgstr "Edit album"
 
-#: app/routes/photos/forms.py:55
+#: app/routes/photos/forms.py:44
 msgid "Nom de la collection"
 msgstr "Collection name"
 
-#: app/routes/photos/forms.py:62
+#: app/routes/photos/forms.py:48
 msgid "Collection visible"
 msgstr "Collection visible"
 
-#: app/routes/photos/forms.py:63 app/templates/photos/collection.html:49
+#: app/routes/photos/forms.py:49 app/templates/photos/collection.html:49
 msgid "Modifier la collection"
 msgstr "Edit collection"
 
-#: app/routes/photos/routes.py:26 app/templates/base.html:124
-#: app/templates/cards/photos.html:5 app/templates/cards/photos.html:22
+#: app/routes/photos/routes.py:23 app/templates/cards/photos.html:5
+#: app/templates/cards/photos.html:22 app/templates/navbar.html:45
 #: app/templates/photos/album.html:40 app/templates/photos/collection.html:18
 #: app/templates/photos/main.html:7
 msgid "Photos"
 msgstr "Photos"
 
-#: app/routes/photos/routes.py:81
+#: app/routes/photos/routes.py:67
 msgid "Collection modifiée avec succès !"
 msgstr "Collection successfully edited!"
 
-#: app/routes/photos/routes.py:129
+#: app/routes/photos/routes.py:94
+msgid "IP non détectable, impossible d'accéder aux photos"
+msgstr "Unable to detect your IP, photos can't be loaded"
+
+#: app/routes/photos/routes.py:111
 msgid "Album modifié avec succès !"
 msgstr "Album successfully edited!"
 
-#: app/routes/photos/routes.py:135
+#: app/routes/photos/routes.py:117
 msgid "Cet album est maintenant la miniature de la collection !"
 msgstr "This album is now the collection's thumbnail!"
 
-#: app/routes/photos/routes.py:148
+#: app/routes/photos/routes.py:128
 msgid "Impossible de modifier la photo !"
 msgstr "Unable to edit photo!"
 
-#: app/routes/photos/routes.py:162
+#: app/routes/photos/routes.py:142
 msgid "Photo modifiée avec succès !"
 msgstr "Photo successfully edited!"
 
-#: app/routes/photos/routes.py:169
+#: app/routes/photos/routes.py:148
 msgid "Cette photo est maintenant la miniature de l'album !"
 msgstr "This photo is now the album's thumbnail!"
 
-#: app/routes/profile/forms.py:23 app/routes/profile/forms.py:39
+#: app/routes/profile/forms.py:21 app/routes/profile/forms.py:33
 msgid "Mettre à jour"
 msgstr "Update"
 
-#: app/routes/profile/forms.py:30
+#: app/routes/profile/forms.py:27
 msgid "Mot de passe actuel"
 msgstr "Current password"
 
-#: app/routes/profile/routes.py:15 app/templates/base.html:131
+#: app/routes/profile/routes.py:15 app/templates/navbar.html:59
 msgid "Profil"
 msgstr "Profile"
 
-#: app/routes/profile/routes.py:34
+#: app/routes/profile/routes.py:31
 msgid "Compte modifié avec succès !"
 msgstr "Account successfully modified!"
 
-#: app/routes/profile/routes.py:38
+#: app/routes/profile/routes.py:34
 msgid "Mettre à jour mon compte"
 msgstr "Update my account"
 
-#: app/routes/profile/routes.py:52
+#: app/routes/profile/routes.py:48
 msgid "Mot de passe mis à jour !"
 msgstr "Password updated!"
 
-#: app/routes/profile/routes.py:55
+#: app/routes/profile/routes.py:51
 msgid "Mot de passe actuel incorrect"
 msgstr "Wrong current password"
 
-#: app/routes/profile/routes.py:58
+#: app/routes/profile/routes.py:53
 msgid "Modifier mon mot de passe"
 msgstr "Change my password"
 
@@ -680,36 +883,37 @@ msgstr "Warning: Room transferred, Internet cut"
 
 #: app/routes/rooms/forms.py:14 app/templates/cards/room.html:5
 #: app/templates/cards/room.html:62 app/templates/devices/register.html:13
-#: app/templates/devices/transfer.html:13 app/templates/gris/pceens.html:69
-#: app/templates/gris/pceens.html:210 app/templates/gris/pceens.html:422
+#: app/templates/devices/transfer.html:13 app/templates/gris/pceens.html:110
+#: app/templates/gris/pceens.html:267 app/templates/gris/pceens.html:452
 #: app/templates/main/connect_check.html:21 app/templates/main/contact.html:74
 #: app/templates/rooms/register.html:19
 msgid "Chambre"
 msgstr "Room"
 
-#: app/routes/rooms/forms.py:16 app/routes/rooms/forms.py:28
+#: app/routes/rooms/forms.py:15 app/routes/rooms/forms.py:23
 msgid "Début de la location"
 msgstr "Rental start date"
 
-#: app/routes/rooms/forms.py:19 app/routes/rooms/forms.py:31
+#: app/routes/rooms/forms.py:16 app/routes/rooms/forms.py:24
 msgid "Fin de la location (optionnel)"
 msgstr "Rental end date (optional)"
 
-#: app/routes/rooms/forms.py:21
+#: app/routes/rooms/forms.py:17
 msgid "Enregistrer"
 msgstr "Register"
 
-#: app/routes/rooms/forms.py:33 app/templates/photos/album.html:211
+#: app/routes/rooms/forms.py:25 app/templates/bar/items.html:63
+#: app/templates/bar/user.html:279 app/templates/photos/album.html:211
 #: app/templates/photos/collection.html:181 app/templates/photos/main.html:57
 #: app/templates/rooms/register.html:106
 msgid "Modifier"
 msgstr "Edit"
 
-#: app/routes/rooms/forms.py:40
+#: app/routes/rooms/forms.py:31
 msgid "Fin de la location"
 msgstr "Rental end date"
 
-#: app/routes/rooms/forms.py:42
+#: app/routes/rooms/forms.py:32
 msgid "Terminer la location"
 msgstr "Terminate rental"
 
@@ -721,72 +925,57 @@ msgstr "You already have a rental in progress!"
 msgid "Chambre enregistrée avec succès !"
 msgstr "Room successfully registered!"
 
-#: app/routes/rooms/routes.py:78
+#: app/routes/rooms/routes.py:76
 msgid "Nouvelle location"
 msgstr "New rental"
 
-#: app/routes/rooms/routes.py:98
+#: app/routes/rooms/routes.py:94
 msgid "Location modifiée avec succès !"
 msgstr "Rental successfully modified!"
 
-#: app/routes/rooms/routes.py:100
+#: app/routes/rooms/routes.py:96
 msgid "Pas de location en cours !"
 msgstr "No rental in progress!"
 
-#: app/routes/rooms/routes.py:104
+#: app/routes/rooms/routes.py:99
 msgid "Mettre à jour ma location"
 msgstr "Modify rental"
 
-#: app/routes/rooms/routes.py:133 app/templates/cards/room.html:95
+#: app/routes/rooms/routes.py:127 app/templates/cards/room.html:95
 msgid "Changer de chambre"
 msgstr "Change room"
-
-#: app/templates/auth/auth_needed.html:21 app/templates/auth/login.html:53
-#: app/templates/base.html:108
-msgid "Créer un compte"
-msgstr "Sign up"
-
-#: app/templates/base.html:116 app/templates/gris/pceens.html:91
-#: app/templates/gris/pceens.html:464
-msgid "Abonnement"
-msgstr "Subscription"
-
-#: app/templates/base.html:137 app/templates/devices/transfer.html:42
-msgid "Déconnexion"
-msgstr "Sign out"
-
-#: app/templates/base.html:178 app/templates/mails_base.html:58
-msgid "Version"
-msgstr "Version"
-
-#: app/templates/auth/reset_password_request.html:33
-#: app/templates/base.html:194 app/templates/devices/register.html:250
-msgid "Nous contacter"
-msgstr "Contact us"
-
-#: app/templates/base.html:202
-msgid "Code source"
-msgstr "Source code"
 
 #: app/templates/doas.html:3
 #, python-format
 msgid "Action réalisée en tant que %(doas)s"
 msgstr "Action done as %(doas)s"
 
-#: app/templates/cards/device_modal.html:10
+#: app/templates/bar/items.html:135 app/templates/cards/device_modal.html:10
 #: app/templates/cards/device_modal.html:66
-#: app/templates/devices/modify.html:67 app/templates/doas.html:5
-#: app/templates/gris/pceens.html:405 app/templates/gris/pceens.html:412
-#: app/templates/gris/pceens.html:424 app/templates/gris/pceens.html:431
-#: app/templates/gris/pceens.html:445 app/templates/gris/pceens.html:452
-#: app/templates/gris/pceens.html:467 app/templates/gris/pceens.html:474
-#: app/templates/gris/pceens.html:497 app/templates/gris/roles.html:202
+#: app/templates/devices/modify.html:66 app/templates/doas.html:5
+#: app/templates/gris/pceens.html:453 app/templates/gris/pceens.html:459
+#: app/templates/gris/pceens.html:470 app/templates/gris/pceens.html:476
+#: app/templates/gris/pceens.html:488 app/templates/gris/pceens.html:494
+#: app/templates/gris/pceens.html:515 app/templates/gris/roles.html:202
 #: app/templates/macros.html:53 app/templates/payments/main.html:263
 #: app/templates/payments/main.html:272 app/templates/payments/main.html:289
 #: app/templates/payments/main.html:296 app/templates/photos/album.html:252
 #: app/templates/photos/album.html:318 app/templates/rooms/register.html:70
 msgid "Fermer"
 msgstr "Close"
+
+#: app/templates/footer.html:12 app/templates/mails_base.html:58
+msgid "Version"
+msgstr "Version"
+
+#: app/templates/auth/reset_password_request.html:33
+#: app/templates/devices/register.html:250 app/templates/footer.html:24
+msgid "Nous contacter"
+msgstr "Contact us"
+
+#: app/templates/footer.html:30
+msgid "Code source"
+msgstr "Source code"
 
 #: app/templates/macros.html:37
 msgid "Information :"
@@ -817,6 +1006,27 @@ msgstr "I no longer wish to receive emails"
 #: app/templates/mails_base.html:82
 msgid "Se désinscrire"
 msgstr "Unsubscribe"
+
+#: app/templates/auth/auth_needed.html:21 app/templates/auth/login.html:53
+#: app/templates/navbar.html:29
+msgid "Créer un compte"
+msgstr "Sign up"
+
+#: app/templates/devices/register.html:19
+#: app/templates/devices/transfer.html:19
+#: app/templates/main/connect_check.html:28 app/templates/navbar.html:37
+#: app/templates/rooms/register.html:25
+msgid "Internet"
+msgstr "Internet"
+
+#: app/templates/cards/bar.html:5 app/templates/gris/pceens.html:36
+#: app/templates/navbar.html:53
+msgid "Bar"
+msgstr "Bar"
+
+#: app/templates/devices/transfer.html:42 app/templates/navbar.html:64
+msgid "Déconnexion"
+msgstr "Sign out"
 
 #: app/templates/auth/auth_needed.html:11
 msgid "Un compte est nécessaire pour accéder à cette page."
@@ -905,7 +1115,7 @@ msgstr "Available from Rezidence network only"
 msgid "Authentification espci.psl.eu"
 msgstr "Authentication espci.psl.eu"
 
-#: app/templates/auth/register.html:48 app/templates/devices/modify.html:40
+#: app/templates/auth/register.html:48 app/templates/devices/modify.html:39
 msgid "Fonctionnalité à venir"
 msgstr "Upcoming feature"
 
@@ -1019,8 +1229,338 @@ msgstr ""
 "For any question or for more information, you can simply answer this "
 "email."
 
+#: app/templates/bar/export.html:7
+msgid "Exporter les données"
+msgstr "Export data"
+
+#: app/templates/bar/export.html:15
+msgid "Début"
+msgstr "Start"
+
+#: app/templates/bar/export.html:16
+msgid "Fin"
+msgstr "End"
+
+#: app/templates/bar/export.html:17
+msgid "Fichier"
+msgstr "File"
+
+#: app/templates/bar/items.html:39
+msgid "Articles en stock"
+msgstr "Items in inventory"
+
+#: app/templates/bar/items.html:42 app/templates/bar/transactions.html:24
+#: app/templates/gris/pceens.html:48
+msgid "Total :"
+msgstr "Total:"
+
+#: app/templates/bar/items.html:60 app/templates/cards/offer.html:22
+msgid "Prix"
+msgstr "Price"
+
+#: app/templates/bar/items.html:61
+msgid "Alcoolisé"
+msgstr "Alcoholic"
+
+#: app/templates/bar/items.html:62 app/templates/gris/roles.html:47
+msgid "Priorité"
+msgstr "Priority"
+
+#: app/templates/bar/items.html:70
+msgid "N/A"
+msgstr "N/A"
+
+#: app/templates/bar/items.html:133
+msgid "Nouvel article || Modifier : _name_"
+msgstr "New item || Edit _name_"
+
+#: app/templates/bar/items.html:183 app/templates/bar/transactions.html:42
+#: app/templates/bar/user.html:190 app/templates/bar/user.html:280
+#: app/templates/bar/user.html:307 app/templates/devices/modify.html:79
+msgid "Annuler"
+msgstr "Cancel"
+
+#: app/templates/bar/navbar.html:6
+msgid "Menu Bar"
+msgstr "Bar Menu"
+
+#: app/templates/bar/navbar.html:14
+msgid "Rechercher un utilisateur"
+msgstr "Search for an user"
+
+#: app/templates/bar/navbar.html:15 app/templates/bar/stats.html:118
+msgid "Go"
+msgstr "Go"
+
+#: app/templates/bar/navbar.html:29
+msgid "Stats"
+msgstr "Stats"
+
+#: app/templates/bar/navbar.html:34
+msgid "Articles"
+msgstr "Items"
+
+#: app/templates/bar/navbar.html:39 app/templates/bar/transactions.html:21
+#: app/templates/bar/user.html:179
+msgid "Transactions"
+msgstr "Transactions"
+
+#: app/templates/bar/navbar.html:45
+msgid "Outils"
+msgstr "Tools"
+
+#: app/templates/bar/navbar.html:50
+msgid "Exports"
+msgstr "Exports"
+
+#: app/templates/bar/navbar.html:55 app/templates/bar/settings.html:7
+msgid "Paramètres"
+msgstr "Settings"
+
+#: app/templates/bar/search.html:34
+msgid "Recherche"
+msgstr "Search"
+
+#: app/templates/bar/search.html:37
+msgid "Résultats :"
+msgstr "Results:"
+
+#: app/templates/bar/search.html:54
+msgid "(exté)"
+msgstr "(external)"
+
+#: app/templates/bar/settings.html:17
+msgid "Paramètre"
+msgstr "Parameter"
+
+#: app/templates/bar/settings.html:18
+msgid "Valeur"
+msgstr "Value"
+
+#: app/templates/bar/settings.html:28
+msgid "Image de fond"
+msgstr "Background image"
+
+#: app/templates/bar/stats.html:17
+msgid "aujourd’hui"
+msgstr "today"
+
+#: app/templates/bar/stats.html:17
+msgid "le "
+msgstr "on "
+
+#: app/templates/bar/stats.html:48
+msgid "Alcool vendu"
+msgstr "Alcohol sold"
+
+#: app/templates/bar/stats.html:65
+msgid "Recette totale"
+msgstr "Total income"
+
+#: app/templates/bar/stats.html:82
+msgid "Moula totale des clients"
+msgstr "Total clients moula"
+
+#: app/templates/bar/stats.html:99
+msgid "Meilleur client du mois"
+msgstr "Best customer of the month"
+
+#: app/templates/bar/stats.html:116
+msgid "Date&nbsp;:"
+msgstr "Date:"
+
+#: app/templates/bar/transactions.html:36 app/templates/bar/user.html:121
+msgid "Client&middot;e"
+msgstr "Client:"
+
+#: app/templates/bar/transactions.html:38 app/templates/bar/user.html:186
+#: app/templates/cards/device.html:19 app/templates/cards/device_modal.html:20
+msgid "Type"
+msgstr "Type"
+
+#: app/templates/bar/transactions.html:39 app/templates/bar/user.html:187
+msgid "Article"
+msgstr "Item"
+
+#: app/templates/bar/transactions.html:40 app/templates/bar/user.html:188
+#: app/templates/gris/pceens.html:151
+msgid "Balance"
+msgstr "Funds"
+
+#: app/templates/bar/transactions.html:41 app/templates/bar/user.html:189
+msgid "Date"
+msgstr "Date"
+
+#: app/templates/bar/transactions.html:60 app/templates/bar/user.html:203
+msgid "Conso"
+msgstr "Consumed"
+
+#: app/templates/bar/transactions.html:63 app/templates/bar/user.html:206
+msgid "Recharge"
+msgstr "Top up"
+
+#: app/templates/bar/user.html:16
+msgid "Profil Bar :"
+msgstr "Bar Profile:"
+
+#: app/templates/bar/user.html:29 app/templates/bar/user.html:306
+#: app/templates/cards/bar.html:40
+msgid "Recharger"
+msgstr "Top up"
+
+#: app/templates/bar/user.html:36 app/templates/cards/subscription.html:106
+#: app/templates/cards/subscription.html:114
+#: app/templates/cards/subscription.html:121
+#: app/templates/payments/main.html:86 app/templates/payments/main.html:94
+#: app/templates/payments/main.html:101
+msgid "Payer"
+msgstr "Pay"
+
+#: app/templates/bar/user.html:39
+msgid "Favoris"
+msgstr "Favorites"
+
+#: app/templates/bar/user.html:43
+msgid "Autres articles"
+msgstr "Other items"
+
+#: app/templates/bar/user.html:59
+msgid "Modifiable depuis l'onglet Paramètres"
+msgstr "Can be modified form Settings tab"
+
+#: app/templates/bar/user.html:71
+msgid "Pas de favori"
+msgstr "No favorite"
+
+#: app/templates/bar/user.html:80 app/templates/gris/pceens.html:141
+msgid "Caution"
+msgstr "Deposit"
+
+#: app/templates/bar/user.html:82
+#, python-format
+msgid "Accepter la caution de %(name)s ?"
+msgstr "Accept %(name)s deposit?"
+
+#: app/templates/bar/user.html:85
+msgid "Valider le dépôt de caution"
+msgstr "Validate deposit"
+
+#: app/templates/bar/user.html:91
+msgid "Modifier le surnom"
+msgstr "Edit nickname"
+
+#: app/templates/bar/user.html:110 app/templates/gris/roles.html:36
+msgid "Rôle"
+msgstr "Role"
+
+#: app/templates/bar/user.html:115
+msgid "GRI tout-puissant"
+msgstr "Almighty GRI"
+
+#: app/templates/bar/user.html:119
+msgid "Observateur"
+msgstr "Observer"
+
+#: app/templates/bar/user.html:126 app/templates/cards/account.html:30
+msgid "Email"
+msgstr "Mail"
+
+#: app/templates/bar/user.html:135
+msgid "Externe"
+msgstr "External"
+
+#: app/templates/bar/user.html:138
+msgid "Solde actuel"
+msgstr "Current founds"
+
+#: app/templates/bar/user.html:154
+msgid "Limite d'alcool aujourd’hui"
+msgstr "Alcohol limit today"
+
+#: app/templates/bar/user.html:258
+#, python-format
+msgid "Modifier les infos Bar de %(name)s"
+msgstr "Edit %(name)s's Bar info"
+
+#: app/templates/bar/user.html:273
+msgid "Nouvel avatar (sera recadré en 160x200 px) :"
+msgstr "New avatar (will be cropped to 160x200px):"
+
+#: app/templates/bar/user.html:295
+#, python-format
+msgid "Recharger le compte de %(name)s"
+msgstr "Top up %(name)s's account"
+
+#: app/templates/bar/user.html:302
+msgid "Montant en euros"
+msgstr "Amount in euros"
+
+#: app/templates/bar/welcome.html:17
+msgid "Le site du Bar fait maintenant partie intégrante de PC est magique !"
+msgstr "Bar site is now an integral part of PC est magique!"
+
+#: app/templates/bar/welcome.html:19
+msgid "Pas de panique, rien ne change."
+msgstr "Don't panic, nothing changes."
+
+#: app/templates/bar/welcome.html:22
+msgid "Amis barmen, il y a même quelques nouvelles fonctionnalités au passage !"
+msgstr "Barmen friends, the're even some new features by the way!"
+
+#: app/templates/bar/welcome.html:34
+msgid "J'ai déjà un compte PC est magique / IntraRez"
+msgstr "I already have a PC est magique / IntraRez account"
+
+#: app/templates/bar/welcome.html:44
+msgid ""
+"Si tout va bien, tes données Bar ont été automatiquement importées dans "
+"ton compte !"
+msgstr ""
+"If everything went good, your Bar data have automatically been imported "
+"into your account!"
+
+#: app/templates/bar/welcome.html:60
+msgid "J'avais un compte du Bar uniquement, avec mon adresse ESPCI"
+msgstr "I only had a Bar account, with my ESPCI address"
+
+#: app/templates/bar/welcome.html:70
+msgid ""
+"Ton compte a été importé automatiquement ! Tu peux t'y connecter "
+"directement grâce à ton compte ESPCI (aucun partage de données)"
+msgstr ""
+"Your account has been automatically imported! You can connect directly "
+"through your ESPCI account (no data shared)"
+
+#: app/templates/bar/welcome.html:75
+msgid "Connexion<br/>ESPCI"
+msgstr "ESPCI<br/>login"
+
+#: app/templates/bar/welcome.html:87
+msgid "J'avais un compte du Bar uniquement"
+msgstr "I only had a Bar account"
+
+#: app/templates/bar/welcome.html:97
+msgid ""
+"Ton compte a été importé automatiquement, avec les mêmes identifiant et "
+"mot de passe !"
+msgstr ""
+"Your account has been automatically imported, with same login and "
+"password!"
+
+#: app/templates/bar/welcome.html:101
+msgid "Connexion<br/>manuelle"
+msgstr "Manual<br/>login"
+
+#: app/templates/bar/welcome.html:121
+msgid "En cas de pépin, n'hésite pas à"
+msgstr "If any problem, do not hesitate to "
+
+#: app/templates/bar/welcome.html:122
+msgid "contacter les GRI"
+msgstr "contact GRI"
+
 #: app/templates/cards/account.html:5 app/templates/devices/register.html:10
-#: app/templates/devices/transfer.html:10 app/templates/gris/pceens.html:403
+#: app/templates/devices/transfer.html:10
 #: app/templates/main/connect_check.html:18
 #: app/templates/rooms/register.html:16
 msgid "Compte"
@@ -1030,12 +1570,8 @@ msgstr "Account"
 msgid "Identifiant"
 msgstr "ID"
 
-#: app/templates/cards/account.html:30
-msgid "Email"
-msgstr "Mail"
-
 #: app/templates/cards/account.html:36 app/templates/gris/menu.html:14
-#: app/templates/gris/pceens.html:113
+#: app/templates/gris/pceens.html:172
 msgid "Rôles"
 msgstr "Roles"
 
@@ -1047,22 +1583,43 @@ msgstr "Edit an information"
 msgid "Changer de mot de passe"
 msgstr "Change password"
 
+#: app/templates/cards/bar.html:14
+msgid "Mon solde"
+msgstr "Current funds"
+
+#: app/templates/cards/bar.html:18
+msgid "Limite d'alcool"
+msgstr "Alcohol limit"
+
+#: app/templates/cards/bar.html:20
+#, python-format
+msgid "%(count)s/%(limit)s aujourd’hui"
+msgstr "(count)s/%(limit)s today"
+
+#: app/templates/cards/bar.html:28
+msgid "Dépensé aujourd’hui"
+msgstr "Spent today"
+
+#: app/templates/cards/bar.html:35 app/templates/cards/device.html:109
+msgid "Détails"
+msgstr "Details"
+
+#: app/templates/cards/bar.html:38
+msgid "Fonctionnalité à venir - voir directement au Bar"
+msgstr "Upcoming feature – see directly at the Bar"
+
 #: app/templates/cards/coming_soon.html:5
 msgid "À venir"
 msgstr "Coming soon"
 
-#: app/templates/cards/device.html:5 app/templates/gris/pceens.html:80
-#: app/templates/gris/pceens.html:442
+#: app/templates/cards/device.html:5 app/templates/gris/pceens.html:120
+#: app/templates/gris/pceens.html:468
 msgid "Appareils"
 msgstr "Devices"
 
 #: app/templates/cards/device.html:15 app/templates/cards/device.html:52
 msgid "Appareil actuel"
 msgstr "Actual device"
-
-#: app/templates/cards/device.html:19 app/templates/cards/device_modal.html:20
-msgid "Type"
-msgstr "Type"
 
 #: app/templates/cards/device.html:27 app/templates/cards/device_modal.html:30
 msgid "IP attribuée"
@@ -1073,7 +1630,7 @@ msgid "Enregistrement"
 msgstr "Register"
 
 #: app/templates/cards/device.html:39 app/templates/cards/device.html:88
-#: app/templates/cards/device_modal.html:44 app/templates/gris/pceens.html:102
+#: app/templates/cards/device_modal.html:44 app/templates/gris/pceens.html:162
 msgid "Dernière connexion"
 msgstr "Last connection"
 
@@ -1102,17 +1659,13 @@ msgstr "Other devices:"
 msgid "Appareils :"
 msgstr "Devices:"
 
-#: app/templates/cards/device.html:109
-msgid "Détails"
-msgstr "Details"
-
 #: app/templates/cards/device.html:136
 msgid "Nouvel appareil"
 msgstr "New device"
 
 #: app/templates/cards/device_modal.html:8
 #: app/templates/devices/register.html:16
-#: app/templates/devices/transfer.html:16 app/templates/gris/pceens.html:229
+#: app/templates/devices/transfer.html:16 app/templates/gris/pceens.html:286
 #: app/templates/main/connect_check.html:24
 #: app/templates/rooms/register.html:22
 msgid "Appareil"
@@ -1127,10 +1680,6 @@ msgstr "Offer"
 #: app/templates/cards/offer.html:18
 msgid "Description"
 msgstr "Description"
-
-#: app/templates/cards/offer.html:22
-msgid "Prix"
-msgstr "Price"
 
 #: app/templates/cards/offer.html:31
 msgid "Changer d'offre"
@@ -1226,8 +1775,9 @@ msgid "Modifier les dates"
 msgstr "Edit dates"
 
 #: app/templates/cards/subscription.html:5
-msgid "Mon abonnement"
-msgstr "My subscription"
+#: app/templates/cards/subscription.html:87
+msgid "Accès Internet"
+msgstr "Internet Access"
 
 #: app/templates/cards/subscription.html:17
 #: app/templates/cards/subscription.html:41
@@ -1235,7 +1785,7 @@ msgstr "My subscription"
 msgid "État"
 msgstr "Status"
 
-#: app/templates/cards/subscription.html:20 app/templates/gris/pceens.html:241
+#: app/templates/cards/subscription.html:20 app/templates/gris/pceens.html:298
 #: app/templates/payments/main.html:18
 msgid "Abonné(e)"
 msgstr "Subscribed"
@@ -1245,14 +1795,10 @@ msgstr "Subscribed"
 msgid "Coupure le"
 msgstr "Cut on"
 
-#: app/templates/cards/subscription.html:44 app/templates/gris/pceens.html:245
+#: app/templates/cards/subscription.html:44 app/templates/gris/pceens.html:300
 #: app/templates/payments/main.html:37
 msgid "Mois offert"
 msgstr "Free month"
-
-#: app/templates/cards/subscription.html:87
-msgid "Accès Internet"
-msgstr "Internet Access"
 
 #: app/templates/cards/subscription.html:88 app/templates/payments/main.html:72
 msgid "Suspendu"
@@ -1266,14 +1812,6 @@ msgstr "More information"
 #: app/templates/payments/main.html:83
 msgid "Renouvellement possible à partir de la fin de l'abonnement actuel"
 msgstr "Renewal possible from the end of the current subscription"
-
-#: app/templates/cards/subscription.html:106
-#: app/templates/cards/subscription.html:114
-#: app/templates/cards/subscription.html:121
-#: app/templates/payments/main.html:86 app/templates/payments/main.html:94
-#: app/templates/payments/main.html:101
-msgid "Payer"
-msgstr "Pay"
 
 #: app/templates/devices/error.html:17
 msgid ""
@@ -1314,7 +1852,7 @@ msgstr "so we can see together how to address this issue."
 msgid "Code erreur :"
 msgstr "Error code:"
 
-#: app/templates/devices/modify.html:19
+#: app/templates/devices/modify.html:18
 msgid ""
 "Pour plus d'informations sur les adresses MAC et comment la trouver pour "
 "un appareil, voir en bas de "
@@ -1322,40 +1860,29 @@ msgstr ""
 "For more information on MAC addresses and how to find it for a device, "
 "see at the bottom of "
 
-#: app/templates/devices/modify.html:22
+#: app/templates/devices/modify.html:21
 msgid "la page d'enregistrement"
 msgstr "the registration page"
 
-#: app/templates/devices/modify.html:44 app/templates/devices/modify.html:83
+#: app/templates/devices/modify.html:43 app/templates/devices/modify.html:82
 msgid "Supprimer l'appareil"
 msgstr "Delete device"
 
-#: app/templates/devices/modify.html:56
+#: app/templates/devices/modify.html:55
 #: app/templates/profile/modify_account.html:34
 #: app/templates/profile/update_password.html:31
 #: app/templates/rooms/modify.html:31
 msgid "Retour"
 msgstr "Back"
 
-#: app/templates/devices/modify.html:65
+#: app/templates/devices/modify.html:64
 msgid "Supprimer l'appareil ?"
 msgstr "Delete device?"
 
-#: app/templates/devices/modify.html:71
+#: app/templates/devices/modify.html:70
 #, python-format
 msgid "Supprimer l'appareil « %(name)s » ?"
 msgstr "Delete device \"%(name)s\"?"
-
-#: app/templates/devices/modify.html:80
-msgid "Annuler"
-msgstr "Cancel"
-
-#: app/templates/devices/register.html:19
-#: app/templates/devices/transfer.html:19
-#: app/templates/main/connect_check.html:28
-#: app/templates/rooms/register.html:25
-msgid "Internet"
-msgstr "Internet"
 
 #: app/templates/devices/register.html:31
 msgid "Enregistrer un appareil lui permet de se connecter au réseau."
@@ -1814,43 +2341,59 @@ msgstr "Username:"
 msgid "Mot de passe :"
 msgstr "Password:"
 
-#: app/templates/gris/pceens.html:25 app/templates/gris/roles.html:25
+#: app/templates/gris/pceens.html:24
+msgid "Vue :"
+msgstr "View:"
+
+#: app/templates/gris/pceens.html:28
+msgid "Actifs"
+msgstr "Active"
+
+#: app/templates/gris/pceens.html:32
+msgid "Rezidents"
+msgstr "Rezidents"
+
+#: app/templates/gris/pceens.html:40
+msgid "Tous"
+msgstr "Everyone"
+
+#: app/templates/gris/pceens.html:45
+msgid "Fonctionnalité à venir (peut-être)"
+msgstr "Upcoming feature (maybe)"
+
+#: app/templates/gris/pceens.html:69 app/templates/gris/roles.html:25
 #: app/templates/payments/main.html:195
 msgid "ID"
 msgstr "ID"
 
-#: app/templates/gris/pceens.html:47
+#: app/templates/gris/pceens.html:89
 msgid "Promo"
 msgstr "Grad class"
 
-#: app/templates/gris/pceens.html:195
+#: app/templates/gris/pceens.html:130 app/templates/gris/pceens.html:486
+msgid "Abonnement"
+msgstr "Subscription"
+
+#: app/templates/gris/pceens.html:254
 msgid "Aucune"
 msgstr "None"
 
-#: app/templates/gris/pceens.html:239
+#: app/templates/gris/pceens.html:296
 msgid "Aucun"
 msgstr "None"
 
-#: app/templates/gris/pceens.html:249
+#: app/templates/gris/pceens.html:302
 msgid "Hors-la-loi"
 msgstr "Outlaw"
 
-#: app/templates/gris/pceens.html:494
+#: app/templates/gris/pceens.html:513
 msgid "Bannir _name_ || Ban de _name_"
 msgstr "Ban _name_ || Ban of _name_"
 
-#: app/templates/gris/pceens.html:543 app/templates/photos/album.html:302
+#: app/templates/gris/pceens.html:560 app/templates/photos/album.html:302
 #: app/templates/photos/album.html:337
 msgid "En fait non"
 msgstr "Actually, no"
-
-#: app/templates/gris/roles.html:36
-msgid "Rôle"
-msgstr "Role"
-
-#: app/templates/gris/roles.html:47
-msgid "Priorité"
-msgstr "Priority"
 
 #: app/templates/gris/roles.html:58
 msgid "Permissions"
@@ -1939,7 +2482,7 @@ msgstr "PC est magique and other internal services are still available."
 msgid "Pour toute question ou réclamation, n'hésitez pas à "
 msgstr "For any question or complaint, please feel free to "
 
-#: app/templates/main/changelog.html:11
+#: app/templates/main/changelog.html:13
 msgid ""
 "Ces notes de mise à jour présentent les modifications principales du "
 "point de vue utilisateur. Pour un changelog plus technique, voir"
@@ -1951,27 +2494,31 @@ msgstr ""
 msgid "sur GitHub"
 msgstr "on GitHub"
 
-#: app/templates/main/changelog.html:21
+#: app/templates/main/changelog.html:23
+msgid "Intégration du site du Bar comme module de ce site."
+msgstr "Integration of IntraRez website as a module of this site."
+
+#: app/templates/main/changelog.html:32
 msgid "Mise en place de l'authentification avec le SSO de l'ESPCI."
 msgstr "Setup authentication with ESPCI SSO."
 
-#: app/templates/main/changelog.html:24
+#: app/templates/main/changelog.html:35
 msgid "Accès effectif aux photos."
 msgstr "Effective access to photos."
 
-#: app/templates/main/changelog.html:32
+#: app/templates/main/changelog.html:44
 msgid "Intégration du site de l'IntraRez dans ce site."
 msgstr "Integration of IntraRez website here."
 
-#: app/templates/main/changelog.html:35
+#: app/templates/main/changelog.html:47
 msgid "Ajout du module de photos."
 msgstr "Added photos module."
 
-#: app/templates/main/changelog.html:38
+#: app/templates/main/changelog.html:50
 msgid "Nouveau système de rôles et permissions."
 msgstr "New system of roles & permissions."
 
-#: app/templates/main/changelog.html:46
+#: app/templates/main/changelog.html:59
 msgid ""
 "Système de coupure d'accès Internet en cas de non-paiement ou autre (en "
 "fait avant c'était du bluff eheh) ;"
@@ -1979,85 +2526,85 @@ msgstr ""
 "Internet cut system if not paying or other reason (it was bluff before "
 "then hehe);"
 
-#: app/templates/main/changelog.html:51
+#: app/templates/main/changelog.html:63
 msgid "Correction de divers bugs mineurs."
 msgstr "Minor bug fixes."
 
-#: app/templates/main/changelog.html:59
+#: app/templates/main/changelog.html:72
 msgid "Mise en service des paiements : "
 msgstr "Payments commissioning:"
 
-#: app/templates/main/changelog.html:61
+#: app/templates/main/changelog.html:74
 msgid "Page générique d'information ;"
 msgstr "Generic information page;"
 
-#: app/templates/main/changelog.html:62
+#: app/templates/main/changelog.html:75
 msgid "Page de choix de l'offre et du moyen de paiement ;"
 msgstr "Offer / payment method choice page;"
 
-#: app/templates/main/changelog.html:64
+#: app/templates/main/changelog.html:76
 msgid "Pages de paiement par Lydia / CB, virement bancaire ou espèces ;"
 msgstr "Lydia / credit card, bank transfer and cash pay pages; "
 
-#: app/templates/main/changelog.html:66
+#: app/templates/main/changelog.html:77
 msgid "Page d'ajout / validation de paiement pour les GRI ;"
 msgstr "Payment add / validation page for GRI;"
 
-#: app/templates/main/changelog.html:68
+#: app/templates/main/changelog.html:78
 msgid ""
 "Souscription automatique à l'offre de bienvenue lors de la première "
 "connexion ;"
 msgstr "Automatic subscription to welcoming offer at first connection;"
 
-#: app/templates/main/changelog.html:70
+#: app/templates/main/changelog.html:79
 msgid "Intégration à la page d'accueil et à la barre de menu."
 msgstr "Integration to home page and navigation bar."
 
-#: app/templates/main/changelog.html:75
+#: app/templates/main/changelog.html:83
 msgid "Envoi de mails riches, au format HTML :"
 msgstr "Send rich mails (HTML format):"
 
-#: app/templates/main/changelog.html:77
+#: app/templates/main/changelog.html:85
 msgid "Lors de la création de compte ;"
 msgstr "When creating an account;"
 
-#: app/templates/main/changelog.html:78
+#: app/templates/main/changelog.html:86
 msgid "En cas d'oubli de mot de passe ;"
 msgstr "When you forgot your password;"
 
-#: app/templates/main/changelog.html:79
+#: app/templates/main/changelog.html:87
 msgid "Lors de la perte de sa chambre ;"
 msgstr "When losing its room;"
 
-#: app/templates/main/changelog.html:80
+#: app/templates/main/changelog.html:88
 msgid "À la validation d'un paiement ;"
 msgstr "When a payment is validated;"
 
-#: app/templates/main/changelog.html:81
+#: app/templates/main/changelog.html:89
 msgid "Un mois avant, une semaine avant et le jour d'expiration d'un abonnement."
 msgstr "One month before, one week before, and the day a subscription expires."
 
-#: app/templates/main/changelog.html:86
+#: app/templates/main/changelog.html:93
 msgid "Ajout de la possibilité de modifier : "
 msgstr "Added the possibility de modify:"
 
-#: app/templates/main/changelog.html:88
+#: app/templates/main/changelog.html:95
 msgid "Une information sur son profil ;"
 msgstr "Information on your profile;"
 
-#: app/templates/main/changelog.html:89
+#: app/templates/main/changelog.html:96
 msgid "Son mot de passe ;"
 msgstr "Your password;"
 
-#: app/templates/main/changelog.html:90
+#: app/templates/main/changelog.html:97
 msgid "Les dates d'une location ;"
 msgstr "A rental dates;"
 
-#: app/templates/main/changelog.html:91
+#: app/templates/main/changelog.html:98
 msgid "Les informations sur un appareil."
 msgstr "Information on a device."
 
-#: app/templates/main/changelog.html:95
+#: app/templates/main/changelog.html:102
 msgid ""
 "La langue préférée (français ou anglais, selon les paramètres du "
 "navigateur) est enregistrée pour chaque PCéen, et utilisée pour l'envoi "
@@ -2066,47 +2613,47 @@ msgstr ""
 "The preferred language (French or English, depending of your browser "
 "parameters) is registered for each PCéen, and used for sending mails."
 
-#: app/templates/main/changelog.html:100
+#: app/templates/main/changelog.html:106
 msgid "Ajout d'un mode maintenance activable par les GRI."
 msgstr "Added a maintenance mode activable by the GRI."
 
-#: app/templates/main/changelog.html:103
+#: app/templates/main/changelog.html:109
 msgid "Ajout d'une page GRI pour exécuter un script."
 msgstr "Added a GRI page to run a script."
 
-#: app/templates/main/changelog.html:111
+#: app/templates/main/changelog.html:117
 msgid ""
 "L'IntraRez est maintenant utilisable depuis l'extérieur de la Rezidence, "
 "à l'adresse "
 msgstr "IntraRez is now available from the outside of the Rezidence, at address "
 
-#: app/templates/main/changelog.html:115
+#: app/templates/main/changelog.html:119
 msgid "(sauf pour la création de compte)."
 msgstr "(except for account creation)."
 
-#: app/templates/main/changelog.html:118
+#: app/templates/main/changelog.html:122
 msgid ""
 "L'utilisation du formulaire de contact depuis l'extérieur est maintenant "
 "soumise à un captcha."
 msgstr "Using the contact form from the outside is now subject to a captcha."
 
-#: app/templates/main/changelog.html:127
+#: app/templates/main/changelog.html:130
 msgid "Ajout du mécanisme de changement de chambre."
 msgstr "Added the room change mechanism."
 
-#: app/templates/main/changelog.html:130
+#: app/templates/main/changelog.html:133
 msgid "Ajout de l'adresse IP attribuée aux appareils dans le profil."
 msgstr "Added device allocated IP address to the Profile."
 
-#: app/templates/main/changelog.html:134
+#: app/templates/main/changelog.html:136
 msgid "Les GRI peuvent maintenant gérer les chambres et les appareils des PCéens."
 msgstr "GRI can now manage PCéens rooms and devices."
 
-#: app/templates/main/changelog.html:138
+#: app/templates/main/changelog.html:139
 msgid "Ajout de cette page."
 msgstr "Added this page."
 
-#: app/templates/main/changelog.html:146
+#: app/templates/main/changelog.html:147
 msgid ""
 "Ajout d'options GRI pour la gestion des PCéens et la surveillance du "
 "réseau."
@@ -2116,7 +2663,7 @@ msgstr "Added GRI options for PCéens managements and network monitoring."
 msgid "Mise en place d'un portail captif pour simplifier la connexion au réseau."
 msgstr "Added a captive portal to make connection easier."
 
-#: app/templates/main/changelog.html:162
+#: app/templates/main/changelog.html:161
 msgid "Première version publique."
 msgstr "First public version."
 
@@ -3037,85 +3584,105 @@ msgstr ""
 msgid "Quelqu'un vient de voler ma chambre (%(room)s) !"
 msgstr "Someone just stole my room (%(room)s)!"
 
-#: app/utils/lydia.py:85
+#: app/utils/lydia.py:82
 msgid "Offre Internet à la Rez :"
 msgstr "Rezidence Internet offer:"
 
-#: app/utils/lydia.py:146
+#: app/utils/lydia.py:130
 msgid "Signature invalide, impossible de valider le paiement"
 msgstr "Invalid signature, unable to validate payment"
 
-#: app/utils/validators.py:35
+#: app/utils/roles.py:18
+msgid "Accès aux modules élèves débloqué !"
+msgstr "Students modules access granted!"
+
+#: app/utils/roles.py:44
+msgid "Accès aux modules IntraRez débloqué !"
+msgstr "IntraRez modules access granted!"
+
+#: app/utils/validators.py:36
 msgid "Ce champ est requis."
 msgstr "This field is required."
 
-#: app/utils/validators.py:42
+#: app/utils/validators.py:43
 msgid "Adresse email invalide."
 msgstr "Invalid email address."
 
-#: app/utils/validators.py:49
+#: app/utils/validators.py:50
 msgid "Valeur différente du champ précédent."
 msgstr "The value differ from the previous field."
 
-#: app/utils/validators.py:56
+#: app/utils/validators.py:59
+#, python-format
+msgid "Valeur incohérente avec le champ %(field)s."
+msgstr "Value inconsistent with field %(field)s."
+
+#: app/utils/validators.py:69
 msgid "Adresse MAC invalide (format attendu : xx:xx:xx:xx:xx:xx)."
 msgstr "Invalid MAC address (expected format: xx:xx:xx:xx:xx:xx)."
 
-#: app/utils/validators.py:73
+#: app/utils/validators.py:79
 #, python-format
 msgid "Doit faire moins de %(max)d caractères."
 msgstr "Must be less than %(max)d characters long."
 
-#: app/utils/validators.py:75
+#: app/utils/validators.py:81
 #, python-format
 msgid "Doit faire au moins %(min)d caractères."
 msgstr "Must be at least %(min)d characters long."
 
-#: app/utils/validators.py:77
+#: app/utils/validators.py:83
 #, python-format
 msgid "Doit faire entre %(min)d et %(max)d caractères."
 msgstr "Must be between %(min)d and %(max)d characters."
 
-#: app/utils/validators.py:97
+#: app/utils/validators.py:98
 #, python-format
 msgid "Doit être inférieur à %(max)f."
 msgstr "Must be lower than %(max)f."
 
-#: app/utils/validators.py:99
+#: app/utils/validators.py:100
 #, python-format
 msgid "Doit être supérieur à %(min)f."
 msgstr "Must be higher than %(min)f."
 
-#: app/utils/validators.py:101
+#: app/utils/validators.py:102
 #, python-format
 msgid "Doit être entre %(min)f et %(max)f."
 msgstr "Must be between %(min)f and %(max)f."
 
-#: app/utils/validators.py:106
+#: app/utils/validators.py:107
 msgid "Adresse e-mail déjà liée à un autre compte."
 msgstr "Mail address already linked to an account."
 
-#: app/utils/validators.py:114
+#: app/utils/validators.py:115
 msgid "PCeen ID invalide."
 msgstr "Invalid PCéen ID."
 
-#: app/utils/validators.py:121
+#: app/utils/validators.py:122
 msgid "Numéro de chambre invalide."
 msgstr "Invalid room number."
 
-#: app/utils/validators.py:128
+#: app/utils/validators.py:129
 msgid "Ban ID invalide."
 msgstr "Invalid Ban ID."
 
-#: app/utils/validators.py:135
+#: app/utils/validators.py:136
 msgid "Cette date doit être dans le passé !"
 msgstr "This date must be in the past!"
 
-#: app/utils/validators.py:144
+#: app/utils/validators.py:145
 msgid "Cette date doit être dans le futur !"
 msgstr "This date must be in the future!"
 
-#: app/utils/validators.py:153
+#: app/utils/validators.py:154
 msgid "Numéro de téléphone invalide (il doit être français)."
 msgstr "Invalid phone number (must be a French one)."
 
+#: app/utils/validators.py:162
+msgid "Il existe déjà un article avec ce nom."
+msgstr "An item with this name already exists."
+
+#: app/utils/validators.py:170
+msgid "Item ID invalide."
+msgstr "Invalid item ID."

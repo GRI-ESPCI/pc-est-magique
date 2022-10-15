@@ -1,0 +1,318 @@
+{% extends "bar/base.html" %}
+{% import "_form.html" as wtf %}
+
+{% block bar_app_content %}
+{% with theme = "muted" if not pceen.bar_deposit
+    else ("danger" if pceen.bar_balance <= 1
+    else ("warning" if pceen.bar_balance <= 5
+    else "secondary"))
+%}
+{% with current_user_is_barman = has_permission(PermissionType.write, PermissionScope.bar) %}
+
+<div class="container">
+<div class="card shadow border-{{ theme }}">
+    <div class="card-header">
+        <h3 class="card-title text-{{ theme }} my-1">
+            <span>{{ _("Profil Bar :") }}</span>
+            <span class="fw-bold">{{ pceen.prenom }}
+            {% if current_user_is_barman and pceen.bar_nickname %}&laquo;&nbsp;{{ pceen.bar_nickname }}&nbsp;&raquo;{% endif %}
+            {{ pceen.nom }}</span>
+        </h3>
+        {% if current_user_is_barman %}
+        <hr />
+        <div class="btn-toolbar justify-content-between mb-2" role="toolbar">
+            {% if pceen.bar_deposit %}
+            <div class="d-inline-flex" role="group" aria-label="User actions">
+
+                <button type="button" class="btn user-card-btn btn btn-success" data-bs-toggle="modal" data-bs-target="#top-up-modal">
+                    <svg class="bi flex-shrink-0" width="24" height="24" role="img">{{ macros.bootstrap_icon("credit-card") }}</svg>
+                    <span class="d-none d-sm-inline">{{ _("Recharger") }}</span>
+                </button>
+
+                <div class="dropdown mx-1">
+                    <button class="btn btn-{{ theme }} dropdown-toggle d-inline-block" type="button"
+                            data-bs-toggle="dropdown" {% if not pceen.bar_deposit %} disabled{% endif %}>
+                        <svg class="bi flex-shrink-0" width="24" height="24" role="img">{{ macros.bootstrap_icon("cart-plus") }}</svg>
+                        <span class="d-none d-sm-inline">{{ _("Payer") }}</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <!-- <li><h6 class="dropdown-header">{{ _("Favoris") }}</h6></li> -->
+                        {% for item, (can_be_bought, limit_message, first_not_favorite) in item_descriptions.items() %}
+                        {% if first_not_favorite %}
+                        <li><hr class="dropdown-divider"></li>
+                        <!-- <li><h6 class="dropdown-header">{{ _("Autres articles") }}</h6></li> -->
+                        {% endif %}
+                        <li{% if not can_be_bought %} data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="{{ limit_message }}"{% endif %}>
+                            <a class="dropdown-item{% if not can_be_bought %} disabled{% endif %}" role="button"
+                                {% if can_be_bought %}
+                                onclick="post_and_reload('{{ url_for("api.bar.pay", pceen_id=pceen.id, item_id=item.id) }}');"
+                                {% endif %}
+                            >
+                                {{ item.name }} ({{ babel.format_currency(item.price, "EUR") }}{% if item.is_quantifiable %}, x{{ item.quantity }}{% endif %})
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                {% with can_be_bought, limit_message, _ffi = item_descriptions.get(quick_access_item,
+                    (False, _("Modifiable depuis l'onglet Paramètres"))) %}
+                {% if not can_be_bought %}
+                <div data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="{{ limit_message }}">
+                {% endif %}
+                    <button class="user-card-btn quick-access-item btn btn-outline-{{ theme }}" role="button"
+                        {% if can_be_bought %}onclick="post_and_reload('{{
+                            url_for("api.bar.pay", pceen_id=pceen.id, item_id=quick_access_item.id)
+                        }}');"{% else %}disabled{% endif %}
+                    >
+                        <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                            {{ macros.bootstrap_icon("emoji-heart-eyes-fill" if can_be_bought else "emoji-frown") }}
+                        </svg>
+                        {{ quick_access_item.name or _("Pas de favori") }}
+                    </button>
+                {% if not can_be_bought %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+            </div>
+            {% else %}
+            <div class="btn-group" role="group" aria-label="{{ _("Caution") }}">
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#deposit-modal"
+                        onclick="confirm('{{ _("Accepter la caution de %(name)s ?", name=pceen.full_name) }}')
+                                 && post_and_reload('{{ url_for("api.bar.post_deposit", pceen_id=pceen.id) }}');"
+                        >
+                    {{ _("Valider le dépôt de caution") }}
+                </button>
+            </div>
+            {% endif %}
+
+            <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                    data-bs-target="#edit-user-modal" title="{{ _("Modifier le surnom") }}">
+                <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                    {{ macros.bootstrap_icon("pencil") }}
+                </svg>
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-4 col-lg-3 mb-4" align="center">
+                <img {% include "bar/_avatar_args.html" %}>
+            </div>
+
+            <div class="table-responsive-sm col-md-8 col-lg-9">
+            <table class="table table-striped">
+            <tbody>
+                <tr>
+                    <td title="{{ _("Rôle") }}"><svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                        {{ macros.bootstrap_icon("shield-lock-fill") }}
+                    </svg></td>
+                    <td>
+                        {% if pceen.is_gri %}
+                        {{ _("GRI tout-puissant") }}
+                        {% elif pceen.has_permission(PermissionType.write, PermissionScope.bar) %}
+                        {{ _("Barman / barmaid") }}
+                        {% elif pceen.has_permission(PermissionType.read, PermissionScope.bar_stats) %}
+                        {{ _("Observateur") }}
+                        {% else %}
+                        {{ _("Client&middot;e") }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td title="{{ _("Email") }}"><svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                        {{ macros.bootstrap_icon("envelope-open-fill") }}
+                    </svg></td>
+                    <td><a href="mailto:{{ pceen.email }}" class="text-dark">{{ pceen.email }}</a></td>
+                </tr>
+                <tr>
+                    <td title="{{ _("Promotion") }}"><svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                        {{ macros.bootstrap_icon("people-fill") }}
+                    </svg></td>
+                    <td>{{ pceen.promo or _("Externe") }}</td>
+                </tr>
+                <tr>
+                    <td title="{{ _("Solde actuel") }}"><svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                        {{ macros.bootstrap_icon("piggy-bank-fill") }}
+                    </svg></td>
+                    <td class="container"><div class="row align-middle"><div class="col col-4 col-sm-3 col-lg-2">
+                        {{ babel.format_currency(pceen.bar_balance or 0, "EUR") }}
+                        </div><div class="col">
+                        <div class="progress bg-muted border border-{{ theme }}" style="height: 24px;">
+                            <div class="progress-bar bg-{{ theme }}" role="progressbar"
+                                 aria-valuenow="{{ pceen.bar_balance }}" aria-valuemin="0" aria-valuemax="100"
+                                 style="width: {{ pceen.bar_balance }}%; max-width: 100%">
+                            </div>
+                        </div>
+                    </div></div></td>
+                </tr>
+                <tr>
+                    {% with alcohol_bought_count = pceen.current_bar_daily_data.alcohol_bought_count%}
+                    <td title="{{ _("Limite d'alcool aujourd’hui") }}">
+                        <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                            {{ macros.bootstrap_icon("cup-fill") }}
+                        </svg>
+                    </td>
+                    <td class="container"><div class="row align-middle"><div class="col col-4 col-sm-3 col-lg-2">
+                        {{ alcohol_bought_count }}/{{ Settings.max_daily_alcoholic_drinks_per_user }}
+                        </div><div class="col">
+                            <div class="progress bg-success" style="height: 24px;">
+                                <div class="progress-bar bg-danger" role="progressbar"
+                                aria-valuenow="{{ pceen.bar_balance }}" aria-valuemin="0" aria-valuemax="100"
+                                style="width: {{ alcohol_bought_count * 25 }}%; max-width: 100%">
+                            </div>
+                        </div>
+                    </div></div></td>
+                    {% endwith %}
+                </tr>
+            </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- User statistics -->
+    <div class="card-footer">
+        <h4 class="card-title text-{{ theme }}">{{ _("Transactions") }}</h4>
+        <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>{{ _("Barman / barmaid") }}</th>
+                    <th>{{ _("Type") }}</th>
+                    <th>{{ _("Article") }}</th>
+                    <th>{{ _("Balance") }}</th>
+                    <th>{{ _("Date") }}</th>
+                    {% if current_user_is_barman %}<th>{{ _("Annuler") }}</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in paginator.items %}
+                <tr {% if transaction.is_reverted %}class="table-danger text-decoration-line-through"{% endif %}>
+                    <th class="align-middle">{{ transaction.id }}</th>
+                    <td class="align-middle text-nowrap">
+                        <a href="{{ url_for("bar.user", username=transaction.barman.username) }}" class="text-secondary">
+                            {{ transaction.barman.full_name }}
+                        </a>
+                    </td>
+                    {% if transaction.type == BarTransactionType.pay_item %}
+                    <td class="align-middle">{{ _("Conso") }}</td>
+                    <td class="align-middle text-nowrap">{{ transaction.item.name }}</td>
+                    {% else %}
+                    <td class="align-middle" colspan="2">{{ _("Recharge") }}</td>
+                    {% endif %}
+                    <td class="align-middle">{% if transaction.balance_change and not transaction.is_reverted %}
+                        {{ babel.format_currency(transaction.balance_change, "EUR") }}
+                    {% endif %}</td>
+                    <td class="align-middle text-nowrap">{{ moment(transaction.date).format('lll') }}</td>
+                    {% if current_user_is_barman %}
+                    <td class="align-middle">
+                        <div class="btn-group" role="group" aria-label="Revert transaction">
+                        <a role="button"
+                            class="btn btn-danger{% if transaction.is_reverted %} disabled{% endif %}"
+                            onclick="confirm('Annuler la transaction ?') && post_and_reload('{{
+                                url_for("api.bar.revert_transaction", transaction_id=transaction.id) }}');"
+                        >
+                            <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                                {{ macros.bootstrap_icon("caret-left-fill") }}
+                            </svg>
+                        </a>
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+            {% for page in paginator.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
+                <li class="page-item{% if page == paginator.page %} active{% endif %}{%if not page %} disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for("bar.user", username=pceen.username, page=page) }}">
+                        {% if page %}{{ page }}{% else %}<span class=ellipsis>…</span>{% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+            </ul>
+        </nav>
+    </div>
+</div>
+</div>
+
+{% if current_user_is_barman %}
+
+<!-- User edit modal -->
+<div class="modal fade" id="edit-user-modal" tabindex="-1" role="dialog" aria-labelledby="edit-user-modal-label"
+aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered" role="document">
+<div class="modal-content">
+    <form action="{{ url_for("bar.user", username=pceen.username) }}" method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="modal-header">
+            <h5 class="modal-title" id="edit-user-modal-label">
+                {{ _("Modifier les infos Bar de %(name)s", name=pceen.full_name) }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-floating mb-3">
+                {{ wtf.form_field(form.nickname, value=pceen.bar_nickname or "") }}
+            </div>
+            <div class="form-check form-switch mb-3 ms-1">
+                {{ wtf.form_field(
+                    form.is_barman, checked=pceen.has_permission(PermissionType.write, PermissionScope.bar),
+                ) }}
+            </div>
+            <div>
+                <label for="avatar" class="form-label ms-1">
+                    {{ _("Nouvel avatar (sera recadré en 160x200 px) :") }}
+                </label>
+                {{ wtf.form_field(form.avatar, type="file", accept="image/*", class="form-control") }}
+            </div>
+        </div>
+        <div class="modal-footer">
+            <input class="btn btn-primary" type="submit" value="{{ _("Modifier") }}" role="button">
+            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">{{ _("Annuler") }}</button>
+        </div>
+    </form>
+</div>
+</div>
+</div>
+
+<!-- User top up modal -->
+<div class="modal fade" id="top-up-modal" tabindex="-1" role="dialog" aria-labelledby="top-up-modal-label"
+     aria-hidden="true">
+<div class="modal-dialog modal-dialog-centered" role="document">
+<div class="modal-content">
+    <form onsubmit="post_and_reload('{{ url_for("api.bar.top_up", pceen_id=pceen.id) }}', this);" method="dialog">
+        <div class="modal-header">
+            <h5 class="modal-title" id="top-up-modal-label">
+                {{ _("Recharger le compte de %(name)s", name=pceen.full_name) }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-floating">
+                <input class="form-control" name="amount" type="number" step="0.01" min="0.01" max="500" required>
+                <label class="form-label" for="amount">{{ _("Montant en euros") }}</label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <input class="btn btn-primary" type="submit" value="{{ _("Recharger") }}" role="button">
+            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">{{ _("Annuler") }}</button>
+        </div>
+    </form>
+</div>
+</div>
+</div>
+{% endif %}
+
+{% endwith %}
+{% endwith %}
+
+{% endblock %}

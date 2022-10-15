@@ -41,6 +41,11 @@
         {% include "cards/photos.html" %}
     </div>
     {% endif %}
+    {% if has_permission(PermissionType.read, PermissionScope.bar) %}
+    <div class="col">
+        {% include "cards/bar.html" %}
+    </div>
+    {% endif %}
     {% endwith %}
     <div class="col">
         {% include "cards/coming_soon.html" %}
