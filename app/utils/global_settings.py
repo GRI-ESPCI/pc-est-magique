@@ -33,8 +33,11 @@ class _QuickAccessItemDescriptor:
         Settings._quick_access_item_id = value.id
 
 
-class Settings:
+class _SettingsMeta:
     max_daily_alcoholic_drinks_per_user: int = _SettingDescriptor("MAX_DAILY_ALCOHOLIC_DRINKS_PER_USER")
     _quick_access_item_id: int = _SettingDescriptor("QUICK_ACCESS_ITEM_ID")
 
     quick_access_item: BarItem = _QuickAccessItemDescriptor()
+
+
+Settings = _SettingsMeta()

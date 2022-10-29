@@ -9,12 +9,10 @@
 </div>
 <div class="row">
     <div class="col"><p>
-        {{ _("Bienvenue sur PC est magique ! Ce nouveau portail a pour "
-             "ambition de réunir le maximum de services informatiques des "
-             "PCéens (élèves et alumni, mais aussi locataires de la Rez, "
-             "dans le futur doctorants etc) : photos, accès à Internet à la "
-             "Rez (ancien IntraRez), prochainement le site du Bar, les "
-             "commandes du Club Q, et plein d'autres choses...") }}
+        {{ _("Bienvenue sur PC est magique ! Ce nouveau portail a pour ambition de réunir le maximum de services "
+             "informatiques des PCéens (élèves et alumni, mais aussi locataires de la Rez, dans le futur doctorants "
+             "etc) : photos, site du Bar, accès à Internet à la Rez (ancien IntraRez), les commandes du Club Q, "
+             "et plein d'autres choses...") }}
     </p></div>
 </div>
 
@@ -31,9 +29,9 @@
     <div class="col">
         {% include "cards/profile.html" %}
     </div>
-    {% if has_permission(PermissionType.read, PermissionScope.intrarez) %}
+    {% if has_permission(PermissionType.read, PermissionScope.bar) %}
     <div class="col">
-        {% include "cards/subscription.html" %}
+        {% include "cards/bar.html" %}
     </div>
     {% endif %}
     {% if has_permission(PermissionType.read, PermissionScope.photos) %}
@@ -41,9 +39,9 @@
         {% include "cards/photos.html" %}
     </div>
     {% endif %}
-    {% if has_permission(PermissionType.read, PermissionScope.bar) %}
+    {% if has_permission(PermissionType.read, PermissionScope.intrarez) %}
     <div class="col">
-        {% include "cards/bar.html" %}
+        {% include "cards/subscription.html" %}
     </div>
     {% endif %}
     {% endwith %}

@@ -77,9 +77,8 @@ def set_quick_access_item(item_id: str):
         flask.abort(404, f"Item #{item_id} does not exist")
 
     Settings.quick_access_item = item
-    db.session.commit()
 
-    flask.flash(_("Article %(item)s supprimé.", item=item.name), "success")
+    flask.flash(_("Article %(item)s mis en accès rapide.", item=item.name), "success")
     return {}, 201
 
 

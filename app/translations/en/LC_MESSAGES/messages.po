@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2022-10-15 00:15+0200\n"
-"PO-Revision-Date: 2022-10-15 01:02+0100\n"
+"POT-Creation-Date: 2022-10-29 01:04+0200\n"
+"PO-Revision-Date: 2022-10-29 01:08+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -37,17 +37,22 @@ msgstr "%(name)s's deposit has been approved"
 msgid "La transaction #%(transaction_id)s a bien été annulée."
 msgstr "The transaction #%(transaction_id)s has been reverted."
 
-#: app/routes/api/routes/bar.py:82 app/routes/api/routes/bar.py:99
+#: app/routes/api/routes/bar.py:81
+#, python-format
+msgid "Article %(item)s mis en accès rapide."
+msgstr "Item %(item)s set as quick access."
+
+#: app/routes/api/routes/bar.py:98
 #, python-format
 msgid "Article %(item)s supprimé."
 msgstr "Item %(item)s deleted."
 
-#: app/routes/api/routes/bar.py:127
+#: app/routes/api/routes/bar.py:126
 #, python-format
 msgid "%(amount)s ajoutés au solde de %(name)s"
 msgstr "%(amount)s added to %(name)s's balance"
 
-#: app/routes/api/routes/bar.py:160
+#: app/routes/api/routes/bar.py:159
 #, python-format
 msgid "Achat validé : %(item)s (%(amount)s). Annuler :"
 msgstr "Purchase validated: %(item)s (%(amount)s). Revert:"
@@ -101,7 +106,7 @@ msgid "Prénom"
 msgstr "First name"
 
 #: app/routes/auth/forms.py:32 app/routes/profile/forms.py:16
-#: app/templates/bar/user.html:132 app/templates/cards/account.html:26
+#: app/templates/bar/user.html:144 app/templates/cards/account.html:26
 msgid "Promotion"
 msgstr "Promotion"
 
@@ -220,7 +225,7 @@ msgid "Surnom"
 msgstr "Nickname"
 
 #: app/routes/bar/forms.py:16 app/templates/bar/transactions.html:37
-#: app/templates/bar/user.html:117 app/templates/bar/user.html:185
+#: app/templates/bar/user.html:129 app/templates/bar/user.html:197
 msgid "Barman / barmaid"
 msgstr "Barman/barmaid"
 
@@ -564,24 +569,24 @@ msgstr "Ban this person || Update ban"
 msgid "Mettre fin au ban"
 msgstr "Terminate ban"
 
-#: app/routes/gris/routes.py:97
+#: app/routes/gris/routes.py:100
 msgid "Gestion des PCéens"
 msgstr "Manage PCéens"
 
-#: app/routes/gris/routes.py:130
+#: app/routes/gris/routes.py:133
 msgid "Gestion des rôles"
 msgstr "Manage roles"
 
-#: app/routes/gris/routes.py:164 app/routes/gris/routes.py:166
+#: app/routes/gris/routes.py:167 app/routes/gris/routes.py:169
 #: app/templates/gris/menu.html:18
 msgid "Exécuter un script"
 msgstr "Run a script"
 
-#: app/routes/gris/routes.py:173
+#: app/routes/gris/routes.py:176
 msgid "Darkstat network monitoring"
 msgstr "Darkstat network monitoring"
 
-#: app/routes/gris/routes.py:180
+#: app/routes/gris/routes.py:183
 msgid "Bandwidthd network monitoring"
 msgstr "Bandwidthd network monitoring"
 
@@ -903,7 +908,7 @@ msgid "Enregistrer"
 msgstr "Register"
 
 #: app/routes/rooms/forms.py:25 app/templates/bar/items.html:63
-#: app/templates/bar/user.html:279 app/templates/photos/album.html:211
+#: app/templates/bar/user.html:291 app/templates/photos/album.html:211
 #: app/templates/photos/collection.html:181 app/templates/photos/main.html:57
 #: app/templates/rooms/register.html:106
 msgid "Modifier"
@@ -1275,8 +1280,8 @@ msgid "Nouvel article || Modifier : _name_"
 msgstr "New item || Edit _name_"
 
 #: app/templates/bar/items.html:183 app/templates/bar/transactions.html:42
-#: app/templates/bar/user.html:190 app/templates/bar/user.html:280
-#: app/templates/bar/user.html:307 app/templates/devices/modify.html:79
+#: app/templates/bar/user.html:202 app/templates/bar/user.html:292
+#: app/templates/bar/user.html:319 app/templates/devices/modify.html:79
 msgid "Annuler"
 msgstr "Cancel"
 
@@ -1301,7 +1306,7 @@ msgid "Articles"
 msgstr "Items"
 
 #: app/templates/bar/navbar.html:39 app/templates/bar/transactions.html:21
-#: app/templates/bar/user.html:179
+#: app/templates/bar/user.html:191
 msgid "Transactions"
 msgstr "Transactions"
 
@@ -1369,33 +1374,33 @@ msgstr "Best customer of the month"
 msgid "Date&nbsp;:"
 msgstr "Date:"
 
-#: app/templates/bar/transactions.html:36 app/templates/bar/user.html:121
+#: app/templates/bar/transactions.html:36 app/templates/bar/user.html:133
 msgid "Client&middot;e"
 msgstr "Client:"
 
-#: app/templates/bar/transactions.html:38 app/templates/bar/user.html:186
+#: app/templates/bar/transactions.html:38 app/templates/bar/user.html:198
 #: app/templates/cards/device.html:19 app/templates/cards/device_modal.html:20
 msgid "Type"
 msgstr "Type"
 
-#: app/templates/bar/transactions.html:39 app/templates/bar/user.html:187
+#: app/templates/bar/transactions.html:39 app/templates/bar/user.html:199
 msgid "Article"
 msgstr "Item"
 
-#: app/templates/bar/transactions.html:40 app/templates/bar/user.html:188
+#: app/templates/bar/transactions.html:40 app/templates/bar/user.html:200
 #: app/templates/gris/pceens.html:151
 msgid "Balance"
 msgstr "Funds"
 
-#: app/templates/bar/transactions.html:41 app/templates/bar/user.html:189
+#: app/templates/bar/transactions.html:41 app/templates/bar/user.html:201
 msgid "Date"
 msgstr "Date"
 
-#: app/templates/bar/transactions.html:60 app/templates/bar/user.html:203
+#: app/templates/bar/transactions.html:60 app/templates/bar/user.html:215
 msgid "Conso"
 msgstr "Consumed"
 
-#: app/templates/bar/transactions.html:63 app/templates/bar/user.html:206
+#: app/templates/bar/transactions.html:63 app/templates/bar/user.html:218
 msgid "Recharge"
 msgstr "Top up"
 
@@ -1403,12 +1408,12 @@ msgstr "Top up"
 msgid "Profil Bar :"
 msgstr "Bar Profile:"
 
-#: app/templates/bar/user.html:29 app/templates/bar/user.html:306
+#: app/templates/bar/user.html:34 app/templates/bar/user.html:318
 #: app/templates/cards/bar.html:40
 msgid "Recharger"
 msgstr "Top up"
 
-#: app/templates/bar/user.html:36 app/templates/cards/subscription.html:106
+#: app/templates/bar/user.html:43 app/templates/cards/subscription.html:106
 #: app/templates/cards/subscription.html:114
 #: app/templates/cards/subscription.html:121
 #: app/templates/payments/main.html:86 app/templates/payments/main.html:94
@@ -1416,82 +1421,82 @@ msgstr "Top up"
 msgid "Payer"
 msgstr "Pay"
 
-#: app/templates/bar/user.html:39
+#: app/templates/bar/user.html:46
 msgid "Favoris"
 msgstr "Favorites"
 
-#: app/templates/bar/user.html:43
+#: app/templates/bar/user.html:50
 msgid "Autres articles"
 msgstr "Other items"
 
-#: app/templates/bar/user.html:59
-msgid "Modifiable depuis l'onglet Paramètres"
-msgstr "Can be modified form Settings tab"
-
 #: app/templates/bar/user.html:71
+msgid "Modifiable depuis l'onglet Articles"
+msgstr "Can be modified in Items tab"
+
+#: app/templates/bar/user.html:83
 msgid "Pas de favori"
 msgstr "No favorite"
 
-#: app/templates/bar/user.html:80 app/templates/gris/pceens.html:141
+#: app/templates/bar/user.html:92 app/templates/gris/pceens.html:141
 msgid "Caution"
 msgstr "Deposit"
 
-#: app/templates/bar/user.html:82
+#: app/templates/bar/user.html:94
 #, python-format
 msgid "Accepter la caution de %(name)s ?"
 msgstr "Accept %(name)s deposit?"
 
-#: app/templates/bar/user.html:85
+#: app/templates/bar/user.html:97
 msgid "Valider le dépôt de caution"
 msgstr "Validate deposit"
 
-#: app/templates/bar/user.html:91
+#: app/templates/bar/user.html:103
 msgid "Modifier le surnom"
 msgstr "Edit nickname"
 
-#: app/templates/bar/user.html:110 app/templates/gris/roles.html:36
+#: app/templates/bar/user.html:122 app/templates/gris/roles.html:36
 msgid "Rôle"
 msgstr "Role"
 
-#: app/templates/bar/user.html:115
+#: app/templates/bar/user.html:127
 msgid "GRI tout-puissant"
 msgstr "Almighty GRI"
 
-#: app/templates/bar/user.html:119
+#: app/templates/bar/user.html:131
 msgid "Observateur"
 msgstr "Observer"
 
-#: app/templates/bar/user.html:126 app/templates/cards/account.html:30
+#: app/templates/bar/user.html:138 app/templates/cards/account.html:30
 msgid "Email"
 msgstr "Mail"
 
-#: app/templates/bar/user.html:135
+#: app/templates/bar/user.html:147
 msgid "Externe"
 msgstr "External"
 
-#: app/templates/bar/user.html:138
+#: app/templates/bar/user.html:150
 msgid "Solde actuel"
 msgstr "Current founds"
 
-#: app/templates/bar/user.html:154
+#: app/templates/bar/user.html:166
 msgid "Limite d'alcool aujourd’hui"
 msgstr "Alcohol limit today"
 
-#: app/templates/bar/user.html:258
+#: app/templates/bar/user.html:270
 #, python-format
 msgid "Modifier les infos Bar de %(name)s"
 msgstr "Edit %(name)s's Bar info"
 
-#: app/templates/bar/user.html:273
+#: app/templates/bar/user.html:285
 msgid "Nouvel avatar (sera recadré en 160x200 px) :"
 msgstr "New avatar (will be cropped to 160x200px):"
 
-#: app/templates/bar/user.html:295
+#: app/templates/bar/user.html:307
 #, python-format
 msgid "Recharger le compte de %(name)s"
 msgstr "Top up %(name)s's account"
 
-#: app/templates/bar/user.html:302
+#: app/templates/bar/user.html:314
 msgid "Montant en euros"
 msgstr "Amount in euros"
 
@@ -2742,19 +2747,19 @@ msgid ""
 "Bienvenue sur PC est magique ! Ce nouveau portail a pour ambition de "
 "réunir le maximum de services informatiques des PCéens (élèves et alumni,"
 " mais aussi locataires de la Rez, dans le futur doctorants etc) : photos,"
-" accès à Internet à la Rez (ancien IntraRez), prochainement le site du "
-"Bar, les commandes du Club Q, et plein d'autres choses..."
+" site du Bar, accès à Internet à la Rez (ancien IntraRez), les commandes "
+"du Club Q, et plein d'autres choses..."
 msgstr ""
 "Welcome on PC est magique! This new portal is intended to gather various "
 "IT services of the ESPCI community (students and alumni, but also "
-"Rezidence tenants, and soon PhD students): photos, access to Internet at "
-"the Rezidence (old IntraRez), soon the Bar site, Club Q wishes..."
+"Rezidence tenants, and soon PhD students): photos, Bar site, access to "
+"Internet at the Rezidence (old IntraRez), soon Club Q wishes..."
 
-#: app/templates/main/index.html:23
+#: app/templates/main/index.html:21
 msgid "Une idée, un commentaire ? N'hésitez pas à "
 msgstr "An idea, a comment? Do not hesitate to "
 
-#: app/templates/main/index.html:24
+#: app/templates/main/index.html:22
 msgid "nous en faire part"
 msgstr "tell us about it"
 

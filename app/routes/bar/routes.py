@@ -221,7 +221,7 @@ def user(username: str):
             try:
                 save_bar_avatar(pceen, form.avatar.data)
             except Exception as exc:
-                flask.flash(_("Erreur lors de la transformation de la photo : %(exc)s", exc=exc.stderr.decode()))
+                flask.flash(_("Erreur lors de la transformation de la photo : %(exc)s", exc=exc))
             else:
                 flask.flash(_("L'avatar de %(name)s a bien été modifié", name=pceen.full_name), "success")
 

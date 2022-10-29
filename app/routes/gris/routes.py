@@ -80,7 +80,10 @@ def pceens(view: str = "active") -> typing.RouteReturn:
             query = (
                 query.join(PCeen.roles)
                 .join(Role.permissions)
-                .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.bar)
+                .filter(
+                    Permission.type == PermissionType.read,
+                    Permission.scope.in_([PermissionScope.bar, PermissionScope.bar_stats]),
+                )
             )
         case PCeensViewEnum.all:
             pass

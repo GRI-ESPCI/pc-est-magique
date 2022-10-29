@@ -67,6 +67,7 @@ update:
 	env/bin/pip install -r requirements.txt
 	npm install
 	./node_modules/bower/bin/bower install
+	./node_modules/bower/bin/bower update
 	# Upgrade application
 	@echo "Stopping application before critical updates..."
 	sudo supervisorctl stop pc-est-magique

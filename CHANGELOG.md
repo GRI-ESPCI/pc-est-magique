@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+# v2.2.1 (2022-10-29)
+
+### Changed
+
+  * PCéens with permission read/bar_stats are now reported in the Bar users list.
+
+### Fixed
+
+  * Bar user page crashed when no quick access item was selected ;
+  * Global settings were not saved to base and had a weired behavior ;
+  * Errors when trying to upload a Bar avatar were not correctly handled.
+
+### Removed
+
+  * One-shot Bar data migration script.
+
+
 # v2.2.0 (2022-10-15)
 
 Fusion of the ESPCI Bar site (https://github.com/GRI-ESPCI/espci-bar-web-app) into this project.

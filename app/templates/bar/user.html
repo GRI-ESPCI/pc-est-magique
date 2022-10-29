@@ -15,7 +15,9 @@
         <h3 class="card-title text-{{ theme }} my-1">
             <span>{{ _("Profil Bar :") }}</span>
             <span class="fw-bold">{{ pceen.prenom }}
-            {% if current_user_is_barman and pceen.bar_nickname %}&laquo;&nbsp;{{ pceen.bar_nickname }}&nbsp;&raquo;{% endif %}
+            {% if current_user_is_barman and pceen.bar_nickname %}
+                &laquo;&nbsp;{{ pceen.bar_nickname }}&nbsp;&raquo;
+            {% endif %}
             {{ pceen.nom }}</span>
         </h3>
         {% if current_user_is_barman %}
@@ -24,15 +26,20 @@
             {% if pceen.bar_deposit %}
             <div class="d-inline-flex" role="group" aria-label="User actions">
 
-                <button type="button" class="btn user-card-btn btn btn-success" data-bs-toggle="modal" data-bs-target="#top-up-modal">
-                    <svg class="bi flex-shrink-0" width="24" height="24" role="img">{{ macros.bootstrap_icon("credit-card") }}</svg>
+                <button type="button" class="btn user-card-btn btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#top-up-modal">
+                    <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                        {{ macros.bootstrap_icon("credit-card") }}
+                    </svg>
                     <span class="d-none d-sm-inline">{{ _("Recharger") }}</span>
                 </button>
 
                 <div class="dropdown mx-1">
                     <button class="btn btn-{{ theme }} dropdown-toggle d-inline-block" type="button"
                             data-bs-toggle="dropdown" {% if not pceen.bar_deposit %} disabled{% endif %}>
-                        <svg class="bi flex-shrink-0" width="24" height="24" role="img">{{ macros.bootstrap_icon("cart-plus") }}</svg>
+                        <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                            {{ macros.bootstrap_icon("cart-plus") }}
+                        </svg>
                         <span class="d-none d-sm-inline">{{ _("Payer") }}</span>
                     </button>
                     <ul class="dropdown-menu">
@@ -42,21 +49,26 @@
                         <li><hr class="dropdown-divider"></li>
                         <!-- <li><h6 class="dropdown-header">{{ _("Autres articles") }}</h6></li> -->
                         {% endif %}
-                        <li{% if not can_be_bought %} data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="{{ limit_message }}"{% endif %}>
+                        <li{% if not can_be_bought %} data-bs-toggle="tooltip" data-bs-placement="right"
+                              data-bs-title="{{ limit_message }}"{% endif %}>
                             <a class="dropdown-item{% if not can_be_bought %} disabled{% endif %}" role="button"
                                 {% if can_be_bought %}
-                                onclick="post_and_reload('{{ url_for("api.bar.pay", pceen_id=pceen.id, item_id=item.id) }}');"
+                                onclick="post_and_reload('{{
+                                    url_for('api.bar.pay', pceen_id=pceen.id, item_id=item.id)
+                                }}');"
                                 {% endif %}
                             >
-                                {{ item.name }} ({{ babel.format_currency(item.price, "EUR") }}{% if item.is_quantifiable %}, x{{ item.quantity }}{% endif %})
+                                {{ item.name }}
+                                ({{ babel.format_currency(item.price, "EUR") }}{% if item.is_quantifiable %},
+                                x{{ item.quantity }}{% endif %})
                             </a>
                         </li>
                         {% endfor %}
                     </ul>
                 </div>
 
-                {% with can_be_bought, limit_message, _ffi = item_descriptions.get(quick_access_item,
-                    (False, _("Modifiable depuis l'onglet Paramètres"))) %}
+                {% with can_be_bought, limit_message, _fnf = item_descriptions.get(quick_access_item,
+                    (False, _("Modifiable depuis l'onglet Articles"), False)) %}
                 {% if not can_be_bought %}
                 <div data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="{{ limit_message }}">
                 {% endif %}
