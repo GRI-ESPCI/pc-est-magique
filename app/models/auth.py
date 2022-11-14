@@ -125,7 +125,7 @@ class PCeen(flask_login.UserMixin, Model):
         # Check all permissions for the parent permission
         if scope.parent and elem:
             parent_elem = getattr(elem, scope.parent_attr)
-            if cls._has_permission(type, scope.parent, parent_elem):
+            if cls._has_permission(permissions, type, scope.parent, parent_elem):
                 return True
         # No permission granted
         return False
