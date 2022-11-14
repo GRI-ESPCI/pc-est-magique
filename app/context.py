@@ -334,12 +334,12 @@ def has_permission(type: PermissionType, scope: PermissionScope, elem: Model | N
         elem: The database entry to check the permission for, if applicable.
 
     Returns:
-        ``None`` if no user is logged in, else whether the logged in user
-        has the requested permission.
+        ``None`` if no user is logged in (except if a public permission applies),
+        else whether the logged in user has the requested permission.
     """
-    if not g.logged_in:
-        return None
-    return g.pceen.has_permission(type=type, scope=scope, elem=elem)
+    if g.logged_in:
+        return g.pceen.has_permission(type=type, scope=scope, elem=elem)
+    return PCeen.has_public_permission(type=type, scope=scope, elem=elem) or None
 
 
 def check_permission(type: PermissionType, scope: PermissionScope, elem: Model | None = None) -> None:

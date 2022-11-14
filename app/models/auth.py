@@ -111,6 +111,25 @@ class PCeen(flask_login.UserMixin, Model):
         """The set of all permissions this PCeen has."""
         return set().union(*(role.permissions for role in self.roles))
 
+    @classmethod
+    def _has_permission(cls, permissions, type: PermissionType, scope: PermissionScope, elem: Model = None) -> bool:
+        # Check validity
+        if not scope.allow_elem and elem:
+            raise ValueError(f"Specifying elem is not allowed for {scope}")
+        if scope.need_elem and not elem:
+            raise ValueError(f"Specifying elem is mandatory for {scope}")
+        # Check all permissions
+        for permission in permissions:
+            if permission.grants_for(type, scope, elem):
+                return True
+        # Check all permissions for the parent permission
+        if scope.parent and elem:
+            parent_elem = getattr(elem, scope.parent_attr)
+            if cls._has_permission(type, scope.parent, parent_elem):
+                return True
+        # No permission granted
+        return False
+
     def has_permission(self, type: PermissionType, scope: PermissionScope, elem: Model = None) -> bool:
         """Check whether this PCeen has a given permission.
 
@@ -122,22 +141,24 @@ class PCeen(flask_login.UserMixin, Model):
         Returns:
             If the permission is granted.
         """
-        # Check validity
-        if not scope.allow_elem and elem:
-            raise ValueError(f"Specifying elem is not allowed for {scope}")
-        if scope.need_elem and not elem:
-            raise ValueError(f"Specifying elem is mandatory for {scope}")
-        # Check all permissions
-        for permission in self.permissions:
-            if permission.grants_for(type, scope, elem):
-                return True
-        # Check all permissions for the parent permission
-        if scope.parent and elem:
-            parent_elem = getattr(elem, scope.parent_attr)
-            if self.has_permission(type, scope.parent, parent_elem):
-                return True
-        # No permission granted
-        return False
+        return self._has_permission(self.permissions, type, scope, elem)
+
+    @classmethod
+    def has_public_permission(cls, type: PermissionType, scope: PermissionScope, elem: Model = None) -> bool:
+        """Check whether an anonymous user has a given permission.
+
+        Args:
+            type: The permission type (.read, .write...).
+            scope: The permission scope (.pceen, .album...).
+            elem: The database entry to check the permission for, if applicable.
+
+        Returns:
+            If the permission is granted.
+        """
+        public_role: models.Role = models.Role.query.get(0)
+        if not public_role:
+            return False
+        return cls._has_permission(public_role.permissions, type, scope, elem)
 
     @property
     def first_seen(self) -> datetime.datetime:
