@@ -77,7 +77,7 @@ def collection(collection_dir: str) -> typing.RouteReturn:
 
 
 @bp.route("<collection_dir>/<album_dir>", methods=["GET", "POST"])
-@context.permission_only(PermissionType.read, PermissionScope.photos)
+# @context.permission_only(PermissionType.read, PermissionScope.photos)
 def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
     """Photos album page (list of photos)."""
     collection = Collection.query.filter_by(dir_name=collection_dir).first()
