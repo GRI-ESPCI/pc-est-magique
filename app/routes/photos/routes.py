@@ -11,7 +11,7 @@ from app.utils import typing
 
 
 @bp.route("")
-@context.permission_only(PermissionType.read, PermissionScope.photos)
+# @context.permission_only(PermissionType.read, PermissionScope.photos)
 def main() -> typing.RouteReturn:
     """Photos main page (list of collections)."""
     # Filter collections to display based on permissions
@@ -24,7 +24,7 @@ def main() -> typing.RouteReturn:
 
 
 @bp.route("<collection_dir>", methods=["GET", "POST"])
-@context.permission_only(PermissionType.read, PermissionScope.photos)
+# @context.permission_only(PermissionType.read, PermissionScope.photos)
 def collection(collection_dir: str) -> typing.RouteReturn:
     """Photos collection page (list of albums)."""
     collection = Collection.query.filter_by(dir_name=collection_dir).first()
@@ -32,7 +32,7 @@ def collection(collection_dir: str) -> typing.RouteReturn:
         flask.abort(404)
 
     # Restrict access and filter albums to display based on permissions
-    if context.has_permission(PermissionType.write, PermissionScope.collection, elem=collection):
+    if write_permission := context.has_permission(PermissionType.write, PermissionScope.collection, elem=collection):
         # Write permission: show all albums
         albums = collection.albums.all()
     elif context.has_permission(PermissionType.read, PermissionScope.collection, elem=collection):
@@ -50,7 +50,7 @@ def collection(collection_dir: str) -> typing.RouteReturn:
             for album in collection.albums.all()
             if context.has_permission(album.view_permission_type, PermissionScope.album, elem=album)
         ]
-    if not albums:
+    if not albums and not write_permission:
         # Nothing to show here
         flask.abort(403)
     # Access OK

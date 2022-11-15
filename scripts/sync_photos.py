@@ -126,9 +126,10 @@ def sync_collections(collections: dict[str, Collection], dirnames: list[str]) ->
 
     # Remaining collections, deleted
     for collection_dir, collection in expected_collections.items():
+        albums = collection.albums.all()
         print(f"- DELETED COLLECTION: {collection_dir}")
-        print(f"  - CASCADE: DELETED {len(collection.albums.all())} albums")
-        print(f"    - CASCADE: DELETED {collection.nb_photos} photos")
+        print(f"  - CASCADE: DELETED {len(albums)} albums")
+        print(f"    - CASCADE: DELETED {sum(album.nb_photos for album in albums)} photos")
         collections.pop(collection_dir)
         db.session.delete(collection)
 
