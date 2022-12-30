@@ -1,0 +1,73 @@
+{% extends "mails_base.html" %}
+
+{% block app_content %}
+
+<div class="row mb-3">
+    <div class="col">
+        <h2>{{ _("Vos accès Élève on été remplacés par des accès Alumni") }}</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <p>{{ _("Bonjour %(name)s,", name=pceen.prenom) }}</p>
+        <p>
+            {{ _("Les faits font mal, mais ils sont têtu : il semblerait que ta scolarité à PC "
+            "soit désormais derrière toi...") }}
+        </p>
+        <p>
+            {{ _("En conséquence, <strong>le rôle <em>Élève</em> t'a été enlevé, "
+                "en faveur du rôle <em>Alumni</em></strong>.") }}
+        </p>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <p>
+            {{ _("Concrètement :") }}
+        </p>
+        <ul class="mb-4">
+            <li>
+                {{ _("Pour te connecter, <strong>rien ne change</strong> de notre côté. En revanche, attention : "
+                     "si tu te connectes via ton compte ou ton adresse ESPCI, <strong>celui-ci sera bientôt "
+                     "désactivé</strong> conformément à la politique de l'École. Nous te conseillons fortement "
+                     "de <strong>modifier ton email</strong> dès maintenant, par exemple en faveur de ton mail "
+                     "<a href='https://espci.org'>@espci.org</a> – garanti à vie !") }}
+            </li>
+            <li>
+                {{ _("Pour le reste, tu perds potentiellement l'accès à quelques modules, mais l'essentiel "
+                     "est accessible aux Alumni : photos, site du Bar... même Internet à la Rez (mais il "
+                     "va falloir commencer à penser à partir...)") }}
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col text-center">
+        <a class="btn btn-primary mx-3 my-2" href="{{ url_for("profile.modify_account") }}">
+            {{ _("Modifier mon email") }}
+        </a>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <p>
+            {{ _("<em>Si tu ne souhaites plus rester en contact avec la communauté PCéenne, pas de soucis : "
+                 "ceci est le dernier mail que nous t'enverrons si ton compte reste inactif.</em>") }}
+        </p>
+        <p>
+            {{ _("Pour toute question ou pour plus d'informations, vous pouvez simplement répondre à cet email.") }}
+        </p>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <p>
+            {{ _("Très bonne journée,") }}
+        </p>
+        <p>
+            {{ _("Les GRI") }}
+        </p>
+    </div>
+</div>
+
+{% endblock %}

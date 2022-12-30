@@ -8,6 +8,7 @@
     "bower_components/lightgallery/dist/css/lg-zoom.css",
     "bower_components/lightgallery/dist/css/lg-thumbnail.css",
     "bower_components/lightgallery/dist/css/lg-fullscreen.css",
+    "_dist/uppy/css/uppy.min.css",
 ] %}
 <link href="{{ url_for("static", filename=filename) }}" rel="stylesheet" />
 {% endfor %}
@@ -15,8 +16,13 @@
 
 {% block scripts %}
 {{ super() }}
-{% if has_permission(PermissionType.write, PermissionScope.album, elem=album) %}
+{% if can_edit %}
 <script src="{{ url_for("static", filename="js/photos/edit-form.js") }}" defer></script>
+<script src="{{ url_for("static", filename="_dist/uppy/js/uppy.min.js") }}" defer></script>
+{% if babel.get_locale().language == "fr" %}
+<script src="{{ url_for("static", filename="_dist/uppy/js/fr_FR.min.js") }}" defer></script>
+{% endif %}
+<script src="{{ url_for("static", filename="js/photos/album-edit.js") }}" defer></script>
 {% endif %}
 {% for filename in [
     "bower_components/lightgallery/dist/lightgallery.umd.js",
@@ -53,7 +59,7 @@
     </nav>
 </div>
 
-<div id="header" {{ "hidden" if "edit" in request.args else "" }}>
+<div class="view-mode-only{{ ' d-none' if is_edit_mode else '' }}">
     <div class="row mb-2">
         <div class="col">
             <p {% if not album.visible %}
@@ -71,7 +77,7 @@
                 {% endif %}
             </p>
         </div>
-        {% if has_permission(PermissionType.write, PermissionScope.album, elem=album) %}
+        {% if can_edit %}
         <div class="col col-auto d-flex align-items-center"
              title="{{ _("Miniature actuelle") if album.featured
                    else _("Nouvelle miniature de la collection") }}">
@@ -91,7 +97,7 @@
         <div class="col col-auto me-3 d-flex align-items-center">
             <button class="btn btn-pc5 p-2" type="button" role="button"
                     title="{{ _("Modifier l'album") }}"
-                    onclick="show_edit_form()">
+                    onclick="enable_edit_mode()">
                 <svg class="bi flex-shrink-0 text-secondary"
                     width="24" height="24">
                     {{ macros.bootstrap_icon("pencil") }}
@@ -127,9 +133,8 @@
     </div>
 </div>
 
-{% if has_permission(PermissionType.write, PermissionScope.album, elem=album) %}
-<form action="?" method="post" role="form" id="modify-form"
-      {{ "" if "edit" in request.args else "hidden" }}>
+{% if can_edit %}
+<form action="?" method="post" role="form" class="edit-mode-only{{ ' d-none' if not is_edit_mode else '' }}">
     {{ album_form.hidden_tag() }}
     <div class="row mb-3">
         <div class="col">
@@ -140,7 +145,7 @@
         <div class="col col-auto me-3 d-flex align-items-center">
             <button class="btn btn-pc5 p-2" type="button" role="button"
                     title="{{ _("Arrêter de modifier") }}"
-                    onclick="hide_edit_form()">
+                    onclick="disable_edit_mode()">
                 <svg class="bi flex-shrink-0 text-secondary"
                      width="24" height="24">
                     {{ macros.bootstrap_icon("x-circle") }}
@@ -183,7 +188,7 @@
 
 <div class="row row-cols g-2 justify-content-center" id="lightgallery">
     {% for photo in photos %}
-    <div class="col col-auto">
+    <div class="col col-auto position-relative">
         <a href="{{ photo.src }}?{{ token_args }}"
            data-lg-size="{{ min(photo.height, photo.width) }}-{{ photo.height }}"
            data-file_name="{{ photo.file_name }}"
@@ -197,67 +202,75 @@
         >
             <img src="{{ url_for("static", filename="img/loading.gif") }}"
                  data-src="{{ photo.thumb_src }}?{{ token_args }}"/>
-            {# Si on veut changer la taille de la miniature, il faut
-               modifier sa génération dans scripts/sync_photos.py, et
-               tout regénérer ! (pas de script pour ça pour l'instant) #}
+            {# Si on veut changer la taille de la miniature, il faut la modifier dans app/routes/photos/utils.py,
+               et tout re-générer à l'aide de scripts/sync_photos.py ! (pas de script pour ça pour l'instant) #}
         </a>
+        {% if can_edit %}
+        <!-- Photo edit ribbon -->
+        <div class="position-absolute d-flex bg-warning justify-content-evenly py-2 edit-mode-only
+                    {{ 'd-none' if not is_edit_mode else '' }}" style="bottom:0; width: 136px;">
+            <button type="button" title="{{ _('Modifier') }}" class="btn btn-secondary btn-sm"
+                    data-bs-target="#mo-edit" data-bs-toggle="modal" onclick="preparePhotoEdit(this);">
+                <svg class="bi flex-shrink-0" width="16" height="16">{{ macros.bootstrap_icon("pencil") }}</svg>
+            </button>
+            {% if photo.featured %}
+            <button type="button" title="{{ _('Miniature actuelle') }}" class="btn btn-success btn-sm current-feat">
+                <svg class="bi flex-shrink-0" width="16" height="16">{{ macros.bootstrap_icon("star-fill") }}</svg>
+            </button>
+            {% else %}
+            <button type="button" title="{{ _('Nouvelle miniature') }}" class="btn btn-success btn-sm"
+                    onclick="favoritePhoto(this);">
+                <svg class="bi flex-shrink-0" width="16" height="16">{{ macros.bootstrap_icon("star") }}</svg>
+            </button>
+            {% endif %}
+            <button type="button" title="{{ _('Supprimer') }}" class="btn btn-danger btn-sm"
+                    onclick="confirm('Supprimer cette photo ? Cette action est irréversible !') && deletePhoto(this);">
+                <svg class="bi flex-shrink-0" width="16" height="16">{{ macros.bootstrap_icon("trash") }}</svg>
+            </button>
+        </div>
+        {% endif %}
     </div>
     {% endfor %}
+    {% if can_edit %}
+    <!-- Uploader -->
+    <div class="col col-auto edit-mode-only{{ '' if is_edit_mode else ' d-none' }}" id="uppy-photo-uploader">
+        <button type="button" class="btn btn-outline-success p-5" height="100%" width="136px"
+                title="{{ _('Ajouter des photos') }}" class="lg-icon d-flex align-items-center">
+            <svg class="bi flex-shrink-0 mx-auto" width="38px" height="38px">
+                {{ macros.bootstrap_icon("cloud-upload") }}
+            </svg>
+        </button>
+    </div>
+    {% endif %}
 </div>
 
 <!-- Gallery custom buttons (moved through JS) -->
 <div hidden>
-    {# Boutons déplacés dans la barre de la galerie, une fois chargée #}
-    <button id="edit-button" type="button" aria-label="{{ _("Modifier") }}"
-            class="lg-icon d-flex align-items-center"
-            data-bs-target="#mo-edit" data-bs-toggle="modal">
-        <svg class="bi flex-shrink-0 mx-auto" width="17" height="17">
-            {{ macros.bootstrap_icon("pencil") }}
-        </svg>
-    </button>
-    <button id="follow-button" type="sumbit" form="edit-photo-form"
-            aria-label="{{ _("Miniature") }}"
-            class="lg-icon d-flex align-items-center">
-        <svg class="bi flex-shrink-0 mx-auto" width="17" height="17">
-            {{ macros.bootstrap_icon("star") }}
-        </svg>
-    </button>
-    <button id="followed-button" type="button" aria-label="{{ _("Miniature") }}"
-            class="lg-icon d-none align-items-center"
-            data-bs-toggle="popover" data-bs-placement="bottom"
-            title="{{ _("Déjà la miniature actuelle de l'album !") }}"
-            data-bs-trigger="focus">
-        <svg class="bi flex-shrink-0 mx-auto" width="17" height="17">
-            {{ macros.bootstrap_icon("star-fill") }}
-        </svg>
-    </button>
-    <button id="report-button" type="button" aria-label="{{ _("Signaler") }}"
-            class="lg-icon d-flex align-items-center"
+    {# Bouton déplacé dans la barre de la galerie, une fois chargée #}
+    <button id="report-button" type="button" title="{{ _('Signaler') }}" class="lg-icon d-flex align-items-center"
             data-bs-target="#mo-report" data-bs-toggle="modal">
-        <svg class="bi flex-shrink-0 mx-auto" width="17" height="17">
-            {{ macros.bootstrap_icon("flag") }}
-        </svg>
+        <svg class="bi flex-shrink-0 mx-auto" width="17" height="17">{{ macros.bootstrap_icon("flag") }}</svg>
     </button>
 </div>
 
+{% if can_edit %}
 <!-- Edit modal -->
-<div class="modal fade" id="mo-edit" tabindex="-1"
-     aria-labelledby="mo-edit-lab" aria-hidden="true">
+<div class="modal fade" id="mo-edit" tabindex="-1" aria-labelledby="mo-edit-lab" aria-hidden="true">
     <div class="modal-dialog"><div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="mo-edit-lab">
                 {{ _("Modifier la photo") }}
             </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                    aria-label="{{ _("Fermer") }}"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _("Fermer") }}"></button>
         </div>
-        <form action="" method="post" role="form" id="edit-photo-form">
+        <form action="" method="" role="form" id="edit-photo-form">
             <div class="modal-body container">
                 {{ photo_form.hidden_tag() }}
+                <input name="collection" value="{{ album.collection.dir_name }}" hidden>
+                <input name="album" value="{{ album.dir_name }}" hidden>
                 <div class="row mb-3"><div class="col">
                     <div class="form-floating">
-                        {{ wtf.form_field(photo_form.photo_name,
-                                          readonly=True) }}
+                        {{ wtf.form_field(photo_form.photo_name, readonly=True) }}
                     </div>
                 </div></div>
                 <div class="row mb-3"><div class="col">
@@ -267,8 +280,7 @@
                 </div></div>
                 <div class="row mb-3"><div class="col">
                     <div class="form-floating">
-                        {{ wtf.form_field(photo_form.author_str,
-                                          maxlength=64) }}
+                        {{ wtf.form_field(photo_form.author_str, maxlength=64) }}
                     </div>
                 </div></div>
                 <div class="row mb-3">
@@ -305,6 +317,7 @@
         </form>
     </div></div>
 </div>
+{% endif %}
 
 <!-- Report modal -->
 <div class="modal fade" id="mo-report" tabindex="-1"

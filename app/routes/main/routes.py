@@ -124,7 +124,7 @@ def test_mail(blueprint: str, template: str) -> typing.RouteReturn:
     """Mails test route"""
     from app.email import process_html, html_to_plaintext
 
-    body = flask.render_template(f"{blueprint}/mails/{template}.html")
+    body = flask.render_template(f"{blueprint}/mails/{template}.html", pceen=context.g.pceen)
     body = process_html(body)
     if flask.request.args.get("txt"):
         return f"<pre>{flask.escape(html_to_plaintext(body))}</pre>"

@@ -32,7 +32,7 @@
         category (str): The message category (should be one of "info"
             (default), "success", "danger" or "warning")
 -->
-{% macro flashed_message(message, category="info") %}
+{% macro flashed_message(message, category="info", extra_div_args="") %}
     {% with alert_label, alert_icon = {
             "info":     (_("Information :"),    "info-circle-fill"),
             "success":  (_("Succès :"),         "check-circle-fill"),
@@ -40,7 +40,8 @@
             "danger":   (_("Attention :"),      "exclamation-triangle-fill"),
         }.get(category, ("",                    ""))
     %}
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast{{ ' show-toast' if message else '' }}" role="alert" aria-live="assertive" aria-atomic="true"
+         {{ extra_div_args }}>
         <div class="toast-header text-white bg-{{ category }}">
             <svg class="bi flex-shrink-0 me-2" width="24" height="24"
                  role="img" aria-label="{{ alert_label }}">

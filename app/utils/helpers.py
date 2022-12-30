@@ -135,6 +135,29 @@ def run_script(name: str) -> None:
     script.main()
 
 
+def list_scripts() -> dict[str, str]:
+    """Build the list of existing scripts in app/scripts.
+
+    Returns:
+        The scripts names (without the `.py`) mapped to the first line of their docstring.
+    """
+    scripts = {}
+    for file in os.scandir("scripts"):
+        if not file.is_file():
+            continue
+        name, ext = os.path.splitext(file.name)
+        if ext != ".py":
+            continue
+
+        with open(file, "r") as fp:
+            first_line = fp.readline()
+        doc = first_line.lstrip("'\"").strip()
+
+        scripts[name] = doc
+
+    return scripts
+
+
 def print_progressbar(
     iteration: int,
     total: int,

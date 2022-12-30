@@ -7,7 +7,7 @@ from shutil import which
 import click
 
 from app import PCEstMagiqueApp
-from app.utils.helpers import print_progressbar, run_script
+from app.utils.helpers import list_scripts, print_progressbar, run_script
 
 
 def register(app: PCEstMagiqueApp) -> None:
@@ -84,9 +84,17 @@ def register(app: PCEstMagiqueApp) -> None:
                 print(f"\033[91m{result.stderr.decode()}\033[0m")
 
     @app.cli.command()
-    @click.argument("name")
-    def script(name: str) -> None:
+    @click.argument("name", required=False)
+    def script(name: str | None = None) -> None:
         """Run the script <NAME> in the application context."""
+        if not name:
+            scripts = list_scripts()
+            max_script_name_len = max(len(name) for name in scripts)
+            print("Available scripts:")
+            for script_name, descr in scripts.items():
+                print(f"{script_name.ljust(max_script_name_len)}    {descr}")
+            return
+
         for func in app.before_first_request_funcs:
             func()
         run_script(name)

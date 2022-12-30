@@ -9,7 +9,7 @@
 </div>
 <div class="row">
     <div class="col"><p>
-        {{ macros.s(len(collections), _("collection")) }} {{ macros.s(len(collections), _("visible")) }}
+        {{ macros.s(len(collections), _("collection")) }}, {{ macros.s(len(collections), _("visible")) }}
     </p></div>
 </div>
 <div class="row row-cols g-2">
@@ -29,7 +29,7 @@
                     {{ collection.name }}
                     {% if not collection.visible %}
                     <span class="fw-normal badge bg-danger p-1 align-top"
-                          title="{{ _("Collection non visible") }}">
+                           data-bs-toggle="tooltip" data-bs-title="{{ _("Collection non visible") }}">
                         <svg class="bi flex-shrink-0" width="18" height="18">
                             {{ macros.bootstrap_icon("eye-slash") }}
                         </svg>

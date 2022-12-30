@@ -15,7 +15,6 @@ Ce script peut uniquement être appelé depuis Flask :
 """
 
 import os
-import subprocess
 import sys
 
 import flask
@@ -24,7 +23,8 @@ import sqlalchemy.orm
 try:
     from app import db
     from app.models import Collection, Album, Photo
-    from app.utils import loggers, metadata
+    from app.utils import loggers
+    from app.routes.photos.utils import register_new_photo, PhotoRegistrationError
 except ImportError:
     sys.stderr.write(
         "ERREUR - Ce script peut uniquement être appelé depuis Flask :\n"
@@ -126,9 +126,10 @@ def sync_collections(collections: dict[str, Collection], dirnames: list[str]) ->
 
     # Remaining collections, deleted
     for collection_dir, collection in expected_collections.items():
+        albums = collection.albums.all()
         print(f"- DELETED COLLECTION: {collection_dir}")
-        print(f"  - CASCADE: DELETED {len(collection.albums.all())} albums")
-        print(f"    - CASCADE: DELETED {collection.nb_photos} photos")
+        print(f"  - CASCADE: DELETED {len(albums)} albums")
+        print(f"    - CASCADE: DELETED {sum(album.nb_photos for album in albums)} photos")
         collections.pop(collection_dir)
         db.session.delete(collection)
 
@@ -185,73 +186,17 @@ def sync_photos(album: Album, filenames: list[str]) -> None:
         if file_name in photos:
             expected_photos.pop(file_name)
             ok += 1
+        elif file_name.endswith(".gz"):
+            continue
         else:
-            # Check extension
-            _, ext = os.path.splitext(file_name)
-            if ext.lower() not in [".jpg", ".jpeg", ".png"]:
-                if not ext.lower().endswith(".gz"):
-                    print(f"    WARNING: Bad file type: {file_name} (only .jpg, .jpeg or .png accepted)")
-                continue
-            # Check metadata
-            full_path = os.path.join(album.full_path, file_name)
-            with open(full_path, "rb") as fp:
-                image = metadata.ImageData(fp)
-            if image.width and image.height:
-                width, height = image.width, image.height
-            else:
-                width, height = metadata.get_size_fallback(full_path)
-                if not width or not height:
-                    print(
-                        f"    WARNING: {file_name}: unable to get width/"
-                        "height data, check the file in an editor and "
-                        "re-save it if okay (may be corrupted)"
-                    )
-                    continue
-            # New photo
-            photo = Photo(
-                album=album,
-                file_name=file_name,
-                width=width,
-                height=height,
-                author_str=image.author,
-                timestamp=image.timestamp,
-                lat=image.lat,
-                lng=image.lng,
-                caption=image.caption,
-            )
-            # Create thumbnail and gzipped versions
             try:
-                subprocess.run(
-                    [
-                        "convert",
-                        photo.full_path,  # Take the picture,
-                        "-resize",
-                        "136x136^",  # Fill a 136x136 box,
-                        "-gravity",
-                        "center",  # Refer to image center,
-                        "-extent",
-                        "136x136",  # Then crop overflow,
-                        photo.thumb_full_path,  # There is the thumbnail!
-                    ],
-                    capture_output=True,
-                    check=True,
-                )
-            except subprocess.CalledProcessError as exc:
-                print(
-                    f"    WARNING: {file_name} Unable to create thumbnail:",
-                    exc.cmd,
-                    exc.stderr.decode(),
-                )
-                continue
-            except Exception as exc:
-                print(f"    WARNING: {file_name} Unable to create thumbnail:", exc)
-                continue
-            subprocess.run(["gzip", "-fk", photo.full_path])
-            subprocess.run(["gzip", "-fk", photo.thumb_full_path])
-            # All OK: add photo
-            print(f"    + NEW PHOTO: {file_name}")
-            ok += 1
-            db.session.add(photo)
+                photo = register_new_photo(album, file_name)
+            except PhotoRegistrationError as exc:
+                print(f"    WARNING: {file_name}: ", *exc.args)
+            else:
+                print(f"    + NEW PHOTO: {file_name}")
+                ok += 1
+                db.session.add(photo)
 
     # Remaining photos, deleted
     deleted = 0

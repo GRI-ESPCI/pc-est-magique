@@ -113,11 +113,7 @@ class Album(Model):
     featured: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
     nb_photos: Column[int] = column(sa.Integer, nullable=False, default=0)
 
-    photos: Relationship[list[Photo]] = one_to_many(
-        "Photo.album",
-        cascade="all, delete-orphan",
-        lazy="dynamic",
-    )
+    photos: Relationship[list[Photo]] = one_to_many("Photo.album", cascade="all, delete-orphan", lazy="dynamic")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -149,7 +145,7 @@ class Album(Model):
 
     @property
     def featured_photo(self) -> Photo | None:
-        """The (first) photo of this album marked as featured, if any."""
+        """The (first) photo of this album marked as featured (defaults to the first photo)."""
         return self.photos.filter_by(featured=True).first() or self.photos.first()
 
     def get_access_token(self, ip: str, expires: datetime.datetime = None) -> str:
@@ -179,11 +175,7 @@ class Collection(Model):
     start: Column[datetime.date] = column(sa.Date(), nullable=True)
     end: Column[datetime.date] = column(sa.Date(), nullable=True)
 
-    albums: Relationship[list[Album]] = one_to_many(
-        "Album.collection",
-        cascade="all, delete-orphan",
-        lazy="dynamic",
-    )
+    albums: Relationship[list[Album]] = one_to_many("Album.collection", cascade="all, delete-orphan", lazy="dynamic")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -209,13 +201,13 @@ class Collection(Model):
         return f"/photo/{self.dir_name}"
 
     @property
-    def featured_album(self) -> Photo | None:
-        """The (first) album of this collection marked as featured, if any."""
+    def featured_album(self) -> Album | None:
+        """The (first) album of this collection marked as featured (defaults to the first album)"""
         return self.albums.filter_by(featured=True).first() or self.albums.first()
 
     @property
     def featured_photo(self) -> Photo | None:
-        """The featured photo of the collection's featured album, if any."""
+        """The featured photo of the collection's featured album."""
         if album := self.featured_album:
             return album.featured_photo
         else:

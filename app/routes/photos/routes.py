@@ -1,30 +1,29 @@
 """PC est magique - Photos Gallery Routes"""
 
-import datetime
+import os
 import flask
 from flask_babel import _
 
 from app import context, db
 from app.routes.photos import bp, forms
-from app.models import Collection, PermissionScope, PermissionType, Photo
-from app.utils import typing
+from app.models import Album, Collection, PermissionScope, PermissionType, Photo
+from app.routes.photos.utils import get_dir_name
+from app.utils import typing, helpers
 
 
 @bp.route("")
-@context.permission_only(PermissionType.read, PermissionScope.photos)
 def main() -> typing.RouteReturn:
     """Photos main page (list of collections)."""
     # Filter collections to display based on permissions
     collections = [
         collection
-        for collection in Collection.query.all()
+        for collection in Collection.query.order_by(Collection.start.desc()).all()
         if context.has_permission(collection.view_permission_type, PermissionScope.collection, elem=collection)
     ]
     return flask.render_template("photos/main.html", collections=collections, title=_("Photos"))
 
 
 @bp.route("<collection_dir>", methods=["GET", "POST"])
-@context.permission_only(PermissionType.read, PermissionScope.photos)
 def collection(collection_dir: str) -> typing.RouteReturn:
     """Photos collection page (list of albums)."""
     collection = Collection.query.filter_by(dir_name=collection_dir).first()
@@ -32,7 +31,7 @@ def collection(collection_dir: str) -> typing.RouteReturn:
         flask.abort(404)
 
     # Restrict access and filter albums to display based on permissions
-    if context.has_permission(PermissionType.write, PermissionScope.collection, elem=collection):
+    if write_permission := context.has_permission(PermissionType.write, PermissionScope.collection, elem=collection):
         # Write permission: show all albums
         albums = collection.albums.all()
     elif context.has_permission(PermissionType.read, PermissionScope.collection, elem=collection):
@@ -50,34 +49,64 @@ def collection(collection_dir: str) -> typing.RouteReturn:
             for album in collection.albums.all()
             if context.has_permission(album.view_permission_type, PermissionScope.album, elem=album)
         ]
-    if not albums:
+    if not albums and not write_permission:
         # Nothing to show here
         flask.abort(403)
     # Access OK
 
-    form = forms.EditCollectionForm()
-    if form.validate_on_submit():
-        if not context.has_permission(PermissionType.write, PermissionScope.collection, elem=collection):
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.collection, elem=collection)
+
+    edit_form = forms.EditCollectionForm()
+    create_form = forms.CreateAlbumForm(collection)
+
+    if edit_form.validate_on_submit():
+        if not can_edit:
             flask.abort(403)
-        collection.name = form.name.data
-        collection.description = form.description.data
-        collection.visible = form.visible.data
-        collection.start = form.start.data
-        collection.end = form.end.data
-        flask.flash(_("Collection modifiée avec succès !"), "success")
+        collection.name = edit_form.name.data
+        collection.description = edit_form.description.data
+        collection.visible = edit_form.visible.data
+        collection.start = edit_form.start.data
+        collection.end = edit_form.end.data
+        if collection.visible and not collection.albums.filter_by(visible=True).count():
+            collection.visible = False
+            flask.flash(
+                _("Une collection ne peut pas être rendue visible si elle ne contient aucun album visible !"), "warning"
+            )
+        else:
+            flask.flash(_("Collection modifiée avec succès !"), "success")
         db.session.commit()
+
+    elif create_form.validate_on_submit():
+        if not can_edit:
+            flask.abort(403)
+
+        name = create_form.album_name.data
+        dir_name = get_dir_name(name)
+
+        album = Album(collection=collection, dir_name=dir_name, name=f"[CREATED] {name}", visible=False)
+        os.mkdir(album.full_path)
+        os.mkdir(album.thumbs_full_path)
+
+        db.session.add(album)
+        db.session.commit()
+        flask.flash(_("Album créé !"), "success")
+        return helpers.ensure_safe_redirect(
+            "photos.album", collection_dir=collection_dir, album_dir=dir_name, edit=True, next=None
+        )
 
     return flask.render_template(
         "photos/collection.html",
-        form=form,
+        edit_form=edit_form,
+        create_form=create_form,
         collection=collection,
         albums=albums,
+        can_edit=can_edit,
+        is_edit_mode=can_edit and "edit" in flask.request.args,
         title=collection.name,
     )
 
 
 @bp.route("<collection_dir>/<album_dir>", methods=["GET", "POST"])
-@context.permission_only(PermissionType.read, PermissionScope.photos)
 def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
     """Photos album page (list of photos)."""
     collection = Collection.query.filter_by(dir_name=collection_dir).first()
@@ -95,60 +124,27 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
         flask.abort(403)
     # Access OK
 
-    photo_form = forms.EditPhotoForm()
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.album, elem=album)
+
     album_form = forms.EditAlbumForm()
     if album_form.validate_on_submit():
-        if not context.has_permission(PermissionType.write, PermissionScope.album, elem=album):
+        if not can_edit:
             flask.abort(403)
-
-        if album_form.submit.data:
-            # Clicked on submit: modify album
-            album.name = album_form.name.data
-            album.description = album_form.description.data
-            album.visible = album_form.visible.data
-            album.start = album_form.start.data
-            album.end = album_form.end.data
-            flask.flash(_("Album modifié avec succès !"), "success")
+        album.name = album_form.name.data
+        album.description = album_form.description.data
+        album.visible = album_form.visible.data
+        album.start = album_form.start.data
+        album.end = album_form.end.data
+        if album.visible and not album.photos.count():
+            album.visible = False
+            flask.flash(_("Un album ne peut pas être rendu visible si il ne contient aucune photo !"), "warning")
         else:
-            # Didn't (so clicked on star): mark album as featured
-            album.collection.featured_album.featured = False
-            album.featured = True
-            flask.flash(
-                _("Cet album est maintenant la miniature de la collection !"),
-                "success",
-            )
+            flask.flash(_("Album modifié avec succès !"), "success")
         db.session.commit()
 
-    elif photo_form.validate_on_submit():
-        if not context.has_permission(PermissionType.write, PermissionScope.album, elem=album):
-            flask.abort(403)
+    photo_form = forms.EditPhotoForm()
 
-        photo = album.photos.filter_by(file_name=photo_form.photo_name.data).first()
-        if not photo:
-            flask.flash(_("Impossible de modifier la photo !"), "warning")
-        elif photo_form.submit.data:
-            # Clicked on sumbit: modify photo
-            photo.caption = photo_form.caption.data
-            photo.author_str = photo_form.author_str.data
-            if photo_form.date.data:
-                photo.timestamp = datetime.datetime.combine(
-                    photo_form.date.data,
-                    photo_form.time.data or datetime.time(0, 0),
-                )
-            else:
-                photo.timestamp = None
-            photo.lat = photo_form.lat.data
-            photo.lng = photo_form.lng.data
-            flask.flash(_("Photo modifiée avec succès !"), "success")
-            db.session.commit()
-        else:
-            # Didn't (so clicked on star): mark photo as featured
-            photo.album.featured_photo.featured = False
-            photo.featured = True
-            flask.flash(_("Cette photo est maintenant la miniature de l'album !"), "success")
-            db.session.commit()
-
-    photos = album.photos.order_by(Photo.timestamp).all()
+    photos = album.photos.order_by(Photo.timestamp.asc(), Photo.file_name.asc()).all()
     token_args = album.get_access_token(ip)
     return flask.render_template(
         "photos/album.html",
@@ -157,6 +153,8 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
         token_args=token_args,
         album_form=album_form,
         photo_form=photo_form,
+        can_edit=can_edit,
+        is_edit_mode=can_edit and "edit" in flask.request.args,
         title=f"{album.name} – {collection.name}",
     )
 

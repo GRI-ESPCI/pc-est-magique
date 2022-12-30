@@ -5,6 +5,8 @@ from wtforms.fields import html5
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
 
+from app.models import Collection
+from app.routes.photos.utils import get_dir_name
 from app.utils.validators import DataRequired, Optional, Length, NumberRange
 
 
@@ -36,6 +38,22 @@ class EditAlbumForm(FlaskForm):
     end = html5.DateField(_l("Date de fin (optionnel)"), validators=[Optional()])
     visible = wtforms.BooleanField(_l("Album visible"))
     submit = wtforms.SubmitField(_l("Modifier l'album"))
+
+
+class CreateAlbumForm(FlaskForm):
+    """WTForm used to create an album."""
+
+    def __init__(self, collection: Collection, **kwargs):
+        self.collection = collection
+        super().__init__(**kwargs)
+
+    album_name = wtforms.StringField(_l("Nom de l'album"), validators=[DataRequired(), Length(max=120)])
+    submit = wtforms.SubmitField(_l("Nouvel album"))
+
+    def validate_album_name(self, field: wtforms.Field) -> None:
+        dir_name = get_dir_name(field.data)
+        if self.collection.albums.filter_by(dir_name=dir_name).count():
+            raise wtforms.ValidationError(_l("Un album avec un nom similaire existe déjà dans cette collection !"))
 
 
 class EditCollectionForm(FlaskForm):
