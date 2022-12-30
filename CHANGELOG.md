@@ -5,6 +5,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+# v2.3.0 (2022-12-30)
+
+### Added
+
+  * Extensive photos management system:
+    * Create albums;
+    * Upload photos from app (with automatic thumbnail creation and metadata extraction);
+    * Edit / star / delete photos from album view.
+  * New "public permission" system: 
+    * New role `_PUBLIC` that applies to all users, logged in or not;
+    * New classmethod `PCeen.has_public_permission` checking this role.
+  * New annual script automating changes:
+    * Replace "Student" role by "Alumni" role for leaving students (sending a mail);
+    * Create entering promotion collection and role.
+  * New `showToast` JS function allowing to "create" a new toast through JS, after page loading;
+  * Running `flask script` without argument now list all existing scripts.
+
+### Changed
+
+  * Access to the photo module are no longer restricted (but collections still are!);
+  * Collections are now ordered from most recent to oldest;
+  * Collection and albums cannot be marked visible if they are empty.
+
+### Removed
+
+  * Photo edit / star buttons in the upper ribbon of the gallery; use album view instead.
+
+
 # v2.2.1 (2022-10-29)
 
 ### Changed

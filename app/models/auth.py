@@ -141,7 +141,9 @@ class PCeen(flask_login.UserMixin, Model):
         Returns:
             If the permission is granted.
         """
-        return self._has_permission(self.permissions, type, scope, elem)
+        return self._has_permission(self.permissions, type, scope, elem) or self.has_public_permission(
+            type, scope, elem
+        )
 
     @classmethod
     def has_public_permission(cls, type: PermissionType, scope: PermissionScope, elem: Model = None) -> bool:

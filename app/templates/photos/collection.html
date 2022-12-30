@@ -3,7 +3,7 @@
 
 {% block scripts %}
 {{ super() }}
-{% if has_permission(PermissionType.write, PermissionScope.collection, elem=collection) %}
+{% if can_edit %}
 <script src="{{ url_for("static", filename="js/photos/edit-form.js") }}" defer></script>
 {% endif %}
 {% endblock %}
@@ -25,7 +25,7 @@
     </nav>
 </div>
 
-<div id="header" {{ "hidden" if "edit" in request.args else "" }}>
+<div class="view-mode-only {{ ' d-none' if is_edit_mode else '' }}">
     <div class="row mb-2">
         <div class="col">
             <p {% if not collection.visible %}
@@ -43,11 +43,11 @@
                 {% endif %}
             </p>
         </div>
-        {% if has_permission(PermissionType.write, PermissionScope.collection, elem=collection) %}
+        {% if can_edit %}
         <div class="col col-auto me-3 d-flex align-items-center">
             <button class="btn btn-pc5 p-2" type="button" role="button"
                     title="{{ _("Modifier la collection") }}"
-                    onclick="show_edit_form()">
+                    onclick="enable_edit_mode()">
                 <svg class="bi flex-shrink-0 text-secondary"
                     width="24" height="24">
                     {{ macros.bootstrap_icon("pencil") }}
@@ -83,20 +83,19 @@
     </div>
 </div>
 
-{% if has_permission(PermissionType.write, PermissionScope.collection, elem=collection) %}
-<form action="?" method="post" role="form" id="modify-form"
-      {{ "" if "edit" in request.args else "hidden" }}>
-    {{ form.hidden_tag() }}
+{% if can_edit %}
+<form action="?" method="post" role="form" class="edit-mode-only{{ '' if is_edit_mode else ' d-none' }}">
+    {{ edit_form.hidden_tag() }}
     <div class="row mb-3">
         <div class="col">
             <div class="form-floating ">
-                {{ wtf.form_field(form.name, value=collection.name) }}
+                {{ wtf.form_field(edit_form.name, value=collection.name) }}
             </div>
         </div>
         <div class="col col-auto me-3 d-flex align-items-center">
             <button class="btn btn-pc5 p-2" type="button" role="button"
                     title="{{ _("Arrêter de modifier") }}"
-                    onclick="hide_edit_form()">
+                    onclick="disable_edit_mode()">
                 <svg class="bi flex-shrink-0 text-secondary"
                      width="24" height="24">
                     {{ macros.bootstrap_icon("x-circle") }}
@@ -107,31 +106,31 @@
     <div class="row">
         <div class="col col-12 col-md mb-3">
             <div class="form-floating">
-                {{ wtf.form_field(form.description,
+                {{ wtf.form_field(edit_form.description,
                                   value=collection.description or "") }}
             </div>
         </div>
         <div class="col-auto me-4 d-flex align-items-center mb-3">
             <div class="form-check form-switch">
-                {{ wtf.form_field(form.visible, checked=collection.visible) }}
+                {{ wtf.form_field(edit_form.visible, checked=collection.visible) }}
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col col-12 col-md mb-3">
             <div class="form-floating">
-                {{ wtf.form_field(form.start, value=collection.start or "") }}
+                {{ wtf.form_field(edit_form.start, value=collection.start or "") }}
             </div>
         </div>
         <div class="col col-12 col-md mb-3 me-4">
             <div class="form-floating">
-                {{ wtf.form_field(form.end, value=collection.end or "") }}
+                {{ wtf.form_field(edit_form.end, value=collection.end or "") }}
             </div>
         </div>
     </div>
     <div class="row mb-5">
         <div class="col">
-            {{ wtf.form_field(form.submit) }}
+            {{ wtf.form_field(edit_form.submit) }}
         </div>
     </div>
 </form>
@@ -154,7 +153,7 @@
                     {{ album.name }}
                     {% if not album.visible %}
                     <span class="fw-normal badge bg-danger p-1 align-top"
-                          title="{{ _("Album non visible") }}">
+                          data-bs-toggle="tooltip" data-bs-title="{{ _("Album non visible") }}">
                         <svg class="bi flex-shrink-0" width="18" height="18">
                             {{ macros.bootstrap_icon("eye-slash") }}
                         </svg>
@@ -190,6 +189,34 @@
     </div>
     {% endwith %}
     {% endfor %}
+    {% if can_edit %}
+    <!-- Create album form -->
+    <div class="col edit-mode-only{{ '' if is_edit_mode else ' d-none' }}">
+        <div class="card" style="width: 15rem;">
+            <div class="d-flex align-items-center w-100 p-5 border border-success bg-muted">
+                <svg class="bi flex-shrink-0 mx-auto text-success" width="61px" height="61px">
+                    {{ macros.bootstrap_icon("plus-circle-dotted") }}
+                </svg>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">
+                    {{ _("Nouvel album") }}
+                </h5>
+                <form action="?" method="post" role="form">
+                    <p class="card-text">
+                        {{ _("Il est maintenant possible de créer un album (puis d'y ajouter des photos) "
+                             "directement depuis l'app :") }}
+                    </p>
+                    {{ create_form.hidden_tag() }}
+                    <div class="form-floating mb-3">
+                        {{ wtf.form_field(create_form.album_name) }}
+                    </div>
+                    {{ wtf.form_field(create_form.submit, class="btn btn-success") }}
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 {% endblock %}
