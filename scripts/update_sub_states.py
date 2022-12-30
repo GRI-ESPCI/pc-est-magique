@@ -47,6 +47,10 @@ def main() -> None:
             print("pas d'accès IntraRez")
             continue
 
+        if not pceen.devices:
+            print("pas d'appareils enregistrés")
+            continue
+
         if not pceen.sub_state:
             pceen.add_first_subscription()
 
