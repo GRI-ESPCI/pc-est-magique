@@ -18,6 +18,11 @@
                 {% if g.is_gri %}{% include "gris/menu.html" %}{% endif %}
             </ul>
             <ul class="navbar-nav flex-row flex-wrap justify-content-end">
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2 my-1" href="{{ url_for("main.theatre") }}">
+                        {{ _("Théâtre ESPCI") }}
+                    </a>
+                </li>
                 {% if not g.logged_in %}
                 <li class="nav-item">
                     <a class="btn btn-outline-secondary mx-2 my-1" href="{{ url_for("auth.login") }}">
@@ -65,6 +70,7 @@
                     </a>
                 </li>
                 {% endif %}
+                
             </ul>
         </div>
     </div>
