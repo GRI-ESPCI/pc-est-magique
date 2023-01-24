@@ -178,3 +178,8 @@ def bar_avatar(promo: str, filename: str) -> typing.RouteReturn:
         filename,
     )
     return flask.send_file(filepath)
+
+@bp.route("/theatre")
+def theatre() -> typing.RouteReturn:
+    """Page for the Theatre Club of the ESPCI."""
+    return flask.render_template("main/theatre.html", title=_("Saison théâtrale 2023 du Club Théâtre"))

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2022-12-30 02:40+0100\n"
+"POT-Creation-Date: 2023-01-24 23:30+0100\n"
 "PO-Revision-Date: 2022-10-29 03:04+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
@@ -99,7 +99,7 @@ msgstr "Remember me"
 #: app/templates/auth/register_rezident.html:41
 #: app/templates/auth/reset_password.html:29
 #: app/templates/auth/reset_password_request.html:26
-#: app/templates/bar/welcome.html:48 app/templates/navbar.html:24
+#: app/templates/bar/welcome.html:48 app/templates/navbar.html:29
 msgid "Connexion"
 msgstr "Sign in"
 
@@ -685,6 +685,10 @@ msgstr "Internet access restricted"
 msgid "TEST"
 msgstr "TEST"
 
+#: app/routes/main/routes.py:185
+msgid "Saison théâtrale 2023 du Club Théâtre"
+msgstr ""
+
 #: app/routes/payments/email.py:21 app/routes/payments/routes.py:243
 #: app/routes/payments/routes.py:302
 msgid "Paiement validé !"
@@ -839,36 +843,36 @@ msgstr "Collection visible"
 msgid "Modifier la collection"
 msgstr "Edit collection"
 
-#: app/routes/photos/routes.py:24 app/templates/cards/photos.html:5
-#: app/templates/cards/photos.html:22 app/templates/navbar.html:45
+#: app/routes/photos/routes.py:23 app/templates/cards/photos.html:5
+#: app/templates/cards/photos.html:22 app/templates/navbar.html:50
 #: app/templates/photos/album.html:46 app/templates/photos/collection.html:18
 #: app/templates/photos/main.html:7
 msgid "Photos"
 msgstr "Photos"
 
-#: app/routes/photos/routes.py:75
+#: app/routes/photos/routes.py:73
 msgid ""
 "Une collection ne peut pas être rendue visible si elle ne contient aucun "
 "album visible !"
 msgstr "A collection cannot be made visible if it contains no visible album!"
 
-#: app/routes/photos/routes.py:78
+#: app/routes/photos/routes.py:76
 msgid "Collection modifiée avec succès !"
 msgstr "Collection successfully edited!"
 
-#: app/routes/photos/routes.py:94
+#: app/routes/photos/routes.py:92
 msgid "Album créé !"
 msgstr "Album created!"
 
-#: app/routes/photos/routes.py:126
+#: app/routes/photos/routes.py:123
 msgid "IP non détectable, impossible d'accéder aux photos"
 msgstr "Unable to detect your IP, photos can't be loaded"
 
-#: app/routes/photos/routes.py:143
+#: app/routes/photos/routes.py:140
 msgid "Un album ne peut pas être rendu visible si il ne contient aucune photo !"
 msgstr "An album cannot be made visible if it contains no photos!"
 
-#: app/routes/photos/routes.py:145
+#: app/routes/photos/routes.py:142
 msgid "Album modifié avec succès !"
 msgstr "Album successfully edited!"
 
@@ -880,7 +884,7 @@ msgstr "Update"
 msgid "Mot de passe actuel"
 msgstr "Current password"
 
-#: app/routes/profile/routes.py:15 app/templates/navbar.html:59
+#: app/routes/profile/routes.py:15 app/templates/navbar.html:64
 msgid "Profil"
 msgstr "Profile"
 
@@ -1034,24 +1038,28 @@ msgstr "I no longer wish to receive emails"
 msgid "Se désinscrire"
 msgstr "Unsubscribe"
 
+#: app/templates/navbar.html:23
+msgid "Théâtre ESPCI"
+msgstr "Theatre ESPCI"
+
 #: app/templates/auth/auth_needed.html:21 app/templates/auth/login.html:53
-#: app/templates/navbar.html:29
+#: app/templates/navbar.html:34
 msgid "Créer un compte"
 msgstr "Sign up"
 
 #: app/templates/devices/register.html:19
 #: app/templates/devices/transfer.html:19
-#: app/templates/main/connect_check.html:28 app/templates/navbar.html:37
+#: app/templates/main/connect_check.html:28 app/templates/navbar.html:42
 #: app/templates/rooms/register.html:25
 msgid "Internet"
 msgstr "Internet"
 
 #: app/templates/cards/bar.html:5 app/templates/gris/pceens.html:36
-#: app/templates/navbar.html:53
+#: app/templates/navbar.html:58
 msgid "Bar"
 msgstr "Bar"
 
-#: app/templates/devices/transfer.html:42 app/templates/navbar.html:64
+#: app/templates/devices/transfer.html:42 app/templates/navbar.html:69
 msgid "Déconnexion"
 msgstr "Sign out"
 
@@ -2892,6 +2900,339 @@ msgstr "Contact us"
 msgid "pour toute question relative à la gestion de vos données."
 msgstr "for every question about the management of your data."
 
+#: app/templates/main/theatre.html:13
+msgid ""
+"Vous trouverez sur cette page la description des différentes pièces de "
+"théâtre qui seront jouées en cette année 2023 à l'ESPCI. \n"
+"        Vous pouvez retrouver pour chacune des pièces la billetterie "
+"Lydia dédiée qui vous permettra de réserver une place pour un jour donné "
+"dans la semaine. \n"
+"        Les pièces sont au tarif unique de 5€. Celui-ci passe à 3€ pour "
+"les tous les étudiants (ESPCI ou non)."
+msgstr ""
+"You can find on this page all the theatre play description's that will be played during the 2023 year at the ESPCI. \n"
+"        There is one ticket link for each play. \n"
+"        All play (except Anna) are at the price of 5€, with the exception for students where it is 3€."
+
+#: app/templates/main/theatre.html:19
+msgid ""
+"Il vous est possible d'acquérir un Pass Théâtre (Pour les membres de "
+"l'ESPCI uniquement, étudiants comme chercheurs.) pour voir plusieurs "
+"pièces à moindre coût. Une fois le pass acheté, \n"
+"        il vous suffit de choisir un billet pour la pièce souhaitée en "
+"sélectionnant l'option \"Prix Pass Théâtre (Gratuit)\"."
+msgstr ""
+
+#: app/templates/main/theatre.html:24
+msgid ""
+"Le Club Théâtre 140 - <a href=https://www.facebook.com/theatreESPCI>Page "
+"Facebook du Club Théâtre de l'ESPCI</a>"
+msgstr ""
+"Theatre Club 140 - <a href=https://www.facebook.com/theatreESPCI>Page "
+"Facebook page de l'ESPCI</a>"
+
+#: app/templates/main/theatre.html:28
+msgid "NB : The play \"Anna\" is fully free."
+msgstr ""
+
+#: app/templates/main/theatre.html:33
+msgid "Affiche Saison Théâtrale"
+msgstr ""
+
+#: app/templates/main/theatre.html:40
+msgid "Billetterie Pass"
+msgstr ""
+
+#: app/templates/main/theatre.html:46
+msgid ""
+"Vous pouvez acheter des pass pour voir 3, 4 ou 5 pièces de la saison "
+"théâtrale à un prix réduit. Une fois votre pass acheté, sélectionnez sur "
+"la billetterie des pièces qui vous intéressent l'option \"Pass Théâtre "
+"(Gratuit)\""
+msgstr ""
+
+#: app/templates/main/theatre.html:51
+msgid "Billetterie Pass Théâtre : billetterie à venir"
+msgstr ""
+
+#: app/templates/main/theatre.html:62
+msgid "Anna - Du 6 au 11 mars - Représentations gratuites"
+msgstr ""
+
+#: app/templates/main/theatre.html:67
+msgid "Affiche \"Anna\""
+msgstr ""
+
+#: app/templates/main/theatre.html:72 app/templates/main/theatre.html:127
+#: app/templates/main/theatre.html:180 app/templates/main/theatre.html:233
+#: app/templates/main/theatre.html:287 app/templates/main/theatre.html:346
+msgid "Synopsis"
+msgstr ""
+
+#: app/templates/main/theatre.html:76
+msgid ""
+"Victor lui tenait la main, il n'était pas plus grand qu'elle. Victor, "
+"c'est un mec avec lequel on traîne parfois au bar, je ne dirais pas qu'on"
+" est super proches, un pote de guindaille, ni plus, ni moins. \n"
+"            Ils riaient. Ils se lançaient des regards qui criaient au "
+"désir, ça se sentait même à la distance où j'étai. J'étais jalouse, "
+"enfin, je ne sais plus. \n"
+"            J'étais fatiguée et seule, on envie toutes parfois les gens "
+"qui roucoulent quand on rentre seule le soir. Il l'a doucement poussée "
+"contre une voiture et l'a embrassée. \n"
+"            Elle a eu l'air surpris. Elle a fait un mouvement de la tête."
+" Il a embrassé sa nuque et elle n'a pas bougé. Il y a eu un silence. Elle"
+" a hésité, il avait l'air d'insister. Comme elle hésitait toujours, il "
+"lui a enlevé son chemisier. \n"
+"            Victor, c'est un mec qui va droit au but, je l'ai déjà vu "
+"avec d'autres filles, je ne sais pas, c'est vraiment que j'ai été "
+"surprise qu'il l'enlève d'un coup mais après tout ça ne me regarde pas "
+"non ?"
+msgstr ""
+
+#: app/templates/main/theatre.html:88 app/templates/main/theatre.html:139
+#: app/templates/main/theatre.html:194 app/templates/main/theatre.html:246
+#: app/templates/main/theatre.html:305 app/templates/main/theatre.html:359
+msgid "Représentations :"
+msgstr ""
+
+#: app/templates/main/theatre.html:92
+msgid "Lundi 6 Mars - 19h30"
+msgstr ""
+
+#: app/templates/main/theatre.html:95
+msgid "Mardi 7 Mars - 19h30"
+msgstr ""
+
+#: app/templates/main/theatre.html:98
+msgid ""
+"Mercredi 8 Mars - 18h30 - Présence de Pamela Ghislain (Auteure) et "
+"Sandrine Desmet (Metteuse en scène originelle) "
+msgstr ""
+
+#: app/templates/main/theatre.html:101
+msgid "Samedi 10 Mars - 15h"
+msgstr ""
+
+#: app/templates/main/theatre.html:106 app/templates/main/theatre.html:161
+#: app/templates/main/theatre.html:216 app/templates/main/theatre.html:268
+#: app/templates/main/theatre.html:324 app/templates/main/theatre.html:381
+msgid "Réservations : billetterie à venir"
+msgstr ""
+
+#: app/templates/main/theatre.html:115
+msgid "Le prénom - Du 20 au 25 mars"
+msgstr ""
+
+#: app/templates/main/theatre.html:122
+msgid "Affiche \"Le Prénom\""
+msgstr ""
+
+#: app/templates/main/theatre.html:131
+msgid ""
+"Vincent, la quarantaine bien entamée, va être papa pour la première fois."
+" Invité à dîner chez sa soeur et son beau-frère, il retrouve Claude, un "
+"ami d'enfance. \n"
+"            La soirée se déroule dans la joie et la bonne humeur jusqu'au"
+" moment où Vincent annonce le prénom du futur bébé. Le dîner familial "
+"sombre alors dans le chaos et devient le théâtre de violents règlements "
+"de comptes."
+msgstr ""
+
+#: app/templates/main/theatre.html:143
+msgid "Lundi 20 Mars - 19h"
+msgstr ""
+
+#: app/templates/main/theatre.html:146
+msgid "Mardi 21 Mars - 19h"
+msgstr ""
+
+#: app/templates/main/theatre.html:149
+msgid "Mercredi 22 Mars - 19h"
+msgstr ""
+
+#: app/templates/main/theatre.html:152
+msgid "Vendredi 24 Mars - 19h"
+msgstr ""
+
+#: app/templates/main/theatre.html:155 app/templates/main/theatre.html:318
+msgid "Samedi 25 Mars - 11h"
+msgstr ""
+
+#: app/templates/main/theatre.html:170
+msgid "Le Noir te va si bien - Du 27 mars au 1er avril"
+msgstr ""
+
+#: app/templates/main/theatre.html:175
+msgid "Affiche \"Le Noir te va si bien\""
+msgstr ""
+
+#: app/templates/main/theatre.html:184
+msgid ""
+"Voilà des années que la police de Scotland Yard est sur les traces de "
+"deux êtres sans scrupules : Lady Lucy Kalfayan s'est mariée à plusieurs "
+"hommes richissimes dont elle s'est débarrassée pour récupérer leur "
+"fortune, \n"
+"            et le colonel John Mc Lesby en a fait de même avec ses "
+"épouses fortunées. N'étant jamais parvenu à les coincer, le commissaire "
+"Campbell propose une idée brillante : \n"
+"            les faire se rencontrer dans le manoir anglais de la sœur de "
+"Lucy et, une fois mariés, il ne restera plus qu'à cueillir les deux "
+"malfaiteurs, ou tout du moins ce qu'il en restera. \n"
+"            Si le plan semble impeccable, l'expérience montre que rien ne"
+" se passe jamais comme prévu…"
+msgstr ""
+
+#: app/templates/main/theatre.html:198
+msgid "Lundi 27 Mars - 19h"
+msgstr ""
+
+#: app/templates/main/theatre.html:201
+msgid "Mardi 28 Mars - 19h"
+msgstr ""
+
+#: app/templates/main/theatre.html:204
+msgid "Mercredi 29 Mars - 19h"
+msgstr ""
+
+#: app/templates/main/theatre.html:207
+msgid "Vendredi 31 Mars - 19h"
+msgstr ""
+
+#: app/templates/main/theatre.html:210
+msgid "Samedi 1er Mars - 9h"
+msgstr ""
+
+#: app/templates/main/theatre.html:223
+msgid "Marius - Du 3 au 8 avril"
+msgstr ""
+
+#: app/templates/main/theatre.html:228
+msgid "Affiche \"Marius\""
+msgstr ""
+
+#: app/templates/main/theatre.html:237
+msgid ""
+"Le port de Marseille, dans les années vingt. Marius, le fils de César, "
+"patron du bar de la Marine, est partagé entre son amour pour Fanny la "
+"petite marchande de coquillages, et son désir de prendre la mer, de "
+"parcourir le monde...\n"
+"             Cette pièce vous emmènera du rire aux larmes, grâce aux "
+"accents chantants de Nathan (141), Romain (141), Lilian (141), Anne "
+"(141), Djibril (140), Thomas (140), Simon (140), Cédric (137) et Irène "
+"(136).\n"
+"            "
+msgstr ""
+
+#: app/templates/main/theatre.html:250
+msgid "Lundi 3 Avril - 19h30"
+msgstr ""
+
+#: app/templates/main/theatre.html:253
+msgid "Mardi 4 Avril - 19h30"
+msgstr ""
+
+#: app/templates/main/theatre.html:256
+msgid "Mercredi 5 Avril - 19h30"
+msgstr ""
+
+#: app/templates/main/theatre.html:259
+msgid "Vendredi 7 Avril - 19h30"
+msgstr ""
+
+#: app/templates/main/theatre.html:262
+msgid "Samedi 8 Avril - 11h"
+msgstr ""
+
+#: app/templates/main/theatre.html:277
+msgid "8 femmes - Du 12 au 15 avril"
+msgstr ""
+
+#: app/templates/main/theatre.html:282
+msgid "Affiche \"8 femmes\""
+msgstr ""
+
+#: app/templates/main/theatre.html:291
+msgid ""
+" « Un salon-bibliothèque dans une belle, élégante et charmante demeure "
+"provinciale… ». <br>\n"
+"            Oui, c'est bien ici que se retrouvent huit femmes, un beau "
+"matin de Noël. Huit femmes, quelque peu différentes ; huit femmes, "
+"quelque peu aigries par le temps ; huit femmes, quelque peu "
+"mystérieuses... \n"
+"            Mais toutes possèdent quelque chose en commun : un lien au "
+"père de famille, Marcel, retrouvé mort dans son lit, un poignard planté "
+"dans le dos. Le doute, la peur, l'angoisse s'installent… qui aurait bien "
+"pu tuer Marcel ? \n"
+"            Serait-ce Gaby, mère de famille, hautaine et orgueilleuse ? "
+"Ou bien Louise, la nouvelle femme de chambre ? Serait-ce Suzon, l'aînée "
+"qui semble n'avoir rien à cacher ? \n"
+"            Ou encore Mamy, la vieille grand-mère, qui se traine sur son "
+"fauteuil roulant à longueur de journée ?\n"
+"            C'est donc dans cette charmante demeure provinciale que se "
+"déroulera l'enquête, menée bout-à-bout par ces huit femmes… Parviendront-"
+"elles à démasquer la coupable avant qu'un autre meurtre n'ait lieu ? Car "
+"le temps presse…\n"
+"            \n"
+"            "
+msgstr ""
+
+#: app/templates/main/theatre.html:309
+msgid "Mercredi 12 Avril- 19h30"
+msgstr ""
+
+#: app/templates/main/theatre.html:312
+msgid "Jeudi 13 Avril- 19h30"
+msgstr ""
+
+#: app/templates/main/theatre.html:315
+msgid "Vendredi 14 Avril - 19h30"
+msgstr ""
+
+#: app/templates/main/theatre.html:336
+msgid "Le dîner de cons - Du 17 au 22 avril"
+msgstr ""
+
+#: app/templates/main/theatre.html:341
+msgid "Affiche \"Le diner de cons\""
+msgstr ""
+
+#: app/templates/main/theatre.html:350
+msgid ""
+"François Pignon est employé au Ministère des Finances. Sa passion pour "
+"les maquettes en allumettes lui vaut d'être repéré par un ami de Pierre "
+"Brochant, grand éditeur qui participe chaque semaine à un dîner de cons."
+" \n"
+"            Le principe est simple : chaque participant invite un con au "
+"grand dîner, et celui qui amène le plus con de la soirée gagne. Et Pignon"
+" semble être le parfait candidat : Pierre Brochant l'invite donc sans "
+"hésiter. \n"
+"            Sauf que… Le soir du dîner, Brochant s'est blessé, et est "
+"coincé chez lui. Or il avait proposé à Pignon de passer, histoire de le "
+"rencontrer avant le repas. Être coincé chez soi avec son con : une bonne "
+"soirée en perspective…"
+msgstr ""
+
+#: app/templates/main/theatre.html:363
+msgid "Lundi 17 Avril - 19h30"
+msgstr ""
+
+#: app/templates/main/theatre.html:366
+msgid "Mardi 18 Avril - 19h30"
+msgstr ""
+
+#: app/templates/main/theatre.html:369
+msgid "Mercredi 19 Avril - 19h30"
+msgstr ""
+
+#: app/templates/main/theatre.html:372
+msgid "Vendredi 21 Avril - 19h30"
+msgstr ""
+
+#: app/templates/main/theatre.html:375
+msgid "Samedi 22 Avril - 14h"
+msgstr ""
+
 #: app/templates/payments/main.html:17 app/templates/payments/main.html:36
 #: app/templates/payments/main.html:59
 msgid "État actuel :"
@@ -3798,3 +4139,4 @@ msgstr "An item with this name already exists."
 #: app/utils/validators.py:170
 msgid "Item ID invalide."
 msgstr "Invalid item ID."
+
