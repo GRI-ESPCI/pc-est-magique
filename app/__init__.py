@@ -101,6 +101,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
         photos,
         profile,
         rooms,
+        theatre,
     )
     from app.routes.auth import saml
 
@@ -116,6 +117,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.register_blueprint(payments.bp, url_prefix="/payments")
     app.register_blueprint(profile.bp, url_prefix="/profile")
     app.register_blueprint(bar.bp, url_prefix="/bar")
+    app.register_blueprint(theatre.bp, url_prefix="/theatre")
 
     # Configure logging
     loggers.configure_logging(app)
