@@ -1,384 +1,80 @@
-{% extends "base.html" %}
-
-{% block app_content %}
+{% extends "base.html" %} {% block app_content %}
 
 <div class="row mb-3">
-    <div class="col">
-        <h1>{{ title }}</h1>
-    </div>
+  <div class="col">
+    <h1>{{ title }}</h1>
+  </div>
 </div>
 
 <div class="row">
-    <p>
-        {{ _("Vous trouverez sur cette page la description des différentes pièces de théâtre qui seront jouées en cette année 2023 à l'ESPCI. 
-        Vous pouvez retrouver pour chacune des pièces la billetterie Lydia dédiée qui vous permettra de réserver une place pour un jour donné dans la semaine. 
-        Les pièces sont au tarif unique de 5€. Celui-ci passe à 3€ pour les tous les étudiants (ESPCI ou non).") }}
-    </p>
+  <p>
+    {{ _("Bienvenue sur la billetterie de la saison 2023 du Club Théâtre de
+    l'ESPCI ! Cette année, ce ne sont pas moins de 6 pièces que des étudiants de
+    l'école ont mise en scène pour votre plus grand divertissement, et nous
+    espérons vous voir nombreux ! Que vous soyez étudiant(e), chercheur(se) ou
+    membre du personnel de l'école, n'hésitez pas à venir profiter du spectacle,
+    je suis sûr que vous y trouverez votre bonheur. Laissez-vous transporter par
+    la magie du théâtre et glissez un peu tour à tour du rire au sourire, et du
+    sourire aux larmes…") }}
+  </p>
 
-    <p>
-        {{ _("Il vous est possible d'acquérir un Pass Théâtre (Pour les membres de l'ESPCI uniquement, étudiants comme chercheurs.) pour voir plusieurs pièces à moindre coût. Une fois le pass acheté, 
-        il vous suffit de choisir un billet pour la pièce souhaitée en sélectionnant l'option \"Prix Pass Théâtre (Gratuit)\".") }}
-    </p>
+  <p>
+    {{ _("Vous pouvez acheter un \"Pass Théâtre\" qui vous permet de voir
+    plusieurs pièces gratuitement une fois acheté. Pour utiliser votre pass, il
+    vous suffit de sélectionner l'option \"Tarif Pass\" (prix gratuit) lorsque
+    vous prenez votre billet. Les pass sont ouverts à tous les membres de
+    l'ESPCI (personnel, chercheurs, étudiants). Il en existe 3 selon le nombre
+    de pièces auxquels vous souhaitez assister : ") }}
+  </p>
+  <ul>
+    <li>{{ _("Pass 3 pièces : 8€") }}</li>
+    <li>{{ _("Pass 4 pièces : 10€") }}</li>
+    <li>{{ _("Pass 5 pièces : 12€") }}</li>
+  </ul>
+  <p>{{ _("Billetterie Pass Théâtre : billetterie à venir")}}</p>
 
-    <p>
-        {{ _("Le Club Théâtre 140 - <a href=https://www.facebook.com/theatreESPCI>Page Facebook du Club Théâtre de l'ESPCI</a>") }}
-    </p>
+  <p>
+    {{ _("Vendredi tout est permis (Jour de représentation spéciale) : Le
+    vendredi, les comédiens prennent le pouvoir ! Tout en gardant le texte
+    intact (ou presque...) ils sont autorisés, sans en rien révéler au metteur
+    en scène, à modifier la mise en scène, à leur gré et de manière comique.
+    Attendez-vous à passer de surprise en surprise car la rébellion se passe
+    rarement sans accroc... Si vous avez déjà acheté un billet pour la
+    représentation de la pièce, vous pouvez gratuitement assisté à celle du
+    vendredi en sélectionnant le tarif \"Vendredi tout est permis\"") }}
+  </p>
 
-    <p>
-        {{ _("NB : La pièce \"Anna\" est entièrement gratuite.") }}
-    </p>
+  <p>
+    {{ _("NB : La pièce \"Anna\" est entièrement gratuite. La représentation du
+    vendredi sera normale") }}
+  </p>
 </div>
 
 <p align="center">
-    <img src="{{ url_for("static", filename="img/theatre/aff_saison.png") }}" alt="{{ _("Affiche Saison Théâtrale") }}" width="30%" />
+  <img src="{{ url_for("static", filename="img/theatre/aff_saison.png") }}"
+  alt="{{ _("Affiche Saison Théâtrale") }}" width="30%" />
 </p>
 
-<HR ALIGN=CENTER>  
-
+{% for spect in spectacle %}
+<hr align="CENTER" />
 <div class="row mb-3">
-    <div class="col">
-        <h2>{{ _("Billetterie Pass") }}</h2>
-    </div>
+  <h2>{{ spect.name }}</h2>
+
+  <p align="center">
+    <img src="{{ url_for("static", filename="img/theatre/{{ spect.image_name }}"
+    ) }}" width="30%" />
+  </p>
+
+  <h5>{{ _("Synopsis")}}</h5>
+  <p>
+    <i> {{ spect.description }} </i>
+  </p>
+
+  <h5>{{ _("Représentations :")}}</h5>
+  <ul>
+    {% for rep in representation %} {% if rep._spectacle_id == spect.id %}
+    <li>{{ _("moment(rep.date).format('lll')") }}</li>
+    {% endif %} {% endfor %}
+  </ul>
 </div>
-
-<div class="row">
-    <p>
-        {{ _("Vous pouvez acheter des pass pour voir 3, 4 ou 5 pièces de la saison théâtrale à un prix réduit. Une fois votre pass acheté, sélectionnez sur la billetterie des pièces qui vous intéressent l'option \"Pass Théâtre (Gratuit)\"") }}
-    </p>
-</div>
-
-<p>
-    {{ _("Billetterie Pass Théâtre : billetterie à venir")}}
-</p>
-
-
-
-
-<HR ALIGN=CENTER>  
-
-
-<div class="row mb-3">
-    <div class="col">
-        <h2>{{ _("Anna - Du 6 au 11 mars - Représentations gratuites") }}</h2>
-    </div>
-</div>
-
-<p align="center">
-    <img src="{{ url_for("static", filename="img/theatre/aff_anna.jpg") }}" alt="{{ _("Affiche \"Anna\"") }}" width="30%" />
-</p>
-
-<div class="row">
-    <h5>
-        {{ _("Synopsis")}}
-    </h5>
-    <p>
-        <i>
-            {{ _("Victor lui tenait la main, il n'était pas plus grand qu'elle. Victor, c'est un mec avec lequel on traîne parfois au bar, je ne dirais pas qu'on est super proches, un pote de guindaille, ni plus, ni moins. 
-            Ils riaient. Ils se lançaient des regards qui criaient au désir, ça se sentait même à la distance où j'étai. J'étais jalouse, enfin, je ne sais plus. 
-            J'étais fatiguée et seule, on envie toutes parfois les gens qui roucoulent quand on rentre seule le soir. Il l'a doucement poussée contre une voiture et l'a embrassée. 
-            Elle a eu l'air surpris. Elle a fait un mouvement de la tête. Il a embrassé sa nuque et elle n'a pas bougé. Il y a eu un silence. Elle a hésité, il avait l'air d'insister. Comme elle hésitait toujours, il lui a enlevé son chemisier. 
-            Victor, c'est un mec qui va droit au but, je l'ai déjà vu avec d'autres filles, je ne sais pas, c'est vraiment que j'ai été surprise qu'il l'enlève d'un coup mais après tout ça ne me regarde pas non ?") }}
-        </i>
-    </p>
-</div>
-
-
-<div class="row">
-    <h5>
-        {{ _("Représentations :")}}
-    </h5>
-    <ul>
-        <li>
-            {{ _("Lundi 6 Mars - 19h30") }}
-        </li>
-        <li>
-            {{ _("Mardi 7 Mars - 19h30") }}
-        </li>
-        <li>
-            {{ _("Mercredi 8 Mars - 18h30 - Présence de Pamela Ghislain (Auteure) et Sandrine Desmet (Metteuse en scène originelle) ") }}
-        </li>
-        <li>
-            {{ _("Samedi 10 Mars - 15h") }}
-        </li>
-    </ul>
-</div>
-<p>
-    {{ _("Réservations : billetterie à venir")}}
-</p>
-
-<HR ALIGN=CENTER> 
-
-
-
-<div class="row mb-3">
-    <div class="col">
-        <h2>{{ _("Le prénom - Du 20 au 25 mars") }}</h2>
-    </div>
-</div>
-
-
-
-<p align="center">
-    <img src="{{ url_for("static", filename="img/theatre/aff_prenom.jpg") }}" alt="{{ _("Affiche \"Le Prénom\"") }}" width="30%" />
-</p>
-
-<div class="row">
-    <h5>
-        {{ _("Synopsis")}}
-    </h5>
-    <p>
-        <i>
-            {{ _("Vincent, la quarantaine bien entamée, va être papa pour la première fois. Invité à dîner chez sa soeur et son beau-frère, il retrouve Claude, un ami d'enfance. 
-            La soirée se déroule dans la joie et la bonne humeur jusqu'au moment où Vincent annonce le prénom du futur bébé. Le dîner familial sombre alors dans le chaos et devient le théâtre de violents règlements de comptes.") }}
-        </i>
-    </p>
-</div>
-
-<div class="row">
-    <h5>
-        {{ _("Représentations :")}}
-    </h5>
-    <ul>
-        <li>
-            {{ _("Lundi 20 Mars - 19h") }}
-        </li>
-        <li>
-            {{ _("Mardi 21 Mars - 19h") }}
-        </li>
-        <li>
-            {{ _("Mercredi 22 Mars - 19h") }}
-        </li>
-        <li>
-            {{ _("Vendredi 24 Mars - 19h") }}
-        </li>
-        <li>
-            {{ _("Samedi 25 Mars - 11h") }}
-        </li>
-    </ul>
-</div>
-
-<p>
-    {{ _("Réservations : billetterie à venir")}}
-</p>
-
-<HR ALIGN=CENTER> 
-
-
-
-<div class="row mb-3">
-    <div class="col">
-        <h2>{{ _("Le Noir te va si bien - Du 27 mars au 1er avril") }}</h2>
-    </div>
-</div>
-
-<p align="center">
-    <img src="{{ url_for("static", filename="img/theatre/aff_noir.jpg") }}" width="30%" alt="{{ _("Affiche \"Le Noir te va si bien\"") }}"/>
-</p>
-
-<div class="row">
-    <h5>
-        {{ _("Synopsis")}}
-    </h5>
-    <p>
-        <i>
-            {{ _("Voilà des années que la police de Scotland Yard est sur les traces de deux êtres sans scrupules : Lady Lucy Kalfayan s'est mariée à plusieurs hommes richissimes dont elle s'est débarrassée pour récupérer leur fortune, 
-            et le colonel John Mc Lesby en a fait de même avec ses épouses fortunées. N'étant jamais parvenu à les coincer, le commissaire Campbell propose une idée brillante : 
-            les faire se rencontrer dans le manoir anglais de la sœur de Lucy et, une fois mariés, il ne restera plus qu'à cueillir les deux malfaiteurs, ou tout du moins ce qu'il en restera. 
-            Si le plan semble impeccable, l'expérience montre que rien ne se passe jamais comme prévu…") }}
-        </i>
-    </p>
-</div>
-
-<div class="row">
-    <h5>
-        {{ _("Représentations :")}}
-    </h5>
-    <ul>
-        <li>
-            {{ _("Lundi 27 Mars - 19h") }}
-        </li>
-        <li>
-            {{ _("Mardi 28 Mars - 19h") }}
-        </li>
-        <li>
-            {{ _("Mercredi 29 Mars - 19h") }}
-        </li>
-        <li>
-            {{ _("Vendredi 31 Mars - 19h") }}
-        </li>
-        <li>
-            {{ _("Samedi 1er Mars - 9h") }}
-        </li>
-    </ul>
-</div>
-
-<p>
-    {{ _("Réservations : billetterie à venir")}}
-</p>
-
-<HR ALIGN=CENTER>     
-
-<div class="row mb-3">
-    <div class="col">
-        <h2>{{ _("Marius - Du 3 au 8 avril") }}</h2>
-    </div>
-</div>
-
-<p align="center">
-    <img src="{{ url_for("static", filename="img/theatre/aff_marius.png") }}" alt="{{ _("Affiche \"Marius\"") }}" width="30%" />
-</p>
-
-<div class="row">
-    <h5>
-        {{ _("Synopsis")}}
-    </h5>
-    <p>
-        <i>
-            {{ _("Le port de Marseille, dans les années vingt. Marius, le fils de César, patron du bar de la Marine, est partagé entre son amour pour Fanny la petite marchande de coquillages, et son désir de prendre la mer, de parcourir le monde...
-             Cette pièce vous emmènera du rire aux larmes, grâce aux accents chantants de Nathan (141), Romain (141), Lilian (141), Anne (141), Djibril (140), Thomas (140), Simon (140), Cédric (137) et Irène (136).
-            ") }}
-        </i>
-    </p>
-</div>
-
-<div class="row">
-    <h5>
-        {{ _("Représentations :")}}
-    </h5>
-    <ul>
-        <li>
-            {{ _("Lundi 3 Avril - 19h30") }}
-        </li>
-        <li>
-            {{ _("Mardi 4 Avril - 19h30") }}
-        </li>
-        <li>
-            {{ _("Mercredi 5 Avril - 19h30") }}
-        </li>
-        <li>
-            {{ _("Vendredi 7 Avril - 19h30") }}
-        </li>
-        <li>
-            {{ _("Samedi 8 Avril - 11h") }}
-        </li>
-    </ul>
-</div>
-
-<p>
-    {{ _("Réservations : billetterie à venir")}}
-</p>
-
-<HR ALIGN=CENTER> 
-
-
-
-<div class="row mb-3">
-    <div class="col">
-        <h2>{{ _("8 femmes - Du 12 au 15 avril") }}</h2>
-    </div>
-</div>
-
-<p align="center">
-    <img src="{{ url_for("static", filename="img/theatre/aff_8femmes.jpg") }}" alt="{{ _("Affiche \"8 femmes\"") }}" width="30%" />
-</p>    
-
-<div class="row">
-    <h5>
-        {{ _("Synopsis")}}
-    </h5>
-    <p>
-        <i>
-            {{ _(" « Un salon-bibliothèque dans une belle, élégante et charmante demeure provinciale… ». <br>
-            Oui, c'est bien ici que se retrouvent huit femmes, un beau matin de Noël. Huit femmes, quelque peu différentes ; huit femmes, quelque peu aigries par le temps ; huit femmes, quelque peu mystérieuses... 
-            Mais toutes possèdent quelque chose en commun : un lien au père de famille, Marcel, retrouvé mort dans son lit, un poignard planté dans le dos. Le doute, la peur, l'angoisse s'installent… qui aurait bien pu tuer Marcel ? 
-            Serait-ce Gaby, mère de famille, hautaine et orgueilleuse ? Ou bien Louise, la nouvelle femme de chambre ? Serait-ce Suzon, l'aînée qui semble n'avoir rien à cacher ? 
-            Ou encore Mamy, la vieille grand-mère, qui se traine sur son fauteuil roulant à longueur de journée ?
-            C'est donc dans cette charmante demeure provinciale que se déroulera l'enquête, menée bout-à-bout par ces huit femmes… Parviendront-elles à démasquer la coupable avant qu'un autre meurtre n'ait lieu ? Car le temps presse…
-            
-            ") }}
-        </i>
-    </p>
-</div>
-
-<div class="row">
-    <h5>
-        {{ _("Représentations :")}}
-    </h5>
-    <ul>
-        <li>
-            {{ _("Mercredi 12 Avril- 19h30") }}
-        </li>
-        <li>
-            {{ _("Jeudi 13 Avril- 19h30") }}
-        </li>
-        <li>
-            {{ _("Vendredi 14 Avril - 19h30") }}
-        </li>
-        <li>
-            {{ _("Samedi 25 Mars - 11h") }}
-        </li>
-    </ul>
-</div>
-
-<p>
-    {{ _("Réservations : billetterie à venir")}}
-</p>
-
-
-
-
-<HR ALIGN=CENTER> 
-
-
-
-<div class="row mb-3">
-    <div class="col">
-        <h2>{{ _("Le dîner de cons - Du 17 au 22 avril") }}</h2>
-    </div>
-</div>
-
-<p align="center">
-    <img src="{{ url_for("static", filename="img/theatre/aff_diner.png") }}" alt="{{ _("Affiche \"Le diner de cons\"") }}" width="30%" />
-</p>    
-    
-<div class="row">
-    <h5>
-        {{ _("Synopsis")}}
-    </h5>
-    <p>
-        <i>
-            {{ _("François Pignon est employé au Ministère des Finances. Sa passion pour les maquettes en allumettes lui vaut d'être repéré par un ami de Pierre Brochant, grand éditeur qui participe chaque semaine à un dîner de cons. 
-            Le principe est simple : chaque participant invite un con au grand dîner, et celui qui amène le plus con de la soirée gagne. Et Pignon semble être le parfait candidat : Pierre Brochant l'invite donc sans hésiter. 
-            Sauf que… Le soir du dîner, Brochant s'est blessé, et est coincé chez lui. Or il avait proposé à Pignon de passer, histoire de le rencontrer avant le repas. Être coincé chez soi avec son con : une bonne soirée en perspective…") }}
-        </i>
-    </p>
-</div>
-
-<div class="row">
-    <h5>
-        {{ _("Représentations :")}}
-    </h5>
-    <ul>
-        <li>
-            {{ _("Lundi 17 Avril - 19h30") }}
-        </li>
-        <li>
-            {{ _("Mardi 18 Avril - 19h30") }}
-        </li>
-        <li>
-            {{ _("Mercredi 19 Avril - 19h30") }}
-        </li>
-        <li>
-            {{ _("Vendredi 21 Avril - 19h30") }}
-        </li>
-        <li>
-            {{ _("Samedi 22 Avril - 14h") }}
-        </li>
-    </ul>
-</div>
-
-<p>
-    {{ _("Réservations : billetterie à venir")}}
-</p>
-
-{% endblock %}
+{% endfor %} {% endblock %}
