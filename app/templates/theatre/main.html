@@ -55,14 +55,14 @@
   alt="{{ _("Affiche Saison Théâtrale") }}" width="30%" />
 </p>
 
-{% for spect in spectacle %}
+{% for spect in spectacles %}
 <hr align="CENTER" />
 <div class="row mb-3">
   <h2>{{ spect.name }}</h2>
 
   <p align="center">
-    <img src="{{ url_for("static", filename="img/theatre/{{ spect.image_name }}"
-    ) }}" width="30%" />
+    <img src="{{ url_for("static", filename="img/theatre/{{spect.image_name}}" )
+    }}" width="30%" />
   </p>
 
   <h5>{{ _("Synopsis")}}</h5>
@@ -72,8 +72,10 @@
 
   <h5>{{ _("Représentations :")}}</h5>
   <ul>
-    {% for rep in representation %} {% if rep._spectacle_id == spect.id %}
-    <li>{{ _("moment(rep.date).format('lll')") }}</li>
+    {% for rep in spectacles.representations %} {% if rep._spectacle_id ==
+    spect.id %}
+    <p>{{_("ici")}}</p>
+    <li>{{moment(rep.date).format('lll')}}</li>
     {% endif %} {% endfor %}
   </ul>
 </div>
