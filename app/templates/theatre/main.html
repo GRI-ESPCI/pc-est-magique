@@ -77,5 +77,10 @@
     <li>{{moment(rep.date).format('lll')}}</li>
     {% endif %} {% endfor %}
   </ul>
+  <p>
+    {{ _("Billeterie : ") }} {% if spect.ticket_link == None %} {{ _("Lien à
+    venir") }} {% else %}
+    <a href="{{ spect.ticket_link }}">{{ spect.ticket_link }}</a> {% endif %}
+  </p>
 </div>
 {% endfor %} {% endblock %}
