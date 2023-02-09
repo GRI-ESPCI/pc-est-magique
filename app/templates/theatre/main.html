@@ -72,9 +72,8 @@
 
   <h5>{{ _("Représentations :")}}</h5>
   <ul>
-    {% for rep in spectacles.representations %} {% if rep._spectacle_id ==
-    spect.id %}
-    <p>{{_("ici")}}</p>
+    {% for rep in spect.representations %} {% if rep._spectacle_id == spect.id
+    %}
     <li>{{moment(rep.date).format('lll')}}</li>
     {% endif %} {% endfor %}
   </ul>
