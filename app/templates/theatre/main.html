@@ -31,7 +31,14 @@
     <li>{{ _("Pass 4 pièces : 10€") }}</li>
     <li>{{ _("Pass 5 pièces : 12€") }}</li>
   </ul>
-  <p>{{ _("Billetterie Pass Théâtre : billetterie à venir")}}</p>
+  <p>
+    <strong>
+      {{ _("Billetterie Pass Théâtre : ")}}
+      <a href="https://collecte.io/billeterie-pass-theatre-2432246/fr"
+        >https://collecte.io/billeterie-pass-theatre-2432246/fr</a
+      >
+    </strong>
+  </p>
 
   <p>
     {{ _("Vendredi tout est permis (Jour de représentation spéciale) : Le
@@ -59,10 +66,15 @@
 <hr align="CENTER" />
 <div class="row mb-3">
   <h2>{{ spect.name }}</h2>
-
+  <p>
+    <i>
+      {{ _('Une pièce écrite par ') }} {{spect.author}} {{ _(' et montée par
+      ')}} {{spect.director}}
+    </i>
+  </p>
   <p align="center">
-    <img src="{{ url_for("static", filename="img/theatre/{{spect.image_name}}" )
-    }}" width="30%" />
+    <img src="{{ url_for("static", filename="img/theatre/{{ spect.image_name }}"
+    ) }}" width="30%" />
   </p>
 
   <h5>{{ _("Synopsis")}}</h5>
@@ -74,7 +86,7 @@
   <ul>
     {% for rep in spect.representations %} {% if rep._spectacle_id == spect.id
     %}
-    <li>{{moment(rep.date).format('lll')}}</li>
+    <li>{{moment(rep.date).format('Do dddd MMMM YYYY, hh:mm a')}}</li>
     {% endif %} {% endfor %}
   </ul>
   <p>
