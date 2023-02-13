@@ -58,7 +58,7 @@
 </div>
 
 <p align="center">
-  <img src="{{ url_for("static", filename="img/theatre/aff_saison.png") }}"
+  <img src="{{ url_for("static", filename="img/theatre/aff_saison.jpg") }}"
   alt="{{ _("Affiche Saison Théâtrale") }}" width="30%" />
 </p>
 
@@ -86,7 +86,7 @@
   <ul>
     {% for rep in spect.representations %} {% if rep._spectacle_id == spect.id
     %}
-    <li>{{moment(rep.date).format('Do dddd MMMM YYYY, hh:mm a')}}</li>
+    <li>{{moment(rep.date).format('LLLL')}}</li>
     {% endif %} {% endfor %}
   </ul>
   <p>
