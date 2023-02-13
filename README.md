@@ -11,7 +11,7 @@ Seules les fonctionnalités majeures sont listées ici ; voir
 
 ## 2.4
 
-- Ajout de la page "Théatre ESPCI" à pc-est-magique pour avoir la liste des pièces
+- Ajout de la page "Théâtre ESPCI" à pc-est-magique pour avoir la liste des pièces
   jouées et les liens de réservations pour la prochaine saison.
 
 ### 2.2
