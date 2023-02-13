@@ -178,3 +178,14 @@ def bar_avatar(promo: str, filename: str) -> typing.RouteReturn:
         filename,
     )
     return flask.send_file(filepath)
+
+
+@bp.route("/theatre_posters/<filename>")
+def theatre_posters(filename: str) -> typing.RouteReturn:
+    """Serve theatre poster (fallback if no Nginx, should NOT be used!)"""
+    filepath = os.path.join(
+        flask.current_app.config["PHOTOS_BASE_PATH"],
+        "theatre",
+        filename,
+    )
+    return flask.send_file(filepath)

@@ -12,7 +12,7 @@ from app.utils import helpers, typing
 @bp.route("/")
 def main() -> typing.RouteReturn:
     """PC est magique profile page."""
-    spectacles = Spectacle.query.all()
-    representations = Representation.query.all()
-    return flask.render_template("theatre/main.html", title=_("Théâtre"), spectacles=spectacles, representations=representations)
+    spectacles = Spectacle.query.order_by(Spectacle.id).all()
+    representations = Representation.query.order_by(Representation.date).all()
+    return flask.render_template("theatre/main.html", title=_("Club Théâtre 140"), spectacles=spectacles, representations=representations)
 
