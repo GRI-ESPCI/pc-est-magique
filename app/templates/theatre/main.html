@@ -90,7 +90,7 @@
     {% endif %} {% endfor %}
   </ul>
   <p>
-    {{ _("Billeterie : ") }} {% if spect.ticket_link == None %} {{ _("Lien à
+    {{ _("Billeterie : ") }} {% if not spect.ticket_link %} {{ _("Lien à
     venir") }} {% else %}
     <a href="{{ spect.ticket_link }}">{{ spect.ticket_link }}</a> {% endif %}
   </p>
