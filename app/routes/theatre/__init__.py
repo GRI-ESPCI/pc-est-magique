@@ -1,4 +1,4 @@
-"""PC est magique - Profile Pages Blueprint"""
+"""PC est magique - Theater Pages Blueprint"""
 
 import flask
 
