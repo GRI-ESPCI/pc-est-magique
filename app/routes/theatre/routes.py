@@ -9,6 +9,7 @@ from app.routes.theatre import bp
 from app.utils import helpers, typing
 
 
+@bp.route("")
 @bp.route("/")
 def main() -> typing.RouteReturn:
     """PC est magique profile page."""
