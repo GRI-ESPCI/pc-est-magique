@@ -21,10 +21,10 @@
   <p>
     {{ _("Vous pouvez acheter un \"Pass Théâtre\" qui vous permet de voir
     plusieurs pièces gratuitement une fois acheté. Pour utiliser votre pass, il
-    vous suffit de sélectionner l'option \"Tarif Pass\" (prix gratuit) lorsque
-    vous prenez votre billet. Les pass sont ouverts à tous les membres de
-    l'ESPCI (personnel, chercheurs, étudiants). Il en existe 3 selon le nombre
-    de pièces auxquels vous souhaitez assister : ") }}
+    vous suffit de sélectionner l'option \"Tarif Pass (0€) \" lorsque vous
+    prenez votre billet. Les pass sont ouverts à tous les membres de l'ESPCI
+    (personnel, chercheurs, étudiants). Il en existe 3 selon le nombre de pièces
+    auxquels vous souhaitez assister : ") }}
   </p>
   <ul>
     <li>{{ _("Pass 3 pièces : 8€") }}</li>
@@ -53,13 +53,14 @@
 
   <p>
     {{ _("NB : La pièce \"Anna\" est entièrement gratuite. La représentation du
-    vendredi sera normale") }}
+    vendredi sera normale". Soyez attentif au fait que cette pièce parle de
+    violences sexistes et sexuelles.) }}
   </p>
 </div>
 
 <p align="center">
-  <img src="{{ url_for("static", filename="img/theatre/aff_saison.jpg") }}"
-  alt="{{ _("Affiche Saison Théâtrale") }}" width="30%" />
+  <img src="/theatre_posters/aff_saison.jpg", alt="{{ _("Affiche Saison
+  Théâtrale") }}" width="30%" />
 </p>
 
 {% for spect in spectacles %}
@@ -68,13 +69,12 @@
   <h2>{{ spect.name }}</h2>
   <p>
     <i>
-      {{ _('Une pièce écrite par ') }} {{spect.author}} {{ _(' et montée par
-      ')}} {{spect.director}}
+      {{ _("Une pièce écrite par %(author)s et montée par %(director)s",
+      author=spect.author, director=spect.director) }}
     </i>
   </p>
   <p align="center">
-    <img src="{{ url_for("static", filename="img/theatre/{{ spect.image_name }}"
-    ) }}" width="30%" />
+    <img src="/theatre_posters/{{ spect.image_name }}.jpg" , width="30%" />
   </p>
 
   <h5>{{ _("Synopsis")}}</h5>
@@ -84,14 +84,13 @@
 
   <h5>{{ _("Représentations :")}}</h5>
   <ul>
-    {% for rep in spect.representations %} {% if rep._spectacle_id == spect.id
-    %}
+    {% for rep in spect.representations %}
     <li>{{moment(rep.date).format('LLLL')}}</li>
-    {% endif %} {% endfor %}
+    {% endfor %}
   </ul>
   <p>
-    {{ _("Billeterie : ") }} {% if not spect.ticket_link %} {{ _("Lien à
-    venir") }} {% else %}
+    {{ _("Billeterie : ") }} {% if not spect.ticket_link %} {{ _("Lien à venir")
+    }} {% else %}
     <a href="{{ spect.ticket_link }}">{{ spect.ticket_link }}</a> {% endif %}
   </p>
 </div>
