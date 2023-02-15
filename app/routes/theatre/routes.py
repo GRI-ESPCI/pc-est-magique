@@ -1,4 +1,4 @@
-"""PC est magique - Profile Pages Routes"""
+"""PC est magique - Theater Pages Routes"""
 
 import flask
 from flask_babel import _
