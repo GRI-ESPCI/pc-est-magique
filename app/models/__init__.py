@@ -18,3 +18,5 @@ from app.models.payments import Offer, Payment, Subscription
 from app.models.photos import Album, Collection, Photo
 from app.models.settings import GlobalSetting
 from app.models.rooms import Rental, Room
+from app.models.theatre import Spectacle, Representation
+

@@ -1,0 +1,97 @@
+{% extends "base.html" %} {% block app_content %}
+
+<div class="row mb-3">
+  <div class="col">
+    <h1>{{ title }}</h1>
+  </div>
+</div>
+
+<div class="row">
+  <p>
+    {{ _("Bienvenue sur la billetterie de la saison 2023 du Club Théâtre de
+    l'ESPCI ! Cette année, ce ne sont pas moins de 6 pièces que des étudiants de
+    l'école ont mise en scène pour votre plus grand divertissement, et nous
+    espérons vous voir nombreux ! Que vous soyez étudiant(e), chercheur(se) ou
+    membre du personnel de l'école, n'hésitez pas à venir profiter du spectacle,
+    je suis sûr que vous y trouverez votre bonheur. Laissez-vous transporter par
+    la magie du théâtre et glissez un peu tour à tour du rire au sourire, et du
+    sourire aux larmes…") }}
+  </p>
+
+  <p>
+    {{ _("Vous pouvez acheter un \"Pass Théâtre\" qui vous permet de voir
+    plusieurs pièces gratuitement une fois acheté. Pour utiliser votre pass, il
+    vous suffit de sélectionner l'option \"Tarif Pass (0€) \" lorsque vous
+    prenez votre billet. Les pass sont ouverts à tous les membres de l'ESPCI
+    (personnel, chercheurs, étudiants). Il en existe 3 selon le nombre de pièces
+    auxquels vous souhaitez assister : ") }}
+  </p>
+  <ul>
+    <li>{{ _("Pass 3 pièces : 8€") }}</li>
+    <li>{{ _("Pass 4 pièces : 10€") }}</li>
+    <li>{{ _("Pass 5 pièces : 12€") }}</li>
+  </ul>
+  <p>
+    <strong>
+      {{ _("Billetterie Pass Théâtre : ")}}
+      <a href="https://collecte.io/billeterie-pass-theatre-2432246/fr"
+        >https://collecte.io/billeterie-pass-theatre-2432246/fr</a
+      >
+    </strong>
+  </p>
+
+  <p>
+    {{ _("Vendredi tout est permis (Jour de représentation spéciale) : Le
+    vendredi, les comédiens prennent le pouvoir ! Tout en gardant le texte
+    intact (ou presque...) ils sont autorisés, sans en rien révéler au metteur
+    en scène, à modifier la mise en scène, à leur gré et de manière comique.
+    Attendez-vous à passer de surprise en surprise car la rébellion se passe
+    rarement sans accroc... Si vous avez déjà acheté un billet pour la
+    représentation de la pièce, vous pouvez gratuitement assister à celle du
+    vendredi en sélectionnant le tarif \"Vendredi tout est permis\"") }}
+  </p>
+
+  <p>
+    {{ _("NB : La pièce \"Anna\" est entièrement gratuite. La représentation du
+    vendredi sera normale. Soyez attentif au fait que cette pièce parle de
+    violences sexistes et sexuelles.") }}
+  </p>
+</div>
+
+<p align="center">
+  <img src="/theatre_posters/aff_saison.jpg", alt="{{ _("Affiche Saison
+  Théâtrale") }}" width="30%" />
+</p>
+
+{% for spect in spectacles %}
+<hr align="CENTER" />
+<div class="row mb-3">
+  <h2>{{ spect.name }}</h2>
+  <p>
+    <i>
+      {{ _("Une pièce écrite par %(author)s et montée par %(director)s",
+      author=spect.author, director=spect.director) }}
+    </i>
+  </p>
+  <p align="center">
+    <img src="/theatre_posters/{{ spect.image_name }}.jpg" , width="30%" />
+  </p>
+
+  <h5>{{ _("Synopsis")}}</h5>
+  <p>
+    <i> {{ spect.description }} </i>
+  </p>
+
+  <h5>{{ _("Représentations :")}}</h5>
+  <ul>
+    {% for rep in spect.representations %}
+    <li>{{moment(rep.date).format('LLLL')}}</li>
+    {% endfor %}
+  </ul>
+  <p>
+    {{ _("Billeterie : ") }} {% if not spect.ticket_link %} {{ _("Lien à venir")
+    }} {% else %}
+    <a href="{{ spect.ticket_link }}">{{ spect.ticket_link }}</a> {% endif %}
+  </p>
+</div>
+{% endfor %} {% endblock %}
