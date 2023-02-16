@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2023-02-15 23:07+0100\n"
+"POT-Creation-Date: 2023-02-16 20:56+0100\n"
 "PO-Revision-Date: 2022-10-29 03:04+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
@@ -973,8 +973,8 @@ msgid "Changer de chambre"
 msgstr "Change room"
 
 #: app/routes/theatre/routes.py:17
-msgid "Club Théâtre 140"
-msgstr ""
+msgid "Saison Théâtrale du Club Théâtre 140"
+msgstr "ESPCI Theatre Season 2023"
 
 #: app/templates/doas.html:3
 #, python-format
@@ -3713,11 +3713,12 @@ msgid "Quelqu'un vient de voler ma chambre (%(room)s) !"
 msgstr "Someone just stole my room (%(room)s)!"
 
 #: app/templates/theatre/main.html:11
+#, fuzzy
 msgid ""
 "Bienvenue sur la billetterie de la saison 2023 du Club Théâtre de\n"
-"    l'ESPCI ! Cette année, ce ne sont pas moins de 6 pièces que des "
+"    l'ESPCI ! Cette année, ce ne sont pas moins de 6 pièces que les "
 "étudiants de\n"
-"    l'école ont mise en scène pour votre plus grand divertissement, et "
+"    l'école ont mises en scène pour votre plus grand divertissement, et "
 "nous\n"
 "    espérons vous voir nombreux ! Que vous soyez étudiant(e), "
 "chercheur(se) ou\n"
@@ -3729,13 +3730,10 @@ msgid ""
 " et du\n"
 "    sourire aux larmes…"
 msgstr ""
-"Welcome to this webpage for the "
-"2023 ESPCI's theatre season. This year,"
-" 6 plays will be staged by "
-"ESPCI students. Representations are open "
-"to students, researchers or everyone who"
-" want to assist! NB : All plays"
-" are in French"
+"Welcome to this webpage for the 2023 ESPCI's theatre season. This year, 6"
+" plays will be staged by ESPCI students. Representations are open to "
+"students, researchers or everyone who want to assist! NB : All plays are "
+"in French"
 
 #: app/templates/theatre/main.html:22
 msgid ""
@@ -3750,13 +3748,9 @@ msgid ""
 " pièces\n"
 "    auxquels vous souhaitez assister : "
 msgstr ""
-"You can buy a \"Theatre Pass\" "
-"which allow you to see several "
-"plays at a smaller price. Once "
-"bought, you can select the \"Tarif "
-"Pass (0€) \" on the ticket page"
-" for each play. You can buy a"
-" pass for 3 to 5 plays."
+"You can buy a \"Theatre Pass\" which allow you to see several plays at a "
+"smaller price. Once bought, you can select the \"Tarif Pass (0€) \" on "
+"the ticket page for each play. You can buy a pass for 3 to 5 plays."
 
 #: app/templates/theatre/main.html:30
 msgid "Pass 3 pièces : 8€"
@@ -3775,6 +3769,7 @@ msgid "Billetterie Pass Théâtre : "
 msgstr "Ticket link for Theatre Pass"
 
 #: app/templates/theatre/main.html:44
+#, fuzzy
 msgid ""
 "Vendredi tout est permis (Jour de représentation spéciale) : Le\n"
 "    vendredi, les comédiens prennent le pouvoir ! Tout en gardant le "
@@ -3785,61 +3780,56 @@ msgid ""
 "comique.\n"
 "    Attendez-vous à passer de surprise en surprise car la rébellion se "
 "passe\n"
-"    rarement sans accroc... Si vous avez déjà acheté un billet pour la\n"
+"    rarement sans accroc... Si vous avez déjà acheté un billet pour une\n"
 "    représentation de la pièce, vous pouvez gratuitement assister à celle"
 " du\n"
 "    vendredi en sélectionnant le tarif \"Vendredi tout est permis\""
 msgstr ""
-"On friday, an ESPCI tradition says "
-"that \"On Friday, everything is "
-"allowed\". It means that actors have "
-"prepared some surprised and have made"
-" modifications to their act. Do not"
-" be surprised to see some addition"
-" and people laughing. If you have "
-"already bought a ticket for another "
-"representation day, you can come back"
-" Friday freely (by taking a friday"
-" ticket on the pass ticket webpage.)"
+"On friday, an ESPCI tradition says that \"On Friday, everything is "
+"allowed\". It means that actors have prepared some surprised and have "
+"made modifications to their act. Do not be surprised to see some addition"
+" and people laughing. If you have already bought a ticket for another "
+"representation day, you can come back Friday freely (by taking a friday "
+"ticket on the pass ticket webpage.)"
 
 #: app/templates/theatre/main.html:55
+#, fuzzy
 msgid ""
-"NB : La pièce \"Anna\" est entièrement gratuite. La représentation du\n"
-"    vendredi sera normale. Soyez attentif au fait que cette pièce parle "
-"de\n"
-"    violences sexistes et sexuelles."
+"NB : La pièce \"Anna\" est entièrement gratuite. Soyez attentif au\n"
+"    fait que cette pièce parle de violences sexistes et sexuelles."
 msgstr ""
-"The play \"Anna\" is enterly free. "
-"Friday will be a normal day. "
-"Please be aware that that play "
-"speak about sexual violence"
+"The play \"Anna\" is enterly free. Friday will be a normal day. Please be"
+" aware that that play speak about sexual violence"
 
-#: app/templates/theatre/main.html:62
+#: app/templates/theatre/main.html:61
 msgid ""
 "Affiche Saison\n"
 "  Théâtrale"
 msgstr ""
 
-#: app/templates/theatre/main.html:72
+#: app/templates/theatre/main.html:71
 #, python-format
 msgid "Une pièce écrite par %(author)s et montée par %(director)s"
 msgstr "A play written by %(author)s and set upped by %(director)s"
 
-#: app/templates/theatre/main.html:80
+#: app/templates/theatre/main.html:79
 msgid "Synopsis"
 msgstr ""
 
-#: app/templates/theatre/main.html:85
+#: app/templates/theatre/main.html:84
 msgid "Représentations :"
 msgstr "Representations : "
 
-#: app/templates/theatre/main.html:92
-msgid "Billeterie : "
+#: app/templates/theatre/main.html:91
+#, fuzzy
+msgid "Billetterie : "
 msgstr "Ticket link : "
 
-#: app/templates/theatre/main.html:92
+#: app/templates/theatre/main.html:91
 #, fuzzy
-msgid "Lien à venir"
+msgid ""
+"Lien à\n"
+"    venir"
 msgstr "Coming soon"
 
 #: app/utils/lydia.py:82
@@ -3944,4 +3934,5 @@ msgstr "An item with this name already exists."
 #: app/utils/validators.py:170
 msgid "Item ID invalide."
 msgstr "Invalid item ID."
+
 
