@@ -16,3 +16,4 @@ def main() -> typing.RouteReturn:
     spectacles = Spectacle.query.order_by(Spectacle.id).all()
     return flask.render_template("theatre/main.html", title=_("Saison Théâtrale du Club Théâtre 140"), spectacles=spectacles)
 
+
