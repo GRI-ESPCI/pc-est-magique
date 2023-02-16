@@ -14,5 +14,5 @@ from app.utils import helpers, typing
 def main() -> typing.RouteReturn:
     """PC est magique profile page."""
     spectacles = Spectacle.query.order_by(Spectacle.id).all()
-    return flask.render_template("theatre/main.html", title=_("Club Théâtre 140"), spectacles=spectacles)
+    return flask.render_template("theatre/main.html", title=_("Saison Théâtrale du Club Théâtre 140"), spectacles=spectacles)
 
