@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2023-02-16 20:56+0100\n"
+"POT-Creation-Date: 2023-02-28 20:26+0100\n"
 "PO-Revision-Date: 2022-10-29 03:04+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
@@ -3801,31 +3801,42 @@ msgstr ""
 "The play \"Anna\" is enterly free. Friday will be a normal day. Please be"
 " aware that that play speak about sexual violence"
 
-#: app/templates/theatre/main.html:61
+#: app/templates/theatre/main.html:60
+msgid "Service après vente"
+msgstr "After sales service"
+
+#: app/templates/theatre/main.html:62
+msgid ""
+"Si vous souhaitez changer de jour de représentation, échanger vos\n"
+"  billets, ou si vous avez le moindre soucis, remplissez le lien suivant "
+": "
+msgstr "If you want to change your day of representation, exchange your ticket with someone else, or have any problem, please contact us with the following link : "
+
+#: app/templates/theatre/main.html:72
 msgid ""
 "Affiche Saison\n"
 "  Théâtrale"
 msgstr ""
 
-#: app/templates/theatre/main.html:71
+#: app/templates/theatre/main.html:82
 #, python-format
 msgid "Une pièce écrite par %(author)s et montée par %(director)s"
 msgstr "A play written by %(author)s and set upped by %(director)s"
 
-#: app/templates/theatre/main.html:79
+#: app/templates/theatre/main.html:90
 msgid "Synopsis"
 msgstr ""
 
-#: app/templates/theatre/main.html:84
+#: app/templates/theatre/main.html:95
 msgid "Représentations :"
 msgstr "Representations : "
 
-#: app/templates/theatre/main.html:91
+#: app/templates/theatre/main.html:102
 #, fuzzy
 msgid "Billetterie : "
 msgstr "Ticket link : "
 
-#: app/templates/theatre/main.html:91
+#: app/templates/theatre/main.html:102
 #, fuzzy
 msgid ""
 "Lien à\n"
@@ -3934,5 +3945,4 @@ msgstr "An item with this name already exists."
 #: app/utils/validators.py:170
 msgid "Item ID invalide."
 msgstr "Invalid item ID."
-
 
