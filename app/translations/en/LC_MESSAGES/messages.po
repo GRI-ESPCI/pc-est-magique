@@ -8,6 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
+
 "POT-Creation-Date: 2023-03-17 21:29+0100\n"
 "PO-Revision-Date: 2022-10-29 03:04+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
@@ -3857,19 +3858,23 @@ no latecomer after the start of the piece will be accepted. If you are a ESPCI m
   10 rue Vauquelin, Paris. Someone from the theatre club will bring you to the place. Last group to leave will be 5 minutes before the beggining of the piece. If you have any problem, please fill this form :"
 
 #: app/templates/theatre/main.html:102
+
 msgid ""
 "Affiche Saison\n"
 "  Théâtrale"
 msgstr "Theatre Season Poster"
+
 
 #: app/templates/theatre/main.html:112
 #, python-format
 msgid "Une pièce écrite par %(author)s et montée par %(director)s"
 msgstr "A play written by %(author)s and set upped by %(director)s"
 
+
 #: app/templates/theatre/main.html:120
 msgid "Synopsis"
 msgstr "Synopsis"
+
 
 #: app/templates/theatre/main.html:125
 msgid "Représentations :"
@@ -3879,6 +3884,7 @@ msgstr "Representations : "
 #, fuzzy
 msgid "Billetterie : "
 msgstr "Ticket link : "
+
 
 #: app/templates/theatre/main.html:132
 #, fuzzy
