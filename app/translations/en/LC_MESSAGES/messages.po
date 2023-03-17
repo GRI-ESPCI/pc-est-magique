@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2023-02-28 20:26+0100\n"
+"POT-Creation-Date: 2023-03-17 21:29+0100\n"
 "PO-Revision-Date: 2022-10-29 03:04+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
@@ -3802,41 +3802,85 @@ msgstr ""
 " aware that that play speak about sexual violence"
 
 #: app/templates/theatre/main.html:60
-msgid "Service après vente"
-msgstr "After sales service"
+#, fuzzy
+msgid "Informations pratiques"
+msgstr "Practical informations"
 
 #: app/templates/theatre/main.html:62
 msgid ""
-"Si vous souhaitez changer de jour de représentation, échanger vos\n"
-"  billets, ou si vous avez le moindre soucis, remplissez le lien suivant "
-": "
-msgstr "If you want to change your day of representation, exchange your ticket with someone else, or have any problem, please contact us with the following link : "
+"Concernant l'aspect pratique, les horaires des représentations sont\n"
+"  affichées sur le site que je vous invite à consulter régulièrement pour"
+" vous\n"
+"  assurer de l'heure du jour auquel vous assistez à la représentation. Le"
+"\n"
+"  spectacle commencera à l'heure indiquée et, par respect pour les "
+"comédiens, nous ne pourrons vous admettre dans la salle passée l'heure."
+" \n"
+"\n"
+"  <ul>\n"
+"\n"
+"    <li>Si vous êtes un\n"
+"      membre de l'ESPCI, et donc muni d'un badge vous permettant de "
+"pénétrer dans le\n"
+"      bâtiment, nous vous donnons rendez-vous devant l'amphithéâtre "
+"Boreau. Nous\n"
+"      vous prions de prévoir un minimum d'avance afin que nous puissions "
+"faire\n"
+"      pénétrer tout le monde à temps dans la salle. <br> <br></li>\n"
+"\n"
+"    <li>Si vous êtes une personne\n"
+"      extérieure, nous vous donnons rendez-vous à l'accueil de l'ESPCI au"
+" 10 rue\n"
+"      Vauquelin. Vous trouverez pour vous accueillir 2 membres du club "
+"qui seront\n"
+"      chargés de vous conduire, par groupe, jusqu'à l'amphithéâtre "
+"Boreau. Notez que\n"
+"      le dernier groupe partira de l'accueil 5 minutes avant le début de "
+"la\n"
+"      représentation. Passé ce délai, nous ne pourrons plus vous faire "
+"entrer dans\n"
+"      l'école. </li>\n"
+"\n"
+"  </ul>\n"
+"\n"
+"\n"
+"   Quel que soit votre statut, c'est à l'entrée de l'amphithéâtre que\n"
+"  nous vous demanderons votre nom afin de vous faire pénétrer dans la "
+"salle, et\n"
+"  c'est là que se trouvera la billetterie pour les personnes ayant "
+"demandé un\n"
+"  paiement sur place. Si jamais vous vous trouvez empêché d'assister au\n"
+"  spectacle, ou que vous rencontrez un quelconque souci, merci de remplir "
+msgstr "Please arrive in advance to your piece. For respect to actors, 
+no latecomer after the start of the piece will be accepted. If you are a ESPCI member,
+ pieces takes place at amphi Boreau. For exterior spectators, you must present yourself at the entrance of the ESPCI,
+  10 rue Vauquelin, Paris. Someone from the theatre club will bring you to the place. Last group to leave will be 5 minutes before the beggining of the piece. If you have any problem, please fill this form :"
 
-#: app/templates/theatre/main.html:72
+#: app/templates/theatre/main.html:102
 msgid ""
 "Affiche Saison\n"
 "  Théâtrale"
-msgstr ""
+msgstr "Theatre Season Poster"
 
-#: app/templates/theatre/main.html:82
+#: app/templates/theatre/main.html:112
 #, python-format
 msgid "Une pièce écrite par %(author)s et montée par %(director)s"
 msgstr "A play written by %(author)s and set upped by %(director)s"
 
-#: app/templates/theatre/main.html:90
+#: app/templates/theatre/main.html:120
 msgid "Synopsis"
-msgstr ""
+msgstr "Synopsis"
 
-#: app/templates/theatre/main.html:95
+#: app/templates/theatre/main.html:125
 msgid "Représentations :"
 msgstr "Representations : "
 
-#: app/templates/theatre/main.html:102
+#: app/templates/theatre/main.html:132
 #, fuzzy
 msgid "Billetterie : "
 msgstr "Ticket link : "
 
-#: app/templates/theatre/main.html:102
+#: app/templates/theatre/main.html:132
 #, fuzzy
 msgid ""
 "Lien à\n"
