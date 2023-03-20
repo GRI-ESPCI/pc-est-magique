@@ -28,7 +28,7 @@ from config import Config
 from app import enums
 
 
-in_app_copyright = "2021-2022 GRI ESPCI"
+in_app_copyright = "2021-2023 GRI ESPCI"
 
 
 # Define Flask subclass
@@ -102,6 +102,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
         profile,
         rooms,
         theatre,
+        club_q
     )
     from app.routes.auth import saml
 
@@ -118,6 +119,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.register_blueprint(profile.bp, url_prefix="/profile")
     app.register_blueprint(bar.bp, url_prefix="/bar")
     app.register_blueprint(theatre.bp, url_prefix="/theatre")
+    app.register_blueprint(club_q.bp, url_prefix="/club_q")
 
     # Configure logging
     loggers.configure_logging(app)
