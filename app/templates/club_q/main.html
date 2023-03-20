@@ -1,0 +1,48 @@
+{% extends "base.html" %} {% block app_content %} {% import "_form.html" as wtf
+%}
+<div class="row mb-3">
+  <div class="col">
+    <h1>{{ title }}</h1>
+  </div>
+</div>
+
+<div class="row">
+  <p>
+    {{ _("Bienvenue sur la page de commande du Club Q-ulture.
+    <br />
+    Le Club Q est un club de l'ESPCI cherchant à proposer des spectacles de la
+    vie culturelle parisienne à ses membres. De la danse aux concerts, en
+    passant par l'opéra, le Club Q propose ces spectacles à prix réduit grâce
+    aux tarifs de groupes et étudiants, et en profitant de plus de subventions
+    du Crous, des Alumnis et du BDE.
+    <br />
+    Pour passer commande, classez vos voeux pour les spectacles par ordre de
+    préférence (en commençant par 1, ne mettez pas deux spectacles à la même
+    priorité). Vous pouvez demander plusieurs places, mais en cas de demande
+    importante sur un spectacle, vos chances de l'avoir seront diminuées.
+    <br />
+    En cas de problème technique ou de doute, vous pouvez contacter Samuel
+    Ciztrom 140 ou Alec Cochard 140. Le Club Q 140 vous souhaite une bonne
+    saison artistique !") }}
+  </p>
+</div>
+
+<form action="" method="post" role="form">
+  {{ form.hidden_tag() }}
+  <div class="row row-cols-1 row-cols-lg-2 mb-4">
+    <div class="col">
+      <div class="form-floating mb-3">{{ wtf.form_field(form.priorite) }}</div>
+    </div>
+    <div class="col">
+      <div class="form-floating mb-3">{{ wtf.form_field(form.nb_places) }}</div>
+    </div>
+    <div class="col">
+      <div class="form-floating mb-3">
+        {{ wtf.form_field(form.nb_places_minimum) }}
+      </div>
+    </div>
+    <div>{{ wtf.form_field(form.submit) }}</div>
+  </div>
+</form>
+
+{% endblock %}
