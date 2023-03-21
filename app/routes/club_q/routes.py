@@ -14,5 +14,7 @@ from app.utils import helpers, typing
 def main() -> typing.RouteReturn:
     """PC est magique profile page."""
     form = forms.ClubQForm()
-    return flask.render_template("club_q/main.html", title=_("Club Q"), form=form)
+    spectacles = ClubQSpectacle.query.order_by(ClubQSpectacle.id).all()
+    
+    return flask.render_template("club_q/main.html", title=_("Club Q"), form=form, spectacles=spectacles)
 

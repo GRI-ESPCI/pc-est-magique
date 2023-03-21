@@ -22,19 +22,18 @@ Model = typing.cast(type[type], db.Model)  # type checking hack
 
 class ClubQClient(db.Model):
     """Clients of the Club Q"""
-
+    __tablename__ = "club_q_client"
     id: Column[int] = column(sa.Integer(), primary_key=True)
     mecontentement: Column[float] = column(sa.Float(), nullable=False)
     mecontentement_precedent: Column[float | None] = column(sa.Float(), nullable=False)
     saison_actuelle_mec: Column[int] = column(sa.Integer(), nullable=False)
     a_payer: Column[float] = column(sa.Float(), nullable=False)
-
-#    voeux: Relationship[list[ClubQVoeux]] = one_to_many("ClubQVoeux.client", order_by="ClubQVoeux.id")
+    voeux: Relationship[list[ClubQVoeux]] = one_to_many("ClubQVoeux.client", order_by="ClubQVoeux.id")
 
 
 class ClubQSeason(db.Model):
     """Informations about Club Q Seasons"""
-
+    __tablename__ = "club_q_season"
     id: Column[int] = column(sa.Integer(), primary_key=True)
     nom: Column[str] = column(sa.String(64), nullable=False)
     promo_orga: Column[int] = column(sa.Integer(), nullable=False)
@@ -42,26 +41,28 @@ class ClubQSeason(db.Model):
     fin: Column[datetime.datetime | None] = column(sa.DateTime(), nullable=True)
     fin_inscription: Column[datetime.datetime | None] = column(sa.DateTime(), nullable=True)
 
-#    spectacles: Relationship[list[ClubQSpectacle]] = one_to_many("ClubQSpectacle.season", order_by="ClubQSpectacle.date")
+    spectacles: Relationship[list[ClubQSpectacle]] = one_to_many("ClubQSpectacle.season", order_by="ClubQSpectacle.date")
+    voeux: Relationship[list[ClubQVoeux]] = one_to_many("ClubQVoeux.season", order_by="ClubQVoeux.id")
+
 
 
 class ClubQSalle(db.Model):
     """Informations about Club Q spectacle places"""
-
+    __tablename__ = "club_q_salle"
     id: Column[int] = column(sa.Integer(), primary_key=True)
     nom: Column[str] = column(sa.String(64), nullable=False)
     description: Column[str | None] = column(sa.String(500), nullable=True)
     url: Column[str | None] = column(sa.String(64), nullable=True)
     adresse: Column[str | None] = column(sa.String(64), nullable=True)
     latitude: Column[float | None] = column(sa.Float(), nullable=True)
-    lontitude: Column[float | None] = column(sa.Float(), nullable=True)
+    longitude: Column[float | None] = column(sa.Float(), nullable=True)
 
-#    spectacles: Relationship[list[ClubQSpectacle]] = one_to_many("ClubQSpectacle.salle", order_by="ClubQSpectacle.date")
+    spectacles: Relationship[list[ClubQSpectacle]] = one_to_many("ClubQSpectacle.salle", order_by="ClubQSpectacle.date")
 
 
 class ClubQSpectacle(db.Model):
     """Spectacles dates of representations"""
-
+    __tablename__ = "club_q_spectacle"
     id: Column[int] = column(sa.Integer(), primary_key=True)
     nom: Column[str] = column(sa.String(64), nullable=False)
     categorie: Column[str | None] = column(sa.String(64), nullable=True)
@@ -70,30 +71,34 @@ class ClubQSpectacle(db.Model):
     nb_tickets: Column[int] = column(sa.Integer(), nullable=False)
     unit_price: Column[float] = column(sa.Float(), nullable=False)
 
-#    _season_id: Column[int] = column(sa.ForeignKey("season.id"), nullable=False)
-#    season: Relationship[ClubQSeason] = many_to_one("ClubQSeason.spectacles")
+    voeux: Relationship[list[ClubQVoeux]] = one_to_many("ClubQVoeux.spectacle", order_by="ClubQVoeux.id")
 
-#    _salle_id: Column[int] = column(sa.ForeignKey("salle.id"), nullable=False)
-#    salle: Relationship[ClubQSalle] = many_to_one("ClubQSalle.spectacles")
+    _season_id: Column[int] = column(sa.ForeignKey("club_q_season.id"), nullable=False)
+    season: Relationship[ClubQSeason] = many_to_one("ClubQSeason.spectacles")
+
+    _salle_id: Column[int] = column(sa.ForeignKey("club_q_salle.id"), nullable=False)
+    salle: Relationship[ClubQSalle] = many_to_one("ClubQSalle.spectacles")
     
-#    voeux: Relationship[list[ClubQVoeux]] = one_to_many("ClubQVoeux.spectacle", order_by="ClubQVoeux.id")
 
 
 
 class ClubQVoeux(db.Model):
-    """List of spectacle wishes"""
-
+    """Client wish for a spectacle"""
+    __tablename__ = "club_q_voeux"
     id: Column[int] = column(sa.Integer(), primary_key=True)
     places_demandees: Column[int] = column(sa.Integer(), nullable=False)
     priorite: Column[int] = column(sa.Integer(), nullable=False)
     places_minimum: Column[int | None] = column(sa.Integer(), nullable=True)
     places_attribuees: Column[int | None] = column(sa.Integer(), nullable=True)
 
-#    _client_id: Column[int] = column(sa.ForeignKey("client.id"), nullable=False)
-#    client: Relationship[ClubQClient] = many_to_one("ClubQClient.voeux")
+    _client_id: Column[int] = column(sa.ForeignKey("club_q_client.id"), nullable=False)
+    client: Relationship[ClubQClient] = many_to_one("ClubQClient.voeux")
 
-#    _spectacle_id: Column[int] = column(sa.ForeignKey("spectacle.id"), nullable=False)
-#    spectacle: Relationship[ClubQSeason] = many_to_one("ClubQSpectacle.voeux")
+    _spectacle_id: Column[int] = column(sa.ForeignKey("club_q_spectacle.id"), nullable=False)
+    spectacle: Relationship[ClubQSeason] = many_to_one("ClubQSpectacle.voeux")
+
+    _season_id: Column[int] = column(sa.ForeignKey("club_q_season.id"), nullable=False)
+    season: Relationship[ClubQSeason] = many_to_one("ClubQSeason.voeux")
 
 
 from app import models

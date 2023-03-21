@@ -27,6 +27,13 @@
   </p>
 </div>
 
+{% for spect in spectacles %}
+<div class="row">
+<p>
+  <h3>{{ spect.nom }}</h3>
+  {{ spect.description }}
+</p>
+</div>
 <form action="" method="post" role="form">
   {{ form.hidden_tag() }}
   <div class="row row-cols-1 row-cols-lg-2 mb-4">
@@ -44,5 +51,5 @@
     <div>{{ wtf.form_field(form.submit) }}</div>
   </div>
 </form>
-
+{% endfor %}
 {% endblock %}
