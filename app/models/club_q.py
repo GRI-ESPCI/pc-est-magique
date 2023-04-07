@@ -20,17 +20,6 @@ from app.utils.columns import (
 Model = typing.cast(type[type], db.Model)  # type checking hack
 
 
-class ClubQClient(db.Model):
-    """Clients of the Club Q"""
-    __tablename__ = "club_q_client"
-    id: Column[int] = column(sa.Integer(), primary_key=True)
-    mecontentement: Column[float] = column(sa.Float(), nullable=False)
-    mecontentement_precedent: Column[float | None] = column(sa.Float(), nullable=False)
-    saison_actuelle_mec: Column[int] = column(sa.Integer(), nullable=False)
-    a_payer: Column[float] = column(sa.Float(), nullable=False)
-    voeux: Relationship[list[ClubQVoeux]] = one_to_many("ClubQVoeux.client", order_by="ClubQVoeux.id")
-
-
 class ClubQSeason(db.Model):
     """Informations about Club Q Seasons"""
     __tablename__ = "club_q_season"
@@ -66,7 +55,8 @@ class ClubQSpectacle(db.Model):
     id: Column[int] = column(sa.Integer(), primary_key=True)
     nom: Column[str] = column(sa.String(64), nullable=False)
     categorie: Column[str | None] = column(sa.String(64), nullable=True)
-    description: Column[str | None] = column(sa.String(500), nullable=True)
+    image_name: Column[str | None] = column(sa.String(64), nullable=True)
+    description: Column[str | None] = column(sa.String(2500), nullable=True)
     date: Column[datetime.datetime] = column(sa.DateTime(), nullable=False)
     nb_tickets: Column[int] = column(sa.Integer(), nullable=False)
     unit_price: Column[float] = column(sa.Float(), nullable=False)
@@ -91,8 +81,8 @@ class ClubQVoeux(db.Model):
     places_minimum: Column[int | None] = column(sa.Integer(), nullable=True)
     places_attribuees: Column[int | None] = column(sa.Integer(), nullable=True)
 
-    _client_id: Column[int] = column(sa.ForeignKey("club_q_client.id"), nullable=False)
-    client: Relationship[ClubQClient] = many_to_one("ClubQClient.voeux")
+    _client_id: Column[int] = column(sa.ForeignKey("pceen.id"), nullable=False)
+    client: Relationship[models.PCeen] = many_to_one("PCeen.clubq_voeux", foreign_keys=[_client_id])
 
     _spectacle_id: Column[int] = column(sa.ForeignKey("club_q_spectacle.id"), nullable=False)
     spectacle: Relationship[ClubQSeason] = many_to_one("ClubQSpectacle.voeux")

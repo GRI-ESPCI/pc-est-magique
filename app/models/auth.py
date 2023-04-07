@@ -93,6 +93,10 @@ class PCeen(flask_login.UserMixin, Model):
     )
     bar_daily_data: Relationship[Query[models.BarDailyData]] = one_to_many("BarDailyData.pceen", lazy="dynamic")
 
+    clubq_voeux: Relationship[Query[models.ClubQVoeux]] = one_to_many(
+        "ClubQVoeux.client", foreign_keys="ClubQVoeux._client_id", lazy="dynamic"
+    )
+
     def __repr__(self) -> str:
         """Returns repr(self)."""
         return f"<PCeen #{self.id} ('{self.username}')>"

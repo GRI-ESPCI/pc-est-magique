@@ -189,3 +189,15 @@ def theatre_posters(filename: str) -> typing.RouteReturn:
         filename,
     )
     return flask.send_file(filepath)
+
+
+@bp.route("/club_q/<season>/<filename>")
+def club_q(season : str, filename: str) -> typing.RouteReturn:
+    """Serve Club Q image (fallback if no Nginx, should NOT be used!)"""
+    filepath = os.path.join(
+        flask.current_app.config["PHOTOS_BASE_PATH"],
+        "club_q",
+        season,
+        filename,
+    )
+    return flask.send_file(filepath)
