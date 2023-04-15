@@ -16,6 +16,9 @@
     aux tarifs de groupes et étudiants, et en profitant de plus de subventions
     du Crous, des Alumnis et du BDE.
     <br />
+    Les places sont prioritairement attribués aux étudiants actuels de l'école,
+    et seulement ensuite à d'autres membres de l'école.
+    <br />
     Pour passer commande, classez vos voeux pour les spectacles par ordre de
     préférence (en commençant par 1, ne mettez pas deux spectacles à la même
     priorité). Vous pouvez demander plusieurs places, mais en cas de demande
@@ -43,34 +46,31 @@
       <h5>{{moment(spect.date).format('LLLL')}} - {{ spect.unit_price}} €</h5>
       <p>{{ spect.description }}</p>
 
-      <div class="row mb-3">
-        <div class="col-3">
+      <div class="row mb-5">
+        <div class="col-sm-4">
           <p>
             <b>{{ _("Priorité") }}</b>
-            <input type="number" name="priorite" class="form-control" />
+            {{ getattr(form, "priorite_" + str(spect.id))() }}
           </p>
         </div>
 
-        <div class="col-3">
+        <div class="col-sm-4">
           <p>
             <b>{{ _("Nombre de places") }}</b>
-            <input type="number" name="nb_places" class="form-control" />
+            {{ getattr(form, "nb_places_" + str(spect.id))() }}
           </p>
         </div>
 
-        <div class="col-3">
+        <div class="form_floating form_control col-sm-4">
           <p>
             <b>{{ _("Places minimum") }}</b>
-            <input
-              type="number"
-              name="nb_places_minimum"
-              class="form-control"
-            />
+            {{ getattr(form, "nb_places_minimum_" + str(spect.id))() }}
           </p>
         </div>
       </div>
     </div>
   </div>
+  <hr align="CENTER" />
   {% endif %} {% endfor %}
   <div class="row mt-3">
     <div class="col text-center">

@@ -9,6 +9,10 @@ Rien pour l'instant
 Seules les fonctionnalités majeures sont listées ici ; voir
 [`CHANGELOG.md`](CHANGELOG.md) pour les détails.
 
+### 2.5
+
+- Ajout de la page de voeux "Club Q" pour la réservation des spectacles du club culture de l'ESPCI.
+
 ### 2.4
 
 - Ajout de la page "Théâtre ESPCI" à pc-est-magique pour avoir la liste des pièces

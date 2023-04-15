@@ -3,10 +3,9 @@
 import flask
 from flask_babel import _
 
-from app import context, db
-from app.models import Spectacle, Representation
+from app.models import Spectacle
 from app.routes.theatre import bp
-from app.utils import helpers, typing
+from app.utils import typing
 
 
 @bp.route("")
