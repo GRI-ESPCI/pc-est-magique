@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ESPCI Club Q-ulture page
   - Booking page
   - List of spectacles
+  - Club Q read permission
 
 ### Changed
 
