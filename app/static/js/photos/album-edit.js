@@ -97,7 +97,7 @@ function deletePhoto(button) {
 const uppy = new Uppy.Uppy({
   locale: Uppy.locales.fr_FR,
   restrictions: {
-    maxFileSize: 25000000,
+    maxFileSize: 100000000,
     minFileSize: 10000,
     allowedFileTypes: [".jpg", ".jpeg", ".png"],
   },
@@ -107,7 +107,7 @@ const uppy = new Uppy.Uppy({
     trigger: "#uppy-photo-uploader",
     closeModalOnClickOutside: true,
     disablePageScrollWhenModalOpen: false,
-    note: "Images .jpg / .jpeg / .png uniquement, maximum 25 MB par fichier",
+    note: "Images .jpg / .jpeg / .png uniquement, maximum 100 MB par fichier",
     fileManagerSelectionType: "both",
     locale: Uppy.locales.fr_FR,
   })

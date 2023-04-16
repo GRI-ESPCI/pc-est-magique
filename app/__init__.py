@@ -28,7 +28,7 @@ from config import Config
 from app import enums
 
 
-in_app_copyright = "2021-2022 GRI ESPCI"
+in_app_copyright = "2021-2023 GRI ESPCI"
 
 
 # Define Flask subclass

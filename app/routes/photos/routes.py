@@ -12,6 +12,7 @@ from app.utils import typing, helpers
 
 
 @bp.route("")
+@context.permission_only(PermissionType.read, PermissionScope.photos)
 def main() -> typing.RouteReturn:
     """Photos main page (list of collections)."""
     # Filter collections to display based on permissions
@@ -24,6 +25,7 @@ def main() -> typing.RouteReturn:
 
 
 @bp.route("<collection_dir>", methods=["GET", "POST"])
+@context.permission_only(PermissionType.read, PermissionScope.photos)
 def collection(collection_dir: str) -> typing.RouteReturn:
     """Photos collection page (list of albums)."""
     collection = Collection.query.filter_by(dir_name=collection_dir).first()
@@ -107,6 +109,7 @@ def collection(collection_dir: str) -> typing.RouteReturn:
 
 
 @bp.route("<collection_dir>/<album_dir>", methods=["GET", "POST"])
+@context.permission_only(PermissionType.read, PermissionScope.photos)
 def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
     """Photos album page (list of photos)."""
     collection = Collection.query.filter_by(dir_name=collection_dir).first()

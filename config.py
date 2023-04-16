@@ -49,6 +49,8 @@ class Config:
     MAIL_SUPPRESS_SEND = os.environ.get("MAIL_SUPPRESS_SEND")
     ADMINS = os.environ.get("ADMINS", "").split(";")
 
+    MAX_CONTENT_LENGTH = int(os.environ.get("MAX_CONTENT_LENGTH", 25000000))
+
     ERROR_WEBHOOK = os.environ.get("ERROR_WEBHOOK")
     LOGGING_WEBHOOK = os.environ.get("LOGGING_WEBHOOK")
     MESSAGE_WEBHOOK = os.environ.get("MESSAGE_WEBHOOK")
