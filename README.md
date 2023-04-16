@@ -2,9 +2,18 @@
 
 Application Flask tournant sur https://pc-est-magique.fr.
 
-## Quoi de neuf sur PC est magique ?
+## Contenu
 
-Rien pour l'instant
+- [Quoi de neuf sur PC est magique ?](#whatsnew)
+- [Exigences](#dependencies)
+- [Installation](#install)
+- [Documentation](#doc)
+  - [Système de permissions](#doc-permissions)
+- [Notes de développement](#devnotes)
+
+<a name="whatsnew"/>
+
+## Quoi de neuf sur PC est magique ?
 
 Seules les fonctionnalités majeures sont listées ici ; voir
 [`CHANGELOG.md`](CHANGELOG.md) pour les détails.
@@ -79,6 +88,8 @@ Seules les fonctionnalités majeures sont listées ici ; voir
   - Génération des règles DHCP pour chaque chambre et script de mise à jour,
   - Menu GRI avec liste des rezidents.
 
+<a name="dependencies"/>
+
 ## Exigences
 
 - Python >= 3.10 ;
@@ -87,8 +98,10 @@ Seules les fonctionnalités majeures sont listées ici ; voir
 - Package npm : `bower sass`
   - Package Bower : `bootstrap chartjs moment webping-js lightgallery`
 - Packages Python : Voir [`requirements.txt`](requirements.txt), plus pour le
-  déploiement : `gunicorn pymysql cryptography` ;
+  déploiement : `gunicorn psycopg2 cryptography` ;
 - Pour le déploiement : un utilisateur Linux `pc-est-magique` dédié.
+
+<a name="install"/>
 
 ## Installation
 
@@ -286,6 +299,72 @@ sudo supervisorctl start pc-est-magique
 ```
 
 (côté développement, voir plus bas)
+
+<a name="doc"/>
+
+## Documentation
+
+L'essentiel de la structure de l'explication est détaillée dans le tutoriel suivi :
+https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deployment-on-linux
+
+<a name="doc-permissions"/>
+
+### Système de permissions
+
+#### Modèles
+
+Le système de permission se base sur les modèles `Role` et `Permission` défini dans
+[`app/models/gris.py`](app/models/gris.py) :
+
+- Chaque `Permission` est définie par
+
+  - Son `type` (enum `PermissionType`) : `read`, `write`, `delete` ou `all`
+  - Son `scope` (enum `PermissionScope`) qui peuvent correspondre soit
+    - Aux modules de l'application (`photos`, `intrarez`...)
+    - Aux éléments auquel on veut restreindre l'accès (`collection`, `album`...)
+  - Éventuellement un `ref_id` contenant l'ID de l'objet concerné par cette permission (e.g. un album précis).
+
+- Chaque `Role` :
+  - a un nom, un index (ordre de priorité dans la liste), et une couleur ;
+  - possède un ensemble de permissions via la table d'association `_Role_Permission_AT` (many-to-many).
+    - Ceci peut se gérer directement depuis le menu de l'application, dans le menu GRI / Rôles.
+  - est associé à un ensemble de PCéens possédant ce rôle, via la table d'association `_PCeen_Role_AT` (many-to-many).
+    - Ceci peut se gérer directement depuis le menu de l'application, dans le menu GRI / PCéens.
+
+#### Utilisation
+
+Les éléments de l'application peuvent être restreint à une permission donnée de différentes manières
+(du plus haut au plus bas niveau) :
+
+- Via le décorateur `@context.permission_only` directement appliqué sur la route (voir par ex. les routes dans
+  [`app/routes/rooms.py`](app/routes/rooms.py)), ou son dérivé `@context.any_permission_only` (si plusieurs
+  permissions permettent chacune d'accéder à la page (OR) : si il faut plusieurs permissions en même temps
+  pour y accéder (AND), il suffit de mettre un décorateur pour chaque) ;
+- Via les fonctions `context.check_permission`, `context.check_any_permission` ou `context.check_all_permissions`,
+  qui lèvent une exception si le PCéen identifié n'a pas la ou les permission(s) demandée(s) ;
+- Via la fonction `context.has_permission`, qui renvoie `True` ou `False` ;
+- Via la méthode `PCeen.has_permission` (ne devrait pas être utilisée directement).
+
+#### Héritage
+
+Les permissions ont également un système d'**héritage**, défini dans `PermissionScope` dans
+[`app/enums.py`](app/enums.py). Par exemple, pour les photos :
+
+- Si un PCéen a la permission `read/collection[None]` (`ref_id = None`), alors il pourra voir TOUTES les collections;
+- Si un PCéen a la permission `read/collection[3]` (`ref_id = 3`), alors il pourra voir uniquement la collection 3;
+- Si un PCéen a la permission `read/collection[3]`, il peut également voir tous les albums de la collection 3;
+- Si un PCéen a la permission `read/albums[4]`, il peut voir uniquement l'album 4;
+- La permission `read/albums[None]` n'est pas autorisée (`need_elem = True`).
+
+#### Permissions publiques
+
+Enfin, une dernière spécificité de ce système est l'existence d'un rôle spécial, le rôle `PUBLIC` d'ID `0`.
+
+Les permissions que possède ce rôle sont les permissions de _tous_ les visiteurs de la plateforme,
+y compris ceux ne possédant pas de compte. Actuellement, cela sert pour afficher publiquement la collection
+de photos PSL (qui est par ailleurs protégée par une auth BASIC.)
+
+<a name="devnotes"/>
 
 ## Notes de développement
 

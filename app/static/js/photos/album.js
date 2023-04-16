@@ -44,6 +44,7 @@ lg.addEventListener("lgAfterSlide", (event) => {
   // Update slide number in URL hash
   window.history.replaceState({}, document.title, "#" + (event.detail.index + 1));
   // Update photo link in report URL
+  const data = gallery.items[event.detail.index].dataset;
   report.href = report_template.replace("__photo__", data["file_name"]);
 });
 

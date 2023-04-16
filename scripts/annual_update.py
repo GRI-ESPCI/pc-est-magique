@@ -18,6 +18,7 @@ Ce script peut uniquement être appelé depuis Flask :
 import datetime
 import os
 import sys
+import time
 
 try:
     from app import db, __version__
@@ -46,6 +47,7 @@ def replace_student_role(leaving_promo: int) -> None:
     for index, pceen in enumerate(pceens):
         if student_role not in pceen.roles:
             continue
+        time.sleep(2)
 
         print(f"Processing ({index + 1}/{total}): {pceen!r}...")
 

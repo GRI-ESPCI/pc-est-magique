@@ -103,7 +103,7 @@ class Permission(Model):
             return None
         item = self.scope.query(models).get(self.ref_id)
         if not item:
-            raise ValueError(f"Permission {self} refer to non-existing {self.scope}")
+            raise ValueError(f"Permission {self.id} refer to non-existing {self.scope}")
         return item
 
     def __str__(self) -> str:

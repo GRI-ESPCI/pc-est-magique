@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
 # v2.5.0 (2023-04-17)
 
 ### Added
@@ -17,6 +18,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - "Theatre ESPCI" was renamed "Club Théâtre"
+
+# v2.4.5 (2023-04-16)
+
+### Added
+
+- Some documentation in README.md + table of contents
+
+### Fixed
+
+- A lot of small things backported from fixes applied directly to production server (don't do that)
+
+# v2.4.4 (2023-03-17)
+
+### Added
+
+- Practical information about theatre piece at ESPCI
+
+# v2.4.3 (2023-02-28)
+
+### Added
+
+- Link for after sales service for the theatre page
+
 
 # v2.4.2 (2023-02-16)
 

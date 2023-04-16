@@ -57,7 +57,6 @@ if TYPE_CHECKING:
         #: The query parameters for attr:`.redemption_endpoint`, if applicable.
         redemption_params: dict[str, Any]
 
-    #: salut
     g: _RequestContext
 
 

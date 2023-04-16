@@ -69,7 +69,7 @@ class BarTransaction(db.Model):
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
-        return f"<BarTransaction #{self.id} ({self.client.username} / {self.item.name} / {self.date})>"
+        return f"<BarTransaction #{self.id} ({self.client.username} / {self.item.name if self.item else '<no item>'} / {self.date})>"
 
     def _update_linked_objects(self, revert: bool):
         factor = -1 if revert else 1
