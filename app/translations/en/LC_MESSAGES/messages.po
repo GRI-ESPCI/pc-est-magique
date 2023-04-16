@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2023-02-16 20:56+0100\n"
+"POT-Creation-Date: 2023-04-17 00:32+0200\n"
 "PO-Revision-Date: 2022-10-29 03:04+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
@@ -413,6 +413,19 @@ msgstr "Item out of stock (can be modified on Items page)"
 #: app/routes/bar/utils.py:119
 msgid "IP non détectable, impossible d'afficher les avatars"
 msgstr "Unable to detect your IP, the avatars can't be shown"
+
+#: app/routes/club_q/forms.py:12 app/routes/profile/forms.py:21
+#: app/routes/profile/forms.py:33
+msgid "Mettre à jour"
+msgstr "Update"
+
+#: app/routes/club_q/routes.py:44
+msgid "Vos choix ont été enregistrés."
+msgstr "Your choices has been saved"
+
+#: app/routes/club_q/routes.py:45
+msgid "Page de réservation pour le Club Q"
+msgstr "Club Q-ulture ooking page"
 
 #: app/routes/devices/forms.py:13 app/routes/devices/forms.py:22
 #: app/routes/devices/forms.py:30
@@ -840,7 +853,7 @@ msgid "Modifier la collection"
 msgstr "Edit collection"
 
 #: app/routes/photos/routes.py:23 app/templates/cards/photos.html:5
-#: app/templates/cards/photos.html:22 app/templates/navbar.html:50
+#: app/templates/cards/photos.html:22 app/templates/navbar.html:56
 #: app/templates/photos/album.html:46 app/templates/photos/collection.html:18
 #: app/templates/photos/main.html:7
 msgid "Photos"
@@ -872,15 +885,11 @@ msgstr "An album cannot be made visible if it contains no photos!"
 msgid "Album modifié avec succès !"
 msgstr "Album successfully edited!"
 
-#: app/routes/profile/forms.py:21 app/routes/profile/forms.py:33
-msgid "Mettre à jour"
-msgstr "Update"
-
 #: app/routes/profile/forms.py:27
 msgid "Mot de passe actuel"
 msgstr "Current password"
 
-#: app/routes/profile/routes.py:15 app/templates/navbar.html:64
+#: app/routes/profile/routes.py:15 app/templates/navbar.html:70
 msgid "Profil"
 msgstr "Profile"
 
@@ -972,7 +981,7 @@ msgstr "Modify rental"
 msgid "Changer de chambre"
 msgstr "Change room"
 
-#: app/routes/theatre/routes.py:17
+#: app/routes/theatre/routes.py:16
 msgid "Saison Théâtrale du Club Théâtre 140"
 msgstr "ESPCI Theatre Season 2023"
 
@@ -1039,8 +1048,8 @@ msgid "Se désinscrire"
 msgstr "Unsubscribe"
 
 #: app/templates/navbar.html:23
-msgid "Théâtre ESPCI"
-msgstr "Theatre ESPCI"
+msgid "Club Théâtre"
+msgstr "Theatre Club"
 
 #: app/templates/auth/auth_needed.html:21 app/templates/auth/login.html:53
 #: app/templates/navbar.html:34
@@ -1054,12 +1063,16 @@ msgstr "Sign up"
 msgid "Internet"
 msgstr "Internet"
 
+#: app/templates/navbar.html:49
+msgid "Club Q"
+msgstr "Q-ulture Club"
+
 #: app/templates/cards/bar.html:5 app/templates/gris/pceens.html:36
-#: app/templates/navbar.html:58
+#: app/templates/navbar.html:64
 msgid "Bar"
 msgstr "Bar"
 
-#: app/templates/devices/transfer.html:42 app/templates/navbar.html:69
+#: app/templates/devices/transfer.html:42 app/templates/navbar.html:75
 msgid "Déconnexion"
 msgstr "Sign out"
 
@@ -1301,7 +1314,8 @@ msgstr "Price"
 msgid "Alcoolisé"
 msgstr "Alcoholic"
 
-#: app/templates/bar/items.html:62 app/templates/gris/roles.html:47
+#: app/templates/bar/items.html:62 app/templates/club_q/main.html:52
+#: app/templates/gris/roles.html:47
 msgid "Priorité"
 msgstr "Priority"
 
@@ -1851,6 +1865,54 @@ msgstr "More information"
 #: app/templates/payments/main.html:83
 msgid "Renouvellement possible à partir de la fin de l'abonnement actuel"
 msgstr "Renewal possible from the end of the current subscription"
+
+#: app/templates/club_q/main.html:11
+msgid ""
+"Bienvenue sur la page de commande du Club Q-ulture.\n"
+"    <br />\n"
+"    Le Club Q est un club de l'ESPCI cherchant à proposer des spectacles "
+"de la\n"
+"    vie culturelle parisienne à ses membres. De la danse aux concerts, en"
+"\n"
+"    passant par l'opéra, le Club Q propose ces spectacles à prix réduit "
+"grâce\n"
+"    aux tarifs de groupes et étudiants, et en profitant de plus de "
+"subventions\n"
+"    du Crous, des Alumnis et du BDE.\n"
+"    <br />\n"
+"    Les places sont prioritairement attribués aux étudiants actuels de "
+"l'école,\n"
+"    et seulement ensuite à d'autres membres de l'école.\n"
+"    <br />\n"
+"    Pour passer commande, classez vos voeux pour les spectacles par ordre"
+" de\n"
+"    préférence (en commençant par 1, ne mettez pas deux spectacles à la "
+"même\n"
+"    priorité). Vous pouvez demander plusieurs places, mais en cas de "
+"demande\n"
+"    importante sur un spectacle, vos chances de l'avoir seront diminuées."
+"\n"
+"    <br />\n"
+"    En cas de problème technique ou de doute, vous pouvez contacter "
+"Samuel\n"
+"    Ciztrom 140 ou Alec Cochard 140. Le Club Q 140 vous souhaite une "
+"bonne\n"
+"    saison artistique !"
+msgstr "Q-ulture Club is part of ESPCI. This club aims to propose to the school students an access to the parisian cultural life. With dance, concerts, operas, all these spectacles are proposed with a reduction, thanks to scolar and group prices. Moreover, the Q-ulture Club has subventions from the CROUS, the Alumnis and the BDE. Places are firslty given to ESPCI students, but if there is some tickets left, they are proposed to the other ESPCI members. For reservation, please put the priority (From 1, being the one you want the most) and the number of places wanted for each spectacle you are interested in. In case of any problem, please contact Alec Cochard or Samuel Czitrom. We wish you a pleasant Club Q 3rd season."
+
+#: app/templates/club_q/main.html:59
+#, fuzzy
+msgid "Nombre de places"
+msgstr "No. of wanted seats"
+
+#: app/templates/club_q/main.html:66
+msgid "Places minimum"
+msgstr "Minimal no. of seats"
+
+#: app/templates/club_q/main.html:78
+#, fuzzy
+msgid "Mise à jour"
+msgstr "Update"
 
 #: app/templates/devices/error.html:17
 msgid ""
@@ -3934,5 +3996,4 @@ msgstr "An item with this name already exists."
 #: app/utils/validators.py:170
 msgid "Item ID invalide."
 msgstr "Invalid item ID."
-
 

@@ -4,7 +4,7 @@ import flask
 from flask_babel import _
 
 from app import context, db
-from app.models import ClubQSpectacle, ClubQVoeux
+from app.models import ClubQSpectacle, ClubQVoeux, PermissionScope, PermissionType
 from app.routes.club_q import bp, forms
 from app.utils import typing
 from app.utils.validators import Optional
@@ -14,9 +14,11 @@ import wtforms
 
 @bp.route("", methods=["GET", "POST"])
 @bp.route("/", methods=["GET", "POST"])
+@context.permission_only(PermissionType.read, PermissionScope.club_q)
 def main() -> typing.RouteReturn:
     """PC est magique Club Q page."""
 
+    #Ajout dynamique de 1 form par spectacle de la saison
     season_id = 0  # ID of the season to show
     spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
     for spect in spectacles:
@@ -24,6 +26,7 @@ def main() -> typing.RouteReturn:
         setattr(forms.ClubQForm, f"nb_places_{spect.id}", wtforms.IntegerField(('Nombre places demandées'), render_kw={"class": "form-control"}, validators=[Optional()]))
         setattr(forms.ClubQForm, f"nb_places_minimum_{spect.id}", wtforms.IntegerField(('Nombre places minimum demandées'), render_kw={"class": "form-control"}, validators=[Optional()]))
 
+    #Gestion des requêtes
     form = forms.ClubQForm()
     if form.validate_on_submit():
         for spect in spectacles:
