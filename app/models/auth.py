@@ -61,12 +61,18 @@ class PCeen(flask_login.UserMixin, Model):
     # Login info
     activated: Column[bool] = column(sa.Boolean(), nullable=False, default=True)
     _password_hash: Column[str] = column(sa.String(128), nullable=True)
-    espci_sso_enabled: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
+    espci_sso_enabled: Column[bool] = column(
+        sa.Boolean(), nullable=False, default=False
+    )
 
     # Bar info
     bar_nickname: Column[str | None] = column(sa.String(128), nullable=True)
-    bar_balance: Column[float | None] = column(sa.Numeric(6, 2, asdecimal=False), default=0.0, nullable=True)
-    bar_deposit: Column[bool | None] = column(sa.Boolean(), default=False, nullable=True)
+    bar_balance: Column[float | None] = column(
+        sa.Numeric(6, 2, asdecimal=False), default=0.0, nullable=True
+    )
+    bar_deposit: Column[bool | None] = column(
+        sa.Boolean(), default=False, nullable=True
+    )
 
     photos: Relationship[list[models.Photo]] = one_to_many("Photo.author")
     roles: Relationship[list[models.Role]] = many_to_many(
@@ -77,24 +83,38 @@ class PCeen(flask_login.UserMixin, Model):
     bans: Relationship[list[models.Ban]] = one_to_many("Ban.pceen")
     devices: Relationship[list[models.Device]] = one_to_many("Device.pceen")
     rentals: Relationship[list[models.Rental]] = one_to_many("Rental.pceen")
-    subscriptions: Relationship[list[models.Subscription]] = one_to_many("Subscription.pceen")
-    payments: Relationship[list[models.Payment]] = one_to_many("Payment.pceen", foreign_keys="Payment._pceen_id")
-    payments_created: Relationship[list[models.Payment]] = one_to_many("Payment.gri", foreign_keys="Payment._gri_id")
+    subscriptions: Relationship[list[models.Subscription]] = one_to_many(
+        "Subscription.pceen"
+    )
+    payments: Relationship[list[models.Payment]] = one_to_many(
+        "Payment.pceen", foreign_keys="Payment._pceen_id"
+    )
+    payments_created: Relationship[list[models.Payment]] = one_to_many(
+        "Payment.gri", foreign_keys="Payment._gri_id"
+    )
     photos: Relationship[list[models.Photo]] = one_to_many("Photo.author")
 
     bar_transactions_made: Relationship[Query[models.BarTransaction]] = one_to_many(
-        "BarTransaction.client", foreign_keys="BarTransaction._client_id", lazy="dynamic"
+        "BarTransaction.client",
+        foreign_keys="BarTransaction._client_id",
+        lazy="dynamic",
     )
     bar_transactions_cashed: Relationship[Query[models.BarTransaction]] = one_to_many(
-        "BarTransaction.barman", foreign_keys="BarTransaction._barman_id", lazy="dynamic"
+        "BarTransaction.barman",
+        foreign_keys="BarTransaction._barman_id",
+        lazy="dynamic",
     )
     bar_transactions_reverted: Relationship[Query[models.BarTransaction]] = one_to_many(
-        "BarTransaction.reverter", foreign_keys="BarTransaction._reverter_id", lazy="dynamic"
+        "BarTransaction.reverter",
+        foreign_keys="BarTransaction._reverter_id",
+        lazy="dynamic",
     )
-    bar_daily_data: Relationship[Query[models.BarDailyData]] = one_to_many("BarDailyData.pceen", lazy="dynamic")
+    bar_daily_data: Relationship[Query[models.BarDailyData]] = one_to_many(
+        "BarDailyData.pceen", lazy="dynamic"
+    )
 
-    clubq_voeux: Relationship[Query[models.ClubQVoeux]] = one_to_many(
-        "ClubQVoeux.client", foreign_keys="ClubQVoeux._client_id", lazy="dynamic"
+    clubq_voeux: Relationship[Query[models.ClubQVoeu]] = one_to_many(
+        "ClubQVoeu.pceen", lazy="dynamic"
     )
 
     def __repr__(self) -> str:
@@ -116,7 +136,13 @@ class PCeen(flask_login.UserMixin, Model):
         return set().union(*(role.permissions for role in self.roles))
 
     @classmethod
-    def _has_permission(cls, permissions, type: PermissionType, scope: PermissionScope, elem: Model = None) -> bool:
+    def _has_permission(
+        cls,
+        permissions,
+        type: PermissionType,
+        scope: PermissionScope,
+        elem: Model = None,
+    ) -> bool:
         # Check validity
         if not scope.allow_elem and elem:
             raise ValueError(f"Specifying elem is not allowed for {scope}")
@@ -134,7 +160,9 @@ class PCeen(flask_login.UserMixin, Model):
         # No permission granted
         return False
 
-    def has_permission(self, type: PermissionType, scope: PermissionScope, elem: Model = None) -> bool:
+    def has_permission(
+        self, type: PermissionType, scope: PermissionScope, elem: Model = None
+    ) -> bool:
         """Check whether this PCeen has a given permission.
 
         Args:
@@ -145,12 +173,14 @@ class PCeen(flask_login.UserMixin, Model):
         Returns:
             If the permission is granted.
         """
-        return self._has_permission(self.permissions, type, scope, elem) or self.has_public_permission(
-            type, scope, elem
-        )
+        return self._has_permission(
+            self.permissions, type, scope, elem
+        ) or self.has_public_permission(type, scope, elem)
 
     @classmethod
-    def has_public_permission(cls, type: PermissionType, scope: PermissionScope, elem: Model = None) -> bool:
+    def has_public_permission(
+        cls, type: PermissionType, scope: PermissionScope, elem: Model = None
+    ) -> bool:
         """Check whether an anonymous user has a given permission.
 
         Args:
@@ -196,7 +226,9 @@ class PCeen(flask_login.UserMixin, Model):
         *If the PCeen's "current_device" is not the device currently making the request
         (connection from outside/GRIs list), it is included in this list.
         """
-        all = sorted(self.devices, key=lambda device: device.last_seen_time, reverse=True)
+        all = sorted(
+            self.devices, key=lambda device: device.last_seen_time, reverse=True
+        )
         if flask.g.internal and self == flask.g.pceen:
             # Really connected from current device: exclude it from other
             return all[1:]
@@ -371,7 +403,9 @@ class PCeen(flask_login.UserMixin, Model):
             pceen exists, else ``None``.
         """
         try:
-            id = jwt.decode(token, flask.current_app.config["SECRET_KEY"], algorithms=["HS256"])["reset_password"]
+            id = jwt.decode(
+                token, flask.current_app.config["SECRET_KEY"], algorithms=["HS256"]
+            )["reset_password"]
         except Exception:
             return
         return cls.query.get(id)

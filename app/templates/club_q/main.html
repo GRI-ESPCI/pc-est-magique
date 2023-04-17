@@ -43,7 +43,10 @@
     </div>
     <div class="col-10">
       <h3><b>{{ spect.nom }}</b></h3>
-      <h5>{{moment(spect.date).format('LLLL')}} - {{ spect.unit_price}} €</h5>
+      <h5>
+        {{moment(spect.date).format('LLLL')}} - {{
+        babel.format_currency(spect.unit_price, "EUR") }}
+      </h5>
       <p>{{ spect.description }}</p>
 
       <div class="row mb-5">
