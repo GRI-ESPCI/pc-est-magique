@@ -32,7 +32,6 @@ def index() -> typing.RouteReturn:
             len(Album.query.all()),
             len(Photo.query.all()),
         )
-
     return flask.render_template("main/index.html", title=_("Accueil"), photos_infos=photos_infos)
 
 
@@ -191,8 +190,8 @@ def theatre_posters(filename: str) -> typing.RouteReturn:
     return flask.send_file(filepath)
 
 
-@bp.route("/club_q/<season>/<filename>")
-def club_q(season : str, filename: str) -> typing.RouteReturn:
+@bp.route("/club_q_images/<season>/<filename>")
+def club_q(season: str, filename: str) -> typing.RouteReturn:
     """Serve Club Q image (fallback if no Nginx, should NOT be used!)"""
     filepath = os.path.join(
         flask.current_app.config["PHOTOS_BASE_PATH"],

@@ -74,25 +74,17 @@ class Payment(Model):
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
     _pceen_id: Column[int] = column(sa.ForeignKey("pceen.id"), nullable=False)
-    pceen: Relationship[models.PCeen] = many_to_one(
-        "PCeen.payments", foreign_keys=_pceen_id
-    )
+    pceen: Relationship[models.PCeen] = many_to_one("PCeen.payments", foreign_keys=_pceen_id)
     amount: Column[float] = column(sa.Numeric(6, 2, asdecimal=False), nullable=False)
     created: Column[datetime.date] = column(sa.DateTime(), nullable=False)
     payed: Column[datetime.date] = column(sa.DateTime(), nullable=True)
-    status: Column[PaymentStatus] = column(
-        Enum(PaymentStatus), nullable=False, default=PaymentStatus.creating
-    )
+    status: Column[PaymentStatus] = column(Enum(PaymentStatus), nullable=False, default=PaymentStatus.creating)
     lydia_uuid: Column[str | None] = column(sa.String(32), nullable=True)
     lydia_transaction_id: Column[str | None] = column(sa.String(32), nullable=True)
     _gri_id: Column[int | None] = column(sa.ForeignKey("pceen.id"), nullable=True)
-    gri: Relationship[models.PCeen] = many_to_one(
-        "PCeen.payments_created", foreign_keys=_gri_id
-    )
+    gri: Relationship[models.PCeen] = many_to_one("PCeen.payments_created", foreign_keys=_gri_id)
 
-    subscriptions: Relationship[list[Subscription]] = one_to_many(
-        "Subscription.payment"
-    )
+    subscriptions: Relationship[list[Subscription]] = one_to_many("Subscription.payment")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -107,9 +99,7 @@ class Offer(Model):
     name_en: Column[str] = column(sa.String(64), nullable=False)
     description_fr: Column[str | None] = column(sa.String(2000), nullable=True)
     description_en: Column[str | None] = column(sa.String(2000), nullable=True)
-    price: Column[float | None] = column(
-        sa.Numeric(6, 2, asdecimal=False), nullable=True
-    )
+    price: Column[float | None] = column(sa.Numeric(6, 2, asdecimal=False), nullable=True)
     months: Column[int] = column(sa.Integer(), nullable=False, default=0)
     days: Column[int] = column(sa.Integer(), nullable=False, default=0)
     visible: Column[bool] = column(sa.Boolean(), nullable=False, default=True)
@@ -165,9 +155,7 @@ class Offer(Model):
         locale = flask_babel.get_locale()
         if locale is None:
             raise RuntimeError("Outside of request context")
-        return (
-            self.description_fr if locale.language[:2] == "fr" else self.description_en
-        ) or ""
+        return (self.description_fr if locale.language[:2] == "fr" else self.description_en) or ""
 
     @classmethod
     def first_offer(cls) -> Offer:

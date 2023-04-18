@@ -30,15 +30,11 @@ class ClubQSeason(db.Model):
     promo_orga: Column[int] = column(sa.Integer(), nullable=False)
     debut: Column[datetime.datetime | None] = column(sa.DateTime(), nullable=True)
     fin: Column[datetime.datetime | None] = column(sa.DateTime(), nullable=True)
-    fin_inscription: Column[datetime.datetime | None] = column(
-        sa.DateTime(), nullable=True
-    )
+    fin_inscription: Column[datetime.datetime | None] = column(sa.DateTime(), nullable=True)
     spectacles: Relationship[list[ClubQSpectacle]] = one_to_many(
         "ClubQSpectacle.season", order_by="ClubQSpectacle.date"
     )
-    voeu: Relationship[list[ClubQVoeu]] = one_to_many(
-        "ClubQVoeu.season", order_by="ClubQVoeu.id"
-    )
+    voeu: Relationship[list[ClubQVoeu]] = one_to_many("ClubQVoeu.season", order_by="ClubQVoeu.id")
 
 
 class ClubQSalle(db.Model):
@@ -52,10 +48,7 @@ class ClubQSalle(db.Model):
     adresse: Column[str | None] = column(sa.String(64), nullable=True)
     latitude: Column[float | None] = column(sa.Float(), nullable=True)
     longitude: Column[float | None] = column(sa.Float(), nullable=True)
-
-    spectacles: Relationship[list[ClubQSpectacle]] = one_to_many(
-        "ClubQSpectacle.salle", order_by="ClubQSpectacle.date"
-    )
+    spectacles: Relationship[list[ClubQSpectacle]] = one_to_many("ClubQSpectacle.salle", order_by="ClubQSpectacle.date")
 
 
 class ClubQSpectacle(db.Model):
@@ -71,9 +64,7 @@ class ClubQSpectacle(db.Model):
     nb_tickets: Column[int] = column(sa.Integer(), nullable=False)
     unit_price: Column[float] = column(sa.Float(), nullable=False)
 
-    voeu: Relationship[list[ClubQVoeu]] = one_to_many(
-        "ClubQVoeu.spectacle", order_by="ClubQVoeu.id"
-    )
+    voeu: Relationship[list[ClubQVoeu]] = one_to_many("ClubQVoeu.spectacle", order_by="ClubQVoeu.id")
 
     _season_id: Column[int] = column(sa.ForeignKey("club_q_season.id"), nullable=False)
     season: Relationship[ClubQSeason] = many_to_one("ClubQSeason.spectacles")
@@ -93,13 +84,9 @@ class ClubQVoeu(db.Model):
     places_attribuees: Column[int | None] = column(sa.Integer(), nullable=True)
 
     _pceen_id: Column[int] = column(sa.ForeignKey("pceen.id"), nullable=False)
-    pceen: Relationship[models.PCeen] = many_to_one(
-        "PCeen.clubq_voeux", foreign_keys=[_pceen_id]
-    )
+    pceen: Relationship[models.PCeen] = many_to_one("PCeen.clubq_voeux", foreign_keys=[_pceen_id])
 
-    _spectacle_id: Column[int] = column(
-        sa.ForeignKey("club_q_spectacle.id"), nullable=False
-    )
+    _spectacle_id: Column[int] = column(sa.ForeignKey("club_q_spectacle.id"), nullable=False)
     spectacle: Relationship[ClubQSeason] = many_to_one("ClubQSpectacle.voeu")
 
     _season_id: Column[int] = column(sa.ForeignKey("club_q_season.id"), nullable=False)

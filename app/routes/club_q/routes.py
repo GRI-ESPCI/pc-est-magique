@@ -20,11 +20,7 @@ def main() -> typing.RouteReturn:
 
     # Ajout dynamique de 1 form par spectacle de la saison
     season_id = 0  # ID of the season to show
-    spectacles = (
-        ClubQSpectacle.query.filter_by(_season_id=season_id)
-        .order_by(ClubQSpectacle.date)
-        .all()
-    )
+    spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
     for spect in spectacles:
         setattr(
             forms.ClubQForm,
@@ -73,9 +69,7 @@ def main() -> typing.RouteReturn:
                     db.session.add(voeux)
                 voeux.priorite = form[f"priorite_{spect.id}"].data
                 voeux.places_demandees = form[f"nb_places_{spect.id}"].data
-                voeux.places_minimum = (
-                    form[f"nb_places_minimum_{spect.id}"].data or None
-                )
+                voeux.places_minimum = form[f"nb_places_minimum_{spect.id}"].data or None
 
         db.session.commit()
         flask.flash(_("Vos choix ont été enregistrés."))
