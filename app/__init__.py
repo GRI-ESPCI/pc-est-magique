@@ -102,7 +102,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
         profile,
         rooms,
         theatre,
-        club_q
+        club_q,
     )
     from app.routes.auth import saml
 

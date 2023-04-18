@@ -31,17 +31,19 @@ class Spectacle(db.Model):
     author: Column[str | None] = column(sa.String(64), nullable=True)
     image_name: Column[str | None] = column(sa.String(120), nullable=True)
 
-    representations: Relationship[list[Representation]] = one_to_many("Representation.spectacle", order_by="Representation.date")
+    representations: Relationship[list[Representation]] = one_to_many(
+        "Representation.spectacle", order_by="Representation.date"
+    )
+
 
 class Representation(db.Model):
     """Spectacles dates of representations"""
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
     date: Column[datetime.datetime] = column(sa.DateTime(), nullable=False)
-    
+
     _spectacle_id: Column[int] = column(sa.ForeignKey("spectacle.id"), nullable=False)
     spectacle: Relationship[Spectacle] = many_to_one("Spectacle.representations")
-
 
 
 from app import models
