@@ -70,6 +70,7 @@ class PermissionScope(enum.Enum):
     intrarez = _PSParams(allow_elem=False, need_elem=False)
     bar = _PSParams(allow_elem=False, need_elem=False)
     bar_stats = _PSParams(allow_elem=False, need_elem=False)
+    club_q = _PSParams(allow_elem=False, need_elem=False)
 
     # Elements scopes
     pceen = _PSParams(

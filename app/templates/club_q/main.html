@@ -1,0 +1,86 @@
+{% extends "base.html" %} {% block app_content %} {% import "_form.html" as wtf
+%}
+<div class="row mb-3">
+  <div class="col">
+    <h1>{{ title }}</h1>
+  </div>
+</div>
+
+<div class="row">
+  <p>
+    {{ _("Bienvenue sur la page de commande du Club Q-ulture.
+    <br />
+    Le Club Q est un club de l'ESPCI cherchant à proposer des spectacles de la
+    vie culturelle parisienne à ses membres. De la danse aux concerts, en
+    passant par l'opéra, le Club Q propose ces spectacles à prix réduit grâce
+    aux tarifs de groupes et étudiants, et en profitant de plus de subventions
+    du Crous, des Alumnis et du BDE.
+    <br />
+    Les places sont prioritairement attribués aux étudiants actuels de l'école,
+    et seulement ensuite à d'autres membres de l'école.
+    <br />
+    Pour passer commande, classez vos voeux pour les spectacles par ordre de
+    préférence (en commençant par 1, ne mettez pas deux spectacles à la même
+    priorité). Vous pouvez demander plusieurs places, mais en cas de demande
+    importante sur un spectacle, vos chances de l'avoir seront diminuées.
+    <br />
+    En cas de problème technique ou de doute, vous pouvez contacter Samuel
+    Ciztrom 140 ou Alec Cochard 140. Le Club Q 140 vous souhaite une bonne
+    saison artistique !") }}
+  </p>
+</div>
+
+<form action="" method="post" role="form">
+  {{ form.hidden_tag() }} {% for spect in spectacles %} {% if spect._season_id
+  == 0 %}
+  <div class="row">
+    <div class="col-2 d-flex align-items-center justify-content-center">
+      <img
+        src="/club_q/{{spect.season.nom }}/{{ spect.image_name }}.jpg"
+        alt="{{ spect.nom }}"
+        class="img-thumbnail"
+      />
+    </div>
+    <div class="col-10">
+      <h3><b>{{ spect.nom }}</b></h3>
+      <h5>
+        {{moment(spect.date).format('LLLL')}} - {{
+        babel.format_currency(spect.unit_price, "EUR") }}
+      </h5>
+      <p>{{ spect.description }}</p>
+
+      <div class="row mb-5">
+        <div class="col-sm-4">
+          <p>
+            <b>{{ _("Priorité") }}</b>
+            {{ getattr(form, "priorite_" + str(spect.id))() }}
+          </p>
+        </div>
+
+        <div class="col-sm-4">
+          <p>
+            <b>{{ _("Nombre de places") }}</b>
+            {{ getattr(form, "nb_places_" + str(spect.id))() }}
+          </p>
+        </div>
+
+        <div class="form_floating form_control col-sm-4">
+          <p>
+            <b>{{ _("Places minimum") }}</b>
+            {{ getattr(form, "nb_places_minimum_" + str(spect.id))() }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr align="CENTER" />
+  {% endif %} {% endfor %}
+  <div class="row mt-3">
+    <div class="col text-center">
+      <button type="submit" class="btn btn-lg btn-primary">
+        {{ _("Mise à jour") }}
+      </button>
+    </div>
+  </div>
+</form>
+{% endblock %}

@@ -8,7 +8,13 @@ from app import db
 Model = typing.cast(type[type], db.Model)  # type checking hack
 
 
-from app.enums import PaymentStatus, PermissionScope, PermissionType, SubState, BarTransactionType
+from app.enums import (
+    PaymentStatus,
+    PermissionScope,
+    PermissionType,
+    SubState,
+    BarTransactionType,
+)
 
 from app.models.auth import PCeen
 from app.models.bar import BarItem, BarTransaction, BarDailyData
@@ -19,4 +25,4 @@ from app.models.photos import Album, Collection, Photo
 from app.models.settings import GlobalSetting
 from app.models.rooms import Rental, Room
 from app.models.theatre import Spectacle, Representation
-
+from app.models.club_q import ClubQSeason, ClubQSalle, ClubQSpectacle, ClubQVoeu
