@@ -6,6 +6,16 @@
   </div>
 </div>
 
+{% if has_permission(PermissionType.write, PermissionScope.club_q) %}
+<a class="btn btn-primary admin-button"" 
+    href="{{ url_for("club_q.admin") }}">
+      {{ _("Administration") }}
+      
+</a>
+<br />
+<br />
+{% endif %}
+
 <div class="row">
   <p>
     {{ _("Bienvenue sur la page de commande du Club Q-ulture.
@@ -30,9 +40,18 @@
   </p>
 </div>
 
+<br />
+<a class="btn btn-primary" 
+    href="{{ url_for("club_q.user", username=user.username) }}">
+      {{ _("Mes réservations") }}
+      
+</a>
+<br />
+<br />
+
 <form action="" method="post" role="form">
   {{ form.hidden_tag() }} {% for spect in spectacles %} {% if spect._season_id
-  == 0 %}
+  == season_id %}
   <div class="row">
     <div class="col-2 d-flex align-items-center justify-content-center">
       <img
@@ -67,7 +86,7 @@
           </p>
         </div>
 
-        <div class="form_floating form_control col-sm-4">
+        <div class="col-sm-4">
           <p>
             <b>{{ _("Places minimum") }}</b>
             {{ getattr(form, "nb_places_minimum_" + str(spect.id))() }}
@@ -77,6 +96,7 @@
     </div>
   </div>
   <hr align="CENTER" />
+
   {% endif %} {% endfor %}
   <div class="row mt-3">
     <div class="col text-center">
@@ -86,4 +106,18 @@
     </div>
   </div>
 </form>
+
+
+
+<style>
+  /* Putting a red button for administration */
+  .admin-button {
+    background-color: rgb(195, 0, 0);
+    border: 2px solid rgb(99, 0, 0);
+  }
+  .admin-button:hover {
+    background-color: rgb(99, 0, 0);
+    border: 2px solid rgb(99, 0, 0);
+  }
+</style>
 {% endblock %}

@@ -474,3 +474,15 @@ def capture() -> typing.RouteReturn | None:
         return helpers.safe_redirect("main.banned")
 
     return helpers.safe_redirect("main.index")
+
+
+def permission_condition(permission_check):
+    def decorator(route: _Route) -> _Route:
+        @functools.wraps(route)
+        def new_route(*args: _RP.args, **kwargs: _RP.kwargs) -> typing.RouteReturn:
+            if permission_check:
+                return route(*args, **kwargs)
+            else:
+                flask.abort(403)
+        return new_route
+    return decorator

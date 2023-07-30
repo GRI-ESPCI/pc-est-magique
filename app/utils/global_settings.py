@@ -39,5 +39,7 @@ class _SettingsMeta:
 
     quick_access_item: BarItem = _QuickAccessItemDescriptor()
 
+    season_number_club_q: int = _SettingDescriptor("SEASON_NUMBER_CLUB_Q")
+
 
 Settings = _SettingsMeta()

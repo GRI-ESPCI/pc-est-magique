@@ -64,7 +64,7 @@ class ClubQSpectacle(db.Model):
     nb_tickets: Column[int] = column(sa.Integer(), nullable=False)
     unit_price: Column[float] = column(sa.Float(), nullable=False)
 
-    voeu: Relationship[list[ClubQVoeu]] = one_to_many("ClubQVoeu.spectacle", order_by="ClubQVoeu.id")
+    voeu: Relationship[list[ClubQVoeu]] = one_to_many("ClubQVoeu.spectacle", order_by="ClubQVoeu.id", lazy="dynamic")
 
     _season_id: Column[int] = column(sa.ForeignKey("club_q_season.id"), nullable=False)
     season: Relationship[ClubQSeason] = many_to_one("ClubQSeason.spectacles")
@@ -72,7 +72,17 @@ class ClubQSpectacle(db.Model):
     _salle_id: Column[int] = column(sa.ForeignKey("club_q_salle.id"), nullable=False)
     salle: Relationship[ClubQSalle] = many_to_one("ClubQSalle.spectacles")
 
+    @property
+    def sum_places_demandees(self) -> int:
+        """The number of tickets asked for a spectacle"""
+        return sum(v.places_demandees for v in self.voeu.filter_by(_season_id = models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value))
+    
+    @property
+    def sum_places_attribuees(self) -> int:
+        """The number of tickets asked for a spectacle"""
+        return sum(v.places_attribuees for v in self.voeu.filter_by(_season_id = models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value).all())
 
+    
 class ClubQVoeu(db.Model):
     """Client wish for a spectacle"""
 

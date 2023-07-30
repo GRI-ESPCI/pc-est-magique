@@ -126,6 +126,8 @@ https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deploymen
   pip install -r requirements.txt
   pip install gunicorn pymysql cryptography
   cp .conf_models/model.env .env
+  mkdir logs
+  nano logs/mails.log
   ```
 
 - Créer et initialiser la base de données :

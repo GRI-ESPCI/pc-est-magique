@@ -1,0 +1,180 @@
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block app_content
+%}
+
+<div class="row mb-3">
+  <div class="col">
+    <h1>{{ title }}</h1>
+  </div>
+</div>
+
+<div class="container mb-3">
+  <div class="btn-toolbar justify-content-between" role="toolbar">
+    <div class="d-flex align-items-center">
+      <div class="btn-group" role="group" name="slt">
+        <a
+          role="button"
+          href="{{ url_for('club_q.admin', view='active') }}"
+          class="btn {{ 'btn-primary' if view == 'active' else 'btn-outline-primary' }}"
+        >
+          {{ _("Résumé") }}
+          <a
+            role="button"
+            href="{{ url_for('club_q.admin', view='attribution') }}"
+            class="btn {{ 'btn-primary' if view == 'attribution' else 'btn-outline-primary' }}"
+          >
+            {{ _("Attribution") }}
+            <a
+              role="button"
+              href="{{ url_for('club_q.admin', view='voeux') }}"
+              class="btn {{ 'btn-primary' if view == 'voeux' else 'btn-outline-primary' }}"
+            >
+              {{ _("Voeux") }}
+              <a
+                role="button"
+                href="{{ url_for('club_q.admin', view='options') }}"
+                class="btn {{ 'btn-primary' if view == 'options' else 'btn-outline-primary' }}"
+              >
+                {{ _("Paramètres") }}
+              </a>
+            </a>
+          </a>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if view == 'active' %}
+
+<h4>{{ _("Spectacles : ")}}</h4>
+
+<div class="row">
+  <div class="col table-responsive">
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">{{ _("ID") }}</th>
+          <th scope="col">{{ _("Spectacle") }}</th>
+          <th scope="col">{{ _("Catégorie") }}</th>
+          <th scope="col">{{ _("Date") }}</th>
+          <th scope="col">{{ _("Prix") }}</th>
+          <th scope="col">{{ _("Places") }}</th>
+          <th scope="col">{{ _("Demandées") }}</th>
+          <th scope="col">{{ _("Attribués") }}</th>
+          <th scope="col">{{ _("Restantes") }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for spect in spectacles %} {% if spect._season_id == season_id %}
+        <tr
+          onclick="window.location='{{ url_for('club_q.spectacle', id=spect.id) }}';"
+        >
+          <td>{{ spect.id }}</td>
+          <td>{{ spect.nom }}</td>
+          <td>{{ spect.categorie }}</td>
+          <td>{{ moment(spect.date).format('DD/MM/YYYY HH:mm:ss') }}</td>
+          <td>{{ babel.format_currency(spect.unit_price, "EUR") }}</td>
+          <td>{{ spect.nb_tickets }}</td>
+          <td>{{ spect.sum_places_demandees}}</td>
+          <td>{{ spect.sum_places_attribuees}}</td>
+          <td>{{ spect.nb_tickets - spect.sum_places_attribuees}}</td>
+        </tr>
+        {% endif %}{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<hr align="CENTER" />
+
+<h4>{{ _("Élèves : ")}}</h4>
+
+<div class="row">
+  <div class="col table-responsive">
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">{{ _("ID") }}</th>
+          <th scope="col">{{ _("Nom") }}</th>
+          <th scope="col">{{ _("Promo") }}</th>
+          <th scope="col">{{ _("Demandées") }}</th>
+          <th scope="col">{{ _("Attribués") }}</th>
+          <th scope="col">{{ _("Mécontentement") }}</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for pceen in pceens %}
+        <tr
+          onclick="window.location='{{ url_for('club_q.user', username=pceen.username) }}';"
+        >
+          <td>{{ pceen.id }}</td>
+          <td>{{ pceen.full_name }}</td>
+          <td>{{ pceen.promo }}</td>
+          <td>{{ pceen.sum_places_demandees }}</td>
+          <td>{{ pceen.sum_places_attribuees }}</td>
+          <td>{{ "hey" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% elif view == 'voeux' %}
+
+<h4>{{ _("Voeux : ")}}</h4>
+
+<div class="row">
+  <div class="col table-responsive">
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">{{ _("ID") }}</th>
+          <th scope="col">{{ _("Spectacle") }}</th>
+          <th scope="col">{{ _("Pcéen") }}</th>
+          <th scope="col">{{ _("Priorité") }}</th>
+          <th scope="col">{{ _("Demandées") }}</th>
+          <th scope="col">{{ _("Minimum") }}</th>
+          <th scope="col">{{ _("Attribuées") }}</th>
+          <th scope="col">{{ _("Prix total") }}</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for voeu in voeux %}
+        <tr>
+          <td>{{ voeu.id }}</td>
+          <td>{{ voeu.spectacle.nom }}</td>
+          <td>{{ voeu.pceen.username }}</td>
+          <td>{{ voeu.priorite }}</td>
+          <td>{{ voeu.places_demandees }}</td>
+          <td>{{ voeu.places_minimum }}</td>
+          <td>{{ voeu.places_attribuees }}</td>
+          <td>
+            {{ babel.format_currency(voeu.spectacle.unit_price *
+            voeu.places_attribuees, "EUR") }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% elif view == 'options' %}
+
+<h4>{{ _("Paramètres : ")}}</h4>
+
+<form action="" method="post" role="form">
+  {{ form_setting.hidden_tag() }}
+  <h5>{{ _("Visibilité de la page : ")}}</h5>
+  <p>{{ form_setting.visibility }} {{ _("Page visible") }}</p>
+
+  <h5>{{ _("Saison actuelle:")}}</h5>
+  <p>{{ form_setting.saison }}</p>
+
+  {{ form_setting.submit(render_kw={"class": "btn btn-lg"}) }}
+</form>
+
+{% endif %} {% endblock %}

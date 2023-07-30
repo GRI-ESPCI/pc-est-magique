@@ -1,0 +1,8 @@
+- Add reportlab to needed librairies of pem
+- Update changelog
+- update readme
+- do translations
+- Remove useless javascript file
+- Add PC, Club Q logos to griway
+- Verify permissions
+- Clean utils/context if new added function not used

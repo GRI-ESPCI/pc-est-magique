@@ -386,5 +386,30 @@ class PCeen(flask_login.UserMixin, Model):
             return
         return cls.query.get(id)
 
+    @property
+    def demand_made(self) -> int:
+        """Return if the pceen has made a demand for the given club Q season"""
+
+        if self.clubq_voeux.filter_by(_season_id = models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value) != None:
+            return(True)
+        return(False)
+
+    @property
+    def sum_places_demandees(self) -> int:
+        """Gives the number of wanted places for the given saison of Club Q """
+
+
+        return sum(v.places_demandees for v in self.clubq_voeux.filter_by(_season_id = models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value).all())
+
+
+    @property
+    def sum_places_attribuees(self) -> int:
+        """Gives the number of given places for the given saison of Club Q """
+        return sum(v.places_attribuees for v in self.clubq_voeux.filter_by(_season_id = models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value).all())
+
+    @property
+    def total_price(self) -> int:
+        """Gives the number of given places for the given saison of Club Q """
+        return sum(v.places_attribuees*v.spectacle.unit_price for v in self.clubq_voeux.filter_by(_season_id = models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value).all())
 
 from app import models
