@@ -1,19 +1,30 @@
 {% extends "base.html" %} {% block app_content %}
+{% if has_permission(PermissionType.write, PermissionScope.club_q) %}
+<a class="btn btn-primary admin-button"" 
+    href="{{ url_for("club_q.admin") }}">
+      {{ _("Administration") }}
+      
+</a>
+<br />
+<br />
+{% endif %}
+
 <div class="row mb-3">
   <div class="col">
     <h3>{{ title }}</h3>
   </div>
 </div>
 
+
 <h4>{{ _("Informations : ")}}</h4>
 
+{% if has_permission(PermissionType.write, PermissionScope.club_q) %}
 <ul>
   <li>{{ _("Promotion : ")}} {{ pceen.promo}}</li>
   <li>{{ _("Mail : ")}} {{ pceen.email}}</li>
-  {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
   <li>{{ _("Mécontentement : ")}} {{ pceen.discontent}}</li>
-  {% endif %}
 </ul>
+{% endif %}
 
 <h4>{{ _("Voeux : ")}}</h4>
 
@@ -38,7 +49,9 @@
 
       <tbody>
         {% for voeu in voeux %}
-        <tr>
+        <tr
+          onclick="window.location='{{ url_for('club_q.spectacle', id=voeu.spectacle.id) }}';"
+        >
           <td>{{ voeu.id }}</td>
           <td>{{ voeu.spectacle.nom }}</td>
           <td>{{ voeu.priorite }}</td>
@@ -79,10 +92,20 @@
 <br />
 <br />
 <a class="btn btn-primary" 
-    href="{{ url_for("club_q.generate_pdf", username=pceen.username) }}">
+    href="{{ url_for("club_q.user_generate_pdf", username=pceen.username) }}">
       {{ _("Imprimer la facture") }}
       
 </a>
 
-
+<style>
+    /* Putting a red button for administration */
+    .admin-button {
+      background-color: rgb(195, 0, 0);
+      border: 2px solid rgb(99, 0, 0);
+    }
+    .admin-button:hover {
+      background-color: rgb(99, 0, 0);
+      border: 2px solid rgb(99, 0, 0);
+    }
+  </style>
 {% endblock %}

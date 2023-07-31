@@ -65,8 +65,13 @@ class PCeen(flask_login.UserMixin, Model):
 
     # Bar info
     bar_nickname: Column[str | None] = column(sa.String(128), nullable=True)
-    bar_balance: Column[float | None] = column(sa.Numeric(6, 2, asdecimal=False), default=0.0, nullable=True)
+    bar_balance: Column[float | None] = column(
+        sa.Numeric(precision=6, scale=2, asdecimal=False), default=0.0, nullable=True
+    )
     bar_deposit: Column[bool | None] = column(sa.Boolean(), default=False, nullable=True)
+
+    # Club Q info
+    discontent: Column[float] = column(sa.Numeric(precision=2, asdecimal=False), nullable=True)
 
     photos: Relationship[list[models.Photo]] = one_to_many("Photo.author")
     roles: Relationship[list[models.Role]] = many_to_many(
@@ -390,26 +395,45 @@ class PCeen(flask_login.UserMixin, Model):
     def demand_made(self) -> int:
         """Return if the pceen has made a demand for the given club Q season"""
 
-        if self.clubq_voeux.filter_by(_season_id = models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value) != None:
-            return(True)
-        return(False)
+        if (
+            self.clubq_voeux.filter_by(
+                _season_id=models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value
+            )
+            != None
+        ):
+            return True
+        return False
 
     @property
     def sum_places_demandees(self) -> int:
-        """Gives the number of wanted places for the given saison of Club Q """
+        """Gives the number of wanted places for the given saison of Club Q"""
 
-
-        return sum(v.places_demandees for v in self.clubq_voeux.filter_by(_season_id = models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value).all())
-
+        return sum(
+            v.places_demandees
+            for v in self.clubq_voeux.filter_by(
+                _season_id=models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value
+            ).all()
+        )
 
     @property
     def sum_places_attribuees(self) -> int:
-        """Gives the number of given places for the given saison of Club Q """
-        return sum(v.places_attribuees for v in self.clubq_voeux.filter_by(_season_id = models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value).all())
+        """Gives the number of given places for the given saison of Club Q"""
+        return sum(
+            v.places_attribuees
+            for v in self.clubq_voeux.filter_by(
+                _season_id=models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value
+            ).all()
+        )
 
     @property
     def total_price(self) -> int:
-        """Gives the number of given places for the given saison of Club Q """
-        return sum(v.places_attribuees*v.spectacle.unit_price for v in self.clubq_voeux.filter_by(_season_id = models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value).all())
+        """Gives the number of given places for the given saison of Club Q"""
+        return sum(
+            v.places_attribuees * v.spectacle.unit_price
+            for v in self.clubq_voeux.filter_by(
+                _season_id=models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value
+            ).all()
+        )
+
 
 from app import models

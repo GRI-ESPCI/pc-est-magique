@@ -1,6 +1,32 @@
 {% extends "base.html" %} {% import "_form.html" as wtf %} {% block app_content
 %}
 
+<head>
+  <!-- Other meta tags, title, and other necessary elements -->
+  <style>
+    .overflow {
+      width: 200px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    td:hover .overflow {
+      overflow: visible;
+      white-space: normal;
+    }
+    .no_extra {
+      margin: 0;
+      padding: 0;
+    }
+    .log-box {
+            max-height: 400px; /* Limite la hauteur à 300 pixels */
+            overflow-y: auto; /* Ajoute une barre de défilement verticale si le contenu dépasse la hauteur maximale */
+            border: 1px solid #000000;
+            padding: 10px;
+        }
+  </style>
+</head>
 <div class="row mb-3">
   <div class="col">
     <h1>{{ title }}</h1>
@@ -55,13 +81,14 @@
         <tr>
           <th scope="col">{{ _("ID") }}</th>
           <th scope="col">{{ _("Spectacle") }}</th>
+          <th scope="col">{{ _("Salle") }}</th>
           <th scope="col">{{ _("Catégorie") }}</th>
           <th scope="col">{{ _("Date") }}</th>
           <th scope="col">{{ _("Prix") }}</th>
-          <th scope="col">{{ _("Places") }}</th>
-          <th scope="col">{{ _("Demandées") }}</th>
-          <th scope="col">{{ _("Attribués") }}</th>
-          <th scope="col">{{ _("Restantes") }}</th>
+          <th scope="col">{{ _("Nbr.") }}</th>
+          <th scope="col">{{ _("Dem.") }}</th>
+          <th scope="col">{{ _("Att.") }}</th>
+          <th scope="col">{{ _("Rst.") }}</th>
         </tr>
       </thead>
       <tbody>
@@ -70,7 +97,8 @@
           onclick="window.location='{{ url_for('club_q.spectacle', id=spect.id) }}';"
         >
           <td>{{ spect.id }}</td>
-          <td>{{ spect.nom }}</td>
+          <td><p class="overflow no_extra">{{ spect.nom }}</p></td>
+          <td><p class="overflow no_extra">{{ spect.salle.nom }}</p></td>
           <td>{{ spect.categorie }}</td>
           <td>{{ moment(spect.date).format('DD/MM/YYYY HH:mm:ss') }}</td>
           <td>{{ babel.format_currency(spect.unit_price, "EUR") }}</td>
@@ -87,7 +115,7 @@
 
 <hr align="CENTER" />
 
-<h4>{{ _("Élèves : ")}}</h4>
+<h4>{{ _("Pcéens : ")}}</h4>
 
 <div class="row">
   <div class="col table-responsive">
@@ -109,17 +137,52 @@
           onclick="window.location='{{ url_for('club_q.user', username=pceen.username) }}';"
         >
           <td>{{ pceen.id }}</td>
-          <td>{{ pceen.full_name }}</td>
+          <td><p class="overflow no_extra">{{ pceen.full_name }}</p></td>
           <td>{{ pceen.promo }}</td>
           <td>{{ pceen.sum_places_demandees }}</td>
           <td>{{ pceen.sum_places_attribuees }}</td>
-          <td>{{ "hey" }}</td>
+          <td>{{ pceen.discontent }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
+
+{% elif view == 'attribution' %}
+<h4>{{ _("Algorithme d'attribution")}}</h4>
+<div class="row">
+<div class="col-sm-4">
+  
+<br>
+<form action="" method="post" role="form">
+  {{ form_algo_setting.hidden_tag() }}
+  <h5>{{ _("Bonus de mécontentement :")}}</h5>
+  <p>{{ form_algo_setting.promo(size=3)  }} {{ _("Promotion actuelle en 1A") }}</p>
+  <p>{{ form_algo_setting.m1A(size=2)  }} {{ _("Mécontentement 1A") }}</p>
+  <p>{{ form_algo_setting.m2A(size=2)  }} {{ _("Mécontentement 2A") }}</p>
+  <p>{{ form_algo_setting.m3A(size=2)  }} {{ _("Mécontentement 3A") }}</p>
+  <p>{{ form_algo_setting.m4A(size=2)  }} {{ _("Mécontentement 4A") }}</p>
+
+  <h5>{{ _("Sauvegarder résultat algorithme ? :")}}</h5>
+  <p>{{ form_algo_setting.save }} {{ _("Si coché, à la suite de l'exécution de l'algorithme, les résultats seront sauvegardés dans la base de données") }}</p>
+
+  {{ form_algo_setting.submit(render_kw={"class": "btn btn-lg"}) }}
+</form>
+</div>
+<div class="col-sm-8">
+  
+<body>
+  <pre  class="log-box">{{ log_algo }}</pre>
+</body>
+</div>
+</div>
+<div class="container text-center">
+<a class="btn btn-primary" 
+    href="{{ url_for("club_q.algorithm") }}">
+      {{ _("Lancer l'algorithme") }}
+      
+</a></div>
 
 {% elif view == 'voeux' %}
 
@@ -168,7 +231,7 @@
 
 <form action="" method="post" role="form">
   {{ form_setting.hidden_tag() }}
-  <h5>{{ _("Visibilité de la page : ")}}</h5>
+  <h5>{{ _("Visibilité de la page de voeux : ")}}</h5>
   <p>{{ form_setting.visibility }} {{ _("Page visible") }}</p>
 
   <h5>{{ _("Saison actuelle:")}}</h5>

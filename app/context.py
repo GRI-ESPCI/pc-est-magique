@@ -484,5 +484,7 @@ def permission_condition(permission_check):
                 return route(*args, **kwargs)
             else:
                 flask.abort(403)
+
         return new_route
+
     return decorator

@@ -75,14 +75,24 @@ class ClubQSpectacle(db.Model):
     @property
     def sum_places_demandees(self) -> int:
         """The number of tickets asked for a spectacle"""
-        return sum(v.places_demandees for v in self.voeu.filter_by(_season_id = models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value))
-    
+        return sum(
+            v.places_demandees
+            for v in self.voeu.filter_by(
+                _season_id=models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value
+            )
+        )
+
     @property
     def sum_places_attribuees(self) -> int:
         """The number of tickets asked for a spectacle"""
-        return sum(v.places_attribuees for v in self.voeu.filter_by(_season_id = models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value).all())
+        return sum(
+            v.places_attribuees
+            for v in self.voeu.filter_by(
+                _season_id=models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value
+            ).all()
+        )
 
-    
+
 class ClubQVoeu(db.Model):
     """Client wish for a spectacle"""
 

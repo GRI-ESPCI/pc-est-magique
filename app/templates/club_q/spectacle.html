@@ -1,4 +1,14 @@
 {% extends "base.html" %} {% block app_content %}
+{% if has_permission(PermissionType.write, PermissionScope.club_q) %}
+<a class="btn btn-primary admin-button"" 
+    href="{{ url_for("club_q.admin") }}">
+      {{ _("Administration") }}
+      
+</a>
+<br />
+<br />
+{% endif %}
+
 <div class="row mb-3">
   <div class="col">
     <h3>{{ title }}</h3>
@@ -38,7 +48,9 @@
 
       <tbody>
         {% for voeu in voeux %}
-        <tr>
+        <tr
+          onclick="window.location='{{ url_for('club_q.user', username=voeu.pceen.username) }}';"
+        >
           <td>{{ voeu.id }}</td>
           <td>{{ voeu.pceen.full_name }}</td>
           <td>{{ voeu.priorite }}</td>
@@ -70,5 +82,34 @@
     </table>
   </div>
 </div>
+
+  
+<br />
+<br />
+<div style="display: flex;">
+    <a class="btn btn-primary " style="margin-right: 10px;"
+    href="{{ url_for("club_q.spect_generate_pdf", id = spectacle.id) }}">
+      {{ _("Générer le PDF") }}
+      </a>
+      <a class="btn btn-primary" 
+      href="{{ url_for("club_q.spect_generate_excel", id = spectacle.id) }}">
+        {{ _("Générer l'Excel") }}
+        
+      </a>
+  </div>
+  
+
+
+  <style>
+    /* Putting a red button for administration */
+    .admin-button {
+      background-color: rgb(195, 0, 0);
+      border: 2px solid rgb(99, 0, 0);
+    }
+    .admin-button:hover {
+      background-color: rgb(99, 0, 0);
+      border: 2px solid rgb(99, 0, 0);
+    }
+  </style>
 
 {% endblock %}

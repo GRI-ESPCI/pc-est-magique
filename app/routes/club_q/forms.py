@@ -20,3 +20,7 @@ class SettingClubQPage(FlaskForm):
     submit = wtforms.SubmitField(_l("Mettre à jour"))
 
 
+class SettingAlgoClubQPage(FlaskForm):
+    """WTForm used to say if the page should be visible or not"""
+
+    submit = wtforms.SubmitField(_l("Mettre à jour"))
