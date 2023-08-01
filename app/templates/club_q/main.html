@@ -1,17 +1,29 @@
 {% extends "base.html" %} {% block app_content %} {% import "_form.html" as wtf
 %}
+
+<style>
+  /* Putting a red button for administration */
+  .admin-button {
+    background-color: rgb(195, 0, 0);
+    border: 2px solid rgb(99, 0, 0);
+  }
+  .admin-button:hover {
+    background-color: rgb(99, 0, 0);
+    border: 2px solid rgb(99, 0, 0);
+  }
+</style>
+
 <div class="row mb-3">
   <div class="col">
     <h1>{{ title }}</h1>
   </div>
 </div>
 
-{% if has_permission(PermissionType.write, PermissionScope.club_q) %}
-<a class="btn btn-primary admin-button"" 
-    href="{{ url_for("club_q.admin") }}">
-      {{ _("Administration") }}
-      
+{% if has_permission(PermissionType.write, PermissionScope.club_q) %} <a
+class="btn btn-primary admin-button"" href="{{ url_for("club_q.pceens") }}"> {{
+_("Administration") }}
 </a>
+
 <br />
 <br />
 {% endif %}
@@ -41,10 +53,8 @@
 </div>
 
 <br />
-<a class="btn btn-primary" 
-    href="{{ url_for("club_q.user", username=user.username) }}">
-      {{ _("Mes réservations") }}
-      
+<a class="btn btn-primary" href="{{ url_for("club_q.user",
+username=user.username) }}"> {{ _("Mes réservations") }}
 </a>
 <br />
 <br />
@@ -107,17 +117,4 @@
   </div>
 </form>
 
-
-
-<style>
-  /* Putting a red button for administration */
-  .admin-button {
-    background-color: rgb(195, 0, 0);
-    border: 2px solid rgb(99, 0, 0);
-  }
-  .admin-button:hover {
-    background-color: rgb(99, 0, 0);
-    border: 2px solid rgb(99, 0, 0);
-  }
-</style>
 {% endblock %}

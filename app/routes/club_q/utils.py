@@ -315,3 +315,4 @@ def excel_spectacle(spec, season, voeux_attrib, voeux_nan_attrib):
     workbook.save(excel_data)
 
     return excel_data
+

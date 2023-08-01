@@ -1,0 +1,108 @@
+<style>
+  .overflow {
+    width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  td:hover .overflow {
+    overflow: visible;
+    white-space: normal;
+  }
+  .no_extra {
+    margin: 0;
+    padding: 0;
+  }
+  .log-box {
+    max-height: 400px; /* Limite la hauteur à 300 pixels */
+    overflow-y: auto; /* Ajoute une barre de défilement verticale si le contenu dépasse la hauteur maximale */
+    border: 1px solid #000000;
+    padding: 10px;
+  }
+  .centered {
+    text-align: center; /* Center the content horizontally within the th element */
+  }
+
+  .centered-content {
+    display: grid;
+    place-items: center; /* Center the content both horizontally and vertically */
+  }
+</style>
+
+<div class="row mb-3">
+  <div class="col">
+    <h1>{{ "Administration Club Q" }}</h1>
+  </div>
+</div>
+
+<div class="container mb-3">
+  <div class="btn-toolbar justify-content-between" role="toolbar">
+    <div class="d-flex align-items-center">
+      <div class="btn-group" role="group" name="slt">
+        <a
+          role="button"
+          href="{{ url_for('club_q.pceens') }}"
+          class="btn {{ 'btn-primary' if view == 'pceens' else 'btn-outline-primary' }}"
+        >
+          {{ _("PCéens") }}
+        </a>
+        <a
+          role="button"
+          href="{{ url_for('club_q.spectacles') }}"
+          class="btn {{ 'btn-primary' if view == 'spectacles' else 'btn-outline-primary' }}"
+        >
+          {{ _("Spectacles") }}
+        </a>
+        <a
+          role="button"
+          href="{{ url_for('club_q.salles') }}"
+          class="btn {{ 'btn-primary' if view == 'salles' else 'btn-outline-primary' }}"
+        >
+          {{ _("Salles") }}
+        </a>
+        <a
+          role="button"
+          href="{{ url_for('club_q.voeux') }}"
+          class="btn {{ 'btn-primary' if view == 'voeux' else 'btn-outline-primary' }}"
+        >
+          {{ _("Voeux") }}
+        </a>
+        <a
+          role="button"
+          href="{{ url_for('club_q.saisons') }}"
+          class="btn {{ 'btn-primary' if view == 'saisons' else 'btn-outline-primary' }}"
+        >
+          {{ _("Saisons") }}
+        </a>
+        <a
+          role="button"
+          href="{{ url_for('club_q.attribution') }}"
+          class="btn {{ 'btn-primary' if view == 'attribution' else 'btn-outline-primary' }}"
+        >
+          {{ _("Attribution") }}
+        </a>
+        <a
+          role="button"
+          href="{{ url_for('club_q.mails') }}"
+          class="btn {{ 'btn-primary' if view == 'mails' else 'btn-outline-primary' }}"
+        >
+          {{ _("Mails") }}
+        </a>
+        <a
+          role="button"
+          href="{{ url_for('club_q.options') }}"
+          class="btn {{ 'btn-primary' if view == 'options' else 'btn-outline-primary' }}"
+        >
+          {{ _("Options") }}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Icons templates -->
+<div hidden>
+  <div id="icon-template-down">{{ macros.bootstrap_icon("caret-down-fill") }}</div>
+  <div id="icon-template-up">{{ macros.bootstrap_icon("caret-up-fill") }}</div>
+</div>

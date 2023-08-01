@@ -1,0 +1,15 @@
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} 
+
+{{ super() }} 
+<script src="{{url_for("static", filename="js/sort-table.js") }}" defer>
+ </script>
+<script src="{{url_for("static", filename="js/club_q/club_q.js") }}" defer>
+</script>
+{% endblock %}{% block app_content %} {% include 'club_q/admin/common.html'
+%}
+
+
+
+
+
+{% endblock %}

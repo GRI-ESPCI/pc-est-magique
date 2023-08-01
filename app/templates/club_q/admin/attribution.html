@@ -1,0 +1,44 @@
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} 
+
+{{ super() }} 
+<script src="{{url_for("static", filename="js/sort-table.js") }}" defer>
+ </script>
+<script src="{{url_for("static", filename="js/club_q/club_q.js") }}" defer>
+</script>
+{% endblock %}{% block app_content %} {% include 'club_q/admin/common.html'
+%}
+
+<h4>{{ _("Algorithme d'attribution")}}</h4>
+<div class="row">
+  <div class="col-sm-4">
+    <br />
+    <form action="" method="post" role="form">
+      {{ form_algo_setting.hidden_tag() }}
+      <h5>{{ _("Bonus de mécontentement :")}}</h5>
+      <p>{{ form_algo_setting.promo(size=3) }} {{ _("Promotion actuelle en 1A") }}</p>
+      <p>{{ form_algo_setting.m1A(size=2) }} {{ _("Mécontentement 1A") }}</p>
+      <p>{{ form_algo_setting.m2A(size=2) }} {{ _("Mécontentement 2A") }}</p>
+      <p>{{ form_algo_setting.m3A(size=2) }} {{ _("Mécontentement 3A") }}</p>
+      <p>{{ form_algo_setting.m4A(size=2) }} {{ _("Mécontentement 4A") }}</p>
+
+      <h5>{{ _("Sauvegarder résultat algorithme ? :")}}</h5>
+      <p>
+        {{ form_algo_setting.save }} {{ _("Si coché, à la suite de l'exécution de l'algorithme, les résultats seront
+        sauvegardés dans la base de données") }}
+      </p>
+
+      {{ form_algo_setting.submit(render_kw={"class": "btn btn-lg"}) }}
+    </form>
+  </div>
+
+  <div class="col-sm-8">
+    <body>
+      <pre class="log-box">{{ log_algo }}</pre>
+    </body>
+  </div>
+</div>
+<div class="container text-center">
+  <a class="btn btn-primary" href="{{ url_for("club_q.algorithm") }}"> {{_("Lancer l'algorithme") }} </a>
+</div>
+
+{% endblock %}

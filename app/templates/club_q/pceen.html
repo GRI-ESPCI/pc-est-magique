@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block app_content %}
 {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
 <a class="btn btn-primary admin-button"" 
-    href="{{ url_for("club_q.admin") }}">
+    href="{{ url_for("club_q.pceens") }}">
       {{ _("Administration") }}
       
 </a>

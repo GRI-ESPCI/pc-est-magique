@@ -2,10 +2,10 @@
 - Update changelog
 - update readme
 - do translations
-- Remove useless javascript file
 - Add PC, Club Q logos to griway
 - Verify permissions
 - Clean utils/context if new added function not used
 - Time zone problems
-- Add rules for propority in club q form
+- Add rules for proprity in club q form
 - add club_q settings in db
+- Add diminution of discontent when getting a voeu

@@ -1,7 +1,6 @@
 """PC est magique - Club Q Pages Routes"""
 
 import flask
-import enum
 import os
 from flask_babel import _
 
@@ -9,6 +8,7 @@ from app import context, db
 from app.models import (
     ClubQSeason,
     ClubQSpectacle,
+    ClubQSalle,
     ClubQVoeu,
     PermissionScope,
     PermissionType,
@@ -28,11 +28,6 @@ from app.routes.club_q.utils import pdf_client, pdf_spectacle, excel_spectacle
 from app.routes.club_q.algorithm import attribution
 
 
-class ClubQViewEnum(enum.Enum):
-    active = enum.auto()
-    attribution = enum.auto()
-    options = enum.auto()
-    voeux = enum.auto()
 
 
 @bp.route("", methods=["GET", "POST"])
@@ -51,12 +46,14 @@ def main() -> typing.RouteReturn:
     # Ajout dynamique de 1 form par spectacle de la saison
     season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
     spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
+    
     for spect in spectacles:
         voeu = ClubQVoeu.query.filter_by(
             _spectacle_id=spect.id,
             _pceen_id=context.g.pceen.id,
             _season_id=spect._season_id,
         ).first()
+
         setattr(
             forms.ClubQForm,
             f"priorite_{spect.id}",
@@ -134,39 +131,113 @@ def main() -> typing.RouteReturn:
 
 
 @bp.route("/admin", methods=["GET", "POST"])
-@bp.route("/admin/<view>", methods=["GET", "POST"])
+@bp.route("/admin/pceen", methods=["GET", "POST"])
 @context.permission_only(PermissionType.all, PermissionScope.club_q)
-def admin(view: str = "active") -> typing.RouteReturn:
+def pceens() -> typing.RouteReturn:
     """Administration page for Club Q."""
 
-    try:
-        view = ClubQViewEnum[view]
-    except KeyError:
-        flask.abort(404)
+
+    season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+
+    subquery = ClubQVoeu.query.filter_by(_season_id = season_id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
+    pceens = (
+        PCeen.query.join(PCeen.roles)
+        .join(Role.permissions)
+        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q).filter(subquery)
+    )
+
+    return flask.render_template(
+        "club_q/admin/pceens.html",
+        view="pceens",
+        pceens=pceens,
+
+    )
+
+@bp.route("/admin/spectacles", methods=["GET", "POST"])
+@context.permission_only(PermissionType.all, PermissionScope.club_q)
+def spectacles() -> typing.RouteReturn:
+
+    season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+    spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
+
+    return flask.render_template(
+        "club_q/admin/spectacles.html",
+        view = "spectacles",
+        spectacles=spectacles,
+        season_id=season_id
+        )
+
+@bp.route("/admin/salles", methods=["GET", "POST"])
+@context.permission_only(PermissionType.all, PermissionScope.club_q)
+def salles() -> typing.RouteReturn:
+
+    season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+
+    subquery = ClubQSpectacle.query.filter_by(_season_id = season_id).filter(ClubQSpectacle._salle_id == ClubQSalle.id).exists()
+    salles = ClubQSalle.query.filter(subquery).order_by(ClubQSalle.nom)
+
+    return flask.render_template(
+        "club_q/admin/salles.html",
+        view = "salles",
+        salles = salles
+        )
+
+@bp.route("/admin/voeux", methods=["GET", "POST"])
+@context.permission_only(PermissionType.all, PermissionScope.club_q)
+def voeux() -> typing.RouteReturn:
+
+
+    season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+    voeux = ClubQVoeu.query.filter_by(_season_id=season_id).order_by(ClubQVoeu.id).all()
+
+    form_edit_voeu = forms.EditVoeu()
+    form_delete_voeu = forms.DeleteVoeu()
+
+
+    if form_edit_voeu.validate_on_submit():
+        voeu = ClubQVoeu.query.filter_by(id=form_edit_voeu["id"].data).one()
+
+        voeu.priorite = form_edit_voeu["priorite"].data
+        voeu.places_demandees = form_edit_voeu["places_demandees"].data
+        voeu.places_minimum = form_edit_voeu["places_minimum"].data or None
+        voeu.places_attribuees = form_edit_voeu["places_attribuees"].data
+
+        db.session.commit()
+        flask.flash(_("Mis à jour."))
+
+    return flask.render_template(
+        "club_q/admin/voeux.html",
+        view = "voeux",
+        voeux=voeux,
+        form_edit_voeu=form_edit_voeu,
+        form_delete_voeu=form_delete_voeu
+        )
+
+@bp.route("/admin/saisons", methods=["GET", "POST"])
+@context.permission_only(PermissionType.all, PermissionScope.club_q)
+def saisons() -> typing.RouteReturn:
+
+    return flask.render_template(
+        "club_q/admin/saisons.html",
+        view = "saisons",
+        )
+
+@bp.route("/admin/attribution", methods=["GET", "POST"])
+@context.permission_only(PermissionType.all, PermissionScope.club_q)
+def attribution() -> typing.RouteReturn:
 
     season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
     seasons = ClubQSeason.query.order_by(ClubQSeason.id).all()
     spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
+    salles = ClubQSalle.query.order_by(ClubQSalle.nom).all()
     voeux = ClubQVoeu.query.filter_by(_season_id=season_id).order_by(ClubQVoeu.id).all()
 
+
+    subquery = ClubQVoeu.query.filter(ClubQVoeu._pceen_id == PCeen.id).exists()
     pceens = (
         PCeen.query.join(PCeen.roles)
         .join(Role.permissions)
-        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q)
-    )
-
-    # Ajout du form pour le choix de la visibilité de la page pour les options du Club Q
-    setattr(
-        forms.SettingClubQPage,
-        "visibility",
-        wtforms.BooleanField(default=bool(GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value)),
-    )
-
-    # Ajout du form pour le choix de la saison à afficher pour les options du Club Q
-    setattr(
-        forms.SettingClubQPage,
-        "saison",
-        wtforms.SelectField(choices=[(s.id, s.nom) for s in seasons], default=season_id),
+        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q).filter(subquery)
     )
 
     # Ajout des forms pour choisir les mécontentements bonus
@@ -198,27 +269,17 @@ def admin(view: str = "active") -> typing.RouteReturn:
         wtforms.IntegerField(default=GlobalSetting.query.filter_by(key="PROMO_1A").one().value),
     )
 
-    form_setting = forms.SettingClubQPage()
     form_algo_setting = forms.SettingAlgoClubQPage()
+    
 
-    log_algo = 'error'
-    if view == ClubQViewEnum.attribution:
-        #Get the last log file of algorithm attribution
-        with open(os.path.join("logs", "club_q", "algorithm.log"), 'r') as log_file:
+    try:
+        # Get the last log file of algorithm attribution
+        with open(os.path.join("logs", "club_q", "algorithm.log"), "r") as log_file:
             log_algo = log_file.read()
+    except:
+        log_algo="error"
 
-    #Cheking if something changed in forms
-    if form_setting.validate_on_submit():
-        if form_setting.visibility.data:
-            GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value = 1
-
-        else:
-            GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value = 0
-
-        GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value = form_setting.saison.data
-
-        db.session.commit()
-        flask.flash(_("Mis à jour."))
+   
 
     if form_algo_setting.validate_on_submit():
         if form_algo_setting.save.data:
@@ -236,23 +297,70 @@ def admin(view: str = "active") -> typing.RouteReturn:
 
         db.session.commit()
         flask.flash(_("Mis à jour."))
-    
-
-
 
     return flask.render_template(
-        "club_q/admin.html",
-        title=_("Administration Club Q"),
-        form_setting=form_setting,
+        "club_q/admin/attribution.html",
+        view = "attribution",
         form_algo_setting=form_algo_setting,
-        spectacles=spectacles,
         voeux=voeux,
         season_id=season_id,
-        view=view.name,
         pceens=pceens,
-        log_algo=log_algo
+        log_algo=log_algo,
+        )
+
+
+@bp.route("/admin/mails", methods=["GET", "POST"])
+@context.permission_only(PermissionType.all, PermissionScope.club_q)
+def mails() -> typing.RouteReturn:
+
+    return flask.render_template(
+        "club_q/admin/mails.html",
+        view = "mails",
+        
+        )
+
+@bp.route("/admin/options", methods=["GET", "POST"])
+@context.permission_only(PermissionType.all, PermissionScope.club_q)
+def options() -> typing.RouteReturn:
+
+
+    season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+    seasons = ClubQSeason.query.order_by(ClubQSeason.id).all()
+
+        # Ajout du form pour le choix de la visibilité de la page pour les options du Club Q
+    setattr(
+        forms.SettingClubQPage,
+        "visibility",
+        wtforms.BooleanField(default=bool(GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value)),
     )
 
+    # Ajout du form pour le choix de la saison à afficher pour les options du Club Q
+    setattr(
+        forms.SettingClubQPage,
+        "saison",
+        wtforms.SelectField(choices=[(s.id, s.nom) for s in seasons], default=season_id),
+    )
+
+    form_setting = forms.SettingClubQPage()
+
+     # Cheking if something changed in forms
+    if form_setting.validate_on_submit():
+        if form_setting.visibility.data:
+            GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value = 1
+
+        else:
+            GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value = 0
+
+        GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value = form_setting.saison.data
+
+        db.session.commit()
+        flask.flash(_("Mis à jour."))
+
+    return flask.render_template(
+        "club_q/admin/options.html",
+        view = "options",
+        form_setting=form_setting
+        )
 
 @bp.route("/algorithm", methods=["GET", "POST"])
 @context.permission_only(PermissionType.all, PermissionScope.club_q)
@@ -266,14 +374,14 @@ def algorithm() -> typing.RouteReturn:
         GlobalSetting.query.filter_by(key="DISCONTENT_BONUS_4A").one().value,
     ]
 
-    subquery = (
-    ClubQVoeu.query.filter(ClubQVoeu._pceen_id == PCeen.id).exists())
+    subquery = ClubQVoeu.query.filter(ClubQVoeu._pceen_id == PCeen.id).exists()
 
     voeux = ClubQVoeu.query.filter_by(_season_id=season_id).all()
     pceens = (
         PCeen.query.join(PCeen.roles)
         .join(Role.permissions)
-        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q).filter(subquery)
+        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q)
+        .filter(subquery)
     )
     # Place attribution
     voeux, pceens = attribution(voeux, pceens, promo_1A, bonus)
@@ -283,9 +391,20 @@ def algorithm() -> typing.RouteReturn:
     ):  # Save algorithm results in database ?
         # Commit the changes to the database
         db.session.commit()
+        flask.flash(_("Mis à jour."))
 
     return flask.redirect(flask.url_for("club_q.admin", view="attribution"))
 
+@bp.route("/delete_voeu/<id>", methods=["GET", "DELETE"])
+@context.permission_only(PermissionType.all, PermissionScope.club_q)
+def delete_voeu(id):
+
+    voeu = ClubQVoeu.query.get_or_404(id)
+    db.session.delete(voeu)
+    db.session.commit()
+    flask.flash(_("Voeu supprimé."))
+
+    return flask.redirect(flask.request.referrer)
 
 @bp.route("/user/<username>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
@@ -340,7 +459,7 @@ def user_generate_pdf(username: str):
     return response
 
 
-@bp.route("/spectacle/<id>", methods=["GET", "POST"])
+@bp.route("/spectacle/<int:id>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
 def spectacle(id: str):
     """Sum up of informations concerning the club Q spectacle of the given id"""
@@ -366,7 +485,7 @@ def spectacle(id: str):
     )
 
 
-@bp.route("/spectacle/<id>/generate_pdf", methods=["GET", "POST"])
+@bp.route("/spectacle/<int:id>/generate_pdf", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
 def spect_generate_pdf(id: str):
     """Sum up of informations concerning the club Q spectacle of the given id"""
@@ -400,7 +519,7 @@ def spect_generate_pdf(id: str):
     return response
 
 
-@bp.route("/spectacle/<id>/generate_excel", methods=["GET", "POST"])
+@bp.route("/spectacle/<int:id>/generate_excel", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
 def spect_generate_excel(id: str):
     """Sum up of informations concerning the club Q spectacle of the given id"""
@@ -437,3 +556,17 @@ def spect_generate_excel(id: str):
     # Write the Excel data from the BytesIO buffer to the response
     response.data = excel_spectacle(spectacle, season, voeux_attrib, voeux_nan_attrib).getvalue()
     return response
+
+@bp.route("/salle/<int:id>", methods=["GET", "POST"])
+@context.permission_only(PermissionType.read, PermissionScope.club_q)
+def salle(id: str):
+    """Sum up of informations concerning the club Q salle of the given id"""
+    salle = ClubQSalle.query.filter_by(id=id).one()
+
+    return flask.render_template(
+        "club_q/salle.html",
+        title=_(salle.nom),
+
+    )
+
+

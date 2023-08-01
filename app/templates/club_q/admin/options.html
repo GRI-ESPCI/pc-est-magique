@@ -1,0 +1,27 @@
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} 
+
+{{ super() }} 
+<script src="{{url_for("static", filename="js/sort-table.js") }}" defer>
+ </script>
+<script src="{{url_for("static", filename="js/club_q/club_q.js") }}" defer>
+</script>
+{% endblock %}{% block app_content %} {% include 'club_q/admin/common.html'
+%}
+
+<h4>{{ _("Paramètres : ")}}</h4>
+
+<form action="" method="post" role="form">
+  {{ form_setting.hidden_tag() }}
+  <h5>{{ _("Visibilité de la page de voeux : ")}}</h5>
+  <p>{{ form_setting.visibility }} {{ _("Page visible") }}</p>
+
+  <h5>{{ _("Saison actuelle:")}}</h5>
+  <p>{{ form_setting.saison }}</p>
+
+  {{ form_setting.submit(render_kw={"class": "btn btn-lg"}) }}
+</form>
+
+
+
+
+{% endblock %}
