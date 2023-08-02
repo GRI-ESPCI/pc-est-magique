@@ -8,101 +8,181 @@
     <table class="table table-striped table-hover table-bordered">
       <thead>
         <tr>
-          <th scope="col" onclick="sort('id');">
+          <th
+            scope="col"
+            onclick="sort('id');"
+          >
             <span class="d-flex user-select-none">
               <span>{{ _("ID") }}</span>
               <span class="mx-auto">
-                <svg class="bi flex-shrink-0" width="16" height="16" id="sort-svg-id">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-id"
+                >
                   <!-- Sort button inserted through JS -->
                 </svg>
               </span>
             </span>
           </th>
-          <th scope="col" onclick="sort('name');">
+          <th
+            scope="col"
+            onclick="sort('name');"
+          >
             <span class="d-flex user-select-none">
               <span>{{ _("Spectacle") }}</span>
               <span class="mx-auto">
-                <svg class="bi flex-shrink-0" width="16" height="16" id="sort-svg-name">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-name"
+                >
                   <!-- Sort button inserted through JS -->
                 </svg>
               </span>
             </span>
           </th>
-          <th scope="col" onclick="sort('salle');">
+          <th
+            scope="col"
+            onclick="sort('salle');"
+          >
             <span class="d-flex user-select-none">
               <span>{{ _("Salle") }}</span>
               <span class="mx-auto">
-                <svg class="bi flex-shrink-0" width="16" height="16" id="sort-svg-salle">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-salle"
+                >
                   <!-- Sort button inserted through JS -->
                 </svg>
               </span>
             </span>
           </th>
-          <th scope="col" onclick="sort('category');">
+          <th
+            scope="col"
+            onclick="sort('category');"
+          >
             <span class="d-flex user-select-none">
               <span>{{ _("Catégorie") }}</span>
               <span class="mx-auto">
-                <svg class="bi flex-shrink-0" width="16" height="16" id="sort-svg-category">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-category"
+                >
                   <!-- Sort button inserted through JS -->
                 </svg>
               </span>
             </span>
           </th>
-          <th scope="col" onclick="sort('date');">
+          <th
+            scope="col"
+            onclick="sort('date');"
+          >
             <span class="d-flex user-select-none">
               <span>{{ _("Date") }}</span>
               <span class="mx-auto">
-                <svg class="bi flex-shrink-0" width="16" height="16" id="sort-svg-date">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-date"
+                >
                   <!-- Sort button inserted through JS -->
                 </svg>
               </span>
             </span>
           </th>
-          <th scope="col" onclick="sort('price');">
+          <th
+            scope="col"
+            onclick="sort('price');"
+          >
             <span class="d-flex user-select-none">
               <span>{{ _("Prix") }}</span>
               <span class="mx-auto">
-                <svg class="bi flex-shrink-0" width="16" height="16" id="sort-svg-price">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-price"
+                >
                   <!-- Sort button inserted through JS -->
                 </svg>
               </span>
             </span>
           </th>
-          <th scope="col" onclick="sort('tickets');">
+          <th
+            scope="col"
+            onclick="sort('tickets');"
+          >
             <span class="d-flex user-select-none">
               <span>{{ _("Nbr.") }}</span>
               <span class="mx-auto">
-                <svg class="bi flex-shrink-0" width="16" height="16" id="sort-svg-tickets">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-tickets"
+                >
                   <!-- Sort button inserted through JS -->
                 </svg>
               </span>
             </span>
           </th>
-          <th scope="col" onclick="sort('asked');">
+          <th
+            scope="col"
+            onclick="sort('asked');"
+          >
             <span class="d-flex user-select-none">
               <span>{{ _("Dem.") }}</span>
               <span class="mx-auto">
-                <svg class="bi flex-shrink-0" width="16" height="16" id="sort-svg-asked">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-asked"
+                >
                   <!-- Sort button inserted through JS -->
                 </svg>
               </span>
             </span>
           </th>
-          <th scope="col" onclick="sort('given');">
+          <th
+            scope="col"
+            onclick="sort('given');"
+          >
             <span class="d-flex user-select-none">
               <span>{{ _("Att.") }}</span>
               <span class="mx-auto">
-                <svg class="bi flex-shrink-0" width="16" height="16" id="sort-svg-given">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-given"
+                >
                   <!-- Sort button inserted through JS -->
                 </svg>
               </span>
             </span>
           </th>
-          <th scope="col" onclick="sort('rest');">
+          <th
+            scope="col"
+            onclick="sort('rest');"
+          >
             <span class="d-flex user-select-none">
               <span>{{ _("Rst.") }}</span>
               <span class="mx-auto">
-                <svg class="bi flex-shrink-0" width="16" height="16" id="sort-svg-rest">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-rest"
+                >
                   <!-- Sort button inserted through JS -->
                 </svg>
               </span>
@@ -111,7 +191,13 @@
           <th scope="col">
             <span class="d-flex user-select-none">
               <span>
-                <svg class="bi flex-shrink-0" width="22" height="22">{{ macros.bootstrap_icon("pen") }}</svg>
+                <svg
+                  class="bi flex-shrink-0"
+                  width="22"
+                  height="22"
+                >
+                  {{ macros.bootstrap_icon("pen") }}
+                </svg>
               </span>
             </span>
           </th>
@@ -151,7 +237,13 @@
               data-spect-id="{{ spect.id }}"
               data-spect-name="{{ spect.nom }}"
             >
-              <svg class="bi flex-shrink-0" width="18" height="18">{{ macros.bootstrap_icon("pen") }}</svg>
+              <svg
+                class="bi flex-shrink-0"
+                width="18"
+                height="18"
+              >
+                {{ macros.bootstrap_icon("pen") }}
+              </svg>
             </button>
           </td>
         </tr>

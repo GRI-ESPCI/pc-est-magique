@@ -4,10 +4,7 @@ import wtforms
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
 from flask import Flask
-from app.utils.validators import (
-    DataRequired,
-    Optional
-)
+from app.utils.validators import DataRequired, Optional, InputRequired
 
 app = Flask(__name__)
 
@@ -30,15 +27,19 @@ class SettingAlgoClubQPage(FlaskForm):
     submit = wtforms.SubmitField(_l("Mettre à jour"))
 
 
+class AddVoeu(FlaskForm):
+    priorite_add = wtforms.IntegerField("Priorité", validators=[InputRequired()])
+    places_demandees_add = wtforms.IntegerField("Places demandées", validators=[InputRequired()])
+    places_minimum_add = wtforms.IntegerField("Places minimum", validators=[Optional()])
+    places_attribuees_add = wtforms.IntegerField("Places attribuées", validators=[InputRequired()])
+    submit_add = wtforms.SubmitField(_l("Ajouter"))
+
 
 class EditVoeu(FlaskForm):
-    id = wtforms.HiddenField("", validators=[DataRequired()])
-    priorite = wtforms.IntegerField("Priorité", validators=[DataRequired()])
-    places_demandees = wtforms.IntegerField("Places demandées", validators=[DataRequired()])
-    places_minimum = wtforms.IntegerField("Places minimum", validators=[Optional()])
-    places_attribuees = wtforms.IntegerField("Places attribuées", validators=[DataRequired()])
-    submit = wtforms.SubmitField(_l("Mettre à jour"))
-
-class DeleteVoeu(FlaskForm):
-    id_d = wtforms.HiddenField("", validators=[DataRequired()])
-    submit = wtforms.SubmitField(_l("Supprimer"))
+    id_edit = wtforms.HiddenField("", validators=[InputRequired()])
+    priorite_edit = wtforms.IntegerField("Priorité", validators=[InputRequired()])
+    places_demandees_edit = wtforms.IntegerField("Places demandées", validators=[InputRequired()])
+    places_minimum_edit = wtforms.IntegerField("Places minimum", validators=[Optional()])
+    places_attribuees_edit = wtforms.IntegerField("Places attribuées", validators=[InputRequired()])
+    submit_edit = wtforms.SubmitField(_l("Modifier"))
+    delete_edit = wtforms.SubmitField(_l("Supprimer"))
