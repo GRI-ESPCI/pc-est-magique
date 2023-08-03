@@ -36,10 +36,18 @@
   </div>
 </div>
 
+<!-- Global Club Q navbar -->
 <div class="container mb-3">
-  <div class="btn-toolbar justify-content-between" role="toolbar">
+  <div
+    class="btn-toolbar justify-content-between"
+    role="toolbar"
+  >
     <div class="d-flex align-items-center">
-      <div class="btn-group" role="group" name="slt">
+      <div
+        class="btn-group"
+        role="group"
+        name="slt"
+      >
         <a
           role="button"
           href="{{ url_for('club_q.pceens') }}"
@@ -100,6 +108,33 @@
     </div>
   </div>
 </div>
+
+{% if view in ['pceens', 'spectacles', 'voeux', 'salles'] %}
+<!-- Season navbar -->
+<div class="container mb-3">
+  <div
+    class="btn-toolbar justify-content-between"
+    role="toolbar"
+  >
+    <div class="d-flex align-items-center">
+      <div
+        class="btn-group"
+        role="group"
+        name="slt"
+      >
+        {% for saison in saisons %}
+        <a
+          role="button"
+          href="{{ url_for(redirect, season_id = saison.id)}}"
+          class="btn {{ 'btn-primary' if season_id == saison.id else 'btn-outline-primary' }}"
+          >{{saison.nom}}</a
+        >
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
 
 <!-- Icons templates -->
 <div hidden>

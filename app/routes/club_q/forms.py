@@ -1,10 +1,18 @@
 """PC est magique - Profile-related Forms"""
 
 import wtforms
+from wtforms.fields import html5
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
 from flask import Flask
-from app.utils.validators import DataRequired, Optional, InputRequired
+from app.utils.validators import (
+    DataRequired, 
+    Optional, 
+    InputRequired,
+    Email,
+    Length,
+    NewEmail
+    )
 
 app = Flask(__name__)
 
@@ -43,3 +51,13 @@ class EditVoeu(FlaskForm):
     places_attribuees_edit = wtforms.IntegerField("Places attribuées", validators=[InputRequired()])
     submit_edit = wtforms.SubmitField(_l("Modifier"))
     delete_edit = wtforms.SubmitField(_l("Supprimer"))
+
+
+class Mail(FlaskForm):
+    reply_to = html5.EmailField(
+        _l("Adresse e-mail de réponse"),
+        validators=[DataRequired(), Length(max=120), Email()],
+    )
+    date = html5.DateField("Date de payement", validators=[DataRequired()])
+    threshold = wtforms.IntegerField("Envoyer à partir du x-ème email (à utiliser en cas de bug)" ,validators=[Optional()])
+    submit_mail = wtforms.SubmitField(_l("Envoyer les e-mails"))

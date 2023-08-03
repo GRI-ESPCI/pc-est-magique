@@ -20,7 +20,7 @@
 </div>
 
 {% if has_permission(PermissionType.write, PermissionScope.club_q) %} <a
-class="btn btn-primary admin-button"" href="{{ url_for("club_q.pceens") }}"> {{
+class="btn btn-primary admin-button"" href="{{ url_for('club_q.pceens', season_id = season_id ) }}"> {{
 _("Administration") }}
 </a>
 
@@ -53,7 +53,7 @@ _("Administration") }}
 </div>
 
 <br />
-<a class="btn btn-primary" href="{{ url_for("club_q.user",
+<a class="btn btn-primary" href="{{ url_for('club_q.user',
 username=user.username) }}"> {{ _("Mes réservations") }}
 </a>
 <br />

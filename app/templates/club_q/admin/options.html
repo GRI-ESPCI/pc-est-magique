@@ -1,27 +1,25 @@
-{% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} 
-
-{{ super() }} 
-<script src="{{url_for("static", filename="js/sort-table.js") }}" defer>
- </script>
-<script src="{{url_for("static", filename="js/club_q/club_q.js") }}" defer>
-</script>
-{% endblock %}{% block app_content %} {% include 'club_q/admin/common.html'
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block app_content %} {% include 'club_q/admin/common.html'
 %}
 
-<h4>{{ _("Paramètres : ")}}</h4>
-
-<form action="" method="post" role="form">
+<form
+  action=""
+  method="post"
+  role="form"
+>
   {{ form_setting.hidden_tag() }}
-  <h5>{{ _("Visibilité de la page de voeux : ")}}</h5>
-  <p>{{ form_setting.visibility }} {{ _("Page visible") }}</p>
+  <h5>{{ _("Page de voeux : ")}}</h5>
+  <div class="row mb-3">
+    <div class="col">
+      <div class="form-check form-switch">{{ wtf.form_field(form_setting.visibility) }}</div>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col">
+      <div class="form-floating">{{ wtf.form_field(form_setting.saison) }}</div>
+    </div>
+  </div>
 
-  <h5>{{ _("Saison actuelle:")}}</h5>
-  <p>{{ form_setting.saison }}</p>
-
-  {{ form_setting.submit(render_kw={"class": "btn btn-lg"}) }}
+  {{ form_setting.submit(render_kw={"class": "btn btn-primary"}) }}
 </form>
-
-
-
 
 {% endblock %}

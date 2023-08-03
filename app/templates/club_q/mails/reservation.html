@@ -1,0 +1,43 @@
+{% extends "mails_base.html" %} {% block app_content %}
+
+<div class="row mb-3">
+  <div class="col">
+    <h2>{{ _("TEST - Réservations places Club Q %(nom)s", nom=saison.nom) }}</h2>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <p>{{ _("Bonjour %(name)s,", name=pceen.prenom) }}</p>
+    <p>
+      {{ _("L'attribution de places pour cette saison du Club Q a été effectuée et tu peux retrouver les places qui
+      t'ont été attribuées sur ")}}
+      <a href="https://pc-est-magique.fr/club-q/username/pceen.username">{{ _("ta page personnelle") }}</a>."
+    </p>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <p>
+      {{ _("Concernant le paiement, merci de le faire avant le %(date_here)s pour faciliter le travail du trésorier du
+      Club Q. Deux moyens de paiement sont possibles :", date_here=date) }}
+    </p>
+    <ul class="mb-4">
+      <li>
+        {{ _("Par chèque à l'ordre <i>BDE Physique Chimie Paris Club Q</i> en le déposant dans l'enveloppe prévue à cet
+        effet au foyer.") }}
+      </li>
+      <li>
+        {{ _("Par virement bancaire en précisant \"Club Q\" et votre nom dans l'ordre du virement. Le RIB du compte
+        bancaire du Club Q est le suivant :") }}
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <p>{{ _("Très bonne journée,") }}</p>
+    <p>{{ _("Le Club Q") }}</p>
+  </div>
+</div>
+
+{% endblock %}

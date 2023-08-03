@@ -28,6 +28,8 @@ from app.routes.club_q.utils import pdf_client, pdf_spectacle, excel_spectacle
 
 from app.routes.club_q.algorithm import attribution
 
+from app.email import send_email
+
 
 
 @bp.route("", methods=["GET", "POST"])
@@ -131,13 +133,16 @@ def main() -> typing.RouteReturn:
 
 
 @bp.route("/admin", methods=["GET", "POST"])
-@bp.route("/admin/pceen", methods=["GET", "POST"])
+@bp.route("/admin/pceen/", methods=["GET", "POST"])
 @context.permission_only(PermissionType.all, PermissionScope.club_q)
 def pceens() -> typing.RouteReturn:
     """Administration page for Club Q."""
 
-    season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
 
+    season_id = flask.request.args.get('season_id')
+    if season_id == None:
+        season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+    saisons= ClubQSeason.query.all()
     subquery = ClubQVoeu.query.filter_by(_season_id=season_id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
     pceens = (
         PCeen.query.join(PCeen.roles)
@@ -150,37 +155,57 @@ def pceens() -> typing.RouteReturn:
         "club_q/admin/pceens.html",
         view="pceens",
         pceens=pceens,
+        saisons=saisons,
+        season_id=int(season_id),
+        redirect='club_q.pceens'
     )
 
 
 @bp.route("/admin/spectacles", methods=["GET", "POST"])
 @context.permission_only(PermissionType.all, PermissionScope.club_q)
 def spectacles() -> typing.RouteReturn:
-    season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+
+    season_id = flask.request.args.get('season_id')
+    if season_id == None:
+        season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+
+    saisons= ClubQSeason.query.all()
+
     spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
 
     return flask.render_template(
-        "club_q/admin/spectacles.html", view="spectacles", spectacles=spectacles, season_id=season_id
+        "club_q/admin/spectacles.html", view="spectacles", spectacles=spectacles, season_id=int(season_id),
+        saisons=saisons, redirect='club_q.spectacles'
     )
 
 
 @bp.route("/admin/salles", methods=["GET", "POST"])
 @context.permission_only(PermissionType.all, PermissionScope.club_q)
 def salles() -> typing.RouteReturn:
-    season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+    season_id = flask.request.args.get('season_id')
 
+    if season_id == None:
+        season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+
+    saisons= ClubQSeason.query.all()
     subquery = (
         ClubQSpectacle.query.filter_by(_season_id=season_id).filter(ClubQSpectacle._salle_id == ClubQSalle.id).exists()
     )
     salles = ClubQSalle.query.filter(subquery).order_by(ClubQSalle.nom)
 
-    return flask.render_template("club_q/admin/salles.html", view="salles", salles=salles)
+    return flask.render_template("club_q/admin/salles.html", view="salles", salles=salles, season_id=int(season_id),
+        saisons=saisons, redirect='club_q.salles')
 
 
 @bp.route("/admin/voeux", methods=["GET", "POST"])
 @context.permission_only(PermissionType.all, PermissionScope.club_q)
 def voeux() -> typing.RouteReturn:
-    season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+
+    season_id = flask.request.args.get('season_id')
+    if season_id == None:
+        season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+
+    saisons= ClubQSeason.query.all()
     spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
     pceens = (
         PCeen.query.join(PCeen.roles)
@@ -256,6 +281,9 @@ def voeux() -> typing.RouteReturn:
         voeux=voeux,
         form_add_voeu=form_add_voeu,
         form_edit_voeu=form_edit_voeu,
+        season_id=int(season_id),
+        saisons=saisons,
+        redirect='club_q.voeux'
     )
 
 
@@ -354,9 +382,42 @@ def attribution() -> typing.RouteReturn:
 @bp.route("/admin/mails", methods=["GET", "POST"])
 @context.permission_only(PermissionType.all, PermissionScope.club_q)
 def mails() -> typing.RouteReturn:
+
+    season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+    saison = ClubQSeason.query.filter_by(id=season_id).one()
+    subquery = ClubQVoeu.query.filter_by(_season_id=season_id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
+    pceens = (
+        PCeen.query.join(PCeen.roles)
+        .join(Role.permissions)
+        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q)
+        .filter(subquery)
+    )
+
+    form_mail = forms.Mail()
+
+    if form_mail.validate_on_submit():
+        date = form_mail["date"].data
+        subject = f"Attribution Club Q {saison.nom}"
+        for pceen in pceens:
+            html_body = flask.render_template(
+            "club_q/mails/reservation.html",
+            saison=saison,
+            pceen=pceen,
+            date=date,
+            )
+            
+            send_email(
+            "club_q/mails",
+            subject=f"[PC est magique - Club - Q] {subject}",
+            sender='club_q',
+            recipients={pceen.email: pceen.full_name},
+            html_body=html_body,
+            )
+
     return flask.render_template(
         "club_q/admin/mails.html",
         view="mails",
+        form_mail=form_mail
     )
 
 
@@ -370,15 +431,15 @@ def options() -> typing.RouteReturn:
     setattr(
         forms.SettingClubQPage,
         "visibility",
-        wtforms.BooleanField(default=bool(GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value)),
+        wtforms.BooleanField("Visibilité de la page de réservation", default=bool(GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value)),
     )
 
-    # Ajout du form pour le choix de la saison à afficher pour les options du Club Q
     setattr(
         forms.SettingClubQPage,
         "saison",
-        wtforms.SelectField(choices=[(s.id, s.nom) for s in seasons], default=season_id),
+        wtforms.SelectField("Saison actuelle", choices=[(s.id, s.nom) for s in seasons], default=season_id),
     )
+
 
     form_setting = forms.SettingClubQPage()
 
@@ -434,7 +495,7 @@ def algorithm() -> typing.RouteReturn:
 
 @bp.route("/delete_voeu/<id>", methods=["GET", "DELETE"])
 @context.permission_only(PermissionType.all, PermissionScope.club_q)
-def delete_voeu(id):
+def delete_voeu(id : int):
     voeu = ClubQVoeu.query.get_or_404(id)
     db.session.delete(voeu)
     db.session.commit()
