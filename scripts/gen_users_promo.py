@@ -56,7 +56,7 @@ def main():
             db.session.add(user)
             db.session.commit()
             helpers.log_action(
-                f"Internal -> Registered account {pceen!r} ({pceen.prenom} {pceen.nom} " f"{pceen.promo}, {pceen.email})"
+                f"Internal -> Registered account {user!r} ({user.prenom} {user.nom} " f"{user.promo}, {user.email})"
             )
             email.send_account_registered_email(user)
     print("Done.")
