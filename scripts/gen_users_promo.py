@@ -15,6 +15,7 @@ Il faut modifier le script pour changer le numéro de la promo.
 """
 import csv
 import string
+import random
 
 try:
     from app import db, __version__
