@@ -46,7 +46,7 @@ def _send_email(app: PCEstMagiqueApp, template: str, msg: flask_mail.Message) ->
 def send_email(
     template: str,
     *,
-    sender : str = 'pem',
+    sender: str = "pem",
     subject: str,
     recipients: dict[str | None, str],
     html_body: str,
@@ -72,9 +72,9 @@ def send_email(
     # Construct mail
     recipients_f = {addr: name for addr, name in recipients.items() if addr}
 
-    if sender == 'pem':
+    if sender == "pem":
         sender_mail = flask.current_app.config["ADMINS"][0]
-    elif sender == 'club_q':
+    elif sender == "club_q":
         sender_mail = flask.current_app.config["CLUB_Q"][0]
 
     msg = flask_mail.Message(

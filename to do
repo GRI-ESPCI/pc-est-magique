@@ -6,6 +6,11 @@
 - Verify permissions
 - Clean utils/context if new added function not used
 - Time zone problems
-- Add rules for proprity in club q form
+- Add rules for proprity in club q form **
 - add club_q settings in db
 - Add diminution of discontent when getting a voeu
+- Change date format for saison database
+- Change max description format for salle database
+- Do mecontentement modification button
+- Put modification buttons in salles & spectacle page as well as ordering
+- Put current season voeu in salle unit page

@@ -315,3 +315,33 @@ def excel_spectacle(spec, season, voeux_attrib, voeux_nan_attrib):
     workbook.save(excel_data)
 
     return excel_data
+
+
+def pceen_sum_places_demandees(pceen, voeux) -> int:
+    """Gives the number of wanted places for a pceen for the given saison of Club Q"""
+
+    return sum(voeu.places_demandees for voeu in voeux)
+
+
+def pceen_sum_places_attribuees(pceen, voeux) -> int:
+    """Gives the number of given places for a pceen for the given saison of Club Q"""
+    return sum(voeu.places_attribuees for voeu in voeux)
+
+
+def pceen_prix_total(pceen, voeux) -> int:
+    """Gives the the total price for a pceen for the given saison of Club Q"""
+    return sum(voeu.places_attribuees * voeu.spectacle.unit_price for voeu in voeux)
+
+
+def spectacles_sum_places_attribuees(spectacles) -> int:
+    """Gives the number of given places for a saison of Club Q"""
+    return sum(spectacle.sum_places_attribuees for spectacle in spectacles)
+
+
+def spectacles_sum_places_demandees(spectacles) -> int:
+    """Gives the number of wanted places for a saison of Club Q"""
+    return sum(spectacle.sum_places_demandees for spectacle in spectacles)
+
+def spectacles_sum_places(spectacles) -> int:
+    """Gives the total numbers of tickets for the given saison of Club Q"""
+    return sum(spectacle.nb_tickets for spectacle in spectacles)

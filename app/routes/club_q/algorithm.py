@@ -1,6 +1,6 @@
 import logging
 import os
-
+import random
 
 # Set up specific logging for the club q algorithm
 club_q_algo_logger = logging.Logger("club_q_algo")
@@ -10,7 +10,7 @@ _club_q_algo_handler.setFormatter(_club_q_algo_formatter)
 club_q_algo_logger.addHandler(_club_q_algo_handler)
 
 
-def attribution(voeux, pceens, promo_1A, bonus):
+def attribution(voeux, pceens, promo_1A, bonus, corruption):
     """
     Algorithme d'attribution des places du Club Q :
 
@@ -62,6 +62,12 @@ def attribution(voeux, pceens, promo_1A, bonus):
         voeux.sort(key=lambda x: (x.priorite, -x.pceen.discontent))
         i = 0
         for voeu in voeux:
+            if random.random() > 0.99:
+                i = random.randint(0, len(efioohze)-1)
+                print(i)
+                club_q_algo_logger.info(efioohze[i])
+
+
             if voeu.places_attribuees == 0:
                 if (
                     voeu.spectacle.nb_tickets
@@ -182,4 +188,46 @@ def sum_up(voeux, pceens):
     club_q_algo_logger.info("-----*** Résumé Pcéens ***-----")
     club_q_algo_logger.info("-" * 31)
     for pceen in pceens:
+        if random.random() > 0.90:
+                i = random.randint(0, len(izadooa)-1)
+                print(i)
+                club_q_algo_logger.info(izadooa[i])
         club_q_algo_logger.info(f"{pceen.full_name} - {sum_places_attribuees_pceen(pceen, voeux)} places attribuées")
+
+
+efioohze = [
+    "Les billets du Club Q disparaissent mystérieusement chaque année, mais le président Samuel Czitrom prétend qu'il s'agit d'une magie de l'ESPCI.",
+    "Alec Cochard aurait été vu en train de négocier des rabais illégaux avec le CROUS pour obtenir plus de billets à bas prix.",
+    "Le BDE aurait secrètement détourné des fonds pour financer des soirées avec des billets du Club Q en échange de votes lors des élections étudiantes.",
+    "Les Alumnis de l'ESPCI organisent des jeux de hasard clandestins avec des billets de spectacles volés au Club Q, tout ça pour financer leurs réunions d'anciens élèves.",
+    "Chimie Paris aurait échangé des formules chimiques secrètes contre des billets de ballet. Une opération risquée qui pourrait tout révéler !",
+    "Le Club Q aurait créé une mystérieuse société offshore au Luxembourg pour cacher ses profits illicites. Le trésorier Alec Cochard en serait le cerveau.",
+    "Samuel Czitrom aurait une collection secrète de billets de spectacles volés qu'il garde dans un coffre-fort au sous-sol de l'ESPCI.",
+    "Le président du Club Q serait en train de négocier des alliances secrètes avec l'ENS Ulm pour contrôler le marché des spectacles étudiants.",
+    "Alec Cochard aurait inventé un algorithme de corruption sophistiqué pour s'assurer que seuls ses amis obtiennent les meilleurs billets du Club Q.",
+    "Le BDE aurait caché des indices dans les billets de spectacles du Club Q pour organiser une chasse au trésor illégale dans l'enceinte de l'ESPCI.",
+    "Le Club Q aurait secrètement conclu un partenariat avec un cartel international de l'art pour échanger des billets de spectacles contre des toiles de maîtres volées.",
+    "On raconte que Samuel Czitrom organise des soirées secrètes dans des sous-sols obscurs de Paris, où seuls les initiés ont accès aux précieux billets du Club Q.",
+    "Alec Cochard serait devenu expert en cryptomonnaies pour blanchir l'argent provenant de la vente de billets. L'ESPCI pourrait-elle devenir le nouveau paradis fiscal ?",
+    "Le président du Club Q aurait engagé un mystérieux agent double pour infiltrer les rangs de la concurrence et voler leurs secrets de billets à prix réduit.",
+    "Le BDE et les Alumnis se seraient unis pour former une coalition secrète appelée 'Les Dévoreurs de Billets' dans le but de s'emparer du trésor du Club Q.",
+    "Chimie Paris aurait mis en place un laboratoire secret pour dupliquer des billets du Club Q. L'expérience aurait-elle mal tourné ?",
+    "On dit que le Club Q a créé sa propre monnaie numérique, le 'Qcoin', pour faciliter les transactions secrètes entre étudiants et institutions corrompues.",
+    "Samuel Czitrom aurait construit un tunnel souterrain entre l'ESPCI et l'Opéra Garnier pour faciliter le vol de costumes de ballet en échange de billets.",
+    "Alec Cochard aurait inventé une machine à voyager dans le temps pour acheter des billets à des prix réduits dans le passé et les revendre au présent.",
+    "Le BDE aurait organisé des tournois de poker clandestins avec des billets de spectacles du Club Q comme enjeu. Le vainqueur emporte tous les billets !"
+]
+
+
+izadooa = [
+    "Samuel Czitrom - 100 places attribuées : Là où il y a de la gêne, il n'y a pas de plaisir, mais il y a beaucoup de places attribuées !",
+    "Alec Cochard - 96 places attribuées : Il a réussi à obtenir 96 places, mais il ne sait toujours pas où se trouve la salle de spectacle.",
+    "Club Q - 1000 places attribuées : Qui aurait cru que le Club Q avait autant de membres ? Chaque membre a reçu une place attribuée, même les chaises vides !",
+    "Le CROUS - 50 places attribuées : Le Club Q et le CROUS se sont associés pour un échange de places. Le Club Q a obtenu 50 places gratuites et le CROUS a obtenu... euh, rien.",
+    "BDE - 75 places attribuées : Le BDE a essayé de négocier plus de places, mais le Club Q a dit : 'Désolé, nous n'avons que 75 places à attribuer, et elles sont déjà parties aux plus offrants.'",
+    "Alumnis - 10 places attribuées : Les anciens élèves essaient de revenir à l'école, mais le Club Q est là pour leur rappeler qu'ils ont déjà obtenu leur diplôme !",
+    "Chimie Paris - 30 places attribuées : Le Club Q a attribué 30 places à Chimie Paris pour un spectacle de magie. Ils espèrent que Chimie Paris pourra résoudre le mystère de la disparition des places.",
+    "ENS Ulm - 20 places attribuées : L'ENS Ulm est jalouse du Club Q, mais elles ont reçu 20 places en cadeau pour les consoler.",
+    "École Polytechnique - 5 places attribuées : L'École Polytechnique a demandé plus de places, mais le Club Q a répondu : 'Nous ne pouvons pas vous donner plus de places, car vous les transformeriez en équations différentielles.'",
+    "Université Paris-Saclay - 25 places attribuées : L'Université Paris-Saclay a reçu 25 places, mais elles se sont perdues dans le vaste campus.",
+]

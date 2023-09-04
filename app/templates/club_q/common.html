@@ -30,12 +30,6 @@
   }
 </style>
 
-<div class="row mb-3">
-  <div class="col">
-    <h1>{{ "Administration Club Q" }}</h1>
-  </div>
-</div>
-
 <!-- Global Club Q navbar -->
 <div class="container mb-3">
   <div
@@ -46,15 +40,31 @@
       <div
         class="btn-group"
         role="group"
-        name="slt"
+        name="clubq_navbar"
       >
         <a
           role="button"
+          href="{{ url_for('club_q.main') }}"
+          class="btn {{ 'btn-primary' if view == 'reservations' else 'btn-outline-primary' }}"
+        >
+          {{ _("Commander") }}
+        </a>
+        <a
+          role="button"
+          href="{{ url_for('club_q.pceen_id', id=user.id) }}"
+          class="btn {{ 'btn-primary' if view == 'pceen_reservations' else 'btn-outline-primary' }}"
+        >
+          {{ _("Mes réservations") }}
+        </a>
+        {% if has_permission(PermissionType.all, PermissionScope.club_q) %}
+        <a
+          role="button"
           href="{{ url_for('club_q.pceens') }}"
-          class="btn {{ 'btn-primary' if view == 'pceens' else 'btn-outline-primary' }}"
+          class="btn {{ 'btn-primary' if view in ['pceens', 'pceen_view'] else 'btn-outline-primary' }}"
         >
           {{ _("PCéens") }}
         </a>
+        {% endif %}
         <a
           role="button"
           href="{{ url_for('club_q.spectacles') }}"
@@ -65,10 +75,11 @@
         <a
           role="button"
           href="{{ url_for('club_q.salles') }}"
-          class="btn {{ 'btn-primary' if view == 'salles' else 'btn-outline-primary' }}"
+          class="btn {{ 'btn-primary' if view in ['salles', 'salle'] else 'btn-outline-primary' }}"
         >
           {{ _("Salles") }}
         </a>
+        {% if has_permission(PermissionType.all, PermissionScope.club_q) %}
         <a
           role="button"
           href="{{ url_for('club_q.voeux') }}"
@@ -85,7 +96,7 @@
         </a>
         <a
           role="button"
-          href="{{ url_for('club_q.attribution') }}"
+          href="{{ url_for('club_q.attribution_manager') }}"
           class="btn {{ 'btn-primary' if view == 'attribution' else 'btn-outline-primary' }}"
         >
           {{ _("Attribution") }}
@@ -104,12 +115,12 @@
         >
           {{ _("Options") }}
         </a>
+        {% endif %}
       </div>
     </div>
   </div>
 </div>
-
-{% if view in ['pceens', 'spectacles', 'voeux', 'salles'] %}
+{% if view in ['pceens', 'pceen_view', 'spectacles', 'voeux', 'salles', 'pceen_reservations'] %}
 <!-- Season navbar -->
 <div class="container mb-3">
   <div
@@ -120,16 +131,30 @@
       <div
         class="btn-group"
         role="group"
-        name="slt"
+        name="saison_navbar"
       >
-        {% for saison in saisons %}
+        {% if view in ['pceen_reservations', 'pceen_view'] %} {% for saison in saisons %}
+        <a
+          role="button"
+          href="{{ url_for('club_q.pceen_id', id=pceen.id, season_id = saison.id)}}"
+          class="btn {{ 'btn-primary' if season_id == saison.id else 'btn-outline-primary' }}"
+          >{{saison.nom}}</a
+        >
+        {% endfor %} {% else %} {% if view == 'salles' %}
+        <a
+          role="button"
+          href="{{ url_for(redirect, season_id = None)}}"
+          class="btn {{ 'btn-primary' if season_id == -1 else 'btn-outline-primary' }}"
+          >Toutes</a
+        >
+        {% endif %} {% for saison in saisons %}
         <a
           role="button"
           href="{{ url_for(redirect, season_id = saison.id)}}"
           class="btn {{ 'btn-primary' if season_id == saison.id else 'btn-outline-primary' }}"
           >{{saison.nom}}</a
         >
-        {% endfor %}
+        {% endfor %} {% endif %}
       </div>
     </div>
   </div>

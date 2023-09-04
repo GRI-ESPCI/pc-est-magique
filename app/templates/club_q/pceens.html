@@ -1,9 +1,9 @@
-{% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} {{ super() }}
-<script
-  src="{{url_for('static', filename='js/sort-table.js') }}"
-  defer
-></script>
-{% endblock %}{% block app_content %} {% include 'club_q/admin/common.html' %}
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} {{ super() }} 
+<script src="{{url_for("static", filename="js/sort-table.js") }}" defer>
+ </script>
+<script src="{{url_for("static", filename="js/club_q/pceens.js") }}" defer>
+</script>
+{% endblock %}{% block app_content %} {% include 'club_q/common.html' %}
 
 <h4>{{ _("PCéens : ")}}</h4>
 
@@ -121,6 +121,24 @@
             </span>
           </th>
           <th
+            scope="col"
+            onclick="sort('cost');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("À payer") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-discontent"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
             class="centered"
             scope="col"
           >
@@ -140,22 +158,23 @@
       </thead>
 
       <tbody id="sort-table">
-        {% for pceen in pceens %}
+        {% for i in size %}
         <tr
-          onclick="window.location='{{ url_for('club_q.user', username=pceen.username) }}';"
-          data-id="{{ str(pceen.id).rjust(5, '0') }}"
-          data-name="{{ pceen.full_name }}"
-          data-promo="{{ pceen.promo or 0 }}"
-          data-asked="{{ str(pceen.sum_places_demandees).rjust(5, '0') }}"
-          data-given="{{ str(pceen.sum_places_attribuees).rjust(5, '0') }}"
-          data-discontent="{{ pceen.discontent or 0}}"
+          data-id="{{ str(pceens[i].id).rjust(5, '0') }}"
+          data-name="{{ pceens[i].full_name }}"
+          data-promo="{{ pceens[i].promo or 0 }}"
+          data-asked="{{ str(sum_places_demandees[i]).rjust(5, '0') }}"
+          data-given="{{ str(sum_places_attribuees[i]).rjust(5, '0') }}"
+          data-cost="{{ pceens_a_payer[i] }}"
+          data-discontent="{{ pceens[i].discontent or 0}}"
         >
-          <td>{{ pceen.id }}</td>
-          <td><p class="overflow no_extra">{{ pceen.full_name }}</p></td>
-          <td>{{ pceen.promo }}</td>
-          <td>{{ pceen.sum_places_demandees }}</td>
-          <td>{{ pceen.sum_places_attribuees }}</td>
-          <td>{{ pceen.discontent }}</td>
+          <td onclick="window.location='{{ url_for('club_q.pceen_id', id=pceens[i].id) }}';">{{ pceens[i].id }}</td>
+          <td onclick="window.location='{{ url_for('club_q.pceen_id', id=pceens[i].id) }}';"><p class="overflow no_extra">{{ pceens[i].full_name }}</p></td>
+          <td>{{ pceens[i].promo }}</td>
+          <td>{{ sum_places_demandees[i] }}</td>
+          <td>{{ sum_places_attribuees[i] }}</td>
+          <td>{{ pceens[i].discontent }}</td>
+          <td>{{ babel.format_currency(pceens_a_payer[i], "EUR")}}</td>
           <td>
             <div
               data-bs-toggle="tooltip"
@@ -165,6 +184,9 @@
                 class="btn btn-outline-danger p-1 pt-0"
                 data-bs-target="#mo-pceen-edit"
                 data-bs-toggle="modal"
+                data-pceen-id="{{ pceens[i].id }}"
+                data-pceen-nom="{{ pceens[i].full_name}}"
+                data-pceen-discontent="{{ pceens[i].discontent }}"
               >
                 <svg
                   class="bi flex-shrink-0"
@@ -179,7 +201,72 @@
         </tr>
         {% endfor %}
       </tbody>
+      <tbody>
+      <tr>
+          <td><b>{{ _("Total") }}</b></td>
+          <td><b>{{ _("-") }}</b></td>
+          <td><b>{{ _("-") }}</b></td>
+          <td><b>{{ showed_season.sum_places_demandees }}</b></td>
+          <td><b>{{ showed_season.sum_places_attribuees }}</b></td>
+          <td><b>{{ _("-") }}</b></td>
+          <td><b>{{ babel.format_currency(total_payement, "EUR") }}</b></td>
+          <td><b>{{ _("") }}</b></td>
+        </tr>
+      </tbody>
     </table>
+  </div>
+</div>
+
+<!-- Modals -->
+
+<!-- Edit pceen discontent modal -->
+<div
+  class="modal fade"
+  id="mo-pceen-edit"
+  tabindex="-1"
+  aria-labelledby="mo-pceen-edit"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5
+          class="modal-title"
+          id="mo-pceen-edit"
+        >
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Fermer') }}"
+        ></button>
+      </div>
+      <form
+        action=""
+        method="post"
+        role="form"
+      >
+        {{ form_discontent.hidden_tag() }}
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form_discontent.discontent) }}</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              {{ _("Annuler") }}
+            </button>
+            {{ form_discontent.modify(class="btn btn-primary") }}
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 

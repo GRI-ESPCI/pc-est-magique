@@ -1,17 +1,4 @@
-{% extends "base.html" %} {% block app_content %} {% import "_form.html" as wtf
-%}
-
-<style>
-  /* Putting a red button for administration */
-  .admin-button {
-    background-color: rgb(195, 0, 0);
-    border: 2px solid rgb(99, 0, 0);
-  }
-  .admin-button:hover {
-    background-color: rgb(99, 0, 0);
-    border: 2px solid rgb(99, 0, 0);
-  }
-</style>
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block app_content %} {% include 'club_q/common.html' %}
 
 <div class="row mb-3">
   <div class="col">
@@ -19,49 +6,35 @@
   </div>
 </div>
 
-{% if has_permission(PermissionType.write, PermissionScope.club_q) %} <a
-class="btn btn-primary admin-button"" href="{{ url_for('club_q.pceens', season_id = season_id ) }}"> {{
-_("Administration") }}
-</a>
-
-<br />
-<br />
-{% endif %}
-
 <div class="row">
   <p>
     {{ _("Bienvenue sur la page de commande du Club Q-ulture.
     <br />
-    Le Club Q est un club de l'ESPCI cherchant à proposer des spectacles de la
-    vie culturelle parisienne à ses membres. De la danse aux concerts, en
-    passant par l'opéra, le Club Q propose ces spectacles à prix réduit grâce
-    aux tarifs de groupes et étudiants, et en profitant de plus de subventions
-    du Crous, des Alumnis et du BDE.
+    Le Club Q est un club de l'ESPCI cherchant à proposer des spectacles de la vie culturelle parisienne à ses membres.
+    De la danse aux concerts, en passant par l'opéra, le Club Q propose ces spectacles à prix réduit grâce aux tarifs de
+    groupes et étudiants, et en profitant de plus de subventions du Crous, des Alumnis et du BDE.
     <br />
-    Les places sont prioritairement attribués aux étudiants actuels de l'école,
-    et seulement ensuite à d'autres membres de l'école.
+    Les places sont prioritairement attribués aux étudiants actuels de l'école, et seulement ensuite à d'autres membres
+    de l'école.
     <br />
-    Pour passer commande, classez vos voeux pour les spectacles par ordre de
-    préférence (en commençant par 1, ne mettez pas deux spectacles à la même
-    priorité). Vous pouvez demander plusieurs places, mais en cas de demande
-    importante sur un spectacle, vos chances de l'avoir seront diminuées.
+    Pour passer commande, classez vos voeux pour les spectacles par ordre de préférence (en commençant par 1, ne mettez
+    pas deux spectacles à la même priorité). Vous pouvez demander plusieurs places, mais en cas de demande importante
+    sur un spectacle, vos chances de l'avoir seront diminuées.
     <br />
-    En cas de problème technique ou de doute, vous pouvez contacter Samuel
-    Ciztrom 140 ou Alec Cochard 140. Le Club Q 140 vous souhaite une bonne
-    saison artistique !") }}
+    En cas de problème technique ou de doute, vous pouvez contacter Samuel Ciztrom 140 ou Alec Cochard 140. Le Club Q
+    140 vous souhaite une bonne saison artistique !") }}
   </p>
 </div>
 
 <br />
-<a class="btn btn-primary" href="{{ url_for('club_q.user',
-username=user.username) }}"> {{ _("Mes réservations") }}
-</a>
-<br />
 <br />
 
-<form action="" method="post" role="form">
-  {{ form.hidden_tag() }} {% for spect in spectacles %} {% if spect._season_id
-  == season_id %}
+<form
+  action=""
+  method="post"
+  role="form"
+>
+  {{ form.hidden_tag() }} {% for spect in spectacles %} {% if spect._season_id == season_id %}
   <div class="row">
     <div class="col-2 d-flex align-items-center justify-content-center">
       <img
@@ -72,10 +45,7 @@ username=user.username) }}"> {{ _("Mes réservations") }}
     </div>
     <div class="col-10">
       <h3><b>{{ spect.nom }}</b></h3>
-      <h5>
-        {{moment(spect.date).format('LLLL')}} - {{
-        babel.format_currency(spect.unit_price, "EUR") }}
-      </h5>
+      <h5>{{moment(spect.date).format('LLLL')}} - {{ babel.format_currency(spect.unit_price, "EUR") }}</h5>
       <h7>
         <p>{{ spect.categorie }}</p>
       </h7>
@@ -110,7 +80,10 @@ username=user.username) }}"> {{ _("Mes réservations") }}
   {% endif %} {% endfor %}
   <div class="row mt-3">
     <div class="col text-center">
-      <button type="submit" class="btn btn-lg btn-primary">
+      <button
+        type="submit"
+        class="btn btn-lg btn-primary"
+      >
         {{ _("Mise à jour") }}
       </button>
     </div>

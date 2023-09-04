@@ -70,7 +70,7 @@ class Role(Model):
             blue = int(self.color[4:], 16)
         except ValueError:
             return False
-        hsp_2 = (0.299 * red**2) + (0.587 * green**2) + (0.114 * blue**2)
+        hsp_2 = (0.299 * red ** 2) + (0.587 * green ** 2) + (0.114 * blue ** 2)
         return hsp_2 < 19500
 
 
