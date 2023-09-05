@@ -20,7 +20,7 @@ from app.models import (
 )
 from app.routes.club_q import bp, forms
 from app.utils import typing
-from app.utils.validators import Optional, DataRequired
+from app.utils.validators import Optional, DataRequired, PriorityOrder
 from datetime import datetime
 
 import wtforms
@@ -36,7 +36,10 @@ from app.routes.club_q.utils import (
     spectacles_sum_places_demandees,
     spectacles_sum_places,
     voeu_form,
-    spectacle_form
+    spectacle_form,
+    export_pdf_spectacles,
+    export_excel_spectacles,
+    exporter_excel_prix
 )
 
 from app.routes.club_q.algorithm import attribution
@@ -110,37 +113,72 @@ def main() -> typing.RouteReturn:
     form = forms.ClubQForm()
 
     if form.validate_on_submit():
+        flag = True #Flag to say if the form results are not following the rules
+
+        #Checking if form rules are respected. Not twice the same number, and start from 1 to the i-e wish. One form field must be empty or have both (at minima) priority and number of places defined
+        #Checking if one wish has a priority, then a number of places is defined and vice-versa
         for spect in spectacles:
-            if form[f"priorite_{spect.id}"].data:
-                voeu = ClubQVoeu.query.filter_by(
-                    _spectacle_id=spect.id,
-                    _pceen_id=context.g.pceen.id,
-                    _season_id=spect._season_id,
-                ).first()
-                if not voeu:
-                    voeu = ClubQVoeu(
+            if form[f"priorite_{spect.id}"].data != None:
+                if form[f"nb_places_{spect.id}"].data == None:
+                    flask.flash(_("Un voeu a été défini avec une priorité mais sans un nombre de places."))
+                    flag = True #RAISE THE FLAG!
+                    break
+            if form[f"nb_places_{spect.id}"].data != None:
+                if form[f"priorite_{spect.id}"].data == None:
+                    flask.flash(_("Un voeu a été défini avec un nombre de places mais sans priorité."))
+                    flag = True #RAISE THE FLAG!
+                    break
+
+        priority_list = []
+        #Checking if every priority is different
+        for spect in spectacles:
+            priority = form[f"priorite_{spect.id}"].data
+            if priority:
+                if priority in priority_list:
+                    flask.flash(_("Deux voeux ne peuvent avoir la même priorité."))
+                    flag = True #RAISE THE FLAG!
+                    break
+                priority_list.append(form[f"priorite_{spect.id}"].data)
+
+        #Cheking if priority increase one by one from one.
+        if sum(priority_list) != len(priority_list)*(len(priority_list)+1)/2:
+            flask.flash(_("Les priorités doivent être croissantes de 1 en 1 en partant de 1."))
+            flag = True #RAISE THE FLAG!
+
+
+        if flag: #If the form is correctly definied, save the results
+            for spect in spectacles:
+                if form[f"priorite_{spect.id}"].data != None:
+                    voeu = ClubQVoeu.query.filter_by(
                         _spectacle_id=spect.id,
                         _pceen_id=context.g.pceen.id,
                         _season_id=spect._season_id,
-                    )
-                    db.session.add(voeu)
+                    ).first()
+                    if not voeu:
+                        voeu = ClubQVoeu(
+                            _spectacle_id=spect.id,
+                            _pceen_id=context.g.pceen.id,
+                            _season_id=spect._season_id,
+                        )
+                        db.session.add(voeu)
 
-                voeu.priorite = form[f"priorite_{spect.id}"].data
-                voeu.places_demandees = form[f"nb_places_{spect.id}"].data
-                voeu.places_minimum = form[f"nb_places_minimum_{spect.id}"].data or 0
-                voeu.places_attribuees = 0
+                    voeu.priorite = form[f"priorite_{spect.id}"].data
+                    voeu.places_demandees = form[f"nb_places_{spect.id}"].data
+                    voeu.places_minimum = form[f"nb_places_minimum_{spect.id}"].data or 0
+                    voeu.places_attribuees = 0
 
-            else:
-                voeu = ClubQVoeu.query.filter_by(
-                    _spectacle_id=spect.id,
-                    _pceen_id=context.g.pceen.id,
-                    _season_id=spect._season_id,
-                ).first()
-                if voeu != None:
-                    db.session.delete(voeu)
+                else:
+                    voeu = ClubQVoeu.query.filter_by(
+                        _spectacle_id=spect.id,
+                        _pceen_id=context.g.pceen.id,
+                        _season_id=spect._season_id,
+                    ).first()
+                    if voeu != None:
+                        db.session.delete(voeu)
 
-        db.session.commit()
-        flask.flash(_("Vos choix ont été enregistrés."))
+            db.session.commit()
+            flask.flash(_("Vos choix ont été enregistrés."))
+
     return flask.render_template(
         "club_q/main.html",
         view="reservations",
@@ -149,7 +187,7 @@ def main() -> typing.RouteReturn:
         spectacles=spectacles,
         season_id=season_id,
         user=context.g.pceen,
-        visibility = 0,
+        visibility = visibility,
         saison=saison
     )
 
@@ -180,7 +218,7 @@ def pceens() -> typing.RouteReturn:
     total_payement = 0
 
     for pceen in pceens:
-        voeux = ClubQVoeu.query.filter_by(_season_id=season_id).filter_by(_pceen_id=pceen.id).all()
+        voeux = ClubQVoeu.query.filter_by(_season_id=season_id).filter_by(_pceen_id=pceen.id)
         sum_places_demandees.append(pceen_sum_places_demandees(pceen, voeux))
         sum_places_attribuees.append(pceen_sum_places_attribuees(pceen, voeux))
         pceens_a_payer.append(pceen_prix_total(pceen, voeux))
@@ -213,6 +251,36 @@ def pceens() -> typing.RouteReturn:
         form_discontent=form_discontent,
     )
 
+@bp.route("/pceens/generate_excel", methods=["GET", "POST"])
+@context.permission_only(PermissionType.all, PermissionScope.club_q)
+def pceens_generate_excel():
+    """Generate the resume of required payements from PCeens to the Club Q"""
+
+
+    season_id = flask.request.args.get("season_id")
+    if season_id == None:
+        season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+    season = ClubQSeason.query.filter_by(id=season_id).order_by(ClubQSeason.id).one()
+    spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
+    subquery = ClubQVoeu.query.filter_by(_season_id=season_id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
+    pceens = (
+        PCeen.query.join(PCeen.roles)
+        .join(Role.permissions)
+        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q)
+        .filter(subquery)
+    )
+    voeux = ClubQVoeu.query.filter_by(_season_id=season_id)
+
+    # Create a response object to serve the Excel file
+    response = flask.make_response()
+
+    # Set the appropriate headers for the response
+    response.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    response.headers["Content-Disposition"] = f"attachment; filename=club_q_payements_{season.nom}.xlsx"
+
+    # Write the Excel data from the BytesIO buffer to the response
+    response.data = exporter_excel_prix(season, pceens, spectacles, voeux).getvalue()
+    return response
 
 @bp.route("/spectacles", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
@@ -256,6 +324,81 @@ def spectacles() -> typing.RouteReturn:
         spect_sum_places_demandees=spect_sum_places_demandees,
         spect_sum_places_attribuees=spect_sum_places_attribuees,
     )
+
+@bp.route("/spectacles/export_pdfs", methods=["GET", "POST"])
+@context.permission_only(PermissionType.read, PermissionScope.club_q)
+def spect_export_pdfs():
+    """Export the PDF spectacle resume for the given id season (or the actual one in the db)"""
+
+    season_id = flask.request.args.get("season_id")
+    if season_id == None:
+        season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+    season = ClubQSeason.query.filter_by(id=season_id).order_by(ClubQSeason.id).one()
+
+    spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
+
+    voeux_attrib_list = []
+    voeux_nan_attrib_list = []
+
+    for spectacle in spectacles:
+        voeux_attrib_list.append(
+            ClubQVoeu.query.filter_by(_season_id=season_id)
+            .filter_by(_spectacle_id=spectacle.id)
+            .filter(ClubQVoeu.places_attribuees != 0)
+            .order_by(ClubQVoeu.priorite)
+            .all()
+        )
+        voeux_nan_attrib_list.append(
+            ClubQVoeu.query.filter_by(_season_id=season_id)
+            .filter_by(_spectacle_id=spectacle.id)
+            .filter(ClubQVoeu.places_attribuees == 0)
+            .order_by(ClubQVoeu.priorite)
+            .all()
+        )
+
+    # Return the PDF as a response to the user
+    response = flask.make_response(export_pdf_spectacles(spectacles, season, voeux_attrib_list, voeux_nan_attrib_list).read())
+    response.headers['Content-Type'] = 'application/zip'
+    response.headers['Content-Disposition'] = f'attachment; filename=pdf_spectacles_{season.nom}.zip'
+    return response
+
+
+@bp.route("/spectacles/<int:id>/generate_excel", methods=["GET", "POST"])
+@context.permission_only(PermissionType.read, PermissionScope.club_q)
+def spect_export_excels(id: str):
+    """Export the excel spectacle resume for the given id season (or the actual one in the db)"""
+    
+    season_id = flask.request.args.get("season_id")
+    if season_id == None:
+        season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+    season = ClubQSeason.query.filter_by(id=season_id).order_by(ClubQSeason.id).one()
+
+    spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
+
+    voeux_attrib_list = []
+    voeux_nan_attrib_list = []
+
+    for spectacle in spectacles:
+        voeux_attrib_list.append(
+            ClubQVoeu.query.filter_by(_season_id=season_id)
+            .filter_by(_spectacle_id=spectacle.id)
+            .filter(ClubQVoeu.places_attribuees != 0)
+            .order_by(ClubQVoeu.priorite)
+            .all()
+        )
+        voeux_nan_attrib_list.append(
+            ClubQVoeu.query.filter_by(_season_id=season_id)
+            .filter_by(_spectacle_id=spectacle.id)
+            .filter(ClubQVoeu.places_attribuees == 0)
+            .order_by(ClubQVoeu.priorite)
+            .all()
+        )
+
+    # Return the PDF as a response to the user
+    response = flask.make_response(export_excel_spectacles(spectacles, season, voeux_attrib_list, voeux_nan_attrib_list).read())
+    response.headers['Content-Type'] = 'application/zip'
+    response.headers['Content-Disposition'] = f'attachment; filename=excel_spectacles_{season.nom}.zip'
+    return response
 
 
 @bp.route("/salles", methods=["GET", "POST"])
@@ -623,7 +766,7 @@ def pceen_id(id: int):
         season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
 
     spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
-    voeux = ClubQVoeu.query.filter_by(_season_id=season_id).filter_by(_pceen_id=pceen.id).order_by(ClubQVoeu.id).all()
+    voeux = ClubQVoeu.query.filter_by(_season_id=season_id).filter_by(_pceen_id=pceen.id).order_by(ClubQVoeu.priorite).all()
 
     pceens = (
         PCeen.query.join(PCeen.roles)
@@ -675,11 +818,11 @@ def pceen_id(id: int):
 
 
 @bp.route("/pceens/<id>/generate_pdf", methods=["GET"])
-@context.permission_only(PermissionType.read, PermissionScope.club_q)
-def user_generate_pdf(username: str):
+@context.permission_only(PermissionType.all, PermissionScope.club_q)
+def user_generate_pdf(id: int):
     """Receipt generation for Club Q as a PDF for the user"""
     # Get user
-    pceen: PCeen | None = PCeen.query.filter_by(username=username).one_or_none()
+    pceen: PCeen | None = PCeen.query.filter_by(id=id).one_or_none()
     if not pceen or (
         not context.g.pceen.has_permission(PermissionType.all, PermissionScope.club_q) and context.g.pceen != pceen
     ):
@@ -707,7 +850,7 @@ def user_generate_pdf(username: str):
 
 @bp.route("/spectacles/<int:id>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
-def spectacle_id(id: str):
+def spectacle_id(id: int):
     """Sum up of informations concerning the club Q spectacle of the given id"""
     # Get spectacle
     spectacle: ClubQSpectacle | None = ClubQSpectacle.query.filter_by(id=id).one_or_none()
@@ -751,15 +894,15 @@ def spectacle_id(id: str):
 
 
 @bp.route("/spectacles/<int:id>/generate_pdf", methods=["GET", "POST"])
-@context.permission_only(PermissionType.read, PermissionScope.club_q)
-def spect_generate_pdf(id: str):
+@context.permission_only(PermissionType.all, PermissionScope.club_q)
+def spect_generate_pdf(id: int):
     """Sum up of informations concerning the club Q spectacle of the given id"""
     # Get spectacle
     spectacle: ClubQSpectacle | None = ClubQSpectacle.query.filter_by(id=id).one_or_none()
     if not spectacle or not context.g.pceen.has_permission(PermissionType.all, PermissionScope.club_q):
         flask.abort(404)
 
-    season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+    season_id = spectacle._season_id
     season = ClubQSeason.query.filter_by(id=season_id).order_by(ClubQSeason.id).one()
 
     voeux_attrib = (
@@ -785,15 +928,15 @@ def spect_generate_pdf(id: str):
 
 
 @bp.route("/spectacles/<int:id>/generate_excel", methods=["GET", "POST"])
-@context.permission_only(PermissionType.read, PermissionScope.club_q)
-def spect_generate_excel(id: str):
+@context.permission_only(PermissionType.all, PermissionScope.club_q)
+def spect_generate_excel(id: int):
     """Sum up of informations concerning the club Q spectacle of the given id"""
     # Get spectacle
     spectacle: ClubQSpectacle | None = ClubQSpectacle.query.filter_by(id=id).one_or_none()
     if not spectacle or not context.g.pceen.has_permission(PermissionType.all, PermissionScope.club_q):
         flask.abort(404)
 
-    season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+    season_id = spectacle._season_id
     season = ClubQSeason.query.filter_by(id=season_id).order_by(ClubQSeason.id).one()
 
     voeux_attrib = (
@@ -825,7 +968,7 @@ def spect_generate_excel(id: str):
 
 @bp.route("/salles/<int:id>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
-def salle_id(id: str):
+def salle_id(id: int):
     """Sum up of informations concerning the club Q salle of the given id"""
 
     salle = ClubQSalle.query.filter_by(id=id).one()

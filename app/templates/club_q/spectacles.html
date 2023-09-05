@@ -328,6 +328,15 @@
   </div>
 </div>
 
+{% if has_permission(PermissionType.write, PermissionScope.club_q) %}
+<div style="display: flex">
+  <a class="btn btn-primary " style="margin-right: 10px;" href="{{
+  url_for('club_q.spect_export_pdfs', id = season_id) }}"> {{ _("Exporter les PDFs
+  ") }} </a> <a class="btn btn-primary" href="{{
+  url_for('club_q.spect_export_excels', id = season_id) }}"> {{ _("Exporter les Excels") }} </a>
+</div>
+{% endif %}
+
 <!-- Modals -->
 
 {% include 'club_q/modals/modals_spectacles.html' %}

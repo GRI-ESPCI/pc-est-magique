@@ -172,3 +172,18 @@ class ValidBarItemID(CustomValidator):
 
     def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
         return field.data.isdigit() and bool(BarItem.query.get(int(field.data)))
+
+class PriorityOrder(CustomValidator):
+    message = _l("Plusieurs voeux ne peuvent avoir la même priorité")
+
+    def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
+        priority_list = []
+
+        # Iterate through the form's fields to check priorities
+        for name, value in form.data.items():
+            if 'priorite_' in name:
+                priority = value
+                if priority != None and priority in priority_list:
+                    return(False)
+                priority_list.append(priority)
+        return(True)

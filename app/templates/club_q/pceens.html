@@ -269,5 +269,10 @@
     </div>
   </div>
 </div>
-
+<a
+  class="btn btn-primary"
+  href="{{ url_for('club_q.pceens_generate_excel', season_id=season_id) }}"
+>
+  {{ _("Récapitulatif payements") }}
+</a>
 {% endblock %}

@@ -5,6 +5,7 @@ from reportlab.platypus import flowables
 import io
 import os
 import openpyxl
+import zipfile
 
 from app import db
 from app.models import (
@@ -49,7 +50,7 @@ def pdf_client(pceen, season, voeux):
     ]
 
     specs.append("-" * 158)
-    specs.append(f"Total à payer : {pceen.total_price} €.")
+    specs.append(f"Total à payer : {pceen_prix_total(pceen, voeux)} €.")
 
     # Conversion en objets reportlab
     blocs_descr = []
@@ -328,20 +329,150 @@ def excel_spectacle(spec, season, voeux_attrib, voeux_nan_attrib):
 
     return excel_data
 
+def export_pdf_spectacles(spectacles, season, voeux_attrib_list, voeux_nan_attrib_list):
+    
+     # Create an in-memory zip file
+    zip_buffer = io.BytesIO()
+
+    # Create a ZipFile object
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        # Add PDF files to the zip archive
+        i = 0
+        for spectacle in spectacles:  # Replace with your logic to get PDF files
+            pdf_data = pdf_spectacle(spectacle, season, voeux_attrib_list[i], voeux_nan_attrib_list[i]).read()  
+            zipf.writestr(f'{spectacle.nom}.pdf', pdf_data)
+            i+=1
+
+    # Move the zip file's pointer to the beginning
+    zip_buffer.seek(0)
+
+    return(zip_buffer)
+
+def export_excel_spectacles(spectacles, season, voeux_attrib_list, voeux_nan_attrib_list):
+
+     # Create an in-memory zip file
+    zip_buffer = io.BytesIO()
+
+    # Create a ZipFile object
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        # Add excel files to the zip archive
+        i = 0
+        for spectacle in spectacles:  # Replace with your logic to get excel files
+            excel_data = excel_spectacle(spectacle, season, voeux_attrib_list[i], voeux_nan_attrib_list[i]).getvalue()
+            zipf.writestr(f'{spectacle.nom}.xlsx', excel_data)
+            i+=1
+
+    # Move the zip file's pointer to the beginning
+    zip_buffer.seek(0)
+
+    return(zip_buffer)
+
+
+def exporter_excel_prix(saison, pceens, spectacles, voeux):
+    # Code de génération de résumé des payements au Club Q originalement par Loïc Simon - Adapté aux besoin de pem
+    # Code assez (très) moche, attention - il y a moyen de faire ça beaucoup mieux, mais bon...
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.title = "Récapitulatif"
+
+    sheet["A1"] = f"Club Q – Récapitulatif saison {saison.nom}"
+    sheet["A1"].font = openpyxl.styles.Font(bold=True)
+
+    sheet["A2"] = "Début :"
+    sheet["B2"] = saison.debut
+    sheet["B2"].number_format = "dd/mm/yyyy"
+    sheet["D2"] = "Fin :"
+    sheet["E2"] = saison.fin
+    sheet["E2"].number_format = "dd/mm/yyyy"
+
+    sheet["A3"] = "Spectacles :"
+    sheet["B3"] = len(spectacles)
+    sheet["D3"] = "Inscrits :"
+    sheet["E3"] = pceens.count()
+
+    sheet["A4"] = "Places proposées :"
+    sheet["B4"] = sum((spec.nb_tickets or 0) for spec in spectacles)
+    sheet["D4"] = "Places vendues :"
+    sheet["E4"] = sum((voeu.places_attribuees or 0) for voeu in voeux)
+
+    sheet["A6"] = "NOM"
+    sheet["B6"] = "Prénom"
+    sheet["C6"] = "Promo/autre"
+    sheet["D6"] = "Adresse mail"
+    sheet["E6"] = "Places"
+    sheet["F6"] = "Somme due"
+    sheet["G6"] = "Payé ?"
+
+    npa = 0
+    tot = 0
+    for i, client in enumerate(sorted(pceens, key=lambda c: c.full_name)):
+        sheet.cell(row=7 + i, column=1).value = client.nom.upper()
+        sheet.cell(row=7 + i, column=2).value = client.prenom.title()
+        sheet.cell(row=7 + i, column=3).value = client.promo or client.autre
+
+        sheet.cell(row=7 + i, column=4).value = client.email
+        if client.email and "@" in client.email:
+            sheet.cell(row=7 + i, column=4).hyperlink = f"mailto:{client.email}"
+            sheet.cell(row=7 + i, column=4).style = "Hyperlink"
+
+        placesattr = pceen_sum_places_attribuees(client, voeux)
+        sheet.cell(row=7 + i, column=5).value = placesattr
+        npa += placesattr
+        apayer = pceen_prix_total(client, voeux)
+        sheet.cell(row=7 + i, column=6).value = apayer
+        sheet.cell(row=7 + i, column=6).number_format = "#,##0.00 €_-"
+        tot += apayer
+
+
+    tab = openpyxl.worksheet.table.Table(displayName="Données", ref=f"A6:G{7 + i}")
+
+    style = openpyxl.worksheet.table.TableStyleInfo(
+        name="TableStyleLight1", showFirstColumn=False, showLastColumn=False,
+        showRowStripes=True, showColumnStripes=False
+        )
+    tab.tableStyleInfo = style
+    sheet.add_table(tab)
+
+    sheet.cell(row=7 + i + 2, column=1).value = "Total"
+    sheet.cell(row=7 + i + 2, column=1).font = openpyxl.styles.Font(bold=True)
+
+    sheet.cell(row=7 + i + 2, column=5).value = npa
+    sheet.cell(row=7 + i + 2, column=5).font = openpyxl.styles.Font(bold=True)
+
+    sheet.cell(row=7 + i + 2, column=6).value = tot
+    sheet.cell(row=7 + i + 2, column=6).font = openpyxl.styles.Font(bold=True)
+    sheet.cell(row=7 + i + 2, column=6).number_format = "#,##0.00 €_-"
+
+
+    sheet.column_dimensions["A"].width = 20
+    sheet.column_dimensions["B"].width = 20
+    sheet.column_dimensions["C"].width = 14
+    sheet.column_dimensions["D"].width = 35
+    sheet.column_dimensions["E"].width = 12
+    sheet.column_dimensions["F"].width = 14
+    sheet.column_dimensions["G"].width = 12
+
+    # Save the Excel workbook to a BytesIO buffer
+    excel_data = io.BytesIO()
+    workbook.save(excel_data)
+
+    return excel_data
 
 def pceen_sum_places_demandees(pceen, voeux) -> int:
     """Gives the number of wanted places for a pceen for the given saison of Club Q"""
-
+    voeux = voeux.filter_by(_pceen_id=pceen.id).all()
     return sum(voeu.places_demandees for voeu in voeux)
 
 
 def pceen_sum_places_attribuees(pceen, voeux) -> int:
     """Gives the number of given places for a pceen for the given saison of Club Q"""
+    voeux = voeux.filter_by(_pceen_id=pceen.id).all()
     return sum(voeu.places_attribuees for voeu in voeux)
 
 
 def pceen_prix_total(pceen, voeux) -> int:
     """Gives the the total price for a pceen for the given saison of Club Q"""
+    voeux = voeux.filter_by(_pceen_id=pceen.id).all()
     return sum(voeu.places_attribuees * voeu.spectacle.unit_price for voeu in voeux)
 
 

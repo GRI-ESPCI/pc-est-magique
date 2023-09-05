@@ -246,7 +246,7 @@
         <tr 
           data-id="{{ str(voeu.id).rjust(5, '0') }}"
           data-spectacle="{{ voeu.spectacle.name }}"
-          data-priority="{{ voeu.priority }}"
+          data-priority="{{ str(voeu.priorite).rjust(3, '0') }}"
           data-asked="{{ voeu.places_demandees }}"
           data-min="{{ voeu.places_minimum }}"
           data-given="{{ voeu.places_attribuees }}"
@@ -315,8 +315,6 @@
   </div>
 </div>
 
-<br />
-<br />
 <a
   class="btn btn-primary"
   href="{{ url_for('club_q.user_generate_pdf', id=pceen.id, season_id=season_id) }}"
