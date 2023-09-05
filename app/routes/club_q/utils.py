@@ -6,6 +6,18 @@ import io
 import os
 import openpyxl
 
+from app import db
+from app.models import (
+    ClubQSpectacle,
+    ClubQVoeu,
+)
+from app.utils.validators import DataRequired
+import wtforms
+import flask
+from app.routes.club_q import forms
+from flask_babel import _
+from datetime import datetime
+
 
 cm = rl.lib.units.cm
 
@@ -342,6 +354,149 @@ def spectacles_sum_places_demandees(spectacles) -> int:
     """Gives the number of wanted places for a saison of Club Q"""
     return sum(spectacle.sum_places_demandees for spectacle in spectacles)
 
+
 def spectacles_sum_places(spectacles) -> int:
     """Gives the total numbers of tickets for the given saison of Club Q"""
     return sum(spectacle.nb_tickets for spectacle in spectacles)
+
+
+def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect):
+
+    if spectacle != None:
+    # Add spectacle select choice for adding voeu
+        setattr(
+            forms.AddVoeu,
+            "spectacle_add",
+            wtforms.SelectField(
+                "Spectacle", choices=[[spect.id, spect.nom] for spect in spectacles], default=spectacle.id, validators=[DataRequired()]
+            ),
+        )
+    else:
+        # Add spectacle select choice for adding voeu
+        setattr(
+            forms.AddVoeu,
+            "spectacle_add",
+            wtforms.SelectField(
+                "Spectacle", choices=[[spect.id, spect.nom] for spect in spectacles], validators=[DataRequired()]
+            ),
+        )
+
+    # Add pceens select choice for adding voeu
+    setattr(
+        forms.AddVoeu,
+        "pceen_add",
+        wtforms.SelectField(
+            "Pcéen",
+            choices=[[pceen_.id, pceen_.full_name] for pceen_ in pceens],
+            default=pceen.id,
+            validators=[DataRequired()],
+        ),
+    )
+
+    # Forms
+    form_add_voeu = forms.AddVoeu()
+    form_edit_voeu = forms.EditVoeu()
+
+    # If a form is validated
+    if form_add_voeu.is_submitted():
+        submit = form_add_voeu["submit_add"].data
+        if submit:
+            if form_add_voeu.validate():
+                voeu = ClubQVoeu()
+                voeu._spectacle_id = form_add_voeu["spectacle_add"].data
+                voeu._pceen_id = form_add_voeu["pceen_add"].data
+                voeu._season_id = season_id
+                voeu.priorite = form_add_voeu["priorite_add"].data
+                voeu.places_demandees = form_add_voeu["places_demandees_add"].data
+                voeu.places_minimum = form_add_voeu["places_minimum_add"].data or 0
+                voeu.places_attribuees = form_add_voeu["places_attribuees_add"].data
+
+                db.session.add(voeu)
+                db.session.commit()
+                flask.flash(_("Voeu ajouté."))
+                return flask.redirect(redirect)
+
+    if form_edit_voeu.is_submitted():
+        delete = form_edit_voeu["delete_edit"].data
+        if delete:
+            voeu = ClubQVoeu.query.filter_by(id=form_edit_voeu["id_edit"].data).one()
+            db.session.delete(voeu)
+
+            db.session.commit()
+            flask.flash(_("Voeu supprimé."))
+            return flask.redirect(redirect)
+
+        if form_edit_voeu.validate():
+            voeu = ClubQVoeu.query.filter_by(id=form_edit_voeu["id_edit"].data).one()
+
+            voeu.priorite = form_edit_voeu["priorite_edit"].data
+            voeu.places_demandees = form_edit_voeu["places_demandees_edit"].data
+            voeu.places_minimum = form_edit_voeu["places_minimum_edit"].data or 0
+            voeu.places_attribuees = form_edit_voeu["places_attribuees_edit"].data
+
+            db.session.commit()
+            flask.flash(_("Voeu édité."))
+            return flask.redirect(redirect)
+        
+
+def spectacle_form(salles, salle, season_id, redirect):
+
+    if salle != None:
+        setattr(
+            forms.EditSpectacle,
+            "salle_id",
+            wtforms.SelectField("Salle", choices=[[salle.id, salle.nom] for salle in salles], default=salle.id, validators=[DataRequired()]),
+        )
+    else:
+        setattr(
+            forms.EditSpectacle,
+            "salle_id",
+            wtforms.SelectField("Salle", choices=[[salle.id, salle.nom] for salle in salles], validators=[DataRequired()]),
+        )
+
+    form_spectacle = forms.EditSpectacle()
+
+    if form_spectacle.validate_on_submit():
+        add = form_spectacle["add"].data
+
+        if add:
+            spectacle = ClubQSpectacle()
+
+            db.session.add(spectacle)
+
+            spectacle.nom = form_spectacle["nom"].data
+            spectacle._season_id = season_id
+            spectacle._salle_id = form_spectacle["salle_id"].data
+            spectacle.description = form_spectacle["description"].data
+            spectacle.categorie = form_spectacle["categorie"].data
+            spectacle.image_name = form_spectacle["image"].data
+            spectacle.date = datetime.combine(form_spectacle["date"].data, form_spectacle["time"].data)
+            spectacle.nb_tickets = form_spectacle["nb_tickets"].data
+            spectacle.unit_price = form_spectacle["price"].data
+
+            db.session.commit()
+            flask.flash(_("Spectacle ajouté."))
+            return flask.redirect(redirect)
+
+        delete = form_spectacle["delete"].data
+        spectacle = ClubQSpectacle.query.filter_by(id=form_spectacle["id"].data).one()
+
+        if delete:
+            db.session.delete(spectacle)
+            db.session.commit()
+            flask.flash(_("Spectacle supprimé."))
+            return flask.redirect(redirect)
+
+        else:
+            spectacle.nom = form_spectacle["nom"].data
+            spectacle._salle_id = form_spectacle["salle_id"].data
+            spectacle.description = form_spectacle["description"].data
+            spectacle.categorie = form_spectacle["categorie"].data
+            spectacle.image_name = form_spectacle["image"].data
+            spectacle.date = datetime.combine(form_spectacle["date"].data, form_spectacle["time"].data)
+            spectacle.nb_tickets = form_spectacle["nb_tickets"].data
+            spectacle.unit_price = form_spectacle["price"].data
+
+            db.session.commit()
+            flask.flash(_("Spectacle édité."))
+            return flask.redirect(redirect)

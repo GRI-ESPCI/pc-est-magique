@@ -120,7 +120,7 @@
     </div>
   </div>
 </div>
-{% if view in ['pceens', 'pceen_view', 'spectacles', 'voeux', 'salles', 'pceen_reservations'] %}
+{% if view in ['pceens', 'salle', 'pceen_view', 'spectacles', 'voeux', 'salles', 'pceen_reservations'] %}
 <!-- Season navbar -->
 <div class="container mb-3">
   <div
@@ -137,6 +137,13 @@
         <a
           role="button"
           href="{{ url_for('club_q.pceen_id', id=pceen.id, season_id = saison.id)}}"
+          class="btn {{ 'btn-primary' if season_id == saison.id else 'btn-outline-primary' }}"
+          >{{saison.nom}}</a
+        >
+        {% endfor %} {% elif view == 'salle' %} {% for saison in saisons %}
+        <a
+          role="button"
+          href="{{ url_for('club_q.salle_id', id=salle.id, season_id = saison.id)}}"
           class="btn {{ 'btn-primary' if season_id == saison.id else 'btn-outline-primary' }}"
           >{{saison.nom}}</a
         >

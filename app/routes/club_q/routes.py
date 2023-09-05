@@ -34,7 +34,9 @@ from app.routes.club_q.utils import (
     pceen_prix_total,
     spectacles_sum_places_attribuees,
     spectacles_sum_places_demandees,
-    spectacles_sum_places
+    spectacles_sum_places,
+    voeu_form,
+    spectacle_form
 )
 
 from app.routes.club_q.algorithm import attribution
@@ -49,15 +51,22 @@ from app.email import send_email
 def main() -> typing.RouteReturn:
     """PC est magique Club Q page."""
 
+    visibility = GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value
+
     "If the page visibility is set at 0 in the admin parameters, don't show it"
-    if not GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value and not context.g.pceen.has_permission(
-        PermissionType.all, PermissionScope.club_q
+    if not context.g.pceen.has_permission(
+        PermissionType.read, PermissionScope.club_q
     ):
         flask.abort(404)
+
+    if context.g.pceen.has_permission(PermissionType.all, PermissionScope.club_q):
+        visibility = 1
 
     # Ajout dynamique de 1 form par spectacle de la saison
     season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
     spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
+
+    saison = ClubQSeason.query.filter_by(id=season_id).first()
 
     for spect in spectacles:
         voeu = ClubQVoeu.query.filter_by(
@@ -135,11 +144,13 @@ def main() -> typing.RouteReturn:
     return flask.render_template(
         "club_q/main.html",
         view="reservations",
-        title=_("Page de réservation pour le Club Q"),
+        title=_(f"Page de réservation pour le Club Q - {saison.nom}"),
         form=form,
         spectacles=spectacles,
         season_id=season_id,
         user=context.g.pceen,
+        visibility = 0,
+        saison=saison
     )
 
 
@@ -151,7 +162,7 @@ def pceens() -> typing.RouteReturn:
     season_id = flask.request.args.get("season_id")
     if season_id == None:
         season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
-    season_id=int(season_id)
+    season_id = int(season_id)
 
     showed_season = ClubQSeason.query.filter_by(id=season_id).one_or_none()
     saisons = ClubQSeason.query.all()
@@ -166,7 +177,7 @@ def pceens() -> typing.RouteReturn:
     sum_places_attribuees = []
     sum_places_demandees = []
     pceens_a_payer = []
-    total_payement=0
+    total_payement = 0
 
     for pceen in pceens:
         voeux = ClubQVoeu.query.filter_by(_season_id=season_id).filter_by(_pceen_id=pceen.id).all()
@@ -199,7 +210,7 @@ def pceens() -> typing.RouteReturn:
         sum_places_attribuees=sum_places_attribuees,
         pceens_a_payer=pceens_a_payer,
         total_payement=total_payement,
-        form_discontent=form_discontent
+        form_discontent=form_discontent,
     )
 
 
@@ -216,62 +227,21 @@ def spectacles() -> typing.RouteReturn:
 
     spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
 
-    setattr(
-        forms.EditSpectacle,
-        "salle_id",
-        wtforms.SelectField("Salle", choices=[[salle.id, salle.nom] for salle in salles], validators=[DataRequired()]),
-    )
 
     spect_sum_places = spectacles_sum_places(spectacles)
     spect_sum_places_demandees = spectacles_sum_places_demandees(spectacles)
     spect_sum_places_attribuees = spectacles_sum_places_attribuees(spectacles)
 
+    redirect = flask.url_for("club_q.spectacles", season_id=season_id)
+
+    if len(spectacles) > 0:
+        salle = salles[0]
+    else:
+        salle = None
+
+    spectacle_form(salles, salle, season_id, redirect)
+
     form_spectacle = forms.EditSpectacle()
-
-    if form_spectacle.validate_on_submit():
-        add = form_spectacle["add"].data
-
-        if add:
-            spectacle = ClubQSpectacle()
-
-            db.session.add(spectacle)
-
-            spectacle.nom = form_spectacle["nom"].data
-            spectacle._season_id = season_id
-            spectacle._salle_id = form_spectacle["salle_id"].data
-            spectacle.description = form_spectacle["description"].data
-            spectacle.categorie = form_spectacle["categorie"].data
-            spectacle.image_name = form_spectacle["image"].data
-            spectacle.date = datetime.combine(form_spectacle["date"].data, form_spectacle["time"].data)
-            spectacle.nb_tickets = form_spectacle["nb_tickets"].data
-            spectacle.unit_price = form_spectacle["price"].data
-
-            db.session.commit()
-            flask.flash(_("Spectacle ajouté."))
-            return flask.redirect(flask.url_for("club_q.spectacles", season_id=season_id))
-
-        delete = form_spectacle["delete"].data
-        spectacle = ClubQSpectacle.query.filter_by(id=form_spectacle["id"].data).one()
-
-        if delete:
-            db.session.delete(spectacle)
-            db.session.commit()
-            flask.flash(_("Spectacle supprimé."))
-            return flask.redirect(flask.url_for("club_q.spectacles", season_id=season_id))
-
-        else:
-            spectacle.nom = form_spectacle["nom"].data
-            spectacle._salle_id = form_spectacle["salle_id"].data
-            spectacle.description = form_spectacle["description"].data
-            spectacle.categorie = form_spectacle["categorie"].data
-            spectacle.image_name = form_spectacle["image"].data
-            spectacle.date = datetime.combine(form_spectacle["date"].data, form_spectacle["time"].data)
-            spectacle.nb_tickets = form_spectacle["nb_tickets"].data
-            spectacle.unit_price = form_spectacle["price"].data
-
-            db.session.commit()
-            flask.flash(_("Spectacle édité."))
-            return flask.redirect(flask.url_for("club_q.spectacles", season_id=season_id))
 
     return flask.render_template(
         "club_q/spectacles.html",
@@ -284,7 +254,7 @@ def spectacles() -> typing.RouteReturn:
         form_spectacle=form_spectacle,
         spect_sum_places=spect_sum_places,
         spect_sum_places_demandees=spect_sum_places_demandees,
-        spect_sum_places_attribuees=spect_sum_places_attribuees
+        spect_sum_places_attribuees=spect_sum_places_attribuees,
     )
 
 
@@ -306,7 +276,7 @@ def salles() -> typing.RouteReturn:
         )
         salles = ClubQSalle.query.filter(subquery).order_by(ClubQSalle.nom)
 
-    saisons = ClubQSeason.query.order_by(ClubQSeason.nom).all()
+    saisons = ClubQSeason.query.all()
 
     form_salle = forms.EditSalle()
 
@@ -379,68 +349,18 @@ def voeux() -> typing.RouteReturn:
     )
     voeux = ClubQVoeu.query.filter_by(_season_id=season_id).order_by(ClubQVoeu.id).all()
 
-    # Add spectacle select choice for adding voeu
-    setattr(
-        forms.AddVoeu,
-        "spectacle_add",
-        wtforms.SelectField(
-            "Spectacle", choices=[[spect.id, spect.nom] for spect in spectacles], validators=[DataRequired()]
-        ),
-    )
+    redirect = flask.url_for("club_q.voeux", season_id=season_id)
 
-    # Add pceens select choice for adding voeu
-    setattr(
-        forms.AddVoeu,
-        "pceen_add",
-        wtforms.SelectField(
-            "Pcéen", choices=[[pceen.id, pceen.full_name] for pceen in pceens], validators=[DataRequired()]
-        ),
-    )
+    if len(spectacles) > 0:
+        spectacle = spectacles[0]
+    else:
+        spectacle = None
+    
+    voeu_form(spectacles, spectacle, pceens, pceens[0], season_id, redirect)
 
     # Forms
     form_add_voeu = forms.AddVoeu()
     form_edit_voeu = forms.EditVoeu()
-
-    # If a form is validated
-    if form_add_voeu.is_submitted():
-        submit = form_add_voeu["submit_add"].data
-        if submit:
-            if form_add_voeu.validate():
-                voeu = ClubQVoeu()
-                voeu._spectacle_id = form_add_voeu["spectacle_add"].data
-                voeu._pceen_id = form_add_voeu["pceen_add"].data
-                voeu._season_id = season_id
-                voeu.priorite = form_add_voeu["priorite_add"].data
-                voeu.places_demandees = form_add_voeu["places_demandees_add"].data
-                voeu.places_minimum = form_add_voeu["places_minimum_add"].data or 0
-                voeu.places_attribuees = form_add_voeu["places_attribuees_add"].data
-
-                db.session.add(voeu)
-                db.session.commit()
-                flask.flash(_("Voeu ajouté."))
-                return flask.redirect(flask.url_for("club_q.voeux", season_id=season_id))
-
-    if form_edit_voeu.is_submitted():
-        delete = form_edit_voeu["delete_edit"].data
-        if delete:
-            voeu = ClubQVoeu.query.filter_by(id=form_edit_voeu["id_edit"].data).one()
-            db.session.delete(voeu)
-
-            db.session.commit()
-            flask.flash(_("Voeu supprimé."))
-            return flask.redirect(flask.url_for("club_q.voeux", season_id=season_id))
-
-        if form_edit_voeu.validate():
-            voeu = ClubQVoeu.query.filter_by(id=form_edit_voeu["id_edit"].data).one()
-
-            voeu.priorite = form_edit_voeu["priorite_edit"].data
-            voeu.places_demandees = form_edit_voeu["places_demandees_edit"].data
-            voeu.places_minimum = form_edit_voeu["places_minimum_edit"].data or 0
-            voeu.places_attribuees = form_edit_voeu["places_attribuees_edit"].data
-
-            db.session.commit()
-            flask.flash(_("Voeu édité."))
-            return flask.redirect(flask.url_for("club_q.voeux", season_id=season_id))
 
     return flask.render_template(
         "club_q/voeux.html",
@@ -552,7 +472,6 @@ def attribution_manager() -> typing.RouteReturn:
     except:
         log_algo = "error"
 
-
     if form_algo_setting.is_submitted():
         submit = form_algo_setting["submit"].data
         if submit and form_algo_setting.validate_on_submit():
@@ -591,7 +510,7 @@ def attribution_manager() -> typing.RouteReturn:
                 flask.flash(_("Algorithme exécuté."))
 
             try:
-            # Get the last log file of algorithm attribution
+                # Get the last log file of algorithm attribution
                 with open(os.path.join("logs", "club_q", "algorithm.log"), "r") as log_file:
                     log_algo = log_file.read()
             except:
@@ -599,14 +518,13 @@ def attribution_manager() -> typing.RouteReturn:
 
             flask.redirect(flask.url_for("club_q.attribution_manager"))
 
-
     return flask.render_template(
         "club_q/attribution.html",
         view="attribution",
         form_algo_setting=form_algo_setting,
         season_id=season_id,
         log_algo=log_algo,
-        user=context.g.pceen
+        user=context.g.pceen,
     )
 
 
@@ -721,71 +639,18 @@ def pceen_id(id: int):
     else:
         view = "pceen_view"
 
+    redirect = flask.url_for("club_q.pceen_id", id=id, season_id=season_id)
 
-    # Add spectacle select choice for adding voeu
-    setattr(
-        forms.AddVoeu,
-        "spectacle_add",
-        wtforms.SelectField(
-            "Spectacle", choices=[[spect.id, spect.nom] for spect in spectacles], validators=[DataRequired()]
-        ),
-    )
+    if len(spectacles) > 0:
+        spectacle = spectacles[0]
+    else:
+        spectacle = None
 
-    # Add pceens select choice for adding voeu
-    setattr(
-        forms.AddVoeu,
-        "pceen_add",
-        wtforms.SelectField(
-            "Pcéen", choices=[[pceen_.id, pceen_.full_name] for pceen_ in pceens], default = pceen.id, validators=[DataRequired()]
-        ),
-    )
+    voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect)
 
     # Forms
     form_add_voeu = forms.AddVoeu()
     form_edit_voeu = forms.EditVoeu()
-
-    # If a form is validated
-    if form_add_voeu.is_submitted():
-        submit = form_add_voeu["submit_add"].data
-        if submit:
-            if form_add_voeu.validate():
-                voeu = ClubQVoeu()
-                voeu._spectacle_id = form_add_voeu["spectacle_add"].data
-                voeu._pceen_id = form_add_voeu["pceen_add"].data
-                voeu._season_id = season_id
-                voeu.priorite = form_add_voeu["priorite_add"].data
-                voeu.places_demandees = form_add_voeu["places_demandees_add"].data
-                voeu.places_minimum = form_add_voeu["places_minimum_add"].data or 0
-                voeu.places_attribuees = form_add_voeu["places_attribuees_add"].data
-
-                db.session.add(voeu)
-                db.session.commit()
-                flask.flash(_("Voeu ajouté."))
-                return flask.redirect(flask.url_for("club_q.pceen_id", id=id, season_id=season_id))
-
-    if form_edit_voeu.is_submitted():
-        delete = form_edit_voeu["delete_edit"].data
-        if delete:
-            voeu = ClubQVoeu.query.filter_by(id=form_edit_voeu["id_edit"].data).one()
-            db.session.delete(voeu)
-
-            db.session.commit()
-            flask.flash(_("Voeu supprimé."))
-            return flask.redirect(flask.url_for("club_q.pceen_id", id=id, season_id=season_id))
-
-        if form_edit_voeu.validate():
-            voeu = ClubQVoeu.query.filter_by(id=form_edit_voeu["id_edit"].data).one()
-
-            voeu.priorite = form_edit_voeu["priorite_edit"].data
-            voeu.places_demandees = form_edit_voeu["places_demandees_edit"].data
-            voeu.places_minimum = form_edit_voeu["places_minimum_edit"].data or 0
-            voeu.places_attribuees = form_edit_voeu["places_attribuees_edit"].data
-
-            db.session.commit()
-            flask.flash(_("Voeu édité."))
-            return flask.redirect(flask.url_for("club_q.pceen_id", id=id, season_id=season_id))
-
-    
 
     total_places_demandees = pceen_sum_places_demandees(pceen, voeux)
     total_places_attribuees = pceen_sum_places_attribuees(pceen, voeux)
@@ -849,13 +714,28 @@ def spectacle_id(id: str):
     if not spectacle or not context.g.pceen.has_permission(PermissionType.read, PermissionScope.club_q):
         flask.abort(404)
 
-    season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+    season_id = spectacle._season_id
     voeux = (
         ClubQVoeu.query.filter_by(_season_id=season_id)
         .filter_by(_spectacle_id=spectacle.id)
         .order_by(ClubQVoeu.id)
         .all()
     )
+    spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
+
+    pceens = (
+        PCeen.query.join(PCeen.roles)
+        .join(Role.permissions)
+        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q)
+    )
+
+    redirect = flask.url_for("club_q.spectacle_id", id=id, season_id=season_id)
+
+    voeu_form(spectacles, spectacle, pceens, pceens[0], season_id, redirect)
+
+    # Forms
+    form_add_voeu = forms.AddVoeu()
+    form_edit_voeu = forms.EditVoeu()
 
     return flask.render_template(
         "club_q/id/spectacle.html",
@@ -865,6 +745,8 @@ def spectacle_id(id: str):
         voeux=voeux,
         user=context.g.pceen,
         view="spectacles",
+        form_add_voeu=form_add_voeu,
+        form_edit_voeu=form_edit_voeu,
     )
 
 
@@ -945,8 +827,49 @@ def spect_generate_excel(id: str):
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
 def salle_id(id: str):
     """Sum up of informations concerning the club Q salle of the given id"""
+
     salle = ClubQSalle.query.filter_by(id=id).one()
+    if not salle or not context.g.pceen.has_permission(PermissionType.read, PermissionScope.club_q):
+        flask.abort(404)
+
+    season_id = flask.request.args.get("season_id")
+    if season_id == None:
+        season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
+
+    saisons = ClubQSeason.query.all()
+    spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).filter_by(_salle_id=salle.id).order_by(ClubQSpectacle.date).all()
+
+    pceens = (
+        PCeen.query.join(PCeen.roles)
+        .join(Role.permissions)
+        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q)
+    )
+    salles = ClubQSalle.query.order_by(ClubQSalle.nom)
+
+    spect_sum_places = spectacles_sum_places(spectacles)
+    spect_sum_places_demandees = spectacles_sum_places_demandees(spectacles)
+    spect_sum_places_attribuees = spectacles_sum_places_attribuees(spectacles)
+
+
+    redirect = flask.url_for("club_q.salle_id", id=id, season_id=season_id)
+
+    spectacle_form(salles, salle, season_id, redirect)
+
+    form_spectacle = forms.EditSpectacle()
+
 
     return flask.render_template(
-        "club_q/id/salle.html", title=_(salle.nom), user=context.g.pceen, view="salle", salle=salle
+        "club_q/id/salle.html",
+        title=_(salle.nom),
+        user=context.g.pceen,
+        view="salle",
+        salle=salle,
+        saisons=saisons,
+        redirect="club_q.salle_id",
+        season_id=int(season_id),
+        spectacles=spectacles,
+        spect_sum_places=spect_sum_places,
+        spect_sum_places_demandees=spect_sum_places_demandees,
+        spect_sum_places_attribuees=spect_sum_places_attribuees,
+        form_spectacle=form_spectacle,
     )

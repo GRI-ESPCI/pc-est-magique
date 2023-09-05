@@ -21,14 +21,15 @@
     pas deux spectacles à la même priorité). Vous pouvez demander plusieurs places, mais en cas de demande importante
     sur un spectacle, vos chances de l'avoir seront diminuées.
     <br />
-    En cas de problème technique ou de doute, vous pouvez contacter Samuel Ciztrom 140 ou Alec Cochard 140. Le Club Q
-    140 vous souhaite une bonne saison artistique !") }}
+    En cas de problème technique ou de doute, vous pouvez contacter les responsables du Club Q ou les GRIs.
+    <br />
+    Le Club Q") }} {{saison.promo_orga}} {{ _(" vous souhaite une bonne saison artistique !") }}
   </p>
 </div>
 
 <br />
 <br />
-
+{% if visibility == 1 %}
 <form
   action=""
   method="post"
@@ -89,5 +90,6 @@
     </div>
   </div>
 </form>
-
-{% endblock %}
+{% else %}
+<h4>{{_("Les réservations ne sont pas ouvertes en ce moment.")}}</h4>
+{% endif %} {% endblock %}

@@ -93,7 +93,6 @@ class ClubQSpectacle(db.Model):
         return sum(v.places_attribuees for v in self.voeu.filter_by(_season_id=self._season_id))
 
 
-
 class ClubQVoeu(db.Model):
     """Client wish for a spectacle"""
 

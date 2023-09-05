@@ -63,10 +63,9 @@ def attribution(voeux, pceens, promo_1A, bonus, corruption):
         i = 0
         for voeu in voeux:
             if random.random() > 0.99:
-                i = random.randint(0, len(efioohze)-1)
+                i = random.randint(0, len(efioohze) - 1)
                 print(i)
                 club_q_algo_logger.info(efioohze[i])
-
 
             if voeu.places_attribuees == 0:
                 if (
@@ -79,6 +78,13 @@ def attribution(voeux, pceens, promo_1A, bonus, corruption):
                     club_q_algo_logger.info(
                         f"Full - {voeu.places_attribuees} places - {voeu.pceen.full_name} - {voeu.spectacle.nom} - Priority {voeu.priorite} - Discontent {voeu.pceen.discontent :.2f}"
                     )
+                    if voeu.priorite < 6:
+                        for pceen in pceens:
+                            if voeu.pceen.id == pceen.id:
+                                pceen.discontent = pceen.discontent + 1 / 3 * voeu.priorite - 2
+                                club_q_algo_logger.info(
+                                    f"Substracted {1/3*voeu.priorite-2 :.2f} discontent. New discontent : {pceen.discontent :.2f}"
+                                )
                 elif (
                     voeu.spectacle.nb_tickets
                     - sum_places_attribuees_spect(voeu.spectacle, voeux)
@@ -91,6 +97,13 @@ def attribution(voeux, pceens, promo_1A, bonus, corruption):
                     club_q_algo_logger.info(
                         f"Partial - {voeu.places_attribuees} places - {voeu.pceen.full_name} - {voeu.spectacle.nom} - Priority {voeu.priorite} - Discontent {voeu.pceen.discontent :.2f} - {voeu.places_demandees} asked."
                     )
+                    if voeu.priorite < 6:
+                        for pceen in pceens:
+                            if voeu.pceen.id == pceen.id:
+                                pceen.discontent = pceen.discontent + 1 / 6 * voeu.priorite - 1
+                                club_q_algo_logger.info(
+                                    f"Substracted {1/6*voeu.priorite-1 :.2f} discontent. New discontent : {pceen.discontent :.2f}"
+                                )
                 else:
                     club_q_algo_logger.info(
                         f"Refused - {voeu.pceen.full_name} - {voeu.spectacle.nom} - Priority {voeu.priorite} - {sum_places_attribuees_spect(voeu.spectacle, voeux)} left - {voeu.places_demandees} asked"
@@ -189,9 +202,9 @@ def sum_up(voeux, pceens):
     club_q_algo_logger.info("-" * 31)
     for pceen in pceens:
         if random.random() > 0.90:
-                i = random.randint(0, len(izadooa)-1)
-                print(i)
-                club_q_algo_logger.info(izadooa[i])
+            i = random.randint(0, len(izadooa) - 1)
+            print(i)
+            club_q_algo_logger.info(izadooa[i])
         club_q_algo_logger.info(f"{pceen.full_name} - {sum_places_attribuees_pceen(pceen, voeux)} places attribuées")
 
 
@@ -215,7 +228,7 @@ efioohze = [
     "On dit que le Club Q a créé sa propre monnaie numérique, le 'Qcoin', pour faciliter les transactions secrètes entre étudiants et institutions corrompues.",
     "Samuel Czitrom aurait construit un tunnel souterrain entre l'ESPCI et l'Opéra Garnier pour faciliter le vol de costumes de ballet en échange de billets.",
     "Alec Cochard aurait inventé une machine à voyager dans le temps pour acheter des billets à des prix réduits dans le passé et les revendre au présent.",
-    "Le BDE aurait organisé des tournois de poker clandestins avec des billets de spectacles du Club Q comme enjeu. Le vainqueur emporte tous les billets !"
+    "Le BDE aurait organisé des tournois de poker clandestins avec des billets de spectacles du Club Q comme enjeu. Le vainqueur emporte tous les billets !",
 ]
 
 

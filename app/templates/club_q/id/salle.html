@@ -1,5 +1,14 @@
 {% extends "base.html" %} {% import "_form.html" as wtf %} {% block app_content %} {% include 'club_q/common.html' %}
 
+<script
+  src="{{url_for('static', filename='js/sort-table.js') }}"
+  defer
+></script>
+<script
+  src="{{url_for('static', filename='js/club_q/spectacles.js') }}"
+  defer
+></script>
+
 <div class="row mb-3">
   <div class="col">
     <h3>{{ title }}</h3>
@@ -25,6 +34,325 @@
 <br />
 <div>{{ salle.description }}</div>
 <br />
+
+<div class="container mb-3">
+  <div class="btn-toolbar justify-content-between">
+    <h4>{{ _("Spectacles : ")}}</h4>
+    {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
+    <div
+      data-bs-toggle="tooltip"
+      data-bs-placement="right"
+      title="{{ _('Ajouter un spectacle') }}"
+    >
+      <button
+        type="button"
+        class="btn btn-success"
+        data-bs-target="#mo-spectacle-add"
+        data-bs-toggle="modal"
+      >
+        <svg
+          class="bi flex-shrink-0"
+          width="24"
+          height="24"
+          role="img"
+        >
+          {{ macros.bootstrap_icon("plus-circle") }}
+        </svg>
+      </button>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row mb-3">
+  <div class="col table-responsive">
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th
+            scope="col"
+            onclick="sort('id');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("ID") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-id"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
+            onclick="sort('name');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Spectacle") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-name"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
+            onclick="sort('salle');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Salle") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-salle"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
+            onclick="sort('category');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Catégorie") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-category"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
+            onclick="sort('date');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Date") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-date"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
+            onclick="sort('price');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Prix") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-price"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
+          <th
+            scope="col"
+            onclick="sort('tickets');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Nbr.") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-tickets"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
+            onclick="sort('asked');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Dem.") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-asked"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
+            onclick="sort('given');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Att.") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-given"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
+            onclick="sort('rest');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Rst.") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-rest"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+
+          <th scope="col">
+            <span class="d-flex user-select-none">
+              <span>
+                <svg
+                  class="bi flex-shrink-0"
+                  width="22"
+                  height="22"
+                >
+                  {{ macros.bootstrap_icon("wrench") }}
+                </svg>
+              </span>
+            </span>
+          </th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody id="sort-table">
+        {% for spect in spectacles %} {% if spect._season_id == season_id %}
+        <tr
+          data-id="{{ str(spect.id).rjust(5, '0') }}"
+          data-name="{{ spect.nom }}"
+          data-salle="{{ spect.salle.nom }}"
+          data-category="{{ spect.categorie }}"
+          data-date="{{ spect.date }}"
+          data-price="{{ str(spect.unit_price).rjust(5, '0') }}"
+          data-tickets="{{ str(spect.nb_tickets).rjust(5, '0') }}"
+          data-asked="{{ str(spect.sum_places_demandees).rjust(5, '0') }}"
+          data-given="{{ str(spect.sum_places_attribuees).rjust(5, '0') }}"
+          data-rest="{{ str(spect.nb_tickets - spect.sum_places_attribuees).rjust(5, '0') }}"
+        >
+          <td onclick="window.location='{{ url_for('club_q.spectacle_id', id=spect.id) }}';">{{ spect.id }}</td>
+          <td onclick="window.location='{{ url_for('club_q.spectacle_id', id=spect.id) }}';">
+            <p class="overflow no_extra">{{ spect.nom }}</p>
+          </td>
+          <td onclick="window.location='{{ url_for('club_q.salle_id', id=spect._salle_id) }}';">
+            <p class="overflow no_extra">{{ spect.salle.nom }}</p>
+          </td>
+          <td>{{ spect.categorie }}</td>
+          <td>{{ moment(spect.date).format('DD/MM/YYYY HH:mm:ss') }}</td>
+          <td>{{ babel.format_currency(spect.unit_price, "EUR") }}</td>
+          {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
+          <td>{{ spect.nb_tickets }}</td>
+          <td>{{ spect.sum_places_demandees}}</td>
+          <td>{{ spect.sum_places_attribuees}}</td>
+          <td>{{ spect.nb_tickets - spect.sum_places_attribuees}}</td>
+          <td>
+            <button
+              class="btn btn-outline-danger p-1 pt-0"
+              data-bs-target="#mo-spectacle-edit"
+              data-bs-toggle="modal"
+              data-spectacle-id="{{ spect.id }}"
+              data-spectacle-nom="{{ spect.nom}}"
+              data-salle-id="{{ spect._salle_id}}"
+              data-salle-nom="{{ spect.salle.nom }}"
+              data-saison-id="{{ spect._season_id }}"
+              data-saison-nom="{{ spect.season.nom}}"
+              data-spectacle-name="{{ spect.nom }}"
+              data-spectacle-categorie="{{ spect.categorie }}"
+              data-spectacle-image="{{ spect.image_name }}"
+              data-spectacle-description="{{ spect.description }}"
+              data-spectacle-date="{{ spect.date }}"
+              data-spectacle-time="{{ spect.time }}"
+              data-spectacle-nb-tickets="{{ spect.nb_tickets }}"
+              data-spectacle-price="{{ spect.unit_price}}"
+            >
+              <svg
+                class="bi flex-shrink-0"
+                width="18"
+                height="18"
+              >
+                {{ macros.bootstrap_icon("pen") }}
+              </svg>
+            </button>
+          </td>
+          {% endif %}
+        </tr>
+
+        {% endif %}{% endfor %}
+      </tbody>
+      <tbody>
+        {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
+        <tr>
+          <td><b>{{ _("Total") }}</b></td>
+          <td><b>{{ _("-") }}</b></td>
+          <td><b>{{ _("-") }}</b></td>
+          <td><b>{{ _("-") }}</b></td>
+          <td><b>{{ _("-") }}</b></td>
+          <td><b>{{ _("-") }}</b></td>
+          <td><b>{{ spect_sum_places }}</b></td>
+          <td><b>{{ spect_sum_places_demandees }}</b></td>
+          <td><b>{{ spect_sum_places_attribuees }}</b></td>
+          <td><b>{{ spect_sum_places - spect_sum_places_attribuees }}</b></td>
+          <td><b>{{ _("-") }}</b></td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<br />
+
 <iframe
   width="100%"
   height="400px"
@@ -32,4 +360,6 @@
   style="border: 1px solid black"
 ></iframe>
 
-{% endblock %}
+<!-- Modals -->
+
+{% include 'club_q/modals/modals_spectacles.html' %} {% endblock %}

@@ -31,7 +31,6 @@ class SettingClubQPage(FlaskForm):
 class SettingAlgoClubQPage(FlaskForm):
     """WTForm for the various options of the algorithm of club q"""
 
-
     save_attribution = wtforms.BooleanField(_l("Sauvegarder l'attribution"), default=False)
     corruption = wtforms.BooleanField(_l("Corruption"), default=False)
     submit = wtforms.SubmitField(_l("Mettre à jour"))
@@ -95,10 +94,11 @@ class EditSpectacle(FlaskForm):
     modify = wtforms.SubmitField(_l("Modifier"))
     delete = wtforms.SubmitField(_l("Supprimer"))
 
+
 class EditDiscontent(FlaskForm):
     id = wtforms.HiddenField("")
-    discontent=wtforms.DecimalField(_l("Mécontentement"), validators=[DataRequired()], default=0)
-    modify = wtforms.SubmitField(_l("Modifier"))   
+    discontent = wtforms.DecimalField(_l("Mécontentement"), validators=[DataRequired()], default=0)
+    modify = wtforms.SubmitField(_l("Modifier"))
 
 
 class Mail(FlaskForm):
