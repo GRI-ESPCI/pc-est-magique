@@ -1,15 +1,13 @@
-{% extends "base.html" %} {% import "_form.html" as wtf %} 
-{% block scripts %} 
-
-{{ super() }} 
-<script src="{{url_for("static", filename="js/sort-table.js") }}" defer>
- </script>
-<script src="{{url_for("static", filename="js/club_q/spectacles.js") }}" defer>
-</script>
-{% endblock %}
-
-{% block app_content %} {% include 'club_q/common.html'
-%}
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} {{ super() }}
+<script
+  src='{{url_for("static", filename="js/sort-table.js") }}'
+  defer
+></script>
+<script
+  src='{{url_for("static", filename="js/club_q/spectacles.js") }}'
+  defer
+></script>
+{% endblock %} {% block app_content %} {% include 'club_q/common.html' %}
 
 <div class="container mb-3">
   <div class="btn-toolbar justify-content-between">
@@ -244,7 +242,7 @@
               </span>
             </span>
           </th>
-          
+
           <th scope="col">
             <span class="d-flex user-select-none">
               <span>
@@ -276,7 +274,9 @@
           data-given="{{ str(spectacles[i].sum_places_attribuees).rjust(5, '0') }}"
           data-rest="{{ str(spectacles[i].nb_tickets - spectacles[i].sum_places_attribuees).rjust(5, '0') }}"
         >
-          <td onclick="window.location='{{ url_for('club_q.spectacle_id', id=spectacles[i].id) }}';">{{ spectacles[i].id }}</td>
+          <td onclick="window.location='{{ url_for('club_q.spectacle_id', id=spectacles[i].id) }}';">
+            {{ spectacles[i].id }}
+          </td>
           <td onclick="window.location='{{ url_for('club_q.spectacle_id', id=spectacles[i].id) }}';">
             <p class="overflow no_extra">{{ spectacles[i].nom }}</p>
           </td>
@@ -323,8 +323,7 @@
           </td>
           {% endif %}
         </tr>
-        
-        
+
         {% endif %}{% endfor %}
       </tbody>
       <tbody>
@@ -351,15 +350,24 @@
 
 {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
 <div style="display: flex">
-  <a class="btn btn-primary " style="margin-right: 10px;" href="{{
-  url_for('club_q.spect_export_pdfs', id = season_id) }}"> {{ _("Exporter les PDFs
-  ") }} </a> <a class="btn btn-primary" href="{{
-  url_for('club_q.spect_export_excels', id = season_id) }}"> {{ _("Exporter les Excels") }} </a>
+  <a
+    class="btn btn-primary"
+    style="margin-right: 10px"
+    href="{{
+  url_for('club_q.spect_export_pdfs', id = season_id) }}"
+  >
+    {{ _("Exporter les PDFs ") }}
+  </a>
+  <a
+    class="btn btn-primary"
+    href="{{
+  url_for('club_q.spect_export_excels', id = season_id) }}"
+  >
+    {{ _("Exporter les Excels") }}
+  </a>
 </div>
 {% endif %}
 
 <!-- Modals -->
 
-{% include 'club_q/modals/modals_spectacles.html' %}
-
-{% endblock %}
+{% include 'club_q/modals/modals_spectacles.html' %} {% endblock %}

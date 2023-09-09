@@ -1,8 +1,12 @@
-{% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} {{ super() }} 
-<script src="{{url_for("static", filename="js/sort-table.js") }}" defer>
- </script>
-<script src="{{url_for("static", filename="js/club_q/pceens.js") }}" defer>
-</script>
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} {{ super() }}
+<script
+  src='{{url_for("static", filename="js/sort-table.js") }}'
+  defer
+></script>
+<script
+  src='{{url_for("static", filename="js/club_q/pceens.js") }}'
+  defer
+></script>
 {% endblock %}{% block app_content %} {% include 'club_q/common.html' %}
 
 <h4>{{ _("PCéens : ")}}</h4>
@@ -185,10 +189,12 @@
           data-asked="{{ str(sum_places_demandees[i]).rjust(5, '0') }}"
           data-given="{{ str(sum_places_attribuees[i]).rjust(5, '0') }}"
           data-cost="{{ pceens_a_payer[i] }}"
-          data-discontent="{{ pceens[i].discontent or 0}}" 
+          data-discontent="{{ pceens[i].discontent or 0}}"
         >
           <td onclick="window.location='{{ url_for('club_q.pceen_id', id=pceens[i].id) }}';">{{ pceens[i].id }}</td>
-          <td onclick="window.location='{{ url_for('club_q.pceen_id', id=pceens[i].id) }}';"><p class="overflow no_extra">{{ pceens[i].full_name }}</p></td>
+          <td onclick="window.location='{{ url_for('club_q.pceen_id', id=pceens[i].id) }}';">
+            <p class="overflow no_extra">{{ pceens[i].full_name }}</p>
+          </td>
           <td>{{ pceens[i].promo }}</td>
           <td>{{ nb_voeux[i] }}</td>
           <td>{{ sum_places_demandees[i] }}</td>
@@ -222,7 +228,7 @@
         {% endfor %}
       </tbody>
       <tbody>
-      <tr>
+        <tr>
           <td><b>{{ _("Total") }}</b></td>
           <td><b>{{ _("Nb de PCéens : ") }}{{nb_pceens}}</b></td>
           <td><b>{{ _("-") }}</b></td>
@@ -254,8 +260,7 @@
         <h5
           class="modal-title"
           id="mo-pceen-edit"
-        >
-        </h5>
+        ></h5>
         <button
           type="button"
           class="btn-close"

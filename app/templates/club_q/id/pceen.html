@@ -240,10 +240,9 @@
         </tr>
       </thead>
 
-
       <tbody id="sort-table">
         {% for voeu in voeux %}
-        <tr 
+        <tr
           data-id="{{ str(voeu.id).rjust(5, '0') }}"
           data-spectacle="{{ voeu.spectacle.name }}"
           data-priority="{{ str(voeu.priorite).rjust(3, '0') }}"
@@ -255,7 +254,9 @@
           data-price="{{  str(voeu.spectacle.unit_price*voeu.places_attribuees).rjust(5, '0') }}"
         >
           <td>{{ voeu.id }}</td>
-          <td onclick='window.location="{{ url_for('club_q.spectacle_id', id=voeu.spectacle.id) }}";'>{{ voeu.spectacle.nom }}</td>
+          <td onclick="window.location='{{ url_for('club_q.spectacle_id', id=voeu.spectacle.id) }}'';">
+            {{ voeu.spectacle.nom }}
+          </td>
           <td>{{ voeu.priorite }}</td>
           <td>{{ voeu.places_demandees }}</td>
           <td>{{ voeu.places_minimum }}</td>
@@ -324,6 +325,4 @@
 
 <!-- Modals -->
 
-{% include 'club_q/modals/modals_voeux.html' %}
-
-{% endblock %}
+{% include 'club_q/modals/modals_voeux.html' %} {% endblock %}

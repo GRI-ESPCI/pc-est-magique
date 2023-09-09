@@ -48,7 +48,6 @@ from app.routes.club_q.algorithm import attribution
 from app.email import send_email
 
 
-
 @bp.route("", methods=["GET", "POST"])
 @bp.route("/", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
@@ -77,9 +76,7 @@ def main() -> typing.RouteReturn:
             _pceen_id=context.g.pceen.id,
             _season_id=spect._season_id,
         ).first()
-        spect.date = spect.date.strftime('%d %B %Y, %H:%M:%S')
-
-
+        spect.date = spect.date.strftime("%d %B %Y, %H:%M:%S")
 
         setattr(
             forms.ClubQForm,
@@ -136,7 +133,11 @@ def main() -> typing.RouteReturn:
         for spect in spectacles:
             if form[f"nb_places_{spect.id}"].data != None:
                 if form[f"nb_places_minimum_{spect.id}"].data > form[f"nb_places_{spect.id}"].data:
-                    flask.flash(_("Un voeu a été défini avec un nombre de places minimum supérieur au nombre de places demandées."))
+                    flask.flash(
+                        _(
+                            "Un voeu a été défini avec un nombre de places minimum supérieur au nombre de places demandées."
+                        )
+                    )
                     flag = True  # RAISE THE FLAG!
                     break
 
@@ -941,7 +942,7 @@ def spectacle_id(id: int):
         view="spectacles",
         form_add_voeu=form_add_voeu,
         form_edit_voeu=form_edit_voeu,
-        nb_total_voeux=len(voeux)
+        nb_total_voeux=len(voeux),
     )
 
 
@@ -1070,5 +1071,5 @@ def salle_id(id: int):
         spect_sum_places_demandees=spect_sum_places_demandees,
         spect_sum_places_attribuees=spect_sum_places_attribuees,
         form_spectacle=form_spectacle,
-        nb_total_spectacles=len(spectacles)
+        nb_total_spectacles=len(spectacles),
     )

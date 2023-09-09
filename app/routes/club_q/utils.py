@@ -486,7 +486,7 @@ def sum_object(subject, query) -> int:
         query = query.filter_by(_spectacle_id=subject.id).all()
     elif type(subject) == ClubQSalle:
         query = query.filter_by(_salle_id=subject.id).all()
-    
+
     elif type(subject) == ClubQSeason:
         query = query.filter_by(_season_id=subject.id).all()
 

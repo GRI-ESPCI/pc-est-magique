@@ -172,5 +172,3 @@ class ValidBarItemID(CustomValidator):
 
     def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
         return field.data.isdigit() and bool(BarItem.query.get(int(field.data)))
-
-
