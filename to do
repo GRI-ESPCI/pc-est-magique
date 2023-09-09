@@ -1,9 +1,0 @@
-- Add reportlab to needed librairies of pem
-- Update changelog
-- update readme
-- do translations
-- Add PC, Club Q logos to griway
-- Verify permissions
-- add club_q settings in db
-- Change date format for saison database
-- Change max description format for salle database

@@ -65,6 +65,16 @@
               </span>
             </span>
           </th>
+          <th scope="col" onclick="sort('nbspectacles');">
+            <span class="d-flex user-select-none">
+              <span>{{ _("Spects.") }}</span>
+              <span class="mx-auto">
+                <svg class="bi flex-shrink-0" width="16" height="16" id="sort-svg-nbspectacles">
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
           <th scope="col" onclick="sort('description');">
             <span class="d-flex user-select-none">
               <span>{{ _("Description") }}</span>
@@ -127,36 +137,38 @@
         </tr>
       </thead>
       <tbody id="sort-table">
-        {% for salle in salles %}
+        {% for i in size %}
         <tr
-          data-id="{{ str(salle.id).rjust(5, '0') }}"
-          data-name="{{ salle.nom }}"
-          data-description="{{ salle.description }}"
-          data-site="{{ salle.url }}"
-          data-address="{{ salle.adresse }}"
-          data-latitude="{{ str(salle.latitude).rjust(6, '0') }}"
-          data-longitude="{{ str(salle.longitude).rjust(6, '0') }}"
+          data-id="{{ str(salles[i].id).rjust(5, '0') }}"
+          data-name="{{ salles[i].nom }}"
+          data-nbspectacles="{{ str(nb_spectacles[i]).rjust(6, '0') }}"
+          data-description="{{ salles[i].description }}"
+          data-site="{{ salles[i].url }}"
+          data-address="{{ salles[i].adresse }}"
+          data-latitude="{{ str(salles[i].latitude).rjust(6, '0') }}"
+          data-longitude="{{ str(salles[i].longitude).rjust(6, '0') }}"
         >
-          <td onclick="window.location='{{ url_for('club_q.salle_id', id=salle.id) }}';">{{ salle.id }}</td>
-          <td onclick="window.location='{{ url_for('club_q.salle_id', id=salle.id) }}';">{{ salle.nom }}</td>
-          <td onclick="window.location='{{ url_for('club_q.salle_id', id=salle.id) }}';">{{ salle.description }}</td>
-          <td><a href="{{ salle.url }}">{{ salle.url }}</a></td>
-          <td><a href="https://www.openstreetmap.org/search?query={{ salle.adresse }}">{{salle.adresse}}</a></td>
-          <td>{{ salle.latitude }}</td>
-          <td>{{ salle.longitude }}</td>
+          <td onclick="window.location='{{ url_for('club_q.salle_id', id=salles[i].id) }}';">{{ salles[i].id }}</td>
+          <td onclick="window.location='{{ url_for('club_q.salle_id', id=salles[i].id) }}';">{{ salles[i].nom }}</td>
+          <td>{{nb_spectacles[i]}}</td>
+          <td onclick="window.location='{{ url_for('club_q.salle_id', id=salles[i].id) }}';">{{ salles[i].description }}</td>
+          <td><a href="{{ salles[i].url }}">{{ salles[i].url }}</a></td>
+          <td><a href="https://www.openstreetmap.org/search?query={{ salles[i].adresse }}">{{salles[i].adresse}}</a></td>
+          <td>{{ salles[i].latitude }}</td>
+          <td>{{ salles[i].longitude }}</td>
           {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
           <td>
             <button
               class="btn btn-outline-danger p-1 pt-0"
               data-bs-target="#mo-salle-edit"
               data-bs-toggle="modal"
-              data-salle-id="{{ salle.id }}"
-              data-salle-nom="{{ salle.nom }}"
-              data-salle-description="{{ salle.description }}"
-              data-salle-url = "{{ salle.url }}"
-              data-salle-adresse = "{{ salle.adresse }}"
-              data-salle-latitude = "{{ salle.latitude }}"
-              data-salle-longitude = " {{ salle.longitude }}"
+              data-salle-id="{{ salles[i].id }}"
+              data-salle-nom="{{ salles[i].nom }}"
+              data-salle-description="{{ salles[i].description }}"
+              data-salle-url = "{{ salles[i].url }}"
+              data-salle-adresse = "{{ salles[i].adresse }}"
+              data-salle-latitude = "{{ salles[i].latitude }}"
+              data-salle-longitude = " {{ salles[i].longitude }}"
             >
               <svg class="bi flex-shrink-0" width="18" height="18">{{ macros.bootstrap_icon("pen") }}</svg>
             </button>

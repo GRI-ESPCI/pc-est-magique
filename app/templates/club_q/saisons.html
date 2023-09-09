@@ -82,7 +82,7 @@
           onclick="sort('promo');"
         >
           <span class="d-flex user-select-none">
-            <span>{{ _("Promo organisatrice") }}</span>
+            <span>{{ _("Promo orga.") }}</span>
             <span class="mx-auto">
               <svg
                 class="bi flex-shrink-0"
@@ -151,6 +151,60 @@
         </th>
         {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
         <th
+          scope="col"
+          onclick="sort('nbpceens');"
+        >
+          <span class="d-flex user-select-none">
+            <span>{{ _("PCéens") }}</span>
+            <span class="mx-auto">
+              <svg
+                class="bi flex-shrink-0"
+                width="16"
+                height="16"
+                id="sort-svg-nbpceens"
+              >
+                <!-- Sort button inserted through JS -->
+              </svg>
+            </span>
+          </span>
+        </th>
+        <th
+          scope="col"
+          onclick="sort('nbspectacles');"
+        >
+          <span class="d-flex user-select-none">
+            <span>{{ _("Spectacles") }}</span>
+            <span class="mx-auto">
+              <svg
+                class="bi flex-shrink-0"
+                width="16"
+                height="16"
+                id="sort-svg-nbspectacles"
+              >
+                <!-- Sort button inserted through JS -->
+              </svg>
+            </span>
+          </span>
+        </th>
+        <th
+          scope="col"
+          onclick="sort('nbvoeux');"
+        >
+          <span class="d-flex user-select-none">
+            <span>{{ _("Voeux") }}</span>
+            <span class="mx-auto">
+              <svg
+                class="bi flex-shrink-0"
+                width="16"
+                height="16"
+                id="sort-svg-nbvoeux"
+              >
+                <!-- Sort button inserted through JS -->
+              </svg>
+            </span>
+          </span>
+        </th>
+        <th
           class="centered"
           scope="col"
         >
@@ -171,21 +225,28 @@
     </thead>
 
     <tbody id="sort-table">
-      {% for saison in saisons %}
+      {% for i in size %}
       <tr
-        data-id="{{ str(saison.id).rjust(5, '0') }}"
-        data-nom="{{ saison.nom }}"
-        data-promo="{{ saison.promo_orga }}"
-        data-debut="{{ saison.debut }}"
-        data-fin="{{ saison.fin}}"
-        data-inscription="{{ saison.fin_inscription }}"
+        data-id="{{ str(saisons[i].id).rjust(5, '0') }}"
+        data-nom="{{ saisons[i].nom }}"
+        data-promo="{{ saisons[i].promo_orga }}"
+        data-debut="{{ saisons[i].debut }}"
+        data-fin="{{ saisons[i].fin}}"
+        data-inscription="{{ saisons[i].fin_inscription }}"
+        data-nbpceens="{{ str(saison_nb_spectacles[i]).rjust(5, '0') }}"
+        data-nbspectacles="{{ str(saison_nb_spectacles[i]).rjust(5, '0') }}"
+        data-nbvoeux="{{ str(saison_nb_voeux[i]).rjust(5, '0') }}"
       >
-        <td>{{ saison.id }}</td>
-        <td>{{ saison.nom }}</td>
-        <td>{{ saison.promo_orga }}</td>
-        <td>{{ saison.debut }}</td>
-        <td>{{ saison.fin }}</td>
-        <td>{{ saison.fin_inscription }}</td>
+        <td>{{ saisons[i].id }}</td>
+        <td>{{ saisons[i].nom }}</td>
+        <td>{{ saisons[i].promo_orga }}</td>
+        <td>{{ saisons[i].debut }}</td>
+        <td>{{ saisons[i].fin }}</td>
+        <td>{{ saisons[i].fin_inscription }}</td>
+        {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
+        <td>{{ saison_nb_pceens[i]}}</td>
+        <td>{{ saison_nb_spectacles[i]}}</td>
+        <td>{{ saison_nb_voeux[i] }}</td>
         <td>
           <div
             data-bs-toggle="tooltip"
@@ -195,12 +256,12 @@
               class="btn btn-outline-danger p-1 pt-0"
               data-bs-target="#mo-saison-edit"
               data-bs-toggle="modal"
-              data-saison-id="{{ saison.id }}"
-              data-saison-nom="{{ saison.nom }}"
-              data-saison-promo="{{ saison.promo_orga }}"
-              data-saison-debut="{{ saison.debut }}"
-              data-saison-fin="{{ saison.fin }}"
-              data-saison-fin-inscription="{{ saison.fin_inscription }}"
+              data-saison-id="{{ saisons[i].id }}"
+              data-saison-nom="{{ saisons[i].nom }}"
+              data-saison-promo="{{ saisons[i].promo_orga }}"
+              data-saison-debut="{{ saisons[i].debut }}"
+              data-saison-fin="{{ saisons[i].fin }}"
+              data-saison-fin-inscription="{{ saisons[i].fin_inscription }}"
             >
               <svg
                 class="bi flex-shrink-0"
@@ -212,6 +273,7 @@
             </button>
           </div>
         </td>
+        {% endif %}
       </tr>
       {% endfor %}
     </tbody>

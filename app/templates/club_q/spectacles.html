@@ -156,10 +156,28 @@
           {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
           <th
             scope="col"
+            onclick="sort('nbvoeux');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Vx.") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-nbvoeux"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
             onclick="sort('tickets');"
           >
             <span class="d-flex user-select-none">
-              <span>{{ _("Nbr.") }}</span>
+              <span>{{ _("Pl.") }}</span>
               <span class="mx-auto">
                 <svg
                   class="bi flex-shrink-0"
@@ -244,53 +262,55 @@
         </tr>
       </thead>
       <tbody id="sort-table">
-        {% for spect in spectacles %} {% if spect._season_id == season_id %}
+        {% for i in size %} {% if spectacles[i]._season_id == season_id %}
         <tr
-          data-id="{{ str(spect.id).rjust(5, '0') }}"
-          data-name="{{ spect.nom }}"
-          data-salle="{{ spect.salle.nom }}"
-          data-category="{{ spect.categorie }}"
-          data-date="{{ spect.date }}"
-          data-price="{{ str(spect.unit_price).rjust(5, '0') }}"
-          data-tickets="{{ str(spect.nb_tickets).rjust(5, '0') }}"
-          data-asked="{{ str(spect.sum_places_demandees).rjust(5, '0') }}"
-          data-given="{{ str(spect.sum_places_attribuees).rjust(5, '0') }}"
-          data-rest="{{ str(spect.nb_tickets - spect.sum_places_attribuees).rjust(5, '0') }}"
+          data-id="{{ str(spectacles[i].id).rjust(5, '0') }}"
+          data-name="{{ spectacles[i].nom }}"
+          data-salle="{{ spectacles[i].salle.nom }}"
+          data-category="{{ spectacles[i].categorie }}"
+          data-date="{{ spectacles[i].date }}"
+          data-price="{{ str(spectacles[i].unit_price).rjust(5, '0') }}"
+          data-tickets="{{ str(spectacles[i].nb_tickets).rjust(5, '0') }}"
+          data-nbvoeux="{{ str(spect_nb_voeux[i]).rjust(5, '0') }}"
+          data-asked="{{ str(spectacles[i].sum_places_demandees).rjust(5, '0') }}"
+          data-given="{{ str(spectacles[i].sum_places_attribuees).rjust(5, '0') }}"
+          data-rest="{{ str(spectacles[i].nb_tickets - spectacles[i].sum_places_attribuees).rjust(5, '0') }}"
         >
-          <td onclick="window.location='{{ url_for('club_q.spectacle_id', id=spect.id) }}';">{{ spect.id }}</td>
-          <td onclick="window.location='{{ url_for('club_q.spectacle_id', id=spect.id) }}';">
-            <p class="overflow no_extra">{{ spect.nom }}</p>
+          <td onclick="window.location='{{ url_for('club_q.spectacle_id', id=spectacles[i].id) }}';">{{ spectacles[i].id }}</td>
+          <td onclick="window.location='{{ url_for('club_q.spectacle_id', id=spectacles[i].id) }}';">
+            <p class="overflow no_extra">{{ spectacles[i].nom }}</p>
           </td>
-          <td onclick="window.location='{{ url_for('club_q.salle_id', id=spect._salle_id) }}';">
-            <p class="overflow no_extra">{{ spect.salle.nom }}</p>
+          <td onclick="window.location='{{ url_for('club_q.salle_id', id=spectacles[i]._salle_id) }}';">
+            <p class="overflow no_extra">{{ spectacles[i].salle.nom }}</p>
           </td>
-          <td>{{ spect.categorie }}</td>
-          <td>{{ moment(spect.date).format('DD/MM/YYYY HH:mm:ss') }}</td>
-          <td>{{ babel.format_currency(spect.unit_price, "EUR") }}</td>
+          <td>{{ spectacles[i].categorie }}</td>
+          <td>{{ spectacles[i].date }}</td>
+          <td>{{ babel.format_currency(spectacles[i].unit_price, "EUR") }}</td>
           {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
-          <td>{{ spect.nb_tickets }}</td>
-          <td>{{ spect.sum_places_demandees}}</td>
-          <td>{{ spect.sum_places_attribuees}}</td>
-          <td>{{ spect.nb_tickets - spect.sum_places_attribuees}}</td>
+          <td>{{ spect_nb_voeux[i] }}</td>
+          <td>{{ spectacles[i].nb_tickets }}</td>
+          <td>{{ spectacles[i].sum_places_demandees}}</td>
+          <td>{{ spectacles[i].sum_places_attribuees}}</td>
+          <td>{{ spectacles[i].nb_tickets - spectacles[i].sum_places_attribuees}}</td>
           <td>
             <button
               class="btn btn-outline-danger p-1 pt-0"
               data-bs-target="#mo-spectacle-edit"
               data-bs-toggle="modal"
-              data-spectacle-id="{{ spect.id }}"
-              data-spectacle-nom="{{ spect.nom}}"
-              data-salle-id="{{ spect._salle_id}}"
-              data-salle-nom="{{ spect.salle.nom }}"
-              data-saison-id="{{ spect._season_id }}"
-              data-saison-nom="{{ spect.season.nom}}"
-              data-spectacle-name="{{ spect.nom }}"
-              data-spectacle-categorie="{{ spect.categorie }}"
-              data-spectacle-image="{{ spect.image_name }}"
-              data-spectacle-description="{{ spect.description }}"
-              data-spectacle-date="{{ spect.date }}"
-              data-spectacle-time="{{ spect.time }}"
-              data-spectacle-nb-tickets="{{ spect.nb_tickets }}"
-              data-spectacle-price="{{ spect.unit_price}}"
+              data-spectacle-id="{{ spectacles[i].id }}"
+              data-spectacle-nom="{{ spectacles[i].nom}}"
+              data-salle-id="{{ spectacles[i]._salle_id}}"
+              data-salle-nom="{{ spectacles[i].salle.nom }}"
+              data-saison-id="{{ spectacles[i]._season_id }}"
+              data-saison-nom="{{ spectacles[i].season.nom}}"
+              data-spectacle-name="{{ spectacles[i].nom }}"
+              data-spectacle-categorie="{{ spectacles[i].categorie }}"
+              data-spectacle-image="{{ spectacles[i].image_name }}"
+              data-spectacle-description="{{ spectacles[i].description }}"
+              data-spectacle-date="{{ spectacles[i].date }}"
+              data-spectacle-time="{{ spectacles[i].time }}"
+              data-spectacle-nb-tickets="{{ spectacles[i].nb_tickets }}"
+              data-spectacle-price="{{ spectacles[i].unit_price}}"
             >
               <svg
                 class="bi flex-shrink-0"
@@ -311,11 +331,12 @@
         {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
         <tr>
           <td><b>{{ _("Total") }}</b></td>
+          <td><b>{{ _("Nb de spectacles : ") }}{{nb_spectacles}}</b></td>
           <td><b>{{ _("-") }}</b></td>
           <td><b>{{ _("-") }}</b></td>
           <td><b>{{ _("-") }}</b></td>
           <td><b>{{ _("-") }}</b></td>
-          <td><b>{{ _("-") }}</b></td>
+          <td><b>{{ total_nb_voeux }}</b></td>
           <td><b>{{ spect_sum_places }}</b></td>
           <td><b>{{ spect_sum_places_demandees }}</b></td>
           <td><b>{{ spect_sum_places_attribuees }}</b></td>

@@ -8,10 +8,7 @@ import openpyxl
 import zipfile
 
 from app import db
-from app.models import (
-    ClubQSpectacle,
-    ClubQVoeu,
-)
+from app.models import ClubQSpectacle, ClubQVoeu, PCeen, ClubQSeason, ClubQSalle
 from app.utils.validators import DataRequired
 import wtforms
 import flask
@@ -19,6 +16,7 @@ from app.routes.club_q import forms
 from flask_babel import _
 from datetime import datetime
 
+app = flask.Flask(__name__)
 
 cm = rl.lib.units.cm
 
@@ -329,43 +327,45 @@ def excel_spectacle(spec, season, voeux_attrib, voeux_nan_attrib):
 
     return excel_data
 
+
 def export_pdf_spectacles(spectacles, season, voeux_attrib_list, voeux_nan_attrib_list):
-    
-     # Create an in-memory zip file
+
+    # Create an in-memory zip file
     zip_buffer = io.BytesIO()
 
     # Create a ZipFile object
-    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
         # Add PDF files to the zip archive
         i = 0
         for spectacle in spectacles:  # Replace with your logic to get PDF files
-            pdf_data = pdf_spectacle(spectacle, season, voeux_attrib_list[i], voeux_nan_attrib_list[i]).read()  
-            zipf.writestr(f'{spectacle.nom}.pdf', pdf_data)
-            i+=1
+            pdf_data = pdf_spectacle(spectacle, season, voeux_attrib_list[i], voeux_nan_attrib_list[i]).read()
+            zipf.writestr(f"{spectacle.nom}.pdf", pdf_data)
+            i += 1
 
     # Move the zip file's pointer to the beginning
     zip_buffer.seek(0)
 
-    return(zip_buffer)
+    return zip_buffer
+
 
 def export_excel_spectacles(spectacles, season, voeux_attrib_list, voeux_nan_attrib_list):
 
-     # Create an in-memory zip file
+    # Create an in-memory zip file
     zip_buffer = io.BytesIO()
 
     # Create a ZipFile object
-    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
         # Add excel files to the zip archive
         i = 0
         for spectacle in spectacles:  # Replace with your logic to get excel files
             excel_data = excel_spectacle(spectacle, season, voeux_attrib_list[i], voeux_nan_attrib_list[i]).getvalue()
-            zipf.writestr(f'{spectacle.nom}.xlsx', excel_data)
-            i+=1
+            zipf.writestr(f"{spectacle.nom}.xlsx", excel_data)
+            i += 1
 
     # Move the zip file's pointer to the beginning
     zip_buffer.seek(0)
 
-    return(zip_buffer)
+    return zip_buffer
 
 
 def exporter_excel_prix(saison, pceens, spectacles, voeux):
@@ -423,13 +423,15 @@ def exporter_excel_prix(saison, pceens, spectacles, voeux):
         sheet.cell(row=7 + i, column=6).number_format = "#,##0.00 €_-"
         tot += apayer
 
-
     tab = openpyxl.worksheet.table.Table(displayName="Données", ref=f"A6:G{7 + i}")
 
     style = openpyxl.worksheet.table.TableStyleInfo(
-        name="TableStyleLight1", showFirstColumn=False, showLastColumn=False,
-        showRowStripes=True, showColumnStripes=False
-        )
+        name="TableStyleLight1",
+        showFirstColumn=False,
+        showLastColumn=False,
+        showRowStripes=True,
+        showColumnStripes=False,
+    )
     tab.tableStyleInfo = style
     sheet.add_table(tab)
 
@@ -442,7 +444,6 @@ def exporter_excel_prix(saison, pceens, spectacles, voeux):
     sheet.cell(row=7 + i + 2, column=6).value = tot
     sheet.cell(row=7 + i + 2, column=6).font = openpyxl.styles.Font(bold=True)
     sheet.cell(row=7 + i + 2, column=6).number_format = "#,##0.00 €_-"
-
 
     sheet.column_dimensions["A"].width = 20
     sheet.column_dimensions["B"].width = 20
@@ -457,6 +458,7 @@ def exporter_excel_prix(saison, pceens, spectacles, voeux):
     workbook.save(excel_data)
 
     return excel_data
+
 
 def pceen_sum_places_demandees(pceen, voeux) -> int:
     """Gives the number of wanted places for a pceen for the given saison of Club Q"""
@@ -474,6 +476,21 @@ def pceen_prix_total(pceen, voeux) -> int:
     """Gives the the total price for a pceen for the given saison of Club Q"""
     voeux = voeux.filter_by(_pceen_id=pceen.id).all()
     return sum(voeu.places_attribuees * voeu.spectacle.unit_price for voeu in voeux)
+
+
+def sum_object(subject, query) -> int:
+    """Return the sum of object in the query corresponding to the subject"""
+    if type(subject) == PCeen:
+        query = query.filter_by(_pceen_id=subject.id).all()
+    elif type(subject) == ClubQSpectacle:
+        query = query.filter_by(_spectacle_id=subject.id).all()
+    elif type(subject) == ClubQSalle:
+        query = query.filter_by(_salle_id=subject.id).all()
+    
+    elif type(subject) == ClubQSeason:
+        query = query.filter_by(_season_id=subject.id).all()
+
+    return len(query)
 
 
 def spectacles_sum_places_attribuees(spectacles) -> int:
@@ -494,12 +511,15 @@ def spectacles_sum_places(spectacles) -> int:
 def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect):
 
     if spectacle != None:
-    # Add spectacle select choice for adding voeu
+        # Add spectacle select choice for adding voeu
         setattr(
             forms.AddVoeu,
             "spectacle_add",
             wtforms.SelectField(
-                "Spectacle", choices=[[spect.id, spect.nom] for spect in spectacles], default=spectacle.id, validators=[DataRequired()]
+                _("Spectacle"),
+                choices=[[spect.id, spect.nom] for spect in spectacles],
+                default=spectacle.id,
+                validators=[DataRequired()],
             ),
         )
     else:
@@ -508,7 +528,7 @@ def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect):
             forms.AddVoeu,
             "spectacle_add",
             wtforms.SelectField(
-                "Spectacle", choices=[[spect.id, spect.nom] for spect in spectacles], validators=[DataRequired()]
+                _("Spectacle"), choices=[[spect.id, spect.nom] for spect in spectacles], validators=[DataRequired()]
             ),
         )
 
@@ -517,7 +537,7 @@ def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect):
         forms.AddVoeu,
         "pceen_add",
         wtforms.SelectField(
-            "Pcéen",
+            _("Pcéen"),
             choices=[[pceen_.id, pceen_.full_name] for pceen_ in pceens],
             default=pceen.id,
             validators=[DataRequired()],
@@ -568,7 +588,7 @@ def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect):
             db.session.commit()
             flask.flash(_("Voeu édité."))
             return flask.redirect(redirect)
-        
+
 
 def spectacle_form(salles, salle, season_id, redirect):
 
@@ -576,13 +596,20 @@ def spectacle_form(salles, salle, season_id, redirect):
         setattr(
             forms.EditSpectacle,
             "salle_id",
-            wtforms.SelectField("Salle", choices=[[salle.id, salle.nom] for salle in salles], default=salle.id, validators=[DataRequired()]),
+            wtforms.SelectField(
+                _("Salle"),
+                choices=[[salle.id, salle.nom] for salle in salles],
+                default=salle.id,
+                validators=[DataRequired()],
+            ),
         )
     else:
         setattr(
             forms.EditSpectacle,
             "salle_id",
-            wtforms.SelectField("Salle", choices=[[salle.id, salle.nom] for salle in salles], validators=[DataRequired()]),
+            wtforms.SelectField(
+                _("Salle"), choices=[[salle.id, salle.nom] for salle in salles], validators=[DataRequired()]
+            ),
         )
 
     form_spectacle = forms.EditSpectacle()

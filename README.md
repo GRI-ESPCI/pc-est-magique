@@ -18,6 +18,10 @@ Application Flask tournant sur https://pc-est-magique.fr.
 Seules les fonctionnalités majeures sont listées ici ; voir
 [`CHANGELOG.md`](CHANGELOG.md) pour les détails.
 
+### 2.6
+
+- Refonte de la page Club Q pour une meilleure expérience utilisateur et l'implémentation d'outils d'administration
+
 ### 2.5
 
 - Ajout de la page de voeux "Club Q" pour la réservation des spectacles du club culture de l'ESPCI.

@@ -1,6 +1,7 @@
 import logging
 import os
 import random
+import flask
 
 # Set up specific logging for the club q algorithm
 club_q_algo_logger = logging.Logger("club_q_algo")
@@ -8,6 +9,8 @@ _club_q_algo_handler = logging.FileHandler("logs/club_q/algorithm.log")
 _club_q_algo_formatter = logging.Formatter("")
 _club_q_algo_handler.setFormatter(_club_q_algo_formatter)
 club_q_algo_logger.addHandler(_club_q_algo_handler)
+
+app = flask.Flask(__name__)
 
 
 def attribution(voeux, pceens, promo_1A, bonus, corruption):
@@ -62,7 +65,7 @@ def attribution(voeux, pceens, promo_1A, bonus, corruption):
         voeux.sort(key=lambda x: (x.priorite, -x.pceen.discontent))
         i = 0
         for voeu in voeux:
-            if random.random() > 0.99:
+            if corruption and random.random() > 0.99:
                 i = random.randint(0, len(efioohze) - 1)
                 print(i)
                 club_q_algo_logger.info(efioohze[i])
@@ -136,7 +139,7 @@ def attribution(voeux, pceens, promo_1A, bonus, corruption):
 
     # Sum up for logs
     club_q_algo_logger.info("\n")
-    sum_up(voeux, pceens)
+    sum_up(voeux, pceens, corruption)
 
     return (voeux, pceens)
 
@@ -185,7 +188,7 @@ def places_minimum_handle(nb):
     return nb
 
 
-def sum_up(voeux, pceens):
+def sum_up(voeux, pceens, corruption):
     club_q_algo_logger.info("-" * 35)
     club_q_algo_logger.info("-----*** Résumé Spectacles ***-----")
     club_q_algo_logger.info("-" * 35)
@@ -201,7 +204,7 @@ def sum_up(voeux, pceens):
     club_q_algo_logger.info("-----*** Résumé Pcéens ***-----")
     club_q_algo_logger.info("-" * 31)
     for pceen in pceens:
-        if random.random() > 0.90:
+        if corruption and random.random() > 0.90:
             i = random.randint(0, len(izadooa) - 1)
             print(i)
             club_q_algo_logger.info(izadooa[i])

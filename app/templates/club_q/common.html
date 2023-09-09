@@ -47,7 +47,7 @@
           href="{{ url_for('club_q.main') }}"
           class="btn {{ 'btn-primary' if view == 'reservations' else 'btn-outline-primary' }}"
         >
-          {{ _("Commander") }}
+          {{ _("Réservations") }}
         </a>
         <a
           role="button"
@@ -87,6 +87,7 @@
         >
           {{ _("Voeux") }}
         </a>
+        {% endif %}
         <a
           role="button"
           href="{{ url_for('club_q.saisons') }}"
@@ -94,6 +95,7 @@
         >
           {{ _("Saisons") }}
         </a>
+        {% if has_permission(PermissionType.all, PermissionScope.club_q) %}
         <a
           role="button"
           href="{{ url_for('club_q.attribution_manager') }}"

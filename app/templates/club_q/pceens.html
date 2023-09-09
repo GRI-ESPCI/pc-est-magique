@@ -68,6 +68,24 @@
           </th>
           <th
             scope="col"
+            onclick="sort('nbvoeux');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Nombre de voeux") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-nbvoeux"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
             onclick="sort('asked');"
           >
             <span class="d-flex user-select-none">
@@ -163,14 +181,16 @@
           data-id="{{ str(pceens[i].id).rjust(5, '0') }}"
           data-name="{{ pceens[i].full_name }}"
           data-promo="{{ pceens[i].promo or 0 }}"
+          data-nbvoeux="{{ str(nb_voeux[i]).rjust(5, '0') }}"
           data-asked="{{ str(sum_places_demandees[i]).rjust(5, '0') }}"
           data-given="{{ str(sum_places_attribuees[i]).rjust(5, '0') }}"
           data-cost="{{ pceens_a_payer[i] }}"
-          data-discontent="{{ pceens[i].discontent or 0}}"
+          data-discontent="{{ pceens[i].discontent or 0}}" 
         >
           <td onclick="window.location='{{ url_for('club_q.pceen_id', id=pceens[i].id) }}';">{{ pceens[i].id }}</td>
           <td onclick="window.location='{{ url_for('club_q.pceen_id', id=pceens[i].id) }}';"><p class="overflow no_extra">{{ pceens[i].full_name }}</p></td>
           <td>{{ pceens[i].promo }}</td>
+          <td>{{ nb_voeux[i] }}</td>
           <td>{{ sum_places_demandees[i] }}</td>
           <td>{{ sum_places_attribuees[i] }}</td>
           <td>{{ pceens[i].discontent }}</td>
@@ -204,8 +224,9 @@
       <tbody>
       <tr>
           <td><b>{{ _("Total") }}</b></td>
+          <td><b>{{ _("Nb de PCéens : ") }}{{nb_pceens}}</b></td>
           <td><b>{{ _("-") }}</b></td>
-          <td><b>{{ _("-") }}</b></td>
+          <td><b>{{total_nb_voeux}}</b></td>
           <td><b>{{ showed_season.sum_places_demandees }}</b></td>
           <td><b>{{ showed_season.sum_places_attribuees }}</b></td>
           <td><b>{{ _("-") }}</b></td>

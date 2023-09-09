@@ -28,8 +28,13 @@
 </div>
 
 <br />
-<br />
 {% if visibility == 1 %}
+<h1>{{saison.nom}}</h1>
+<em>{{ _("Du ")}} {{ saison.debut }} {{ _(" au ")}} {{ saison.fin }}</em>
+
+<br />
+<br />
+<br />
 <form
   action=""
   method="post"
@@ -46,7 +51,7 @@
     </div>
     <div class="col-10">
       <h3><b>{{ spect.nom }}</b></h3>
-      <h5>{{moment(spect.date).format('LLLL')}} - {{ babel.format_currency(spect.unit_price, "EUR") }}</h5>
+      <h5>{{spect.date}} - {{ babel.format_currency(spect.unit_price, "EUR") }}</h5>
       <h7>
         <p>{{ spect.categorie }}</p>
       </h7>

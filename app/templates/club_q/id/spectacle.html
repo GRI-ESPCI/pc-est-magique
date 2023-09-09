@@ -35,7 +35,7 @@
   <li>{{ _("Saison : ")}} {{ spectacle.season.nom}}</li>
   <li>{{ _("Salle : ")}} {{ spectacle.salle.nom}}</li>
   <li>{{ _("Catégorie : ")}} {{ spectacle.categorie}}</li>
-  <li>{{ _("Date : ")}} {{ spectacle.date}}</li>
+  <li>{{ _("Date : ")}} {{ spectacle.date }}</li>
   <li>
     {{ _("Prix : ")}} {{ babel.format_currency(spectacle.unit_price, "EUR") }}
   </li>
@@ -279,7 +279,7 @@
       <tbody>
         <tr>
           <td><b>{{ _("Total") }}</b></td>
-          <td><b>{{ _("-") }}</b></td>
+          <td><b>{{ _("Nb pcéens : ") }}{{nb_total_voeux}}</b></td>
           <td><b>{{ _("-") }}</b></td>
           <td><b>{{ spectacle.sum_places_demandees }}</b></td>
           <td><b>{{ _("-") }}</b></td>
