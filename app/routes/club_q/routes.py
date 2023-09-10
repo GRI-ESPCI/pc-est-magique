@@ -51,7 +51,6 @@ from app.email import send_email
 @bp.route("", methods=["GET", "POST"])
 @bp.route("/", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
-# @context.permission_condition(lambda: bool(GlobalSetting.query.filter_by(key='ACCESS_CLUB_Q').one().value))
 def main() -> typing.RouteReturn:
     """PC est magique Club Q page."""
 
@@ -120,12 +119,12 @@ def main() -> typing.RouteReturn:
         for spect in spectacles:
             if form[f"priorite_{spect.id}"].data != None:
                 if form[f"nb_places_{spect.id}"].data == None:
-                    flask.flash(_("Un voeu a été défini avec une priorité mais sans un nombre de places."))
+                    flask.flash(_("Un voeu a été défini avec une priorité mais sans un nombre de places."), "danger")
                     flag = True  # RAISE THE FLAG!
                     break
             if form[f"nb_places_{spect.id}"].data != None:
                 if form[f"priorite_{spect.id}"].data == None:
-                    flask.flash(_("Un voeu a été défini avec un nombre de places mais sans priorité."))
+                    flask.flash(_("Un voeu a été défini avec un nombre de places mais sans priorité."), "danger")
                     flag = True  # RAISE THE FLAG!
                     break
 
@@ -136,7 +135,7 @@ def main() -> typing.RouteReturn:
                     flask.flash(
                         _(
                             "Un voeu a été défini avec un nombre de places minimum supérieur au nombre de places demandées."
-                        )
+                       ), "danger"
                     )
                     flag = True  # RAISE THE FLAG!
                     break
@@ -147,14 +146,14 @@ def main() -> typing.RouteReturn:
             priority = form[f"priorite_{spect.id}"].data
             if priority:
                 if priority in priority_list:
-                    flask.flash(_("Deux voeux ne peuvent avoir la même priorité."))
+                    flask.flash(_("Deux voeux ne peuvent avoir la même priorité."), "danger")
                     flag = True  # RAISE THE FLAG!
                     break
                 priority_list.append(form[f"priorite_{spect.id}"].data)
 
         # Cheking if priority increase one by one from one.
         if sum(priority_list) != len(priority_list) * (len(priority_list) + 1) / 2:
-            flask.flash(_("Les priorités doivent être croissantes de 1 en 1 en partant de 1."))
+            flask.flash(_("Les priorités doivent être croissantes de 1 en 1 en partant de 1."), "danger")
             flag = True  # RAISE THE FLAG!
 
         if not flag:  # If the form is correctly definied, save the results
