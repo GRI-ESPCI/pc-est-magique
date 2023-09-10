@@ -391,18 +391,5 @@ class PCeen(flask_login.UserMixin, Model):
             return
         return cls.query.get(id)
 
-    @property
-    def demand_made(self) -> int:
-        """Return if the pceen has made a demand for the given club Q season"""
-
-        if (
-            self.clubq_voeux.filter_by(
-                _season_id=models.GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value
-            )
-            != None
-        ):
-            return True
-        return False
-
 
 from app import models
