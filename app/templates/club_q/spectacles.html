@@ -8,7 +8,6 @@
   defer
 ></script>
 {% endblock %} {% block app_content %} {% include 'club_q/common.html' %}
-
 <div class="container mb-3">
   <div class="btn-toolbar justify-content-between">
     <h4>{{ _("Spectacles : ")}}</h4>
@@ -284,7 +283,7 @@
             <p class="overflow no_extra">{{ spectacles[i].salle.nom }}</p>
           </td>
           <td>{{ spectacles[i].categorie }}</td>
-          <td>{{ spectacles[i].date }}</td>
+          <td>{{ spectacles[i].date}}</td>
           <td>{{ babel.format_currency(spectacles[i].unit_price, "EUR") }}</td>
           {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
           <td>{{ spect_nb_voeux[i] }}</td>

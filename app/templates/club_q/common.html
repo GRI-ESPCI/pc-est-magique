@@ -1,34 +1,8 @@
-<style>
-  .overflow {
-    width: 200px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-
-  td:hover .overflow {
-    overflow: visible;
-    white-space: normal;
-  }
-  .no_extra {
-    margin: 0;
-    padding: 0;
-  }
-  .log-box {
-    max-height: 400px; /* Limite la hauteur à 300 pixels */
-    overflow-y: auto; /* Ajoute une barre de défilement verticale si le contenu dépasse la hauteur maximale */
-    border: 1px solid #000000;
-    padding: 10px;
-  }
-  .centered {
-    text-align: center; /* Center the content horizontally within the th element */
-  }
-
-  .centered-content {
-    display: grid;
-    place-items: center; /* Center the content both horizontally and vertically */
-  }
-</style>
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{{ url_for('static', filename='css/club_q.css') }}"
+/>
 
 <!-- Global Club Q navbar -->
 <div class="container mb-3">

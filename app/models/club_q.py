@@ -56,8 +56,8 @@ class ClubQSalle(db.Model):
     description: Column[str | None] = column(sa.String(500), nullable=True)
     url: Column[str | None] = column(sa.String(64), nullable=True)
     adresse: Column[str | None] = column(sa.String(64), nullable=True)
-    latitude: Column[float | 0] = column(sa.Float(), nullable=True)
-    longitude: Column[float | 0] = column(sa.Float(), nullable=True)
+    latitude: Column[float] = column(sa.Float(), default=0, nullable=False)
+    longitude: Column[float] = column(sa.Float(), default=0, nullable=False)
     spectacles: Relationship[list[ClubQSpectacle]] = one_to_many("ClubQSpectacle.salle", order_by="ClubQSpectacle.date")
 
 

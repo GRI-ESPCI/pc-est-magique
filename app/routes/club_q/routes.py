@@ -5,6 +5,8 @@ import os
 from flask_babel import _
 from sqlalchemy import desc
 
+
+
 from app import context, db
 from app.models import (
     ClubQSeason,
@@ -75,7 +77,7 @@ def main() -> typing.RouteReturn:
             _pceen_id=context.g.pceen.id,
             _season_id=spect._season_id,
         ).first()
-        spect.date = spect.date.strftime("%d %B %Y, %H:%M:%S")
+        #spect.date = spect.date.strftime("%d %B %Y, %H:%M:%S")
 
         setattr(
             forms.ClubQForm,
