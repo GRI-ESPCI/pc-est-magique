@@ -35,22 +35,18 @@ except ImportError:
     )
     sys.exit(1)
 
+
+
 @loggers.log_exception(reraise=True)
 def main():
-    with open("new_promo.csv", 'r', newline='') as file:
-        reader = csv.reader(file, delimiter=',')
+    with open("new_promo.csv", "r", newline="") as file:
+        reader = csv.reader(file, delimiter=",")
         for row in reader:
-            user = PCeen(
-                username=new_username(row[2], row[1]),
-                nom=row[1],
-                prenom=row[2],
-                promo=142,
-                email=row[3]
-            )
+            user = PCeen(username=new_username(row[2], row[1]), nom=row[1], prenom=row[2], promo=142, email=row[3])
 
             # Generate random password
             letters = string.ascii_lowercase
-            user.set_password(''.join(random.choice(letters) for i in range(32)))
+            user.set_password("".join(random.choice(letters) for i in range(32)))
 
             grant_rezident_role(user)
             db.session.add(user)
@@ -60,5 +56,3 @@ def main():
             )
             email.send_account_registered_email(user)
     print("Done.")
-
-

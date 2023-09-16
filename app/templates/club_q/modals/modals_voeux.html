@@ -1,0 +1,144 @@
+<!-- Voeu add modal -->
+<div
+  class="modal fade"
+  id="mo-voeu-add"
+  tabindex="-1"
+  aria-labelledby="mo-voeu-add"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5
+          class="modal-title"
+          id="mo-voeu-add"
+        >
+          {{_('Ajouter un voeu')}}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Fermer') }}"
+        ></button>
+      </div>
+      <form
+        action=""
+        method="post"
+        role="form"
+      >
+        {{ form_add_voeu.hidden_tag() }}
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form_add_voeu.spectacle_add) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form_add_voeu.pceen_add) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form_add_voeu.priorite_add) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form_add_voeu.places_demandees_add) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form_add_voeu.places_minimum_add, value=0) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form_add_voeu.places_attribuees_add, value=0) }}</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              {{ _("Annuler") }}
+            </button>
+            {{ form_add_voeu.submit_add(class="btn btn-primary") }}
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Voeu edit modal -->
+<div
+  class="modal fade"
+  id="mo-voeu-edit"
+  tabindex="-1"
+  aria-labelledby="mo-voeu-edit"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5
+          class="modal-title"
+          id="mo-voeu-edit"
+        >
+          {{ _("Editer voeu") }} {{"{voeu_id}"}} - {{"{voeu_spectacle_nom}"}} - {{"{voeu_pceen_nom}"}}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Fermer') }}"
+        ></button>
+      </div>
+      <form
+        action=""
+        method="post"
+        role="form"
+      >
+        {{ form_edit_voeu.hidden_tag() }}
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form_edit_voeu.priorite_edit) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form_edit_voeu.places_demandees_edit) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form_edit_voeu.places_minimum_edit) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form_edit_voeu.places_attribuees_edit) }}</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              {{ _("Annuler") }}
+            </button>
+            {{ form_edit_voeu.delete_edit(class="btn btn-danger") }} {{ form_edit_voeu.submit_edit(class="btn
+            btn-primary") }}
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

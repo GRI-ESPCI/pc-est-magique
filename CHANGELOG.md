@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# v2.6.0 (2023-09-08)
+
+### Added
+
+- Managing tools for Club Q page (Attribution algorithm, e-mails sender, modules settings)
+- Summary tables for better Club Q administration overview
+- Interacting with the Club Q database through website
+
+### Changed
+
+- Club Q Booking page now takes in account was wishes were made before
+
 
 # v2.5.0 (2023-04-17)
 

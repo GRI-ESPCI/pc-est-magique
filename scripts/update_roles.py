@@ -35,6 +35,7 @@ def permissions() -> dict[str, dict[str, typing.Any]]:
         "access_bar": dict(type=PermissionType.read, scope=PermissionScope.bar, ref_id=None),
         "access_bar_stats": dict(type=PermissionType.read, scope=PermissionScope.bar_stats, ref_id=None),
         "access_club_q": dict(type=PermissionType.read, scope=PermissionScope.club_q, ref_id=None),
+        "manage_club_q": dict(type=PermissionType.all, scope=PermissionScope.club_q, ref_id=None),
         "manage_photos": dict(type=PermissionType.all, scope=PermissionScope.photos, ref_id=None),
         "manage_intrarez": dict(type=PermissionType.all, scope=PermissionScope.intrarez, ref_id=None),
         "manage_pceens": dict(type=PermissionType.all, scope=PermissionScope.pceen, ref_id=None),
@@ -61,8 +62,8 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["manage_roles"],
                 perms["manage_collections"],
                 perms["manage_bar"],
+                perms["manage_club_q"],
                 perms["access_bar_stats"],
-                perms["access_club_q"],
             ],
         ),
         "Rezident": dict(  # NE PAS RENOMMER - nom utilisé dans app/utils/roles.py
@@ -108,6 +109,13 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
             color="000000",
             permissions=[
                 perms["access_bar_stats"],
+            ],
+        ),
+        "Club Q": dict(
+            index=18,
+            color="8f3985",
+            permissions=[
+                perms["manage_club_q"],
             ],
         ),
     }

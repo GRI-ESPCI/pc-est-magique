@@ -1,5 +1,5 @@
-{% extends "base.html" %} {% block app_content %} {% import "_form.html" as wtf
-%}
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block app_content %} {% include 'club_q/common.html' %}
+
 <div class="row mb-3">
   <div class="col">
     <h1>{{ title }}</h1>
@@ -10,29 +10,37 @@
   <p>
     {{ _("Bienvenue sur la page de commande du Club Q-ulture.
     <br />
-    Le Club Q est un club de l'ESPCI cherchant à proposer des spectacles de la
-    vie culturelle parisienne à ses membres. De la danse aux concerts, en
-    passant par l'opéra, le Club Q propose ces spectacles à prix réduit grâce
-    aux tarifs de groupes et étudiants, et en profitant de plus de subventions
-    du Crous, des Alumnis et du BDE.
+    Le Club Q est un club de l'ESPCI cherchant à proposer des spectacles de la vie culturelle parisienne à ses membres.
+    De la danse aux concerts, en passant par l'opéra, le Club Q propose ces spectacles à prix réduit grâce aux tarifs de
+    groupes et étudiants, et en profitant de plus de subventions du Crous, des Alumnis et du BDE.
     <br />
-    Les places sont prioritairement attribués aux étudiants actuels de l'école,
-    et seulement ensuite à d'autres membres de l'école.
+    Les places sont prioritairement attribués aux étudiants actuels de l'école, et seulement ensuite à d'autres membres
+    de l'école.
     <br />
-    Pour passer commande, classez vos voeux pour les spectacles par ordre de
-    préférence (en commençant par 1, ne mettez pas deux spectacles à la même
-    priorité). Vous pouvez demander plusieurs places, mais en cas de demande
-    importante sur un spectacle, vos chances de l'avoir seront diminuées.
+    Pour passer commande, classez vos voeux pour les spectacles par ordre de préférence (en commençant par 1, ne mettez
+    pas deux spectacles à la même priorité). Vous pouvez demander plusieurs places, mais en cas de demande importante
+    sur un spectacle, vos chances de l'avoir seront diminuées.
     <br />
-    En cas de problème technique ou de doute, vous pouvez contacter Samuel
-    Ciztrom 140 ou Alec Cochard 140. Le Club Q 140 vous souhaite une bonne
-    saison artistique !") }}
+    En cas de problème technique ou de doute, vous pouvez contacter les responsables du Club Q ou les GRIs.
+    <br />
+    Le Club Q") }} {{saison.promo_orga}} {{ _(" vous souhaite une bonne saison artistique !") }}
   </p>
 </div>
 
-<form action="" method="post" role="form">
-  {{ form.hidden_tag() }} {% for spect in spectacles %} {% if spect._season_id
-  == 0 %}
+<br />
+{% if visibility == 1 %}
+<h1>{{saison.nom}}</h1>
+<em>{{ _("Du ")}} {{ saison.debut }} {{ _(" au ")}} {{ saison.fin }}</em>
+
+<br />
+<br />
+<br />
+<form
+  action=""
+  method="post"
+  role="form"
+>
+  {{ form.hidden_tag() }} {% for spect in spectacles %} {% if spect._season_id == season_id %}
   <div class="row">
     <div class="col-2 d-flex align-items-center justify-content-center">
       <img
@@ -43,10 +51,7 @@
     </div>
     <div class="col-10">
       <h3><b>{{ spect.nom }}</b></h3>
-      <h5>
-        {{moment(spect.date).format('LLLL')}} - {{
-        babel.format_currency(spect.unit_price, "EUR") }}
-      </h5>
+      <h5>{{spect.date}} - {{ babel.format_currency(spect.unit_price, "EUR") }}</h5>
       <h7>
         <p>{{ spect.categorie }}</p>
       </h7>
@@ -67,7 +72,7 @@
           </p>
         </div>
 
-        <div class="form_floating form_control col-sm-4">
+        <div class="col-sm-4">
           <p>
             <b>{{ _("Places minimum") }}</b>
             {{ getattr(form, "nb_places_minimum_" + str(spect.id))() }}
@@ -77,13 +82,19 @@
     </div>
   </div>
   <hr align="CENTER" />
+
   {% endif %} {% endfor %}
   <div class="row mt-3">
     <div class="col text-center">
-      <button type="submit" class="btn btn-lg btn-primary">
+      <button
+        type="submit"
+        class="btn btn-lg btn-primary"
+      >
         {{ _("Mise à jour") }}
       </button>
     </div>
   </div>
 </form>
-{% endblock %}
+{% else %}
+<h4>{{_("Les réservations ne sont pas ouvertes en ce moment.")}}</h4>
+{% endif %} {% endblock %}

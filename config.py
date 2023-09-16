@@ -48,6 +48,7 @@ class Config:
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
     MAIL_SUPPRESS_SEND = os.environ.get("MAIL_SUPPRESS_SEND")
     ADMINS = os.environ.get("ADMINS", "").split(";")
+    CLUB_Q = os.environ.get("CLUB_Q")
 
     MAX_CONTENT_LENGTH = int(os.environ.get("MAX_CONTENT_LENGTH", 25000000))
 

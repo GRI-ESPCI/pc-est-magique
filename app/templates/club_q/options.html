@@ -1,0 +1,24 @@
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block app_content %} {% include 'club_q/common.html' %}
+
+<form
+  action=""
+  method="post"
+  role="form"
+>
+  {{ form_setting.hidden_tag() }}
+  <h5>{{ _("Page de voeux : ")}}</h5>
+  <div class="row mb-3">
+    <div class="col">
+      <div class="form-check form-switch">{{ wtf.form_field(form_setting.visibility) }}</div>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col">
+      <div class="form-floating">{{ wtf.form_field(form_setting.saison) }}</div>
+    </div>
+  </div>
+
+  {{ form_setting.submit(render_kw={"class": "btn btn-primary"}) }}
+</form>
+
+{% endblock %}

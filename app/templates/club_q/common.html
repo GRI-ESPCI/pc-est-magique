@@ -1,0 +1,151 @@
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{{ url_for('static', filename='css/club_q.css') }}"
+/>
+
+<!-- Global Club Q navbar -->
+<div class="container mb-3">
+  <div
+    class="btn-toolbar justify-content-between"
+    role="toolbar"
+  >
+    <div class="d-flex align-items-center">
+      <div
+        class="btn-group"
+        role="group"
+        name="clubq_navbar"
+      >
+        <a
+          role="button"
+          href="{{ url_for('club_q.main') }}"
+          class="btn {{ 'btn-primary' if view == 'reservations' else 'btn-outline-primary' }}"
+        >
+          {{ _("Réservations") }}
+        </a>
+        <a
+          role="button"
+          href="{{ url_for('club_q.pceen_id', id=user.id) }}"
+          class="btn {{ 'btn-primary' if view == 'pceen_reservations' else 'btn-outline-primary' }}"
+        >
+          {{ _("Mes réservations") }}
+        </a>
+        {% if has_permission(PermissionType.all, PermissionScope.club_q) %}
+        <a
+          role="button"
+          href="{{ url_for('club_q.pceens') }}"
+          class="btn {{ 'btn-primary' if view in ['pceens', 'pceen_view'] else 'btn-outline-primary' }}"
+        >
+          {{ _("PCéens") }}
+        </a>
+        {% endif %}
+        <a
+          role="button"
+          href="{{ url_for('club_q.spectacles') }}"
+          class="btn {{ 'btn-primary' if view == 'spectacles' else 'btn-outline-primary' }}"
+        >
+          {{ _("Spectacles") }}
+        </a>
+        <a
+          role="button"
+          href="{{ url_for('club_q.salles') }}"
+          class="btn {{ 'btn-primary' if view in ['salles', 'salle'] else 'btn-outline-primary' }}"
+        >
+          {{ _("Salles") }}
+        </a>
+        {% if has_permission(PermissionType.all, PermissionScope.club_q) %}
+        <a
+          role="button"
+          href="{{ url_for('club_q.voeux') }}"
+          class="btn {{ 'btn-primary' if view == 'voeux' else 'btn-outline-primary' }}"
+        >
+          {{ _("Voeux") }}
+        </a>
+        {% endif %}
+        <a
+          role="button"
+          href="{{ url_for('club_q.saisons') }}"
+          class="btn {{ 'btn-primary' if view == 'saisons' else 'btn-outline-primary' }}"
+        >
+          {{ _("Saisons") }}
+        </a>
+        {% if has_permission(PermissionType.all, PermissionScope.club_q) %}
+        <a
+          role="button"
+          href="{{ url_for('club_q.attribution_manager') }}"
+          class="btn {{ 'btn-primary' if view == 'attribution' else 'btn-outline-primary' }}"
+        >
+          {{ _("Attribution") }}
+        </a>
+        <a
+          role="button"
+          href="{{ url_for('club_q.mails') }}"
+          class="btn {{ 'btn-primary' if view == 'mails' else 'btn-outline-primary' }}"
+        >
+          {{ _("Mails") }}
+        </a>
+        <a
+          role="button"
+          href="{{ url_for('club_q.options') }}"
+          class="btn {{ 'btn-primary' if view == 'options' else 'btn-outline-primary' }}"
+        >
+          {{ _("Options") }}
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% if view in ['pceens', 'salle', 'pceen_view', 'spectacles', 'voeux', 'salles', 'pceen_reservations'] %}
+<!-- Season navbar -->
+<div class="container mb-3">
+  <div
+    class="btn-toolbar justify-content-between"
+    role="toolbar"
+  >
+    <div class="d-flex align-items-center">
+      <div
+        class="btn-group"
+        role="group"
+        name="saison_navbar"
+      >
+        {% if view in ['pceen_reservations', 'pceen_view'] %} {% for saison in saisons %}
+        <a
+          role="button"
+          href="{{ url_for('club_q.pceen_id', id=pceen.id, season_id = saison.id)}}"
+          class="btn {{ 'btn-primary' if season_id == saison.id else 'btn-outline-primary' }}"
+          >{{saison.nom}}</a
+        >
+        {% endfor %} {% elif view == 'salle' %} {% for saison in saisons %}
+        <a
+          role="button"
+          href="{{ url_for('club_q.salle_id', id=salle.id, season_id = saison.id)}}"
+          class="btn {{ 'btn-primary' if season_id == saison.id else 'btn-outline-primary' }}"
+          >{{saison.nom}}</a
+        >
+        {% endfor %} {% else %} {% if view == 'salles' %}
+        <a
+          role="button"
+          href="{{ url_for(redirect, season_id = None)}}"
+          class="btn {{ 'btn-primary' if season_id == -1 else 'btn-outline-primary' }}"
+          >Toutes</a
+        >
+        {% endif %} {% for saison in saisons %}
+        <a
+          role="button"
+          href="{{ url_for(redirect, season_id = saison.id)}}"
+          class="btn {{ 'btn-primary' if season_id == saison.id else 'btn-outline-primary' }}"
+          >{{saison.nom}}</a
+        >
+        {% endfor %} {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Icons templates -->
+<div hidden>
+  <div id="icon-template-down">{{ macros.bootstrap_icon("caret-down-fill") }}</div>
+  <div id="icon-template-up">{{ macros.bootstrap_icon("caret-up-fill") }}</div>
+</div>

@@ -1,0 +1,43 @@
+{% extends "base.html" %} {% import "_form.html" as wtf %}{% block app_content %} {% include 'club_q/common.html' %}
+
+<h4>{{ _("Algorithme d'attribution")}}</h4>
+<form
+  action=""
+  method="post"
+  role="form"
+>
+  {{ form_algo_setting.hidden_tag() }}
+  <div class="row">
+    <div class="col-sm-4">
+      <br />
+
+      <h5>{{ _("Bonus de mécontentement :")}}</h5>
+      <p>{{ form_algo_setting.promo(size=3) }} {{ _("Promotion actuelle en 1A") }}</p>
+      <p>{{ form_algo_setting.m1A(size=2) }} {{ _("Mécontentement 1A") }}</p>
+      <p>{{ form_algo_setting.m2A(size=2) }} {{ _("Mécontentement 2A") }}</p>
+      <p>{{ form_algo_setting.m3A(size=2) }} {{ _("Mécontentement 3A") }}</p>
+      <p>{{ form_algo_setting.m4A(size=2) }} {{ _("Mécontentement 4A") }}</p>
+
+      {{ wtf.form_field(form_algo_setting.submit) }}
+
+      <br />
+      <br />
+      <h5>{{ _("Options de l'algorithme")}}</h5>
+      <div class="form-check">{{ wtf.form_field(form_algo_setting.save_attribution) }}</div>
+      <p>
+        {{ _("Si coché, à la suite de l'exécution de l'algorithme, les résultats seront sauvegardés dans la base de
+        données") }}
+      </p>
+      <div class="form-check">{{ wtf.form_field(form_algo_setting.corruption) }}</div>
+    </div>
+
+    <div class="col-sm-8">
+      <body>
+        <pre class="log-box">{{ log_algo }}</pre>
+      </body>
+    </div>
+  </div>
+  <div class="container text-center">{{ form_algo_setting.launch_algorithm(class="btn btn-danger") }}</div>
+</form>
+
+{% endblock %}

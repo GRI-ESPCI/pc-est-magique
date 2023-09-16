@@ -28,6 +28,7 @@ class CustomValidator:
 
 
 Optional = wtforms.validators.Optional
+InputRequired = wtforms.validators.InputRequired
 
 
 class DataRequired(wtforms.validators.DataRequired):

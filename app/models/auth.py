@@ -65,8 +65,13 @@ class PCeen(flask_login.UserMixin, Model):
 
     # Bar info
     bar_nickname: Column[str | None] = column(sa.String(128), nullable=True)
-    bar_balance: Column[float | None] = column(sa.Numeric(6, 2, asdecimal=False), default=0.0, nullable=True)
+    bar_balance: Column[float | None] = column(
+        sa.Numeric(precision=6, scale=2, asdecimal=False), default=0.0, nullable=True
+    )
     bar_deposit: Column[bool | None] = column(sa.Boolean(), default=False, nullable=True)
+
+    # Club Q info
+    discontent: Column[float] = column(sa.Numeric(precision=2, asdecimal=False), nullable=True)
 
     photos: Relationship[list[models.Photo]] = one_to_many("Photo.author")
     roles: Relationship[list[models.Role]] = many_to_many(

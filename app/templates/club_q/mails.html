@@ -1,0 +1,31 @@
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block app_content %} {% include 'club_q/common.html' %}
+
+<h4>{{ _("Envoi des mails d'attribution : ")}}</h4>
+
+<form
+  action=""
+  method="post"
+  role="form"
+>
+  {{ form_mail.hidden_tag() }}
+  <div class="modal-body">
+    <div class="row mb-3">
+      <div class="col">
+        <div class="form-floating">{{ wtf.form_field(form_mail.reply_to) }}</div>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        <div class="form-floating">{{ wtf.form_field(form_mail.date) }}</div>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        <div class="form-floating">{{ wtf.form_field(form_mail.threshold) }}</div>
+      </div>
+    </div>
+    <div class="modal-footer">{{ form_mail.submit_mail(class="btn btn-primary") }}</div>
+  </div>
+</form>
+
+{% endblock %}
