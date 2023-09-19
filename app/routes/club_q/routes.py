@@ -632,7 +632,7 @@ def saisons() -> typing.RouteReturn:
 def attribution_manager() -> typing.RouteReturn:
     season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
 
-    subquery = ClubQVoeu.query.filter(ClubQVoeu._pceen_id == PCeen.id).exists()
+    subquery = ClubQVoeu.query.filter_by(_season_id=season_id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
 
     voeux = ClubQVoeu.query.filter_by(_season_id=season_id).all()
     pceens = PCeen.query.filter(subquery)
@@ -753,7 +753,7 @@ def mails() -> typing.RouteReturn:
             send_email(
                 "club_q/mails",
                 subject=f"[PC est magique - Club - Q] {subject}",
-                sender="club_q",
+                sender="CLUB_Q",
                 recipients={pceen.email: pceen.full_name},
                 html_body=html_body,
             )
