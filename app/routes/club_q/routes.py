@@ -632,6 +632,7 @@ def saisons() -> typing.RouteReturn:
 def attribution_manager() -> typing.RouteReturn:
     season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
 
+
     subquery = ClubQVoeu.query.filter_by(_season_id=season_id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
 
     voeux = ClubQVoeu.query.filter_by(_season_id=season_id).all()
