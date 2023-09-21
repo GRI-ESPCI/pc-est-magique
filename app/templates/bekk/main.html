@@ -1,0 +1,32 @@
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block app_content %}
+
+<div class="row mb-3">
+  <div class="col">
+    <h1>{{ title }}</h1>
+  </div>
+</div>
+
+{% include 'bekk/common.html' %}
+
+<div class="row">
+  <p>
+    {{ _("Bienvenue sur la page du Bekk de l'ESPCI.
+    <br />
+    Le Bekk est l'association journalistique de l'école, et produit plusieurs numéros par an, à des occasions et des
+    buts bien spécifiques (Bekk Bibi, Noël, Saint-Valentin, Pré-campagne, Post-campagne et pour finir le Bekk Alpha). Ce
+    club est le premier à être passationer à la toute nouvelle génération de 1A qui s'attaquent directement à la tâche.
+    ")}}
+  </p>
+</div>
+
+<div>
+  <h3>{{_("Le dernier Bekk : ")}} {{bekk.name}}</h3>
+
+  <iframe
+    src="{{ url_for('static', filename='pdfs/Club_Q.pdf') }}"
+    width="100%"
+    height="800px"
+  ></iframe>
+</div>
+
+{% endblock %}

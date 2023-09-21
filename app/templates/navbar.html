@@ -43,6 +43,14 @@
                     </a>
                 </li>
                 {% endif %}
+                {% if has_permission(PermissionType.read, PermissionScope.bekk) %}
+                <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2 my-1 position-relative"
+                       href="{{ url_for("bekk.main") }}">
+                        {{ _("Bekk") }}
+                    </a>
+                </li>
+                {% endif %}
                 {% if has_permission(PermissionType.read, PermissionScope.club_q) %}
                 <li class="nav-item">
                     <a class="btn btn-outline-secondary mx-2 my-1 position-relative"

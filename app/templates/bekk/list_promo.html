@@ -1,0 +1,9 @@
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block app_content %}
+
+<div class="row mb-3">
+  <div class="col">
+    <h1>{{ title }}</h1>
+  </div>
+</div>
+
+{% include 'bekk/common.html' %} {% for bekk in bekks %} {% endfor %}{% endblock %}
