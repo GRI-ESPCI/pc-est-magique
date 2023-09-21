@@ -17,10 +17,14 @@ $custom-colors: (
 );
 
 @import "../bower_components/bootstrap/scss/variables";
+$enable-dark-mode: false;
+
+
 
 // Add PC colors to theme colors (buttons, links...)
 $theme-colors: map-merge($theme-colors, $custom-colors);
 $utilities-bg-colors: $theme-colors;
+
 
 @import "../bower_components/bootstrap/scss/maps";
 @import "../bower_components/bootstrap/scss/mixins";
@@ -39,6 +43,7 @@ $utilities: map-merge(
       ),
   )
 );
+
 
 @import "../bower_components/bootstrap/scss/root";
 @import "../bower_components/bootstrap/scss/reboot";
