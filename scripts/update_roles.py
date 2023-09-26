@@ -124,7 +124,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
             ],
         ),
         "Bekk": dict(
-            index=18,
+            index=19,
             color="546211",
             permissions=[
                 perms["manage_bekk"],

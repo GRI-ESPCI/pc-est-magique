@@ -1,0 +1,119 @@
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block app_content %}
+
+<head>
+  <script
+    type="text/javascript"
+    src="https://code.jquery.com/jquery-3.7.1.min.js"
+  ></script>
+  <script
+    type="text/javascript"
+    src="{{ url_for('static', filename='js/turn.js') }}"
+  ></script>
+
+  <style type="text/css">
+    body {
+      background: #6b6868;
+    }
+    #magazine {
+      width: 992px;
+      height: 701.6px;
+    }
+    #magazine .turn-page {
+      background-color: #ccc;
+      background-size: 100% 100%;
+    }
+    #page-navigation {
+      text-align: center; /* Center-align the button container */
+      margin-top: 20px; /* Add some spacing between the magazine and buttons */
+    }
+    #page-navigation button {
+      margin: 5px; /* Add margin around each button */
+    }
+  </style>
+</head>
+<body text-align:center>
+  <div id="magazine">
+    {% for path in images_path %}
+    <div style="background-image:url('/static/img/test/{{path}}');"></div>
+    {% endfor %}
+  </div>
+
+  <div id="page-navigation">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      id="go-to-first"
+    >
+      <svg
+        class="bi flex-shrink-0"
+        width="24"
+        height="24"
+      >
+        {{ macros.bootstrap_icon("skip-start-fill ") }}
+      </svg>
+    </button>
+    <button
+      type="button"
+      class="btn btn-secondary"
+      id="previous-page"
+    >
+      <svg
+        class="bi flex-shrink-0"
+        width="24"
+        height="24"
+      >
+        {{ macros.bootstrap_icon("caret-left-fill") }}
+      </svg>
+    </button>
+    <button
+      class="btn btn-secondary"
+      type="button"
+      id="next-page"
+    >
+      <svg
+        class="bi flex-shrink-0"
+        width="24"
+        height="24"
+      >
+        {{ macros.bootstrap_icon("caret-right-fill") }}
+      </svg>
+    </button>
+    <button
+      class="btn btn-secondary"
+      type="button"
+      id="go-to-last"
+    >
+      <svg
+        class="bi flex-shrink-0"
+        width="24"
+        height="24"
+      >
+        {{ macros.bootstrap_icon("skip-end-fill ") }}
+      </svg>
+    </button>
+  </div>
+  <div id="page-navigation">
+    <a
+      role="button"
+      href="{{ url_for('bekk.main') }}"
+      class="btn btn-primary"
+    >
+      {{ _("Retour aux bekks ") }}
+    </a>
+
+    <a
+      role="button"
+      href="{{filepath}}/{{bekk.name}}-{{bekk.promo}}.pdf"
+      download="{{bekk.name}}-{{bekk.promo}}.pdf"
+      class="btn btn-primary"
+    >
+      {{ _("Télécharger (PDF)") }}
+    </a>
+  </div>
+
+  <script
+    type="text/javascript"
+    src="{{ url_for('static', filename='js/bekk/reader.js') }}"
+  ></script>
+</body>
+{% endblock %}
