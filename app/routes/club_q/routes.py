@@ -752,8 +752,8 @@ def mails() -> typing.RouteReturn:
 
             send_email(
                 "club_q/mails",
-                subject=f"[PC est magique - Club - Q] {subject}",
                 sender="CLUB_Q",
+                subject=f"[PC est magique - Club - Q] {subject}",
                 recipients={pceen.email: pceen.full_name},
                 html_body=html_body,
             )
