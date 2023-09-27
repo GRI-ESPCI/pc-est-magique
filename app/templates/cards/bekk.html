@@ -1,34 +1,51 @@
-{# Bekk card - used variable bekk (dabatase query)#} {% extends "cards/base.html" %} {% block card_title %} {{ bekk.name
-}} - {{bekk.date}} {% endblock %} {% block card_table %}
+{# Bekk card - used variable bekk (dabatase query)#} {% extends "cards/base.html" %} {% block card_head %}
 <a href="{{ url_for('bekk.reader', id = bekk.id) }}">
   <img
-    src="{{ filepath }}/{{bekk.promo}}/{{bekk.name}}/{{bekk.name}}_{{bekk.promo}}-001.png"
+    src="/bekks/{{bekk.promo}}/{{bekk.name}}/{{bekk.name}}_{{bekk.promo}}_0.png"
     class="card-img-top"
+    width="10%"
     alt="Image not found"
   />
 </a>
-{% endblock %} {% block card_footer %}
+{% endblock %} {% block card_body %}
+<div class="card-body">
+  {% if has_permission(PermissionType.write, PermissionScope.bekk) %}
+  <button
+    class="btn btn-outline-danger p-1 pt-0 float-end"
+    data-bs-target="#mo-bekk-edit"
+    data-bs-toggle="modal"
+    data-bekk-id="{{ bekk.id }}"
+    data-bekk-name="{{ bekk.name }}"
+    data-bekk-promo="{{ bekk.promo }}"
+    data-bekk-date="{{ bekk.date }}"
+  >
+    <svg
+      class="bi flex-shrink-0"
+      width="20"
+      height="20"
+    >
+      {{ macros.bootstrap_icon("pen") }}
+    </svg>
+  </button>
+  {% endif %}
+  <h4 class="card-title">{{ bekk.name }}</h4>
+  <p class="card-text">{{ bekk.date }}</p>
+</div>
+{% endblock %} {% block card_footer_class %}{{ super() }} px-auto{% endblock %} {% block card_footer %}
 <a
   href="{{ url_for('bekk.reader', id=bekk.id) }}"
   class="btn btn-outline-dark"
-  >{{ _("Lire le Bekk") }}</a
 >
-{% if has_permission(PermissionType.write, PermissionScope.bekk) %}
-<button
-  class="btn btn-outline-danger p-1 pt-0"
-  data-bs-target="#mo-bekk-edit"
-  data-bs-toggle="modal"
-  data-bekk-id="{{ bekk.id }}"
-  data-bekk-name="{{ bekk.name }}"
-  data-bekk-promo="{{ bekk.promo }}"
-  data-bekk-date="{{ bekk.date }}"
+  {{ _("Lire le Bekk") }}
+</a>
+
+<a
+  role="button"
+  href="/bekks/{{bekk.promo}}/{{bekk.name}}/{{bekk.name}}_{{bekk.promo}}.pdf"
+  download="{{bekk.name}}-{{bekk.promo}}.pdf"
+  class="btn btn-outline-dark"
 >
-  <svg
-    class="bi flex-shrink-0"
-    width="20"
-    height="20"
-  >
-    {{ macros.bootstrap_icon("pen") }}
-  </svg>
-</button>
-{% endif %} {% endblock %}
+  {{ _("Télécharger (PDF)") }}
+</a>
+
+{% endblock %}

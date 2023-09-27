@@ -33,8 +33,10 @@
 </head>
 <body text-align:center>
   <div id="magazine">
-    {% for path in images_path %}
-    <div style="background-image:url('/static/img/test/{{path}}');"></div>
+    {% for i in pages %}
+    <div
+      style="background-image:url('/bekks/{{bekk.promo}}/{{bekk.name}}/{{bekk.name}}_{{bekk.promo}}_{{i}}.png');"
+    ></div>
     {% endfor %}
   </div>
 
@@ -103,7 +105,7 @@
 
     <a
       role="button"
-      href="{{filepath}}/{{bekk.name}}-{{bekk.promo}}.pdf"
+      href="/bekks/{{bekk.promo}}/{{bekk.name}}/{{bekk.name}}_{{bekk.promo}}.pdf"
       download="{{bekk.name}}-{{bekk.promo}}.pdf"
       class="btn btn-primary"
     >

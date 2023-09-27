@@ -48,6 +48,7 @@ from app.routes.club_q.utils import (
 from app.routes.club_q.algorithm import attribution
 
 from app.email import send_email
+app = flask.Flask(__name__)
 
 
 @bp.route("", methods=["GET", "POST"])
@@ -110,6 +111,11 @@ def main() -> typing.RouteReturn:
             ),
         )
 
+
+    compact = int(flask.request.args.get("compact"))
+    if compact == None:
+        compact = 0
+    app.logger.info(type(compact))
     # Gestion des requêtes
     form = forms.ClubQForm()
 
@@ -133,6 +139,7 @@ def main() -> typing.RouteReturn:
         # Cheking if the minimum number of places is not superior to the number of asked places
         for spect in spectacles:
             if form[f"nb_places_{spect.id}"].data != None:
+                form[f"nb_places_minimum_{spect.id}"].data = 0
                 if form[f"nb_places_minimum_{spect.id}"].data > form[f"nb_places_{spect.id}"].data:
                     flask.flash(
                         _(
@@ -201,6 +208,7 @@ def main() -> typing.RouteReturn:
         user=context.g.pceen,
         visibility=visibility,
         saison=saison,
+        compact=compact
     )
 
 

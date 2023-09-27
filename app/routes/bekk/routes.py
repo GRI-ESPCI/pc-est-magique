@@ -18,6 +18,8 @@ from app.models import (
 
 import fitz
 import os
+import shutil
+
 
 @bp.route("", methods=["GET", "POST"])
 @bp.route("/", methods=["GET", "POST"])
@@ -25,10 +27,10 @@ import os
 def main() -> typing.RouteReturn:
     """Bekk module main page"""
 
-    bekks = Bekk.query.order_by(Bekk.date).all()
+    bekks = Bekk.query.order_by(Bekk.date.desc()).all()
     promos = []
     [promos.append(bekk.promo) for bekk in bekks if bekk.promo not in promos]
-
+    promos.sort(reverse=True)
 
     promo = flask.request.args.get("promo")
     if promo == None:
@@ -37,9 +39,9 @@ def main() -> typing.RouteReturn:
             promo=promo-1
     promo=int(promo)
     if promo!=0:
-        bekks = Bekk.query.filter_by(promo=promo).order_by(Bekk.date).all()
+        bekks = Bekk.query.filter_by(promo=promo).order_by(Bekk.date.desc()).all()
         
-    filepath = flask.current_app.config["BEKKS_BASE_PATH"]
+    bekk_path = flask.current_app.config["BEKKS_BASE_PATH"]
 
     form = forms.Bekk()
 
@@ -47,49 +49,79 @@ def main() -> typing.RouteReturn:
         add = form["add"].data
 
         if add:
-            bekk = Bekk()
+            flag = False
+            if form["pdf_file"].data == None:
+                flask.flash(_("Aucun fichier choisi."), "danger")
+                flag = True
 
-            db.session.add(bekk)
+            if not flag:
+                bekk = Bekk()
 
-            bekk.name = form["bekk_name"].data
-            bekk.promo = form["promo"].data
-            bekk.date = form["date"].data
+                db.session.add(bekk)
+
+                bekk.name = form["bekk_name"].data
+                bekk.promo = form["promo"].data
+                bekk.date = form["date"].data
 
 
-            if not os.path.exists(os.path.join(filepath,form["promo"].data)):
-                os.mkdir(os.path.join(filepath,form["promo"].data))
+                if not os.path.exists(os.path.join(bekk_path,form["promo"].data)):
+                    os.mkdir(os.path.join(bekk_path,form["promo"].data))
 
-            if not os.path.exists(os.path.join(filepath,form["promo"].data, form["bekk_name"].data)):
-                os.mkdir(os.path.join(filepath,form["promo"].data, form["bekk_name"].data))
+                if not os.path.exists(os.path.join(bekk_path,form["promo"].data, form["bekk_name"].data)):
+                    os.mkdir(os.path.join(bekk_path,form["promo"].data, form["bekk_name"].data))
 
-            form["pdf_file"].data.save(os.path.join(filepath,form["promo"].data, form["bekk_name"].data, form["bekk_name"].data + "_" + form["promo"].data + ".pdf"))
-            
-            pdf = fitz.open(os.path.join(filepath,form["promo"].data, form["bekk_name"].data, form["bekk_name"].data + "_" + form["promo"].data + ".pdf"))
-            for page in pdf:
-                pix = page.get_pixmap() 
-                pix.save(form["bekk_name"].data + "_" + form["promo"].data + "-%i.png" % page.number) 
+                form["pdf_file"].data.save(os.path.join(bekk_path,form["promo"].data, form["bekk_name"].data, form["bekk_name"].data + "_" + form["promo"].data + ".pdf"))
+                
+                pdf = fitz.open(os.path.join(bekk_path,form["promo"].data, form["bekk_name"].data, form["bekk_name"].data + "_" + form["promo"].data + ".pdf"))
+                for page in pdf:
+                    pix = page.get_pixmap() 
+                    pix.save(os.path.join(bekk_path,form["promo"].data, form["bekk_name"].data, form["bekk_name"].data + "_" + form["promo"].data + "_%i.png" % page.number)) 
 
-            db.session.commit()
-            flask.flash(_("Bekk ajouté."))
-            return flask.redirect(flask.url_for("bekk.main", promo=promo))
+                db.session.commit()
+                flask.flash(_("Bekk ajouté."))
+                return flask.redirect(flask.url_for("bekk.main", promo=promo))
 
-        delete = form["delete"].data
-        bekk = Bekk.query.filter_by(id=form["id"].data).one()
+        if not add:
+            delete = form["delete"].data
+            bekk = Bekk.query.filter_by(id=form["id"].data).one()
+        
+            if delete:
+                db.session.delete(bekk)
+                db.session.commit()
 
-        if delete:
-            db.session.delete(bekk)
-            db.session.commit()
-            flask.flash(_("Bekk supprimé."))
-            return flask.redirect(flask.url_for("bekk.main", promo=promo))
+                shutil.rmtree(os.path.join(bekk_path,form["promo"].data, form["bekk_name"].data))
 
-        else:
-            bekk.name = form["bekk_name"].data
-            bekk.promo = form["promo"].data
-            bekk.date = form["date"].data
+                flask.flash(_("Bekk supprimé."))
+                return flask.redirect(flask.url_for("bekk.main", promo=promo))
 
-            db.session.commit()
-            flask.flash(_("Bekk édité."))
-            return flask.redirect(flask.url_for("bekk.main", promo=promo))
+            else:
+                old_name = bekk.name
+                old_promo = str(bekk.promo)
+
+                bekk.name = form["bekk_name"].data
+                bekk.promo = form["promo"].data
+                bekk.date = form["date"].data
+
+                if old_name != bekk.name or old_promo != bekk.promo:
+                    old_path = os.path.join(bekk_path,old_promo, old_name)
+                    files = os.listdir(os.path.join(bekk_path,old_promo, old_name))
+                    for file in files:
+                        if file.split(".")[-1] == "png":
+                            os.rename(os.path.join(old_path, file), os.path.join(old_path, bekk.name + "_" + bekk.promo + "_" + file.split("_")[-1]))
+                        else:
+                            os.rename(os.path.join(old_path, file), os.path.join(old_path, bekk.name + "_" + bekk.promo + ".pdf"))
+
+                    if old_name != bekk.name:
+                        os.rename(old_path, os.path.join(bekk_path, old_promo, bekk.name))
+
+                    if old_promo != bekk.promo:
+                        if not os.path.exists(os.path.join(bekk_path,bekk.promo)):
+                            os.mkdir(os.path.join(bekk_path,bekk.promo))
+                        shutil.move(os.path.join(bekk_path, old_promo, bekk.name), os.path.join(bekk_path, bekk.promo))
+
+                db.session.commit()
+                flask.flash(_("Bekk édité."))
+                return flask.redirect(flask.url_for("bekk.main", promo=promo))
 
     return flask.render_template(
         "bekk/main.html",
@@ -97,7 +129,7 @@ def main() -> typing.RouteReturn:
         bekks=bekks,
         view_promo=promo,
         promos=promos,
-        filepath=filepath,
+        bekk_path=bekk_path,
         form=form
     )
 
@@ -114,10 +146,11 @@ def reader(id : int) -> typing.RouteReturn:
         str(bekk.promo),
         bekk.name,
     )
+    pages = range(len(os.listdir(filepath))-1)
 
     return flask.render_template(
         "bekk/reader.html",
         title = _(bekk.name),
         bekk=bekk,
-        filepath=filepath
+        pages=pages
     )
