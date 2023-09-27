@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed Club Q emails & minimum places forms
+- Fixed Club Q minimum places forms bug
 
 
 # v2.6.1 (2023-09-18)

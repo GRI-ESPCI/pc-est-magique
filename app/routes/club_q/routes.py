@@ -48,7 +48,6 @@ from app.routes.club_q.utils import (
 from app.routes.club_q.algorithm import attribution
 
 from app.email import send_email
-app = flask.Flask(__name__)
 
 
 @bp.route("", methods=["GET", "POST"])
@@ -639,7 +638,6 @@ def saisons() -> typing.RouteReturn:
 @context.permission_only(PermissionType.all, PermissionScope.club_q)
 def attribution_manager() -> typing.RouteReturn:
     season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
-
     subquery = ClubQVoeu.query.filter_by(_season_id=season_id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
 
     voeux = ClubQVoeu.query.filter_by(_season_id=season_id).all()
