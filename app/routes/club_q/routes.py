@@ -6,7 +6,6 @@ from flask_babel import _
 from sqlalchemy import desc
 
 
-
 from app import context, db
 from app.models import (
     ClubQSeason,
@@ -77,7 +76,7 @@ def main() -> typing.RouteReturn:
             _pceen_id=context.g.pceen.id,
             _season_id=spect._season_id,
         ).first()
-        #spect.date = spect.date.strftime("%d %B %Y, %H:%M:%S")
+        # spect.date = spect.date.strftime("%d %B %Y, %H:%M:%S")
 
         setattr(
             forms.ClubQForm,
@@ -109,7 +108,6 @@ def main() -> typing.RouteReturn:
                 default=voeu.places_minimum if voeu else None,
             ),
         )
-
 
     compact = int(flask.request.args.get("compact"))
     if compact == None:
@@ -143,7 +141,8 @@ def main() -> typing.RouteReturn:
                     flask.flash(
                         _(
                             "Un voeu a été défini avec un nombre de places minimum supérieur au nombre de places demandées."
-                       ), "danger"
+                        ),
+                        "danger",
                     )
                     flag = True  # RAISE THE FLAG!
                     break
@@ -207,7 +206,7 @@ def main() -> typing.RouteReturn:
         user=context.g.pceen,
         visibility=visibility,
         saison=saison,
-        compact=compact
+        compact=compact,
     )
 
 

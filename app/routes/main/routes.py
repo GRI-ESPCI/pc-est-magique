@@ -201,8 +201,9 @@ def club_q(season: str, filename: str) -> typing.RouteReturn:
     )
     return flask.send_file(filepath)
 
+
 @bp.route("/bekks/<promo>/<name>/<filename>")
-def bekks(promo : str, name: str, filename: str) -> typing.RouteReturn:
+def bekks(promo: str, name: str, filename: str) -> typing.RouteReturn:
     """Serve Bekks files (fallback if no Nginx, should NOT be used!)"""
     filepath = os.path.join(
         flask.current_app.config["BEKKS_BASE_PATH"],
@@ -211,4 +212,3 @@ def bekks(promo : str, name: str, filename: str) -> typing.RouteReturn:
         filename,
     )
     return flask.send_file(filepath)
-

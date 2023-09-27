@@ -36,7 +36,6 @@ except ImportError:
     sys.exit(1)
 
 
-
 @loggers.log_exception(reraise=True)
 def main():
     with open("new_promo.csv", "r", newline="") as file:

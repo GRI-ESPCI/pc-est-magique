@@ -25,4 +25,3 @@ class Bekk(db.Model):
     name: Column[str] = column(sa.String(120), nullable=False)
     promo: Column[int] = column(sa.Integer(), nullable=False)
     date: Column[datetime.date] = column(sa.Date(), nullable=False)
-    

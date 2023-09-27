@@ -16,7 +16,7 @@ class Bekk(FlaskForm):
     bekk_name = wtforms.StringField(_l("Nom du Bekk"), validators=[DataRequired()])
     promo = wtforms.StringField(_l("Promo"), validators=[DataRequired()])
     date = html5.DateField(_l("Date"), validators=[DataRequired()], default=date.today)
-    pdf_file = FileField(_l(''), validators=[FileAllowed(['pdf'], 'PDF uniquement!')])
+    pdf_file = FileField(_l(""), validators=[FileAllowed(["pdf"], "PDF uniquement!")])
     add = wtforms.SubmitField(_l("Ajouter"))
     submit = wtforms.SubmitField(_l("Modifier"))
     delete = wtforms.SubmitField(_l("Supprimer"))
