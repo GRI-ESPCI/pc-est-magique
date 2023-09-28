@@ -28,12 +28,10 @@ def main() -> typing.RouteReturn:
     """Bekk module main page"""
 
     bekks = Bekk.query.order_by(Bekk.date.desc()).all()
-    promos = []
-    [promos.append(bekk.promo) for bekk in bekks if bekk.promo not in promos]
-    promos.sort(reverse=True)
+    promos = sorted({bekk.promo for bekk in bekks}, reverse=True)
 
     promo = flask.request.args.get("promo")
-    if promo == None:
+    if promo is None:
         promo = GlobalSetting.query.filter_by(key="PROMO_1A").one().value  # ID of the season to show
         if promo not in promos:
             promo = promo - 1
@@ -50,7 +48,7 @@ def main() -> typing.RouteReturn:
 
         if add:
             flag = False
-            if form["pdf_file"].data == None:
+            if form["pdf_file"].data is None:
                 flask.flash(_("Aucun fichier choisi."), "danger")
                 flag = True
 
@@ -174,4 +172,4 @@ def reader(id: int) -> typing.RouteReturn:
     )
     pages = range(len(os.listdir(filepath)) - 1)
 
-    return flask.render_template("bekk/reader.html", title=_(bekk.name), bekk=bekk, pages=pages)
+    return flask.render_template("bekk/reader.html", title=bekk.name, bekk=bekk, pages=pages)
