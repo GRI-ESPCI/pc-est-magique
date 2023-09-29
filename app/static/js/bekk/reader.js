@@ -32,7 +32,6 @@ $(window).bind("keydown", function (event) {
 });
 
 
-console.log('here')
 //PDF plotting part
 
 var url = '/bekks/' + bekk_id + '.pdf';
@@ -54,20 +53,15 @@ loadingTask.promise.then(function(pdf) {
     //Render page code from https://mozilla.github.io/pdf.js/examples/
     pdf.getPage(i).then(function(page) {
   
-      var scale = 10;
+      var scale = 1.5;
       var viewport = page.getViewport({scale: scale});
   
       // Prepare canvas using PDF page dimensions
       var canvas = document.getElementById('page-'+i);
       var context = canvas.getContext('2d');
-      /*canvas.height = viewport.height;
+      canvas.height = viewport.height;
       canvas.width = viewport.width;
-      */
-      var outputScale = window.devicePixelRatio || 1;
-      canvas.width = Math.floor(viewport.width * outputScale);
-      canvas.height = Math.floor(viewport.height * outputScale);
-
-
+  
       // Render PDF page into canvas context
       var renderContext = {
         canvasContext: context,
