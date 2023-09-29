@@ -1,7 +1,20 @@
 {% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} {{ super() }}
 
+<script defer>
+  var bekk_id_list = {{ bekk_id_list|tojson }}
+</script>
+<script
+  src="{{url_for('static', filename='js/pdf.js') }}"
+  defer
+></script>
+{% if can_edit %}
 <script
   src="{{url_for('static', filename='js/bekk/bekk.js') }}"
+  defer
+></script>
+{% endif %}
+<script
+  src="{{url_for('static', filename='js/bekk/first_page.js') }}"
   defer
 ></script>
 
@@ -10,7 +23,7 @@
 <div class="container mb-3">
   <div class="btn-toolbar justify-content-between">
     <h4>{{title}}</h4>
-    {% if has_permission(PermissionType.write, PermissionScope.bekk) %}
+    {% if can_edit %}
     <div
       data-bs-toggle="tooltip"
       data-bs-placement="right"
@@ -40,10 +53,11 @@
   <p>
     {{ _("Bienvenue sur la page du Bekk de l'ESPCI.") }}
     <br />
-    {{ _("Le Bekk est l'association journalistique de l'école, et produit plusieurs numéros par an, à des occasions et des
-    buts bien spécifiques (Bekk Bibi, Noël, Saint-Valentin, Pré-campagne, Post-campagne et pour finir le Bekk Alpha). Ce
-    club est le premier à être passationné à la toute nouvelle génération de 1A qui s'attaquent directement à la tâche.
-    Tu retrouveras ici les Bekks triés par promotion, avec la possibilité de les lire ou de les télécharger. ")}}
+    {{ _("Le Bekk est l'association journalistique de l'école, et produit plusieurs numéros par an, à des occasions et
+    des buts bien spécifiques (Bekk Bibi, Noël, Saint-Valentin, Pré-campagne, Post-campagne et pour finir le Bekk
+    Alpha). Ce club est le premier à être passationné à la toute nouvelle génération de 1A qui s'attaquent directement à
+    la tâche. Tu retrouveras ici les Bekks triés par promotion, avec la possibilité de les lire ou de les télécharger.
+    ")}}
   </p>
 </div>
 
@@ -79,11 +93,11 @@
 </div>
 <div class="row">
   {% for bekk in bekks %}
-
   <div class="col-sm-8 col-md-6 col-lg-4">{% include "cards/bekk.html" %}</div>
 
   {% endfor %}
 </div>
+{% if can_edit %}
 <!-- Modals -->
 
 <!-- Bekk edit modal -->
@@ -218,5 +232,4 @@
     </div>
   </div>
 </div>
-
-{% endblock %}
+{% endif %} {% endblock %}

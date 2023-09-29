@@ -1,12 +1,10 @@
 {# Bekk card - used variable bekk (dabatase query)#} {% extends "cards/base.html" %} {% block card_head %}
-<a href="{{ url_for('bekk.reader', id = bekk.id) }}">
-  <img
-    src="/bekks/{{bekk.promo}}/{{bekk.name}}/{{bekk.name}}_{{bekk.promo}}_0.png"
-    class="card-img-top"
-    width="10%"
-    alt="Image not found"
-  />
-</a>
+
+<canvas
+  id="bekk-{{bekk.id}}"
+  onclick="window.location='{{ url_for('bekk.reader', id=bekk.id) }}';"
+></canvas>
+
 {% endblock %} {% block card_body %}
 <div class="card-body">
   {% if has_permission(PermissionType.write, PermissionScope.bekk) %}
@@ -41,8 +39,8 @@
 
 <a
   role="button"
-  href="/bekks/{{bekk.promo}}/{{bekk.name}}/{{bekk.name}}_{{bekk.promo}}.pdf"
-  download="{{bekk.name}}-{{bekk.promo}}.pdf"
+  href="/bekks/{{bekk.id}}.pdf"
+  download="{{bekk.id}}.pdf"
   class="btn btn-outline-dark"
 >
   {{ _("Télécharger (PDF)") }}

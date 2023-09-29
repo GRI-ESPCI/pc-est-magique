@@ -43,3 +43,8 @@ moBekkEdit.addEventListener("show.bs.modal", function (event) {
   document.getElementsByName("pdf_file")[0].value =  null;
 });
 
+
+
+
+
+

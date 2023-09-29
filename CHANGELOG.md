@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Bekk (ESPCI student newspaper) module. Importing Bekks PDFs and converts them in images & Reading Bekks saved on server
+- Bekk (ESPCI student newspaper) module. Read Bekks for user and tools for bekks administrators
 - Compact version to reservation form for Club Q
 
 ### Fixed

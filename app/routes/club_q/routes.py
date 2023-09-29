@@ -76,7 +76,6 @@ def main() -> typing.RouteReturn:
             _pceen_id=context.g.pceen.id,
             _season_id=spect._season_id,
         ).first()
-        # spect.date = spect.date.strftime("%d %B %Y, %H:%M:%S")
 
         setattr(
             forms.ClubQForm,
@@ -109,10 +108,11 @@ def main() -> typing.RouteReturn:
             ),
         )
 
-    compact = int(flask.request.args.get("compact"))
-    if compact == None:
+    compact = flask.request.args.get("compact")
+    if compact is None:
         compact = 0
-    app.logger.info(type(compact))
+    compact = int(compact)
+
     # Gestion des requêtes
     form = forms.ClubQForm()
 
