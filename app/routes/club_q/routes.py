@@ -48,6 +48,7 @@ from app.routes.club_q.algorithm import attribution
 
 from app.email import send_email
 
+app = flask.Flask(__name__)
 
 @bp.route("", methods=["GET", "POST"])
 @bp.route("/", methods=["GET", "POST"])
@@ -896,15 +897,12 @@ def user_generate_pdf(id: int):
         .filter_by(_pceen_id=pceen.id)
         .filter(ClubQVoeu.places_attribuees != 0)
         .order_by(ClubQVoeu.priorite)
-        .all()
     )
-
     # Return the PDF as a response to the user
     response = flask.make_response(pdf_client(pceen, season, voeux).read())
     response.headers["Content-Type"] = "application/pdf"
     response.headers["Content-Disposition"] = f"inline; filename=club_q_{pceen.username}.pdf"
     return response
-
 
 @bp.route("/spectacles/<int:id>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)

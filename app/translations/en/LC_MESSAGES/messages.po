@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2023-09-29 21:07-0700\n"
+"POT-Creation-Date: 2023-09-30 11:07-0700\n"
 "PO-Revision-Date: 2022-10-29 03:04+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
@@ -494,7 +494,7 @@ msgstr "Corruption"
 msgid "Lancer l'algorithme"
 msgstr "Launch algorithm"
 
-#: app/routes/club_q/forms.py:41 app/routes/club_q/routes.py:84
+#: app/routes/club_q/forms.py:41 app/routes/club_q/routes.py:85
 #: app/templates/bar/items.html:62 app/templates/club_q/id/pceen.html:102
 #: app/templates/club_q/id/spectacle.html:121
 #: app/templates/club_q/main.html:103 app/templates/club_q/main.html:246
@@ -532,26 +532,26 @@ msgstr "Mail address"
 msgid "Envoyer les e-mails"
 msgstr "Send e-mails"
 
-#: app/routes/club_q/routes.py:94
+#: app/routes/club_q/routes.py:95
 #, fuzzy
 msgid "Nombre places demandées"
 msgstr "No. of wanted seats"
 
-#: app/routes/club_q/routes.py:104
+#: app/routes/club_q/routes.py:105
 msgid "Nombre places minimum demandées"
 msgstr "Minimal no. of seats"
 
-#: app/routes/club_q/routes.py:127
+#: app/routes/club_q/routes.py:128
 msgid "Un voeu a été défini avec une priorité mais sans un nombre de places."
 msgstr ""
 "A wish has been made with a priority but without a number of wanted "
 "places."
 
-#: app/routes/club_q/routes.py:132
+#: app/routes/club_q/routes.py:133
 msgid "Un voeu a été défini avec un nombre de places mais sans priorité."
 msgstr "A wish has been made with a number of places but without any priority."
 
-#: app/routes/club_q/routes.py:142
+#: app/routes/club_q/routes.py:143
 msgid ""
 "Un voeu a été défini avec un nombre de places minimum supérieur au nombre"
 " de places demandées."
@@ -559,74 +559,74 @@ msgstr ""
 "A wish has been made with a minimal number of places superior to the "
 "number of asked seats."
 
-#: app/routes/club_q/routes.py:156
+#: app/routes/club_q/routes.py:157
 msgid "Deux voeux ne peuvent avoir la même priorité."
 msgstr "Two wishes cannot have the same priority."
 
-#: app/routes/club_q/routes.py:163
+#: app/routes/club_q/routes.py:164
 msgid "Les priorités doivent être croissantes de 1 en 1 en partant de 1."
 msgstr "Priorities must start at 1 and increase 1 by 1."
 
-#: app/routes/club_q/routes.py:197
+#: app/routes/club_q/routes.py:198
 msgid "Vos choix ont été enregistrés."
 msgstr "Your choices has been saved."
 
-#: app/routes/club_q/routes.py:202
+#: app/routes/club_q/routes.py:203
 msgid "Page de réservation pour le Club Q"
 msgstr "Club Q-ulture booking page."
 
-#: app/routes/club_q/routes.py:249
+#: app/routes/club_q/routes.py:250
 msgid "Mécontentement édité."
 msgstr "Edited discontent."
 
-#: app/routes/club_q/routes.py:481
+#: app/routes/club_q/routes.py:482
 msgid "Salle ajoutée."
 msgstr "Added location."
 
-#: app/routes/club_q/routes.py:490
+#: app/routes/club_q/routes.py:491
 msgid "Salle supprimée."
 msgstr "Deleted location."
 
-#: app/routes/club_q/routes.py:502
+#: app/routes/club_q/routes.py:503
 msgid "Salle éditée."
 msgstr "Edited location."
 
-#: app/routes/club_q/routes.py:600
+#: app/routes/club_q/routes.py:601
 #, fuzzy
 msgid "Saison ajoutée."
 msgstr "Added season."
 
-#: app/routes/club_q/routes.py:609
+#: app/routes/club_q/routes.py:610
 msgid "Saison supprimée."
 msgstr "Deleted season."
 
-#: app/routes/club_q/routes.py:620
+#: app/routes/club_q/routes.py:621
 msgid "Saison éditée."
 msgstr "Edited season."
 
-#: app/routes/club_q/routes.py:686 app/routes/club_q/routes.py:804
+#: app/routes/club_q/routes.py:687 app/routes/club_q/routes.py:805
 #, fuzzy
 msgid "Mis à jour."
 msgstr "Updated."
 
-#: app/routes/club_q/routes.py:708
+#: app/routes/club_q/routes.py:709
 msgid "Algorithme exécuté et résultats sauvegardés."
 msgstr "Executed algorithm and saved results."
 
-#: app/routes/club_q/routes.py:710
+#: app/routes/club_q/routes.py:711
 msgid "Algorithme exécuté."
 msgstr "Executed algorithm."
 
-#: app/routes/club_q/routes.py:780
+#: app/routes/club_q/routes.py:781
 msgid "Visibilité de la page de réservation"
 msgstr "Show booking page"
 
-#: app/routes/club_q/routes.py:788 app/templates/cards/club_q.html:9
+#: app/routes/club_q/routes.py:789 app/templates/cards/club_q.html:9
 #, fuzzy
 msgid "Saison actuelle"
 msgstr "Current season"
 
-#: app/routes/club_q/routes.py:861
+#: app/routes/club_q/routes.py:862
 #, fuzzy
 msgid "Récapitulatif - "
 msgstr "Summary"
@@ -1874,7 +1874,7 @@ msgstr "Add bekk"
 
 #: app/templates/bekk/main.html:54
 msgid "Bienvenue sur la page du Bekk de l'ESPCI."
-msgstr ""
+msgstr "Welcome on the Bekk page"
 
 #: app/templates/bekk/main.html:56
 msgid ""
@@ -1887,7 +1887,7 @@ msgid ""
 "    la tâche. Tu retrouveras ici les Bekks triés par promotion, avec la "
 "possibilité de les lire ou de les télécharger.\n"
 "    "
-msgstr ""
+msgstr "The Bekk is the newspaper student club of the ESPCI, with several iterations per year at specials occasions. You can find here all the bekks for the actual and previous year, download them and read them onsite."
 
 #: app/templates/bekk/main.html:80 app/templates/gris/pceens.html:40
 msgid "Tous"
@@ -3485,203 +3485,209 @@ msgstr ""
 msgid "sur GitHub"
 msgstr "on GitHub"
 
-#: app/templates/main/changelog.html:24
+#: app/templates/main/changelog.html:23
+msgid ""
+"Ajout du module du Bekk sur pc-est-magique : possibilité de le lire en "
+"ligne, de le télécharger. Outils d'administration pour l'équipe du Bekk."
+msgstr "Added Bekk (ESPCI Student newspaper) on website with a viewer. Administrative tools for managing team."
+
+#: app/templates/main/changelog.html:33
 msgid ""
 "Refonte complète de la page Club Q pour une meilleure expérience "
 "utilisateur et administrative."
 msgstr "Redesigned Club Q page for a better user and administrative experience."
 
-#: app/templates/main/changelog.html:34
+#: app/templates/main/changelog.html:43
 msgid ""
 "Ajout de la page de voeux \"Club Q\" pour la réservation des spectacles "
 "du club culture de l'ESPCI."
 msgstr "Added booking page for Club Q ESPCI"
 
-#: app/templates/main/changelog.html:44
+#: app/templates/main/changelog.html:53
 msgid ""
 "Ajout d'une page \"Théâtre\" qui recueille les informations sur la "
 "prochaine saison théâtre à l'ESPCI ainsi que les billeteries."
 msgstr "Added Theater page for ESPCI next theater season."
 
-#: app/templates/main/changelog.html:53
+#: app/templates/main/changelog.html:62
 msgid ""
 "Gestion des photos directement depuis le site (création d'albums, upload,"
 " suppression...)"
 msgstr "Mananing pictures directly on the website"
 
-#: app/templates/main/changelog.html:62
+#: app/templates/main/changelog.html:71
 msgid "Intégration du site du Bar comme module de ce site."
 msgstr "Integrated Bar module on website"
 
-#: app/templates/main/changelog.html:71
+#: app/templates/main/changelog.html:80
 msgid "Mise en place de l'authentification avec le SSO de l'ESPCI."
 msgstr "Added ESPCI SSO authentification"
 
-#: app/templates/main/changelog.html:74
+#: app/templates/main/changelog.html:83
 msgid "Accès effectif aux photos."
 msgstr "Effective pictures access"
 
-#: app/templates/main/changelog.html:83
+#: app/templates/main/changelog.html:92
 msgid "Intégration du site de l'IntraRez dans ce site."
 msgstr "Integrated IntraRez website on this one."
 
-#: app/templates/main/changelog.html:86
+#: app/templates/main/changelog.html:95
 #, fuzzy
 msgid "Ajout du module de photos."
 msgstr "Add photos"
 
-#: app/templates/main/changelog.html:89
+#: app/templates/main/changelog.html:98
 msgid "Nouveau système de rôles et permissions."
 msgstr "New roles and permissions system"
 
-#: app/templates/main/changelog.html:98
+#: app/templates/main/changelog.html:107
 msgid ""
 "Système de coupure d'accès Internet en cas de non-paiement ou autre (en "
 "fait avant c'était du bluff eheh) ;"
 msgstr "Ban system in case of non-payement"
 
-#: app/templates/main/changelog.html:102
+#: app/templates/main/changelog.html:111
 msgid "Correction de divers bugs mineurs."
 msgstr "Corrected minor bugs"
 
-#: app/templates/main/changelog.html:111
+#: app/templates/main/changelog.html:120
 #, fuzzy
 msgid "Mise en service des paiements : "
 msgstr "Commissioning of Internet payments"
 
-#: app/templates/main/changelog.html:113
+#: app/templates/main/changelog.html:122
 #, fuzzy
 msgid "Page générique d'information ;"
 msgstr "More information"
 
-#: app/templates/main/changelog.html:114
+#: app/templates/main/changelog.html:123
 #, fuzzy
 msgid "Page de choix de l'offre et du moyen de paiement ;"
 msgstr "Chose an offer and a payment method."
 
-#: app/templates/main/changelog.html:115
+#: app/templates/main/changelog.html:124
 msgid "Pages de paiement par Lydia / CB, virement bancaire ou espèces ;"
 msgstr "Credit card, Lydia, bank transfer or cash for payement ;"
 
-#: app/templates/main/changelog.html:116
+#: app/templates/main/changelog.html:125
 msgid "Page d'ajout / validation de paiement pour les GRI ;"
 msgstr "Validation / add payement for GRI page"
 
-#: app/templates/main/changelog.html:117
+#: app/templates/main/changelog.html:126
 msgid ""
 "Souscription automatique à l'offre de bienvenue lors de la première "
 "connexion ;"
 msgstr "Automatic subscription to welcome offer on first connexion ;"
 
-#: app/templates/main/changelog.html:118
+#: app/templates/main/changelog.html:127
 msgid "Intégration à la page d'accueil et à la barre de menu."
 msgstr "Integrated at the welcome page and navbar."
 
-#: app/templates/main/changelog.html:122
+#: app/templates/main/changelog.html:131
 msgid "Envoi de mails riches, au format HTML :"
 msgstr "Rich e-mails sending in HTML format:"
 
-#: app/templates/main/changelog.html:124
+#: app/templates/main/changelog.html:133
 #, fuzzy
 msgid "Lors de la création de compte ;"
 msgstr "No rental in progress!"
 
-#: app/templates/main/changelog.html:125
+#: app/templates/main/changelog.html:134
 #, fuzzy
 msgid "En cas d'oubli de mot de passe ;"
 msgstr "Change password"
 
-#: app/templates/main/changelog.html:126
+#: app/templates/main/changelog.html:135
 msgid "Lors de la perte de sa chambre ;"
 msgstr "Loosing chamber"
 
-#: app/templates/main/changelog.html:127
+#: app/templates/main/changelog.html:136
 msgid "À la validation d'un paiement ;"
 msgstr "Payement validation"
 
-#: app/templates/main/changelog.html:128
+#: app/templates/main/changelog.html:137
 msgid "Un mois avant, une semaine avant et le jour d'expiration d'un abonnement."
 msgstr "A month, a week and the day before the membership expiration."
 
-#: app/templates/main/changelog.html:132
+#: app/templates/main/changelog.html:141
 msgid "Ajout de la possibilité de modifier : "
 msgstr "Added modification possibility for: "
 
-#: app/templates/main/changelog.html:134
+#: app/templates/main/changelog.html:143
 msgid "Une information sur son profil ;"
 msgstr "An information on your profile;"
 
-#: app/templates/main/changelog.html:135
+#: app/templates/main/changelog.html:144
 #, fuzzy
 msgid "Son mot de passe ;"
 msgstr "Password:"
 
-#: app/templates/main/changelog.html:136
+#: app/templates/main/changelog.html:145
 msgid "Les dates d'une location ;"
 msgstr "Dates of renting ;"
 
-#: app/templates/main/changelog.html:137
+#: app/templates/main/changelog.html:146
 msgid "Les informations sur un appareil."
 msgstr "Informations on a device."
 
-#: app/templates/main/changelog.html:141
+#: app/templates/main/changelog.html:150
 msgid ""
 "La langue préférée (français ou anglais, selon les paramètres du "
 "navigateur) est enregistrée pour chaque PCéen, et utilisée pour l'envoi "
 "des mails."
 msgstr "Favourite language saved for each PCéen and used for e-mail sending."
 
-#: app/templates/main/changelog.html:145
+#: app/templates/main/changelog.html:154
 msgid "Ajout d'un mode maintenance activable par les GRI."
 msgstr "Added maintenance mode."
 
-#: app/templates/main/changelog.html:148
+#: app/templates/main/changelog.html:157
 msgid "Ajout d'une page GRI pour exécuter un script."
 msgstr "Added GRI script page."
 
-#: app/templates/main/changelog.html:156
+#: app/templates/main/changelog.html:165
 msgid ""
 "L'IntraRez est maintenant utilisable depuis l'extérieur de la Rezidence, "
 "à l'adresse "
 msgstr "IntraRez useable from outside the Rezidence, at "
 
-#: app/templates/main/changelog.html:158
+#: app/templates/main/changelog.html:167
 msgid "(sauf pour la création de compte)."
 msgstr "(excepting account creation)."
 
-#: app/templates/main/changelog.html:161
+#: app/templates/main/changelog.html:170
 msgid ""
 "L'utilisation du formulaire de contact depuis l'extérieur est maintenant "
 "soumise à un captcha."
 msgstr "Use of contact form from the exterior now needs captcha completation."
 
-#: app/templates/main/changelog.html:169
+#: app/templates/main/changelog.html:178
 msgid "Ajout du mécanisme de changement de chambre."
 msgstr "Added room change mecanism."
 
-#: app/templates/main/changelog.html:172
+#: app/templates/main/changelog.html:181
 msgid "Ajout de l'adresse IP attribuée aux appareils dans le profil."
 msgstr "Added IP address to devices in profile."
 
-#: app/templates/main/changelog.html:175
+#: app/templates/main/changelog.html:184
 msgid "Les GRI peuvent maintenant gérer les chambres et les appareils des PCéens."
 msgstr "GRI can now manage rooms and devices."
 
-#: app/templates/main/changelog.html:178
+#: app/templates/main/changelog.html:187
 msgid "Ajout de cette page."
 msgstr "Added this page."
 
-#: app/templates/main/changelog.html:186
+#: app/templates/main/changelog.html:195
 msgid ""
 "Ajout d'options GRI pour la gestion des PCéens et la surveillance du "
 "réseau."
 msgstr "Added settings for GRI to manage PCéens and network monitoring."
 
-#: app/templates/main/changelog.html:194
+#: app/templates/main/changelog.html:203
 msgid "Mise en place d'un portail captif pour simplifier la connexion au réseau."
 msgstr "Added captive portal for simplified network connexion."
 
-#: app/templates/main/changelog.html:200
+#: app/templates/main/changelog.html:209
 msgid "Première version publique."
 msgstr "First public version."
 
@@ -4891,3 +4897,4 @@ msgstr "An item with this name already exists."
 #: app/utils/validators.py:171
 msgid "Item ID invalide."
 msgstr "Invalid item ID."
+
