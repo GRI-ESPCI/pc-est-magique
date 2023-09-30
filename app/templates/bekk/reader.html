@@ -1,6 +1,7 @@
 {% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} {{ super() }}
 <script defer>
-  var bekk_id = {{ bekk.id | tojson }}
+  var url = {{ bekk.pdf_src_with_token | tojson }}
+  var nb_pages = {{ nb_pages | tojson }}
 </script>
 {% for filename in [ "bower_components/jquery/dist/jquery.js", "bower_components/turnjs/turn.js", "js/pdf.js",
 "js/bekk/reader.js", ] %}

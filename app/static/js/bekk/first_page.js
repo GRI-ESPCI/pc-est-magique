@@ -9,11 +9,9 @@ function loadAndRenderPDF(bekk_id_list) {
     return;
   }
   var bekk_id = bekk_id_list.shift();
+  var url = url_list.shift();
 
   //Render page code from https://mozilla.github.io/pdf.js/examples/
-
-  var url = '/bekks/' + bekk_id + '.pdf';
-
   // Asynchronous download of PDF
   var loadingTask = pdfjsLib.getDocument(url);
   loadingTask.promise
