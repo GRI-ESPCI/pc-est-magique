@@ -13,6 +13,8 @@ from app.utils.columns import (
     column,
     Column,
 )
+from app.utils.nginx import get_nginx_access_token
+import flask
 
 
 Model = typing.cast(type[type], db.Model)  # type checking hack
@@ -25,3 +27,15 @@ class Bekk(db.Model):
     name: Column[str] = column(sa.String(120), nullable=False)
     promo: Column[int] = column(sa.Integer(), nullable=False)
     date: Column[datetime.date] = column(sa.Date(), nullable=False)
+
+    @property
+    def src(self) -> str:
+        """The online path to the pdf."""
+        return f"/bekks/{self.id}.pdf"
+
+    @property
+    def pdf_src_with_token(self) -> str:
+        """The online query to the pdf with md5 args."""
+        ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]
+        token_args = get_nginx_access_token(self.src, ip)
+        return f"{self.src}?{token_args}"

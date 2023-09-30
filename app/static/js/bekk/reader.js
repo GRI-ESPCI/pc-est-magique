@@ -9,32 +9,30 @@ $(window).ready(function () {
 });
 
   // Bind click events to navigation buttons
-  $("#go-to-first").click(function () {
+  $("#go-to-first").on( "click", function () {
     $("#magazine").turn("page", 1); // Go to the first page
   });
 
-  $("#previous-page").click(function () {
+  $("#previous-page").on( "click", function () {
     $("#magazine").turn("previous"); // Turn to the previous page
   });
 
-  $("#next-page").click(function () {
+  $("#next-page").on( "click", function () {
     $("#magazine").turn("next"); // Turn to the next page
   });
 
-  $("#go-to-last").click(function () {
+  $("#go-to-last").on( "click", function () {
     $("#magazine").turn("page", nb_pages); // Go to the last page
   });
 
 
-$(window).bind("keydown", function (event) {
+$(window).on("keydown", function (event) {
   if (event.key == "ArrowLeft") $("#magazine").turn("previous");
   else if (event.key == "ArrowRight") $("#magazine").turn("next");
 });
 
 
 //PDF plotting part
-
-var url = '/bekks/' + bekk_id + '.pdf';
 var pdfjsLib = window['pdfjs-dist/build/pdf'];
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/static/js/pdf.worker.js';
@@ -48,7 +46,6 @@ loadingTask.promise.then(function(pdf) {
       renderPage(page);
     })(init[i]);
   }
-  var nb_pages = pdf.numPages;
   function renderPage(i) {
     //Render page code from https://mozilla.github.io/pdf.js/examples/
     pdf.getPage(i).then(function(page) {

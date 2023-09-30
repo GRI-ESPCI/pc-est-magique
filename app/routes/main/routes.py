@@ -61,7 +61,7 @@ def index() -> typing.RouteReturn:
         ).first()
 
         voeux = ClubQVoeu.query.filter_by(_pceen_id=pceen.id, _season_id=season_id)
-        if voeux is not None:
+        if voeux.first() is not None:
             to_pay = pceen_prix_total(pceen, voeux)
         else:
             to_pay = 0
@@ -82,7 +82,7 @@ def index() -> typing.RouteReturn:
         bekks = Bekk.query.order_by(Bekk.date)
         last_bekk = bekks.first()
 
-        if bekks == None:
+        if bekks.first() is None:
             bekk_infos = namedtuple("BekkInfos", ["last_bekk", "promo", "nb_bekks", "last_bekk_id"])(
                 "Aucun", "-", 0, -1
             )

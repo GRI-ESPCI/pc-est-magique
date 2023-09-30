@@ -2,6 +2,11 @@
 
 <script defer>
   var bekk_id_list = {{ bekk_id_list|tojson }}
+
+  var url_list = [];
+  {% for bekk in bekks %}
+    url_list.push({{ bekk.pdf_src_with_token |tojson }})
+  {% endfor %}
 </script>
 <script
   src="{{url_for('static', filename='js/pdf.js') }}"

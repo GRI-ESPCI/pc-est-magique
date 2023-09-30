@@ -11,9 +11,6 @@ from app.models import (
     PermissionScope,
     PermissionType,
     GlobalSetting,
-    PCeen,
-    Role,
-    Permission,
 )
 
 import PyPDF2
