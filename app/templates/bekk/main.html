@@ -1,0 +1,235 @@
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} {{ super() }}
+
+<script defer>
+  var bekk_id_list = {{ bekk_id_list|tojson }}
+</script>
+<script
+  src="{{url_for('static', filename='js/pdf.js') }}"
+  defer
+></script>
+{% if can_edit %}
+<script
+  src="{{url_for('static', filename='js/bekk/bekk.js') }}"
+  defer
+></script>
+{% endif %}
+<script
+  src="{{url_for('static', filename='js/bekk/first_page.js') }}"
+  defer
+></script>
+
+{% endblock %} {% block app_content %}
+
+<div class="container mb-3">
+  <div class="btn-toolbar justify-content-between">
+    <h4>{{title}}</h4>
+    {% if can_edit %}
+    <div
+      data-bs-toggle="tooltip"
+      data-bs-placement="right"
+      title="{{ _('Ajouter un bekk') }}"
+    >
+      <button
+        type="button"
+        class="btn btn-success"
+        data-bs-target="#mo-bekk-add"
+        data-bs-toggle="modal"
+      >
+        <svg
+          class="bi flex-shrink-0"
+          width="24"
+          height="24"
+          role="img"
+        >
+          {{ macros.bootstrap_icon("plus-circle") }}
+        </svg>
+      </button>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row">
+  <p>
+    {{ _("Bienvenue sur la page du Bekk de l'ESPCI.") }}
+    <br />
+    {{ _("Le Bekk est l'association journalistique de l'école, et produit plusieurs numéros par an, à des occasions et
+    des buts bien spécifiques (Bekk Bibi, Noël, Saint-Valentin, Pré-campagne, Post-campagne et pour finir le Bekk
+    Alpha). Ce club est le premier à être passationné à la toute nouvelle génération de 1A qui s'attaquent directement à
+    la tâche. Tu retrouveras ici les Bekks triés par promotion, avec la possibilité de les lire ou de les télécharger.
+    ")}}
+  </p>
+</div>
+
+<!-- Bekk navbar -->
+<div class="container mb-3">
+  <div
+    class="btn-toolbar justify-content-between"
+    role="toolbar"
+  >
+    <div class="d-flex align-items-center">
+      <div
+        class="btn-group"
+        role="group"
+        name="saison_navbar"
+      >
+        <a
+          role="button"
+          href="{{ url_for('bekk.main', promo=0)}}"
+          class="btn {{ 'btn-primary' if view_promo == 0 else 'btn-outline-primary' }}"
+          >{{_("Tous")}}</a
+        >
+        {% for promo in promos %}
+        <a
+          role="button"
+          href="{{ url_for('bekk.main', promo=promo)}}"
+          class="btn {{ 'btn-primary' if view_promo == promo else 'btn-outline-primary' }}"
+          >{{promo}}</a
+        >
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  {% for bekk in bekks %}
+  <div class="col-sm-8 col-md-6 col-lg-4">{% include "cards/bekk.html" %}</div>
+
+  {% endfor %}
+</div>
+{% if can_edit %}
+<!-- Modals -->
+
+<!-- Bekk edit modal -->
+<div
+  class="modal fade"
+  id="mo-bekk-edit"
+  tabindex="-1"
+  aria-labelledby="mo-bekk-edit"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5
+          class="modal-title"
+          id="mo-bekk-edit"
+        >
+          {{ _("Editer bekk") }} {{"{bekk_id}"}} - {{"{bekk_name}"}}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Fermer') }}"
+        ></button>
+      </div>
+      <form
+        action=""
+        method="post"
+        role="form"
+      >
+        {{ form.hidden_tag() }}
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form.bekk_name) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form.promo) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form.date) }}</div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              {{ _("Annuler") }}
+            </button>
+            {{ form.delete(class="btn btn-danger") }} {{ form.submit(class="btn btn-primary") }}
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Bekk add modal -->
+<div
+  class="modal fade"
+  id="mo-bekk-add"
+  tabindex="-1"
+  aria-labelledby="mo-bekk-add"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5
+          class="modal-title"
+          id="mo-bekk-add"
+        >
+          {{_('Ajouter un bekk')}}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Fermer') }}"
+        ></button>
+      </div>
+      <form
+        action=""
+        method="post"
+        role="form"
+        enctype="multipart/form-data"
+      >
+        {{ form.hidden_tag() }}
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form.bekk_name) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form.promo) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form.date) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ wtf.form_field(form.pdf_file) }}</div>
+            </div>
+            {% if form.pdf_file.errors %}
+            <small class="form-text text-danger">{{ form.pdf_file.errors[0] }}</small>
+            {% endif %}
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              {{ _("Annuler") }}
+            </button>
+            {{ form.add(class="btn btn-primary") }}
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %} {% endblock %}

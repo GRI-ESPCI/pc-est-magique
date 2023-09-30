@@ -1,0 +1,20 @@
+
+body {
+  background: #6b6868;
+}
+#magazine {
+  width: 992px;
+  height: 701.6px;
+}
+#magazine .turn-page {
+  background-color: #ccc;
+  background-size: 100% 100%;
+}
+#page-navigation {
+  text-align: center; /* Center-align the button container */
+  margin-top: 20px; /* Add some spacing between the magazine and buttons */
+}
+#page-navigation button {
+  margin: 5px; /* Add margin around each button */
+}
+

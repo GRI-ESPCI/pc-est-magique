@@ -6,7 +6,6 @@ from flask_babel import _
 from sqlalchemy import desc
 
 
-
 from app import context, db
 from app.models import (
     ClubQSeason,
@@ -49,6 +48,7 @@ from app.routes.club_q.algorithm import attribution
 
 from app.email import send_email
 
+app = flask.Flask(__name__)
 
 @bp.route("", methods=["GET", "POST"])
 @bp.route("/", methods=["GET", "POST"])
@@ -77,7 +77,6 @@ def main() -> typing.RouteReturn:
             _pceen_id=context.g.pceen.id,
             _season_id=spect._season_id,
         ).first()
-        #spect.date = spect.date.strftime("%d %B %Y, %H:%M:%S")
 
         setattr(
             forms.ClubQForm,
@@ -110,6 +109,11 @@ def main() -> typing.RouteReturn:
             ),
         )
 
+    compact = flask.request.args.get("compact")
+    if compact is None:
+        compact = 0
+    compact = int(compact)
+
     # Gestion des requêtes
     form = forms.ClubQForm()
 
@@ -133,11 +137,13 @@ def main() -> typing.RouteReturn:
         # Cheking if the minimum number of places is not superior to the number of asked places
         for spect in spectacles:
             if form[f"nb_places_{spect.id}"].data != None:
+                form[f"nb_places_minimum_{spect.id}"].data = 0
                 if form[f"nb_places_minimum_{spect.id}"].data > form[f"nb_places_{spect.id}"].data:
                     flask.flash(
                         _(
                             "Un voeu a été défini avec un nombre de places minimum supérieur au nombre de places demandées."
-                       ), "danger"
+                        ),
+                        "danger",
                     )
                     flag = True  # RAISE THE FLAG!
                     break
@@ -201,6 +207,7 @@ def main() -> typing.RouteReturn:
         user=context.g.pceen,
         visibility=visibility,
         saison=saison,
+        compact=compact,
     )
 
 
@@ -631,8 +638,6 @@ def saisons() -> typing.RouteReturn:
 @context.permission_only(PermissionType.all, PermissionScope.club_q)
 def attribution_manager() -> typing.RouteReturn:
     season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
-
-
     subquery = ClubQVoeu.query.filter_by(_season_id=season_id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
 
     voeux = ClubQVoeu.query.filter_by(_season_id=season_id).all()
@@ -753,8 +758,8 @@ def mails() -> typing.RouteReturn:
 
             send_email(
                 "club_q/mails",
-                subject=f"[PC est magique - Club - Q] {subject}",
                 sender="CLUB_Q",
+                subject=f"[PC est magique - Club - Q] {subject}",
                 recipients={pceen.email: pceen.full_name},
                 html_body=html_body,
             )
@@ -892,15 +897,12 @@ def user_generate_pdf(id: int):
         .filter_by(_pceen_id=pceen.id)
         .filter(ClubQVoeu.places_attribuees != 0)
         .order_by(ClubQVoeu.priorite)
-        .all()
     )
-
     # Return the PDF as a response to the user
     response = flask.make_response(pdf_client(pceen, season, voeux).read())
     response.headers["Content-Type"] = "application/pdf"
     response.headers["Content-Disposition"] = f"inline; filename=club_q_{pceen.username}.pdf"
     return response
-
 
 @bp.route("/spectacles/<int:id>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)

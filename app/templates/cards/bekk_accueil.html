@@ -1,0 +1,45 @@
+{# Club Q card - used variables: bekk_infos #} {% extends "cards/base.html" %} {% block card_title %} {{ _("Bekk") }} {{
+macros.badge() }} {% endblock %} {% block card_icon %} {{ macros.bootstrap_icon("newspaper") }} {% endblock %} {% block
+card_table %}
+<tr>
+  <th
+    scope="row"
+    class="ps-4 text-nowrap"
+  >
+    {{ _("Dernier bekk") }}
+  </th>
+  <td>{{ bekk_infos.last_bekk }}</td>
+</tr>
+<tr>
+  <th
+    scope="row"
+    class="ps-4 text-nowrap"
+  >
+    {{ _("Promo") }}
+  </th>
+  <td>{{ bekk_infos.promo }}</td>
+</tr>
+<tr>
+  <th
+    scope="row"
+    class="ps-4 text-nowrap"
+  >
+    {{ _("Nombre de bekks") }}
+  </th>
+  <td>{{ bekk_infos.nb_bekks }}</td>
+</tr>
+{% endblock %} {% block card_footer %}
+<a
+  href="{{ url_for('bekk.main') }}"
+  class="btn btn-outline-dark"
+>
+  {{ _("Bekks") }}
+</a>
+{% if bekk_infos.last_bekk.id != -1 %}
+<a
+  href="{{ url_for('bekk.reader', id=bekk_infos.last_bekk_id) }}"
+  class="btn btn-outline-dark"
+>
+  {{ _("Lire le dernier") }}
+</a>
+{% endif %} {% endblock %}

@@ -16,10 +16,14 @@ $custom-colors: (
   "pc5": #d5c0a9,
 );
 
+$custom-table-variants: (
+  "pctable": #d5c0a9,
+);
+
 @import "../bower_components/bootstrap/scss/variables";
 $enable-dark-mode: false;
 
-
+$table-variants: map-merge($table-variants, $custom-table-variants);
 
 // Add PC colors to theme colors (buttons, links...)
 $theme-colors: map-merge($theme-colors, $custom-colors);
@@ -43,7 +47,6 @@ $utilities: map-merge(
       ),
   )
 );
-
 
 @import "../bower_components/bootstrap/scss/root";
 @import "../bower_components/bootstrap/scss/reboot";

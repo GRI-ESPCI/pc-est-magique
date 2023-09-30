@@ -1,4 +1,11 @@
-{% extends "base.html" %} {% import "_form.html" as wtf %} {% block app_content %} {% include 'club_q/common.html' %}
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} {{ super() }}
+<script
+  src='{{url_for("static", filename="js/sort-table.js") }}'
+  defer
+></script>
+
+{% endblock %} {% block app_content %} {% include 'club_q/common.html' %}
+
 
 <div class="row mb-3">
   <div class="col">
@@ -34,13 +41,43 @@
 
 <br />
 <br />
+<div class="container mb-3">
+  <div
+    class="btn-toolbar"
+    role="toolbar"
+  >
+    <div class="d-flex align-items-center">
+      <div
+        class="btn-group"
+        role="group"
+        name="clubq_navbar"
+      >
+        <a
+          role="button"
+          href="{{ url_for('club_q.main', compact=0) }}"
+          class="btn {{ 'btn-primary' if compact == 0 else 'btn-outline-primary' }}"
+        >
+          {{ _("Version détaillée") }}
+        </a>
+        <a
+          role="button"
+          href="{{ url_for('club_q.main', compact=1) }}"
+          class="btn {{ 'btn-primary' if compact == 1 else 'btn-outline-primary' }}"
+        >
+          {{ _("Version compacte") }}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 <br />
+{% if compact == 0 %}
 <form
   action=""
   method="post"
   role="form"
 >
-  {{ form.hidden_tag() }} {% for spect in spectacles %} {% if spect._season_id == season_id %}
+  {{ form.hidden_tag() }} {% for spect in spectacles %}
   <div class="row">
     <div class="col-2 d-flex align-items-center justify-content-center">
       <img
@@ -50,11 +87,14 @@
       />
     </div>
     <div class="col-10">
-      <h3><b>{{ spect.nom }}</b></h3>
-      <h5>{{spect.date}} - {{ babel.format_currency(spect.unit_price, "EUR") }}</h5>
-      <h7>
-        <p>{{ spect.categorie }}</p>
+      <h3 onclick="window.location='{{ url_for('club_q.spectacle_id', id=spect.id) }}';"><b>{{ spect.nom }}</b></h3>
+      <h5> <span onclick="window.location='{{ url_for('club_q.salle_id', id=spect.salle.id) }}';">{{ spect.salle.nom }} </span>- <em>{{spect.date}}</em> - {{ babel.format_currency(spect.unit_price, "EUR") }}
+        <br />
+        <br />
+        <h7>
+        {{ spect.categorie }}
       </h7>
+
       <p>{{ spect.description }}</p>
 
       <div class="row mb-5">
@@ -83,7 +123,7 @@
   </div>
   <hr align="CENTER" />
 
-  {% endif %} {% endfor %}
+  {% endfor %}
   <div class="row mt-3">
     <div class="col text-center">
       <button
@@ -95,6 +135,213 @@
     </div>
   </div>
 </form>
+
+{% elif compact == 1 %}
+<form
+  action=""
+  method="post"
+  role="form"
+>
+  {{ form.hidden_tag() }} 
+<div class="row mb-3">
+  <div class="col table-responsive">
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th
+            scope="col"
+            onclick="sort('name');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Spectacle") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-name"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
+            onclick="sort('salle');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Salle") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-salle"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
+            onclick="sort('category');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Catégorie") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-category"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
+            onclick="sort('date');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Date") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-date"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
+            onclick="sort('price');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Prix") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-price"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
+            onclick="sort('priority');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Priorité") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-priority"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
+            onclick="sort('asked');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Places voulues") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-asked"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+          <th
+            scope="col"
+            onclick="sort('min');"
+          >
+            <span class="d-flex user-select-none">
+              <span>{{ _("Places minimum") }}</span>
+              <span class="mx-auto">
+                <svg
+                  class="bi flex-shrink-0"
+                  width="16"
+                  height="16"
+                  id="sort-svg-min"
+                >
+                  <!-- Sort button inserted through JS -->
+                </svg>
+              </span>
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="sort-table">
+        {% for spect in spectacles %}
+        <tr
+          data-name="{{ spect.nom }}"
+          data-salle="{{ spect.salle.nom }}"
+          data-category="{{ spect.categorie }}"
+          data-date="{{ spect.date }}"
+          data-price="{{ str(spect.unit_price).rjust(5, '0') }}"
+          data-priority="{{ str(getattr(form, 'priorite_' + str(spect.id)).data).rjust(5, '0') }}"
+          data-asked="{{ str(getattr(form, 'nb_places_' + str(spect.id)).data).rjust(5, '0') }}"
+          data-min="{{ str(getattr(form, 'nb_places_minimum_' + str(spect.id)).data).rjust(5, '0') }}"
+
+        >
+          <td onclick="window.location='{{ url_for('club_q.spectacle_id', id=spect.id) }}';">
+            <p class="overflow no_extra">{{ spect.nom }}</p>
+          </td>
+          <td onclick="window.location='{{ url_for('club_q.salle_id', id=spect._salle_id) }}';">
+            <p class="overflow no_extra">{{ spect.salle.nom }}</p>
+          </td>
+          <td>{{ spect.categorie }}</td>
+          <td>{{ spect.date}}</td>
+          <td>{{ babel.format_currency(spect.unit_price, "EUR") }}</td>
+
+          <td>{{ getattr(form, "priorite_" + str(spect.id))() }}</td>
+          <td>{{ getattr(form, "nb_places_" + str(spect.id))()}}</td>
+          <td>{{ getattr(form, "nb_places_minimum_" + str(spect.id))()}}</td>
+        </tr>
+
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="row mt-3">
+  <div class="col text-center">
+    <button
+      type="submit"
+      class="btn btn-lg btn-primary"
+    >
+      {{ _("Mise à jour") }}
+    </button>
+  </div>
+</div>
+</form>
+
+{% endif %}
+
+
 {% else %}
 <h4>{{_("Les réservations ne sont pas ouvertes en ce moment.")}}</h4>
 {% endif %} {% endblock %}

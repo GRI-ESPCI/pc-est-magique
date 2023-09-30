@@ -35,6 +35,7 @@ def permissions() -> dict[str, dict[str, typing.Any]]:
         "access_bar": dict(type=PermissionType.read, scope=PermissionScope.bar, ref_id=None),
         "access_bar_stats": dict(type=PermissionType.read, scope=PermissionScope.bar_stats, ref_id=None),
         "access_club_q": dict(type=PermissionType.read, scope=PermissionScope.club_q, ref_id=None),
+        "access_bekk": dict(type=PermissionType.read, scope=PermissionScope.bekk, ref_id=None),
         "manage_club_q": dict(type=PermissionType.all, scope=PermissionScope.club_q, ref_id=None),
         "manage_photos": dict(type=PermissionType.all, scope=PermissionScope.photos, ref_id=None),
         "manage_intrarez": dict(type=PermissionType.all, scope=PermissionScope.intrarez, ref_id=None),
@@ -42,6 +43,7 @@ def permissions() -> dict[str, dict[str, typing.Any]]:
         "manage_roles": dict(type=PermissionType.all, scope=PermissionScope.role, ref_id=None),
         "manage_collections": dict(type=PermissionType.all, scope=PermissionScope.collection, ref_id=None),
         "manage_bar": dict(type=PermissionType.all, scope=PermissionScope.bar, ref_id=None),
+        "manage_bekk": dict(type=PermissionType.all, scope=PermissionScope.bekk, ref_id=None),
     }
 
 
@@ -63,6 +65,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["manage_collections"],
                 perms["manage_bar"],
                 perms["manage_club_q"],
+                perms["manage_bekk"],
                 perms["access_bar_stats"],
             ],
         ),
@@ -80,6 +83,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["access_photos"],
                 perms["access_bar"],
                 perms["access_club_q"],
+                perms["access_bekk"],
             ],
         ),
         "Alumni": dict(
@@ -87,6 +91,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
             color="152f4e",
             permissions=[
                 perms["access_photos"],
+                perms["access_bekk"],
             ],
         ),
         "Barman": dict(  # NE PAS RENOMMER - nom utilisé dans app/utils/roles.py
@@ -116,6 +121,13 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
             color="8f3985",
             permissions=[
                 perms["manage_club_q"],
+            ],
+        ),
+        "Bekk": dict(
+            index=19,
+            color="546211",
+            permissions=[
+                perms["manage_bekk"],
             ],
         ),
     }
