@@ -5,16 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-# v2.7.0 (2023-09-25)
+# v2.7.0 (2023-09-29)
 
 ### Added
 
 - Bekk (ESPCI student newspaper) module. Read Bekks for user and tools for bekks administrators
 - Compact version to reservation form for Club Q
+- Bekk & Club Q cards for main page
+
+### Changed
+
+- Being a rezident is no longer required to access main page
 
 ### Fixed
 
 - Fixed Club Q minimum places forms bug
+- Background color bug for tables
 
 
 # v2.6.1 (2023-09-18)

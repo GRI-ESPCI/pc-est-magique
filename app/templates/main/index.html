@@ -44,6 +44,16 @@
         {% include "cards/subscription.html" %}
     </div>
     {% endif %}
+    {% if has_permission(PermissionType.read, PermissionScope.club_q) %}
+    <div class="col">
+        {% include "cards/club_q.html" %}
+    </div>
+    {% endif %}
+    {% if has_permission(PermissionType.read, PermissionScope.bekk) %}
+    <div class="col">
+        {% include "cards/bekk_accueil.html" %}
+    </div>
+    {% endif %}
     {% endwith %}
     <div class="col">
         {% include "cards/coming_soon.html" %}

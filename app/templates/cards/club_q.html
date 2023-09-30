@@ -1,0 +1,53 @@
+{# Club Q card - used variables: club_q_infos #} {% extends "cards/base.html" %} {% block card_title %} {{ _("Club Q")
+}} {{ macros.badge() }} {% endblock %} {% block card_icon %} {{ macros.bootstrap_icon("music-note-beamed") }} {%
+endblock %} {% block card_table %}
+<tr>
+  <th
+    scope="row"
+    class="ps-4 text-nowrap"
+  >
+    {{ _("Saison actuelle") }}
+  </th>
+  {% if club_q_infos.season != None %}
+  <td>{{ club_q_infos.season.nom }}</td>
+  {% else %}
+  <td>{{ _("Aucune") }}</td>
+  {% endif %}
+</tr>
+<tr>
+  <th
+    scope="row"
+    class="ps-4 text-nowrap"
+  >
+    {{ _("Prochain spectacle") }}
+  </th>
+  {% if club_q_infos.next_voeu != None %}
+  <td>{{ club_q_infos.next_voeu.spectacle.nom }} - {{ club_q_infos.next_voeu.spectacle.date }}</td>
+  {% else %}
+  <td>{{ _("Aucun") }}</td>
+  {% endif %}
+</tr>
+<tr>
+  <th
+    scope="row"
+    class="ps-4 text-nowrap"
+  >
+    {{ _("À payer") }}
+  </th>
+  <td>{{ babel.format_currency(club_q_infos.to_pay, "EUR") }}</td>
+</tr>
+{% endblock %} {% block card_footer %} {% if club_q_infos.visibility == 1 %}
+<a
+  href="{{ url_for('club_q.main') }}"
+  class="btn btn-outline-dark"
+>
+  {{ _("Réserver") }}
+</a>
+{% endif %}
+<a
+  href="{{ url_for('club_q.pceen_id', id=club_q_infos.pceen.id) }}"
+  class="btn btn-outline-dark"
+>
+  {{ _("Détails") }}
+</a>
+{% endblock %}

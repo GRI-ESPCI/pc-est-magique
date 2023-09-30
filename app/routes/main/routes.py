@@ -12,9 +12,23 @@ from flask_babel import _
 from discord_webhook import DiscordWebhook
 
 from app import context
-from app.models import Ban, PermissionScope, PermissionType, Collection, Album, Photo
+from app.models import (
+    Ban,
+    PermissionScope,
+    PermissionType,
+    Collection,
+    Album,
+    Photo,
+    GlobalSetting,
+    ClubQSeason,
+    ClubQVoeu,
+    ClubQSpectacle,
+    Bekk,
+)
 from app.routes.main import bp, forms
 from app.utils import captcha, helpers, typing
+from datetime import date
+from app.routes.club_q.utils import pceen_prix_total
 
 
 @bp.route("/")
@@ -22,8 +36,8 @@ from app.utils import captcha, helpers, typing
 @context.logged_in_only
 def index() -> typing.RouteReturn:
     """PC est magique home page."""
-    if context.has_permission(PermissionType.read, PermissionScope.intrarez) and not context.g.intrarez_setup:
-        return helpers.safe_redirect(context.g.redemption_endpoint, **context.g.redemption_params)
+    # if context.has_permission(PermissionType.read, PermissionScope.intrarez) and not context.g.intrarez_setup:
+    #    return helpers.safe_redirect(context.g.redemption_endpoint, **context.g.redemption_params)
 
     photos_infos = None
     if context.has_permission(PermissionType.read, PermissionScope.photos):
@@ -32,7 +46,58 @@ def index() -> typing.RouteReturn:
             len(Album.query.all()),
             len(Photo.query.all()),
         )
-    return flask.render_template("main/index.html", title=_("Accueil"), photos_infos=photos_infos)
+
+    club_q_infos = None
+    if context.has_permission(PermissionType.read, PermissionScope.club_q):
+        pceen = context.g.pceen
+
+        season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value
+        season = ClubQSeason.query.filter_by(id=season_id).first()
+
+        next_voeu = ClubQVoeu.query.filter(
+            ClubQVoeu._pceen_id == pceen.id,
+            ClubQVoeu.places_attribuees > 0,
+            ClubQVoeu.spectacle.has(ClubQSpectacle.date > date.today()),
+        ).first()
+
+        voeux = ClubQVoeu.query.filter_by(_pceen_id=pceen.id, _season_id=season_id)
+        if voeux is not None:
+            to_pay = pceen_prix_total(pceen, voeux)
+        else:
+            to_pay = 0
+
+        visibility = GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value
+
+        club_q_infos = namedtuple("ClubQInfos", ["season", "next_voeu", "to_pay", "booking_open", "pceen"])(
+            season,
+            next_voeu,
+            to_pay,
+            visibility,
+            pceen,
+        )
+
+    bekk_infos = None
+    if context.has_permission(PermissionType.read, PermissionScope.bekk):
+
+        bekks = Bekk.query.order_by(Bekk.date)
+        last_bekk = bekks.first()
+
+        if bekks == None:
+            bekk_infos = namedtuple("BekkInfos", ["last_bekk", "promo", "nb_bekks", "last_bekk_id"])(
+                "Aucun", "-", 0, -1
+            )
+        else:
+            bekk_infos = namedtuple("BekkInfos", ["last_bekk", "promo", "nb_bekks", "last_bekk_id"])(
+                last_bekk.name, last_bekk.promo, bekks.count(), last_bekk.id
+            )
+
+    return flask.render_template(
+        "main/index.html",
+        title=_("Accueil"),
+        photos_infos=photos_infos,
+        bekk_infos=bekk_infos,
+        club_q_infos=club_q_infos,
+    )
 
 
 @bp.route("/contact", methods=["GET", "POST"])
@@ -205,8 +270,5 @@ def club_q(season: str, filename: str) -> typing.RouteReturn:
 @bp.route("/bekks/<filename>")
 def bekks(filename: str) -> typing.RouteReturn:
     """Serve Bekks files (fallback if no Nginx, should NOT be used!)"""
-    filepath = os.path.join(
-        flask.current_app.config["BEKKS_BASE_PATH"],
-        filename
-    )
+    filepath = os.path.join(flask.current_app.config["BEKKS_BASE_PATH"], filename)
     return flask.send_file(filepath)

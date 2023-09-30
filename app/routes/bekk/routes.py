@@ -19,6 +19,7 @@ from app.models import (
 import PyPDF2
 import os
 
+
 @bp.route("", methods=["GET", "POST"])
 @bp.route("/", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.bekk)
@@ -39,7 +40,6 @@ def main() -> typing.RouteReturn:
     if promo != 0:
         bekks = Bekk.query.filter_by(promo=promo).order_by(Bekk.date.desc()).all()
 
-    
     form = forms.Bekk()
 
     if form.validate_on_submit() and context.g.pceen.has_permission(PermissionType.write, PermissionScope.bekk):
@@ -62,10 +62,9 @@ def main() -> typing.RouteReturn:
 
                 db.session.commit()
 
-                bekk_path = os.path.join(flask.current_app.config["BEKKS_BASE_PATH"], str(bekk.id) + '.pdf')
+                bekk_path = os.path.join(flask.current_app.config["BEKKS_BASE_PATH"], str(bekk.id) + ".pdf")
                 form["pdf_file"].data.save(bekk_path)
 
-                
                 flask.flash(_("Bekk ajouté."))
                 return flask.redirect(flask.url_for("bekk.main", promo=promo))
 
@@ -73,7 +72,7 @@ def main() -> typing.RouteReturn:
             delete = form["delete"].data
             bekk = Bekk.query.filter_by(id=form["id"].data).one()
 
-            bekk_path = os.path.join(flask.current_app.config["BEKKS_BASE_PATH"], str(bekk.id) + '.pdf')
+            bekk_path = os.path.join(flask.current_app.config["BEKKS_BASE_PATH"], str(bekk.id) + ".pdf")
 
             if delete:
                 db.session.delete(bekk)
@@ -93,7 +92,6 @@ def main() -> typing.RouteReturn:
                 flask.flash(_("Bekk édité."))
                 return flask.redirect(flask.url_for("bekk.main", promo=promo))
 
-
     bekk_id_list = []
     for bekk in bekks:
         bekk_id_list.append(bekk.id)
@@ -108,7 +106,7 @@ def main() -> typing.RouteReturn:
         promos=promos,
         form=form,
         bekk_id_list=bekk_id_list,
-        can_edit=can_edit
+        can_edit=can_edit,
     )
 
 
@@ -121,8 +119,7 @@ def reader(id: int) -> typing.RouteReturn:
 
     filepath = os.path.join(flask.current_app.config["BEKKS_BASE_PATH"], str(id) + ".pdf")
 
-    with open(filepath, 'rb') as file:
+    with open(filepath, "rb") as file:
         nb_pages = len(PyPDF2.PdfReader(file).pages)
-  
 
     return flask.render_template("bekk/reader.html", title=bekk.name, bekk=bekk, nb_pages=nb_pages)
