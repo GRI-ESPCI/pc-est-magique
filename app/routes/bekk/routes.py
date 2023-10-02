@@ -116,7 +116,15 @@ def reader(id: int) -> typing.RouteReturn:
 
     filepath = os.path.join(flask.current_app.config["BEKKS_BASE_PATH"], str(id) + ".pdf")
 
-    with open(filepath, "rb") as file:
-        nb_pages = len(PyPDF2.PdfReader(file).pages)
+    redirect = flask.url_for("bekk.main")
+    url = bekk.pdf_src_with_token
+    download_name = bekk.id
 
-    return flask.render_template("bekk/reader.html", title=bekk.name, bekk=bekk, nb_pages=nb_pages)
+    with open(filepath, "rb") as file:
+        reader = PyPDF2.PdfReader(file)
+        nb_pages = len(reader.pages)
+        height = reader.pages[0].mediabox.height
+        width = reader.pages[0].mediabox.width
+        dim = [width, height]
+
+    return flask.render_template("reader.html", title=bekk.name, bekk=bekk, nb_pages=nb_pages, dim=dim, redirect=redirect, url=url, download_name=download_name)

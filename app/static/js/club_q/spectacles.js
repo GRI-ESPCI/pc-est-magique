@@ -34,7 +34,6 @@ moSpectacleEdit.addEventListener("show.bs.modal", function (event) {
   var salleNom = button.dataset["salleNom"]
   var spectacleNom = button.dataset["spectacleNom"];
   var spectacleCategorie = button.dataset["spectacleCategorie"];
-  var spectacleImage = button.dataset["spectacleImage"];
   var spectacleDescription = button.dataset["spectacleDescription"];
   var [spectacleDate, spectacleTime] = button.dataset["spectacleDate"].split(" ");
   var spectacleTime=spectacleTime.substring(0,5)
@@ -48,7 +47,7 @@ moSpectacleEdit.addEventListener("show.bs.modal", function (event) {
   document.getElementsByName("salle_id")[0].value = salleId;
   document.getElementsByName("nom")[0].value = spectacleNom;
   document.getElementsByName("categorie")[0].value = spectacleCategorie;
-  document.getElementsByName("image")[0].value = spectacleImage;
+  document.getElementsByName("image")[0].value = null;
   document.getElementsByName("description")[0].value = spectacleDescription;
   document.getElementsByName("date")[0].value = spectacleDate;
   document.getElementsByName("time")[0].value = spectacleTime;

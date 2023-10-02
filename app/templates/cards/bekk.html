@@ -1,7 +1,7 @@
 {# Bekk card - used variable bekk (dabatase query)#} {% extends "cards/base.html" %} {% block card_head %}
 
 <canvas
-  id="bekk-{{bekk.id}}"
+  id="{{bekk.id}}"
   onclick="window.location='{{ url_for('bekk.reader', id=bekk.id) }}';"
 ></canvas>
 
@@ -39,7 +39,7 @@
 
 <a
   role="button"
-  href="/bekks/{{bekk.id}}.pdf"
+  href="{{bekk.pdf_src_with_token}}"
   download="{{bekk.id}}.pdf"
   class="btn btn-outline-dark"
 >

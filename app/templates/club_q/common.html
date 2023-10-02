@@ -69,6 +69,13 @@
         >
           {{ _("Saisons") }}
         </a>
+        <a
+          role="button"
+          href="{{ url_for('club_q.brochures') }}"
+          class="btn {{ 'btn-primary' if view == 'plaquettes' else 'btn-outline-primary' }}"
+        >
+          {{ _("Plaquettes") }}
+        </a>
         {% if has_permission(PermissionType.all, PermissionScope.club_q) %}
         <a
           role="button"

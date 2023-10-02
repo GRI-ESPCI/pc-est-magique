@@ -27,6 +27,7 @@ from app.utils.columns import (
     Relationship,
 )
 
+app = flask.Flask(__name__)
 
 Model = typing.cast(type[type], db.Model)  # type checking hack
 Enum = my_enum  # type checking hack
@@ -252,16 +253,19 @@ class PCeen(flask_login.UserMixin, Model):
         return max(self.subscriptions, key=lambda sub: sub.start)
 
     @property
-    def old_subscriptions(self) -> list[models.Subscription]:
+    def old_subscriptions(self) -> list[models.Subscription] | None:
         """:class:`list[Subscription]`: The PCeen's non-current
         subscriptions.
 
         Sorted from most recent to last recent subscription."""
-        return sorted(
-            (sub for sub in self.subscriptions if not sub.is_active),
-            key=lambda sub: sub.end,
-            reverse=True,
-        )
+        if not self.subscriptions:
+            return None
+        else:
+            return sorted(
+                (sub for sub in self.subscriptions if not sub.is_active),
+                key=lambda sub: sub.end,
+                reverse=True,
+            )
 
     def compute_sub_state(self) -> SubState:
         """Compute the PCeen's subscription state.

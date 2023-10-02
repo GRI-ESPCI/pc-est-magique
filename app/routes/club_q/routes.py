@@ -12,6 +12,7 @@ from app.models import (
     ClubQSpectacle,
     ClubQSalle,
     ClubQVoeu,
+    ClubQBrochure,
     PermissionScope,
     PermissionType,
     GlobalSetting,
@@ -22,9 +23,11 @@ from app.models import (
 from app.routes.club_q import bp, forms
 from app.utils import typing
 from app.utils.validators import Optional, DataRequired
+from app.utils.nginx import get_nginx_access_token
 from datetime import datetime
 
 import wtforms
+import PyPDF2
 
 from app.routes.club_q.utils import (
     pdf_client,
@@ -48,8 +51,6 @@ from app.routes.club_q.algorithm import attribution
 
 from app.email import send_email
 
-app = flask.Flask(__name__)
-
 @bp.route("", methods=["GET", "POST"])
 @bp.route("/", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
@@ -65,11 +66,13 @@ def main() -> typing.RouteReturn:
     if context.g.pceen.has_permission(PermissionType.all, PermissionScope.club_q):
         visibility = 1
 
+
     # Ajout dynamique de 1 form par spectacle de la saison
     season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
     spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
 
     saison = ClubQSeason.query.filter_by(id=season_id).first()
+    brochure = ClubQBrochure.query.filter_by(_season_id=season_id).one_or_none()
 
     for spect in spectacles:
         voeu = ClubQVoeu.query.filter_by(
@@ -208,6 +211,7 @@ def main() -> typing.RouteReturn:
         visibility=visibility,
         saison=saison,
         compact=compact,
+        brochure=brochure
     )
 
 
@@ -240,9 +244,11 @@ def pceens() -> typing.RouteReturn:
         total_payement = sum(pceens_a_payer)
         nb_voeux.append(sum_object(pceen, voeux))
 
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+
     form_discontent = forms.EditDiscontent()
 
-    if form_discontent.validate_on_submit():
+    if form_discontent.validate_on_submit() and can_edit:
         pceen = PCeen.query.filter_by(id=form_discontent["id"].data).one()
         pceen.discontent = form_discontent["discontent"].data
 
@@ -329,7 +335,9 @@ def spectacles() -> typing.RouteReturn:
     else:
         salle = None
 
-    spectacle_form(salles, salle, season_id, redirect)
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+
+    spectacle_form(salles, salle, season_id, redirect, can_edit)
 
     form_spectacle = forms.EditSpectacle()
 
@@ -461,9 +469,11 @@ def salles() -> typing.RouteReturn:
             spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).filter_by(_salle_id=salle.id)
         nb_spectacles.append(sum_object(salle, spectacles))
 
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+
     form_salle = forms.EditSalle()
 
-    if form_salle.validate_on_submit():
+    if form_salle.validate_on_submit() and can_edit:
         add = form_salle["add"].data
 
         if add:
@@ -541,7 +551,9 @@ def voeux() -> typing.RouteReturn:
     else:
         spectacle = None
 
-    voeu_form(spectacles, spectacle, pceens, pceens[0], season_id, redirect)
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+
+    voeu_form(spectacles, spectacle, pceens, pceens[0], season_id, redirect, can_edit)
 
     # Forms
     form_add_voeu = forms.AddVoeu()
@@ -580,9 +592,11 @@ def saisons() -> typing.RouteReturn:
         saison_nb_spectacles.append(sum_object(saison, spectacles))
         saison_nb_pceens.append(pceens.count())
 
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+
     form_saison = forms.EditSaison()
 
-    if form_saison.validate_on_submit():
+    if form_saison.validate_on_submit() and can_edit:
         add = form_saison["add"].data
 
         if add:
@@ -606,6 +620,10 @@ def saisons() -> typing.RouteReturn:
 
         if delete:
             db.session.delete(saison)
+            
+            path = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], str(saison.id))
+            os.rmdir(path)
+            
             db.session.commit()
             flask.flash(_("Saison supprimée."))
             return flask.redirect(flask.url_for("club_q.saisons"))
@@ -673,7 +691,9 @@ def attribution_manager() -> typing.RouteReturn:
     except:
         log_algo = "error"
 
-    if form_algo_setting.is_submitted():
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+
+    if form_algo_setting.is_submitted() and can_edit:
         submit = form_algo_setting["submit"].data
         if submit and form_algo_setting.validate_on_submit():
             GlobalSetting.query.filter_by(key="DISCONTENT_BONUS_1A").one().value = form_algo_setting.m1A.data
@@ -743,9 +763,17 @@ def mails() -> typing.RouteReturn:
         .filter(subquery)
     )
 
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+
     form_mail = forms.Mail()
 
-    if form_mail.validate_on_submit():
+    #Get access to Club Q RIB
+    src_rib = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "RIB_Club_Q.jpg")
+    ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]
+    token_args = get_nginx_access_token(src_rib, ip)
+    rib = f"{src_rib}?{token_args}"
+
+    if form_mail.validate_on_submit() and can_edit:
         date = form_mail["date"].data
         subject = f"Attribution Club Q {saison.nom}"
         for pceen in pceens:
@@ -754,6 +782,7 @@ def mails() -> typing.RouteReturn:
                 saison=saison,
                 pceen=pceen,
                 date=date,
+                rib=rib
             )
 
             send_email(
@@ -762,6 +791,7 @@ def mails() -> typing.RouteReturn:
                 subject=f"[PC est magique - Club - Q] {subject}",
                 recipients={pceen.email: pceen.full_name},
                 html_body=html_body,
+                reply_to=form_mail["reply_to"].data
             )
 
     return flask.render_template("club_q/mails.html", view="mails", form_mail=form_mail, user=context.g.pceen)
@@ -789,10 +819,12 @@ def options() -> typing.RouteReturn:
         wtforms.SelectField(_("Saison actuelle"), choices=[(s.id, s.nom) for s in seasons], default=season_id),
     )
 
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+
     form_setting = forms.SettingClubQPage()
 
     # Cheking if something changed in forms
-    if form_setting.validate_on_submit():
+    if form_setting.validate_on_submit() and can_edit:
         if form_setting.visibility.data:
             GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value = 1
 
@@ -847,7 +879,9 @@ def pceen_id(id: int):
     else:
         spectacle = None
 
-    voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect)
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+
+    voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect, can_edit)
 
     # Forms
     form_add_voeu = forms.AddVoeu()
@@ -904,6 +938,7 @@ def user_generate_pdf(id: int):
     response.headers["Content-Disposition"] = f"inline; filename=club_q_{pceen.username}.pdf"
     return response
 
+
 @bp.route("/spectacles/<int:id>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
 def spectacle_id(id: int):
@@ -930,7 +965,9 @@ def spectacle_id(id: int):
 
     redirect = flask.url_for("club_q.spectacle_id", id=id, season_id=season_id)
 
-    voeu_form(spectacles, spectacle, pceens, pceens[0], season_id, redirect)
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+
+    voeu_form(spectacles, spectacle, pceens, pceens[0], season_id, redirect, can_edit)
 
     # Forms
     form_add_voeu = forms.AddVoeu()
@@ -1057,7 +1094,9 @@ def salle_id(id: int):
 
     redirect = flask.url_for("club_q.salle_id", id=id, season_id=season_id)
 
-    spectacle_form(salles, salle, season_id, redirect)
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+
+    spectacle_form(salles, salle, season_id, redirect, can_edit)
 
     form_spectacle = forms.EditSpectacle()
 
@@ -1077,3 +1116,109 @@ def salle_id(id: int):
         form_spectacle=form_spectacle,
         nb_total_spectacles=len(spectacles),
     )
+
+
+@bp.route("/plaquettes", methods=["GET", "POST"])
+@context.permission_only(PermissionType.read, PermissionScope.club_q)
+def brochures() -> typing.RouteReturn:
+    """Club Q Brochure page"""
+
+    brochures = ClubQBrochure.query.join(ClubQBrochure.season).order_by(ClubQSeason.debut.desc()).all()
+    saisons = ClubQSeason.query.order_by(ClubQSeason.debut.desc()).all()
+
+    setattr(
+            forms.Brochure,
+            "season_id",
+            wtforms.SelectField(
+                _("Saison"),
+                choices=[[saison.id, saison.nom] for saison in saisons],
+                default=GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value,
+                validators=[DataRequired()],
+            ),
+        )
+
+    form = forms.Brochure()
+
+    if form.validate_on_submit() and context.g.pceen.has_permission(PermissionType.write, PermissionScope.club_q):
+        add = form["add"].data
+
+        if add:
+            flag = False
+            if form["pdf_file"].data is None:
+                flask.flash(_("Aucun fichier choisi."), "danger")
+                flag = True
+
+            for brochure in brochures:
+                if brochure._season_id == int(form["season_id"].data):
+                    flask.flash(_("Il y a déjà une plaquette associée à cette saison."), "danger")
+                    flag = True
+
+            if not flag:
+                brochure = ClubQBrochure()
+
+                brochure._season_id = form["season_id"].data
+
+                db.session.add(brochure)
+                db.session.commit()
+                path = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "plaquettes" , str(brochure.id) + ".pdf")
+                form["pdf_file"].data.save(path)
+
+                flask.flash(_("Plaquette ajoutée."))
+                return flask.redirect(flask.url_for("club_q.brochures"))
+
+
+    brochure_id_list = []
+    for brochure in brochures:
+        brochure_id_list.append(brochure.id)
+
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+
+    return flask.render_template(
+        "club_q/brochures.html",
+        title=_("Plaquettes Club Q"),
+        brochures=brochures,
+        view="plaquettes",
+        form=form,
+        brochure_id_list=brochure_id_list,
+        can_edit=can_edit,
+        user=context.g.pceen
+    )
+
+
+@bp.route("/reader/<int:id>", methods=["GET"])
+@context.permission_only(PermissionType.read, PermissionScope.club_q)
+def brochure_reader(id: int) -> typing.RouteReturn:
+    """Club Q module to reader brochures"""
+
+    brochure = ClubQBrochure.query.filter_by(id=id).one_or_none()
+
+    filepath = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "plaquettes" , str(brochure.id) + ".pdf")
+
+    redirect = flask.url_for("club_q.brochures")
+    url = brochure.pdf_src_with_token
+    download_name = brochure.id
+
+    with open(filepath, "rb") as file:
+        reader = PyPDF2.PdfReader(file)
+        nb_pages = len(reader.pages)
+        height = reader.pages[0].mediabox.height
+        width = reader.pages[0].mediabox.width
+        dim = [width, height]
+
+    return flask.render_template("reader.html", brochure=brochure,  nb_pages=nb_pages, dim=dim, redirect=redirect, url=url, download_name=download_name)
+
+
+@bp.route("/reader/delete/<int:id>", methods=["GET"])
+@context.permission_only(PermissionType.read, PermissionScope.club_q)
+def brochure_delete(id: int) -> typing.RouteReturn:
+
+    brochure = ClubQBrochure.query.filter_by(id=id).one()
+    path = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "plaquettes" , str(brochure.id) + ".pdf")
+
+    db.session.delete(brochure)
+    db.session.commit()
+
+    os.remove(path)
+
+    flask.flash(_("Plaquette supprimée."))
+    return flask.redirect(flask.url_for("club_q.brochures"))

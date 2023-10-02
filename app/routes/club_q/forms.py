@@ -5,6 +5,7 @@ from wtforms.fields import html5
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
 from flask import Flask
+from flask_wtf.file import FileField, FileAllowed
 from app.utils.validators import (
     DataRequired,
     Optional,
@@ -85,7 +86,7 @@ class EditSpectacle(FlaskForm):
     nom = wtforms.StringField("Nom", validators=[DataRequired()])
     description = wtforms.TextAreaField("Description", validators=[Optional(), Length(max=2500)])
     categorie = wtforms.StringField("Catégorie", validators=[Optional()])
-    image = wtforms.StringField("Nom de l'image", validators=[Optional()])
+    image = wtforms.FileField(_l(""), validators=[FileAllowed(["jpg"], "JPG uniquement!")])
     date = html5.DateField("Date", validators=[InputRequired()])
     time = html5.TimeField("Heure", validators=[InputRequired()])
     nb_tickets = wtforms.IntegerField("Nombre de places", validators=[DataRequired()])
@@ -111,3 +112,10 @@ class Mail(FlaskForm):
         "Envoyer à partir du x-ème email (à utiliser en cas de bug)", validators=[Optional()]
     )
     submit_mail = wtforms.SubmitField(_l("Envoyer les e-mails"))
+
+class Brochure(FlaskForm):
+    """WTForm used to upload club Q brochures."""
+
+    id = wtforms.HiddenField("")
+    pdf_file = FileField(_l(""), validators=[FileAllowed(["pdf"], "PDF uniquement!")])
+    add = wtforms.SubmitField(_l("Ajouter"))

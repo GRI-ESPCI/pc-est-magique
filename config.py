@@ -58,6 +58,8 @@ class Config:
     MAIL_WEBHOOK = os.environ.get("MAIL_WEBHOOK")
     GRI_ROLE_ID = os.environ.get("GRI_ROLE_ID")
 
+    CLUB_Q_BASE_PATH = os.environ.get("CLUB_Q_BASE_PATH")
+
     BEKKS_BASE_PATH = os.environ.get("BEKKS_BASE_PATH")
 
     PHOTOS_BASE_PATH = os.environ.get("PHOTOS_BASE_PATH")

@@ -19,7 +19,8 @@ from app.utils.columns import (
 
 
 Model = typing.cast(type[type], db.Model)  # type checking hack
-
+from app.utils.nginx import get_nginx_access_token
+import flask
 
 class ClubQSeason(db.Model):
     """Informations about Club Q Seasons"""
@@ -35,6 +36,7 @@ class ClubQSeason(db.Model):
         "ClubQSpectacle.season", order_by="ClubQSpectacle.date"
     )
     voeu: Relationship[list[ClubQVoeu]] = one_to_many("ClubQVoeu.season", order_by="ClubQVoeu.id")
+    brochure: Relationship[list[ClubQBrochure]] = one_to_many("ClubQBrochure.season", order_by="ClubQBrochure.id")
 
     @property
     def sum_places_demandees(self) -> int:
@@ -91,6 +93,12 @@ class ClubQSpectacle(db.Model):
     def sum_places_attribuees(self) -> int:
         """The number of tickets asked for a spectacle"""
         return sum(v.places_attribuees for v in self.voeu.filter_by(_season_id=self._season_id))
+    
+    @property
+    def src(self) -> int:
+        """Image path for club q images"""
+        return f"/club_q_images/{self.season.id}/{self.id}.jpg"
+
 
 
 class ClubQVoeu(db.Model):
@@ -111,3 +119,24 @@ class ClubQVoeu(db.Model):
 
     _season_id: Column[int] = column(sa.ForeignKey("club_q_season.id"), nullable=False)
     season: Relationship[ClubQSeason] = many_to_one("ClubQSeason.voeu")
+
+
+class ClubQBrochure(db.Model):
+    """Bekk registration information"""
+
+    id: Column[int] = column(sa.Integer(), primary_key=True)
+
+    _season_id: Column[int] = column(sa.ForeignKey("club_q_season.id"), nullable=False)
+    season: Relationship[ClubQSeason] = many_to_one("ClubQSeason.brochure")
+
+    @property
+    def src(self) -> str:
+        """The online path to the pdf."""
+        return f"/club_q_plaquettes/{self.id}.pdf"
+
+    @property
+    def pdf_src_with_token(self) -> str:
+        """The online query to the pdf with md5 args."""
+        ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]
+        token_args = get_nginx_access_token(self.src, ip)
+        return f"{self.src}?{token_args}"

@@ -29,7 +29,7 @@
 <div class="container mb-3">
   <div class="btn-toolbar justify-content-between">
     <h4>{{ _("Voeux : ")}}</h4>
-
+    {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
     <div
       data-bs-toggle="tooltip"
       data-bs-placement="right"
@@ -51,6 +51,7 @@
         </svg>
       </button>
     </div>
+    {% endif %}
   </div>
 </div>
 <div class="row mb-3">
@@ -254,7 +255,7 @@
           data-price="{{  str(voeu.spectacle.unit_price*voeu.places_attribuees).rjust(5, '0') }}"
         >
           <td>{{ voeu.id }}</td>
-          <td onclick="window.location='{{ url_for('club_q.spectacle_id', id=voeu.spectacle.id) }}'';">
+          <td onclick="window.location='{{ url_for('club_q.spectacle_id', id=voeu.spectacle.id) }}';">
             {{ voeu.spectacle.nom }}
           </td>
           <td>{{ voeu.priorite }}</td>
@@ -266,6 +267,7 @@
           <td>{{ voeu.spectacle.nb_tickets - voeu.spectacle.sum_places_attribuees}}</td>
           {% endif %}
           <td>{{ babel.format_currency(voeu.spectacle.unit_price * voeu.places_attribuees, "EUR") }}</td>
+          {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
           <td>
             <div
               data-bs-toggle="tooltip"
@@ -293,6 +295,7 @@
               </button>
             </div>
           </td>
+          {% endif %}
         </tr>
         {% endfor %}
       </tbody>
@@ -309,7 +312,9 @@
           <td><b>{{ _("-") }}</b></td>
           {% endif %}
           <td><b>{{ babel.format_currency(prix_total, "EUR") }}</b></td>
+          {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
           <td><b>{{ _("") }}</b></td>
+          {% endif %}
         </tr>
       </tbody>
     </table>

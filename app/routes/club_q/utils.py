@@ -15,8 +15,8 @@ import flask
 from app.routes.club_q import forms
 from flask_babel import _
 from datetime import datetime
+from flask import request
 
-app = flask.Flask(__name__)
 
 cm = rl.lib.units.cm
 
@@ -505,7 +505,7 @@ def spectacles_sum_places(spectacles) -> int:
     return sum(spectacle.nb_tickets for spectacle in spectacles)
 
 
-def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect):
+def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect, can_edit):
 
     if spectacle != None:
         # Add spectacle select choice for adding voeu
@@ -546,7 +546,7 @@ def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect):
     form_edit_voeu = forms.EditVoeu()
 
     # If a form is validated
-    if form_add_voeu.is_submitted():
+    if form_add_voeu.is_submitted() and can_edit:
         submit = form_add_voeu["submit_add"].data
         if submit:
             if form_add_voeu.validate():
@@ -564,7 +564,7 @@ def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect):
                 flask.flash(_("Voeu ajouté."))
                 return flask.redirect(redirect)
 
-    if form_edit_voeu.is_submitted():
+    if form_edit_voeu.is_submitted() and can_edit:
         delete = form_edit_voeu["delete_edit"].data
         if delete:
             voeu = ClubQVoeu.query.filter_by(id=form_edit_voeu["id_edit"].data).one()
@@ -587,7 +587,7 @@ def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect):
             return flask.redirect(redirect)
 
 
-def spectacle_form(salles, salle, season_id, redirect):
+def spectacle_form(salles, salle, season_id, redirect, can_edit):
 
     if salle != None:
         setattr(
@@ -611,7 +611,7 @@ def spectacle_form(salles, salle, season_id, redirect):
 
     form_spectacle = forms.EditSpectacle()
 
-    if form_spectacle.validate_on_submit():
+    if form_spectacle.validate_on_submit() and can_edit:
         add = form_spectacle["add"].data
 
         if add:
@@ -624,21 +624,40 @@ def spectacle_form(salles, salle, season_id, redirect):
             spectacle._salle_id = form_spectacle["salle_id"].data
             spectacle.description = form_spectacle["description"].data
             spectacle.categorie = form_spectacle["categorie"].data
-            spectacle.image_name = form_spectacle["image"].data
             spectacle.date = datetime.combine(form_spectacle["date"].data, form_spectacle["time"].data)
             spectacle.nb_tickets = form_spectacle["nb_tickets"].data
             spectacle.unit_price = form_spectacle["price"].data
 
             db.session.commit()
+
+            if form_spectacle["image"].data is not None:
+                path = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], str(spectacle.season.id))
+                save_path = os.path.join(path, str(spectacle.id) + ".jpg")
+                if not os.path.exists(path):
+                    os.makedirs(path)
+                if os.path.exists(save_path):
+                    os.remove(save_path)
+                form_spectacle["image"].data.save(save_path)
+
             flask.flash(_("Spectacle ajouté."))
             return flask.redirect(redirect)
 
         delete = form_spectacle["delete"].data
         spectacle = ClubQSpectacle.query.filter_by(id=form_spectacle["id"].data).one()
 
+        path = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], str(spectacle.season.id))
+        save_path = os.path.join(path, str(spectacle.id) + ".jpg")
+
         if delete:
+            try:
+                os.remove(save_path)
+            except FileNotFoundError:
+                pass
+
+
             db.session.delete(spectacle)
             db.session.commit()
+
             flask.flash(_("Spectacle supprimé."))
             return flask.redirect(redirect)
 
@@ -647,10 +666,16 @@ def spectacle_form(salles, salle, season_id, redirect):
             spectacle._salle_id = form_spectacle["salle_id"].data
             spectacle.description = form_spectacle["description"].data
             spectacle.categorie = form_spectacle["categorie"].data
-            spectacle.image_name = form_spectacle["image"].data
             spectacle.date = datetime.combine(form_spectacle["date"].data, form_spectacle["time"].data)
             spectacle.nb_tickets = form_spectacle["nb_tickets"].data
             spectacle.unit_price = form_spectacle["price"].data
+
+            if form_spectacle["image"].data is not None:
+                if not os.path.exists(path):
+                    os.makedirs(path)
+                if os.path.exists(save_path):
+                    os.remove(save_path)
+                form_spectacle["image"].data.save(save_path)
 
             db.session.commit()
             flask.flash(_("Spectacle édité."))

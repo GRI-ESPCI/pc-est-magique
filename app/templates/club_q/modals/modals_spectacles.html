@@ -26,6 +26,7 @@
         action=""
         method="post"
         role="form"
+        enctype="multipart/form-data"
       >
         {{ form_spectacle.hidden_tag() }}
         <div class="modal-body">
@@ -42,11 +43,6 @@
           <div class="row mb-3">
             <div class="col">
               <div class="form-floating">{{ wtf.form_field(form_spectacle.categorie) }}</div>
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col">
-              <div class="form-floating">{{ wtf.form_field(form_spectacle.image) }}</div>
             </div>
           </div>
           <div class="row mb-3">
@@ -73,6 +69,14 @@
             <div class="col">
               <div class="form-floating">{{ wtf.form_field(form_spectacle.price) }}</div>
             </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ _("Image : ")}} <br />{{ wtf.form_field(form_spectacle.image) }}</div>
+            </div>
+            {% if form_spectacle.image.errors %}
+            <small class="form-text text-danger">{{ form_spectacle.image.errors[0] }}</small>
+            {% endif %}
           </div>
           <div class="modal-footer">
             <button
@@ -118,6 +122,7 @@
         action=""
         method="post"
         role="form"
+        enctype="multipart/form-data"
       >
         {{ form_spectacle.hidden_tag() }}
         <div class="modal-body">
@@ -134,11 +139,6 @@
           <div class="row mb-3">
             <div class="col">
               <div class="form-floating">{{ wtf.form_field(form_spectacle.categorie) }}</div>
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col">
-              <div class="form-floating">{{ wtf.form_field(form_spectacle.image) }}</div>
             </div>
           </div>
           <div class="row mb-3">
@@ -165,6 +165,14 @@
             <div class="col">
               <div class="form-floating">{{ wtf.form_field(form_spectacle.price) }}</div>
             </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col">
+              <div class="form-floating">{{ _("Image : ")}} <br />{{ wtf.form_field(form_spectacle.image) }}</div>
+            </div>
+            {% if form_spectacle.image.errors %}
+            <small class="form-text text-danger">{{ form_spectacle.image.errors[0] }}</small>
+            {% endif %}
           </div>
           <div class="modal-footer">
             <button
