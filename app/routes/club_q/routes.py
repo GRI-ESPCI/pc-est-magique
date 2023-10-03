@@ -1126,16 +1126,11 @@ def brochures() -> typing.RouteReturn:
     brochures = ClubQBrochure.query.join(ClubQBrochure.season).order_by(ClubQSeason.debut.desc()).all()
     saisons = ClubQSeason.query.order_by(ClubQSeason.debut.desc()).all()
 
-    setattr(
-            forms.Brochure,
-            "season_id",
-            wtforms.SelectField(
-                _("Saison"),
+    forms.Brochure.season_id = wtforms.SelectField(_("Saison"),
                 choices=[[saison.id, saison.nom] for saison in saisons],
                 default=GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value,
                 validators=[DataRequired()],
-            ),
-        )
+            )
 
     form = forms.Brochure()
 
@@ -1167,9 +1162,7 @@ def brochures() -> typing.RouteReturn:
                 return flask.redirect(flask.url_for("club_q.brochures"))
 
 
-    brochure_id_list = []
-    for brochure in brochures:
-        brochure_id_list.append(brochure.id)
+    brochure_id_list = [brochure.id for brochure in brochures]
 
     can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
 
@@ -1191,6 +1184,9 @@ def brochure_reader(id: int) -> typing.RouteReturn:
     """Club Q module to reader brochures"""
 
     brochure = ClubQBrochure.query.filter_by(id=id).one_or_none()
+    if brochure is None:
+        flask.abort(404)
+
 
     filepath = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "plaquettes" , str(brochure.id) + ".pdf")
 
@@ -1208,11 +1204,14 @@ def brochure_reader(id: int) -> typing.RouteReturn:
     return flask.render_template("reader.html", brochure=brochure,  nb_pages=nb_pages, dim=dim, redirect=redirect, url=url, download_name=download_name)
 
 
-@bp.route("/reader/delete/<int:id>", methods=["GET"])
-@context.permission_only(PermissionType.read, PermissionScope.club_q)
+@bp.route("/reader/delete/<int:id>", methods=["GET", "POST"])
+@context.permission_only(PermissionType.write, PermissionScope.club_q)
 def brochure_delete(id: int) -> typing.RouteReturn:
 
-    brochure = ClubQBrochure.query.filter_by(id=id).one()
+    brochure = ClubQBrochure.query.filter_by(id=id).one_or_none()
+    if brochure is None:
+        flask.abort(404)
+
     path = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "plaquettes" , str(brochure.id) + ".pdf")
 
     db.session.delete(brochure)

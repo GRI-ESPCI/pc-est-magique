@@ -7,7 +7,8 @@ import datetime
 import typing
 
 import sqlalchemy as sa
-
+import flask
+from app.utils.nginx import get_nginx_access_token
 from app import db
 from app.utils.columns import (
     column,
@@ -19,8 +20,7 @@ from app.utils.columns import (
 
 
 Model = typing.cast(type[type], db.Model)  # type checking hack
-from app.utils.nginx import get_nginx_access_token
-import flask
+
 
 class ClubQSeason(db.Model):
     """Informations about Club Q Seasons"""
@@ -125,7 +125,7 @@ class ClubQBrochure(db.Model):
     """Bekk registration information"""
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
-
+    
     _season_id: Column[int] = column(sa.ForeignKey("club_q_season.id"), nullable=False)
     season: Relationship[ClubQSeason] = many_to_one("ClubQSeason.brochure")
 

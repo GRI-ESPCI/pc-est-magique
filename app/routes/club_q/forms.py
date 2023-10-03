@@ -117,5 +117,6 @@ class Brochure(FlaskForm):
     """WTForm used to upload club Q brochures."""
 
     id = wtforms.HiddenField("")
+    season_id = wtforms.SelectField(_l("Saison"), choices=[0, 0], validators=[DataRequired()])
     pdf_file = FileField(_l(""), validators=[FileAllowed(["pdf"], "PDF uniquement!")])
     add = wtforms.SubmitField(_l("Ajouter"))
