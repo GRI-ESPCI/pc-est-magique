@@ -51,6 +51,7 @@ def send_email(
     recipients: dict[str | None, str],
     html_body: str,
     text_body: str | None = None,
+    reply_to: str | None = None
 ) -> None:
     """Send an email using Flask-Mail, asynchronously.
 
@@ -63,6 +64,8 @@ def send_email(
         text_body: The mail content to print in plain text mode.
             If not set, it will be constructed from ``html_body`` using
             :func:`.html_to_plaintext`.
+        reply_to: The reply-to address
+            If not set, the sender address will be used
     """
     # Prepare body
     html_body = process_html(html_body)
@@ -80,6 +83,7 @@ def send_email(
         recipients=[f"{name} <{addr}>" for addr, name in recipients_f.items()],
         body=text_body,
         html=html_body,
+        reply_to=reply_to,
         extra_headers={
             "List-Unsubscribe": f"<mailto: {sender_mail}?subject=Unsubscribe: " f"{', '.join(recipients_f.keys())}>"
         },

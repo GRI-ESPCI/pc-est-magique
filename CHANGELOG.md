@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# v2.7.1 (2023-10-02)
+
+### Added
+
+- Club Q brochures for the current season and old ones
+- Club Q spectacle image by website upload
+
+### Changed
+
+- Club Q images are now in a separated folder from /photos
+- Club Q email template and reply-to address 
+
+### Fixed
+
+- Bekk PDF download with tokens
+- Permissions misconfiguration for Club Q allowing users to modify whishes
+- Subscription card was causing an error if the user never subscribed before
+
 # v2.7.0 (2023-09-29)
 
 ### Added

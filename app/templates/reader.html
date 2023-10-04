@@ -1,0 +1,103 @@
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} {{ super() }}
+<script defer>
+  var url = {{ url | tojson }}
+  var nb_pages = {{ nb_pages | tojson }}
+  var page_width = {{ float(dim[0]) | tojson }}
+  var page_height = {{ float(dim[1]) | tojson }}
+</script>
+{# Pre-Load #} {% for filename in [ "bower_components/jquery/dist/jquery.js", "bower_components/turnjs/turn.js",
+"js/pdf.js", "js/pdf_reader/reader.js"] %}
+<script
+  src="{{ url_for('static', filename=filename) }}"
+  defer
+></script>
+{% endfor %} {% endblock %} {% block styles %}{{ super() }}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{{ url_for('static', filename='css/magazine.css') }}"
+/>
+
+{% endblock %} {% block app_content %}
+
+<body style="background-color: #6b6868">
+  <div id="magazine">
+    {% for i in range(1, nb_pages+1) %}
+    <canvas id="page-{{i}}"></canvas>
+    {% endfor %}
+  </div>
+
+  <div id="page-navigation">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      id="go-to-first"
+    >
+      <svg
+        class="bi flex-shrink-0"
+        width="24"
+        height="24"
+      >
+        {{ macros.bootstrap_icon("skip-start-fill ") }}
+      </svg>
+    </button>
+    <button
+      type="button"
+      class="btn btn-secondary"
+      id="previous-page"
+    >
+      <svg
+        class="bi flex-shrink-0"
+        width="24"
+        height="24"
+      >
+        {{ macros.bootstrap_icon("caret-left-fill") }}
+      </svg>
+    </button>
+    <button
+      class="btn btn-secondary"
+      type="button"
+      id="next-page"
+    >
+      <svg
+        class="bi flex-shrink-0"
+        width="24"
+        height="24"
+      >
+        {{ macros.bootstrap_icon("caret-right-fill") }}
+      </svg>
+    </button>
+    <button
+      class="btn btn-secondary"
+      type="button"
+      id="go-to-last"
+    >
+      <svg
+        class="bi flex-shrink-0"
+        width="24"
+        height="24"
+      >
+        {{ macros.bootstrap_icon("skip-end-fill ") }}
+      </svg>
+    </button>
+  </div>
+  <div id="page-navigation">
+    <a
+      role="button"
+      href="{{ redirect }}"
+      class="btn btn-primary"
+    >
+      {{ _("Retour") }}
+    </a>
+
+    <a
+      role="button"
+      href="{{ url }}"
+      download="{{ download_name }}.pdf"
+      class="btn btn-primary"
+    >
+      {{ _("Télécharger (PDF)") }}
+    </a>
+  </div>
+</body>
+{% endblock %}

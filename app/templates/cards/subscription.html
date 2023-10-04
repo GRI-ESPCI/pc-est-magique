@@ -79,10 +79,17 @@
         </div>
     </td>
 </tr>
+{% if pceen.old_subscriptions == None %}
 <tr>
     <th scope="row" class="ps-4 text-nowrap">{{ _("Depuis le") }}</th>
-    <td>{{ moment(pceen.old_subscriptions[0].cut_day).format("LL") }}</td>
+    <td>{{ _("Big bang") }}</td>
 </tr>
+{% else %}
+<tr>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("Depuis le") }}</th>
+    {#<td>{{ moment(pceen.old_subscriptions[0].cut_day).format("LL") }}</td>#}
+</tr>
+{% endif %}
 <tr>
     <th scope="row" class="ps-4 text-nowrap">{{ _("Accès Internet") }}</th>
     <td>{{ _("Suspendu") }}</td>

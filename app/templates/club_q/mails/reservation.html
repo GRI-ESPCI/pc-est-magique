@@ -2,7 +2,7 @@
 
 <div class="row mb-3">
   <div class="col">
-    <h2>{{ _("TEST - Réservations places Club Q %(nom)s", nom=saison.nom) }}</h2>
+    <h2>{{ _("Réservations places Club Q %(nom)s", nom=saison.nom) }}</h2>
   </div>
 </div>
 <div class="row">
@@ -11,7 +11,7 @@
     <p>
       {{ _("L'attribution de places pour cette saison du Club Q a été effectuée et tu peux retrouver les places qui
       t'ont été attribuées sur ")}}
-      <a href="https://pc-est-magique.fr/club-q/username/pceen.username">{{ _("ta page personnelle") }}</a>."
+      <a href="https://pc-est-magique.fr/club-q/pceens/{{pceen.id}}">{{ _("ta page personnelle") }}</a>.
     </p>
   </div>
 </div>
@@ -23,14 +23,20 @@
     </p>
     <ul class="mb-4">
       <li>
-        {{ _("Par chèque à l'ordre <i>BDE Physique Chimie Paris Club Q</i> en le déposant dans l'enveloppe prévue à cet
-        effet au foyer.") }}
+        {{ _("Par chèque à l’ordre du « BDE Physique Chimie Paris Club Q » (une enveloppe dédiée est accrochée au mur du
+        foyer). Au dos mets-y <b>Prénom-Nom-Promo-Saison/spectacles</b>.") }}
       </li>
       <li>
-        {{ _("Par virement bancaire en précisant \"Club Q\" et votre nom dans l'ordre du virement. Le RIB du compte
-        bancaire du Club Q est le suivant :") }}
+        {{ _("Par virement bancaire au RIB ci-dessous, avec les mêmes informations que les chèques (Prénom Nom Promo
+        Saison). La référence du virement est super importante sinon on s’y retrouve plus ! C’est le BDE qui se récolte
+        la compta des virements, alors on préfère les chèques.") }}
       </li>
     </ul>
+    <img
+      src="{{rib}}"
+      alt="{{ RIB Club Q}}"
+      class="img-thumbnail"
+    />
   </div>
 </div>
 <div class="row">

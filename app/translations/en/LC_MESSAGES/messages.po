@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2023-09-30 11:07-0700\n"
+"POT-Creation-Date: 2023-10-01 23:43-0700\n"
 "PO-Revision-Date: 2022-10-29 03:04+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
@@ -108,7 +108,7 @@ msgstr "Sign in"
 #: app/routes/profile/forms.py:14 app/templates/bar/items.html:58
 #: app/templates/cards/account.html:18 app/templates/cards/device.html:87
 #: app/templates/cards/device_modal.html:15 app/templates/cards/offer.html:14
-#: app/templates/club_q/pceens.html:43 app/templates/club_q/saisons.html:67
+#: app/templates/club_q/pceens.html:43 app/templates/club_q/saisons.html:68
 #: app/templates/gris/pceens.html:79
 msgid "Nom"
 msgstr "Name"
@@ -426,19 +426,20 @@ msgstr "Grad class"
 
 #: app/routes/bekk/forms.py:18 app/templates/bar/transactions.html:41
 #: app/templates/bar/user.html:201 app/templates/club_q/id/salle.html:149
-#: app/templates/club_q/main.html:210 app/templates/club_q/spectacles.html:122
+#: app/templates/club_q/main.html:218 app/templates/club_q/spectacles.html:122
 msgid "Date"
 msgstr "Date"
 
-#: app/routes/bekk/forms.py:20 app/routes/club_q/forms.py:45
-#: app/routes/club_q/forms.py:65 app/routes/club_q/forms.py:78
-#: app/routes/club_q/forms.py:93 app/templates/gris/roles.html:203
+#: app/routes/bekk/forms.py:20 app/routes/club_q/forms.py:46
+#: app/routes/club_q/forms.py:66 app/routes/club_q/forms.py:79
+#: app/routes/club_q/forms.py:94 app/routes/club_q/forms.py:121
+#: app/templates/gris/roles.html:203
 msgid "Ajouter"
 msgstr "Add"
 
-#: app/routes/bekk/forms.py:21 app/routes/club_q/forms.py:54
-#: app/routes/club_q/forms.py:66 app/routes/club_q/forms.py:79
-#: app/routes/club_q/forms.py:94 app/routes/club_q/forms.py:101
+#: app/routes/bekk/forms.py:21 app/routes/club_q/forms.py:55
+#: app/routes/club_q/forms.py:67 app/routes/club_q/forms.py:80
+#: app/routes/club_q/forms.py:95 app/routes/club_q/forms.py:102
 #: app/routes/rooms/forms.py:25 app/templates/bar/items.html:63
 #: app/templates/bar/user.html:291 app/templates/photos/album.html:212
 #: app/templates/photos/collection.html:180 app/templates/photos/main.html:57
@@ -446,112 +447,113 @@ msgstr "Add"
 msgid "Modifier"
 msgstr "Edit"
 
-#: app/routes/bekk/forms.py:22 app/routes/club_q/forms.py:55
-#: app/routes/club_q/forms.py:67 app/routes/club_q/forms.py:80
-#: app/routes/club_q/forms.py:95 app/templates/photos/album.html:226
+#: app/routes/bekk/forms.py:22 app/routes/club_q/forms.py:56
+#: app/routes/club_q/forms.py:68 app/routes/club_q/forms.py:81
+#: app/routes/club_q/forms.py:96 app/templates/cards/club_q.html:36
+#: app/templates/photos/album.html:226
 msgid "Supprimer"
 msgstr "Delete"
 
-#: app/routes/bekk/routes.py:51
+#: app/routes/bekk/routes.py:48 app/routes/club_q/routes.py:1148
 msgid "Aucun fichier choisi."
 msgstr "No choosen file"
 
-#: app/routes/bekk/routes.py:68
+#: app/routes/bekk/routes.py:65
 #, fuzzy
 msgid "Bekk ajouté."
 msgstr "Added Bekk."
 
-#: app/routes/bekk/routes.py:83
+#: app/routes/bekk/routes.py:80
 #, fuzzy
 msgid "Bekk supprimé."
 msgstr "Deleted Bekk."
 
-#: app/routes/bekk/routes.py:92
+#: app/routes/bekk/routes.py:89
 #, fuzzy
 msgid "Bekk édité."
 msgstr "Edited Bekk."
 
-#: app/routes/bekk/routes.py:103
+#: app/routes/bekk/routes.py:100
 msgid "Page du Bekk ESPCI"
 msgstr "ESPCI Bekk newspaper"
 
-#: app/routes/club_q/forms.py:22 app/routes/club_q/forms.py:28
-#: app/routes/club_q/forms.py:36 app/routes/profile/forms.py:21
+#: app/routes/club_q/forms.py:23 app/routes/club_q/forms.py:29
+#: app/routes/club_q/forms.py:37 app/routes/profile/forms.py:21
 #: app/routes/profile/forms.py:33
 msgid "Mettre à jour"
 msgstr "Update"
 
-#: app/routes/club_q/forms.py:34
+#: app/routes/club_q/forms.py:35
 msgid "Sauvegarder l'attribution"
 msgstr "Save attribution"
 
-#: app/routes/club_q/forms.py:35
+#: app/routes/club_q/forms.py:36
 #, fuzzy
 msgid "Corruption"
 msgstr "Corruption"
 
-#: app/routes/club_q/forms.py:37
+#: app/routes/club_q/forms.py:38
 msgid "Lancer l'algorithme"
 msgstr "Launch algorithm"
 
-#: app/routes/club_q/forms.py:41 app/routes/club_q/routes.py:85
-#: app/templates/bar/items.html:62 app/templates/club_q/id/pceen.html:102
+#: app/routes/club_q/forms.py:42 app/routes/club_q/routes.py:88
+#: app/templates/bar/items.html:62 app/templates/club_q/id/pceen.html:103
 #: app/templates/club_q/id/spectacle.html:121
-#: app/templates/club_q/main.html:103 app/templates/club_q/main.html:246
+#: app/templates/club_q/main.html:111 app/templates/club_q/main.html:254
 #: app/templates/club_q/voeux.html:104 app/templates/gris/roles.html:47
 msgid "Priorité"
 msgstr "Priority"
 
-#: app/routes/club_q/forms.py:42 app/templates/club_q/pceens.html:97
+#: app/routes/club_q/forms.py:43 app/templates/club_q/pceens.html:97
 #, fuzzy
 msgid "Places demandées"
 msgstr "Places requested"
 
-#: app/routes/club_q/forms.py:43 app/templates/club_q/main.html:117
-#: app/templates/club_q/main.html:282
+#: app/routes/club_q/forms.py:44 app/templates/club_q/main.html:125
+#: app/templates/club_q/main.html:290
 msgid "Places minimum"
 msgstr "Minimal no. of seats"
 
-#: app/routes/club_q/forms.py:44 app/templates/club_q/pceens.html:115
+#: app/routes/club_q/forms.py:45 app/templates/club_q/pceens.html:115
 #, fuzzy
 msgid "Places attribuées"
 msgstr "Places allocated"
 
-#: app/routes/club_q/forms.py:100 app/templates/club_q/pceens.html:133
+#: app/routes/club_q/forms.py:101 app/templates/club_q/pceens.html:133
 #, fuzzy
 msgid "Mécontentement"
 msgstr "Discontent"
 
-#: app/routes/club_q/forms.py:106
+#: app/routes/club_q/forms.py:107
 #, fuzzy
 msgid "Adresse e-mail de réponse"
-msgstr "Mail address"
+msgstr "Reply-to email address"
 
-#: app/routes/club_q/forms.py:113
+#: app/routes/club_q/forms.py:114
 #, fuzzy
 msgid "Envoyer les e-mails"
 msgstr "Send e-mails"
 
-#: app/routes/club_q/routes.py:95
+#: app/routes/club_q/routes.py:98
 #, fuzzy
 msgid "Nombre places demandées"
 msgstr "No. of wanted seats"
 
-#: app/routes/club_q/routes.py:105
+#: app/routes/club_q/routes.py:108
 msgid "Nombre places minimum demandées"
 msgstr "Minimal no. of seats"
 
-#: app/routes/club_q/routes.py:128
+#: app/routes/club_q/routes.py:131
 msgid "Un voeu a été défini avec une priorité mais sans un nombre de places."
 msgstr ""
 "A wish has been made with a priority but without a number of wanted "
 "places."
 
-#: app/routes/club_q/routes.py:133
+#: app/routes/club_q/routes.py:136
 msgid "Un voeu a été défini avec un nombre de places mais sans priorité."
 msgstr "A wish has been made with a number of places but without any priority."
 
-#: app/routes/club_q/routes.py:143
+#: app/routes/club_q/routes.py:146
 msgid ""
 "Un voeu a été défini avec un nombre de places minimum supérieur au nombre"
 " de places demandées."
@@ -559,81 +561,104 @@ msgstr ""
 "A wish has been made with a minimal number of places superior to the "
 "number of asked seats."
 
-#: app/routes/club_q/routes.py:157
+#: app/routes/club_q/routes.py:160
 msgid "Deux voeux ne peuvent avoir la même priorité."
 msgstr "Two wishes cannot have the same priority."
 
-#: app/routes/club_q/routes.py:164
+#: app/routes/club_q/routes.py:167
 msgid "Les priorités doivent être croissantes de 1 en 1 en partant de 1."
 msgstr "Priorities must start at 1 and increase 1 by 1."
 
-#: app/routes/club_q/routes.py:198
+#: app/routes/club_q/routes.py:201
 msgid "Vos choix ont été enregistrés."
 msgstr "Your choices has been saved."
 
-#: app/routes/club_q/routes.py:203
+#: app/routes/club_q/routes.py:206
 msgid "Page de réservation pour le Club Q"
 msgstr "Club Q-ulture booking page."
 
-#: app/routes/club_q/routes.py:250
+#: app/routes/club_q/routes.py:256
 msgid "Mécontentement édité."
 msgstr "Edited discontent."
 
-#: app/routes/club_q/routes.py:482
+#: app/routes/club_q/routes.py:492
 msgid "Salle ajoutée."
 msgstr "Added location."
 
-#: app/routes/club_q/routes.py:491
+#: app/routes/club_q/routes.py:501
 msgid "Salle supprimée."
 msgstr "Deleted location."
 
-#: app/routes/club_q/routes.py:503
+#: app/routes/club_q/routes.py:513
 msgid "Salle éditée."
 msgstr "Edited location."
 
-#: app/routes/club_q/routes.py:601
+#: app/routes/club_q/routes.py:615
 #, fuzzy
 msgid "Saison ajoutée."
 msgstr "Added season."
 
-#: app/routes/club_q/routes.py:610
+#: app/routes/club_q/routes.py:628
 msgid "Saison supprimée."
 msgstr "Deleted season."
 
-#: app/routes/club_q/routes.py:621
+#: app/routes/club_q/routes.py:639
 msgid "Saison éditée."
 msgstr "Edited season."
 
-#: app/routes/club_q/routes.py:687 app/routes/club_q/routes.py:805
+#: app/routes/club_q/routes.py:707 app/routes/club_q/routes.py:837
 #, fuzzy
 msgid "Mis à jour."
 msgstr "Updated."
 
-#: app/routes/club_q/routes.py:709
+#: app/routes/club_q/routes.py:729
 msgid "Algorithme exécuté et résultats sauvegardés."
 msgstr "Executed algorithm and saved results."
 
-#: app/routes/club_q/routes.py:711
+#: app/routes/club_q/routes.py:731
 msgid "Algorithme exécuté."
 msgstr "Executed algorithm."
 
-#: app/routes/club_q/routes.py:781
+#: app/routes/club_q/routes.py:811
 msgid "Visibilité de la page de réservation"
 msgstr "Show booking page"
 
-#: app/routes/club_q/routes.py:789 app/templates/cards/club_q.html:9
+#: app/routes/club_q/routes.py:819 app/templates/cards/club_q_accueil.html:9
 #, fuzzy
 msgid "Saison actuelle"
 msgstr "Current season"
 
-#: app/routes/club_q/routes.py:862
+#: app/routes/club_q/routes.py:896
 #, fuzzy
 msgid "Récapitulatif - "
 msgstr "Summary"
 
+#: app/routes/club_q/routes.py:1133
+#, fuzzy
+msgid "Saison"
+msgstr "Seasons"
+
+#: app/routes/club_q/routes.py:1153
+msgid "Il y a déjà une plaquette associée à cette saison."
+msgstr "There is already a brochure for this season."
+
+#: app/routes/club_q/routes.py:1166
+#, fuzzy
+msgid "Plaquette ajoutée."
+msgstr "Added brochure."
+
+#: app/routes/club_q/routes.py:1178
+msgid "Plaquettes Club Q"
+msgstr "Club Q Brochures"
+
+#: app/routes/club_q/routes.py:1223
+#, fuzzy
+msgid "Plaquette supprimée."
+msgstr "Deleted brochure."
+
 #: app/routes/club_q/utils.py:516 app/routes/club_q/utils.py:528
-#: app/templates/club_q/id/pceen.html:84 app/templates/club_q/id/salle.html:95
-#: app/templates/club_q/main.html:156 app/templates/club_q/spectacles.html:68
+#: app/templates/club_q/id/pceen.html:85 app/templates/club_q/id/salle.html:95
+#: app/templates/club_q/main.html:164 app/templates/club_q/spectacles.html:68
 #: app/templates/club_q/voeux.html:68
 msgid "Spectacle"
 msgstr "Spectacle"
@@ -656,21 +681,21 @@ msgid "Voeu édité."
 msgstr "Edited wish."
 
 #: app/routes/club_q/utils.py:597 app/routes/club_q/utils.py:608
-#: app/templates/club_q/id/salle.html:113 app/templates/club_q/main.html:174
+#: app/templates/club_q/id/salle.html:113 app/templates/club_q/main.html:182
 #: app/templates/club_q/salles.html:69 app/templates/club_q/spectacles.html:86
 msgid "Salle"
 msgstr "Location"
 
-#: app/routes/club_q/utils.py:633
+#: app/routes/club_q/utils.py:642
 msgid "Spectacle ajouté."
 msgstr "Added spectacle."
 
-#: app/routes/club_q/utils.py:642
+#: app/routes/club_q/utils.py:661
 #, fuzzy
 msgid "Spectacle supprimé."
 msgstr "Deleted spectacle"
 
-#: app/routes/club_q/utils.py:656
+#: app/routes/club_q/utils.py:681
 msgid "Spectacle édité."
 msgstr "Edited spectacle"
 
@@ -1045,7 +1070,7 @@ msgstr "Time (optional)"
 
 #: app/routes/photos/forms.py:22
 msgid "Latitude (optionnel)"
-msgstr "Latitute (optional)"
+msgstr "Latitude (optional)"
 
 #: app/routes/photos/forms.py:26
 msgid "Longitude (optionnel)"
@@ -1230,15 +1255,16 @@ msgstr "ESPCI Theatre Season 2023"
 msgid "Action réalisée en tant que %(doas)s"
 msgstr "Action done as %(doas)s"
 
-#: app/templates/bar/items.html:135 app/templates/bekk/main.html:124
-#: app/templates/bekk/main.html:186 app/templates/cards/device_modal.html:10
+#: app/templates/bar/items.html:135 app/templates/bekk/main.html:134
+#: app/templates/bekk/main.html:196 app/templates/cards/device_modal.html:10
 #: app/templates/cards/device_modal.html:66
+#: app/templates/club_q/brochures.html:97
 #: app/templates/club_q/modals/modals_spectacles.html:22
-#: app/templates/club_q/modals/modals_spectacles.html:114
+#: app/templates/club_q/modals/modals_spectacles.html:118
 #: app/templates/club_q/modals/modals_voeux.html:22
 #: app/templates/club_q/modals/modals_voeux.html:99
-#: app/templates/club_q/pceens.html:269 app/templates/club_q/saisons.html:306
-#: app/templates/club_q/saisons.html:378 app/templates/club_q/salles.html:285
+#: app/templates/club_q/pceens.html:269 app/templates/club_q/saisons.html:307
+#: app/templates/club_q/saisons.html:379 app/templates/club_q/salles.html:285
 #: app/templates/club_q/salles.html:362 app/templates/devices/modify.html:66
 #: app/templates/doas.html:5 app/templates/gris/pceens.html:453
 #: app/templates/gris/pceens.html:459 app/templates/gris/pceens.html:470
@@ -1315,7 +1341,7 @@ msgstr "Internet"
 msgid "Bekk"
 msgstr "Bekk"
 
-#: app/templates/cards/club_q.html:1 app/templates/navbar.html:58
+#: app/templates/cards/club_q_accueil.html:1 app/templates/navbar.html:58
 msgid "Club Q"
 msgstr "Q-ulture Club"
 
@@ -1327,6 +1353,19 @@ msgstr "Bar"
 #: app/templates/devices/transfer.html:42 app/templates/navbar.html:85
 msgid "Déconnexion"
 msgstr "Sign out"
+
+#: app/templates/devices/modify.html:55
+#: app/templates/profile/modify_account.html:34
+#: app/templates/profile/update_password.html:31 app/templates/reader.html:90
+#: app/templates/rooms/modify.html:31
+msgid "Retour"
+msgstr "Back"
+
+#: app/templates/cards/bekk.html:46 app/templates/cards/club_q.html:27
+#: app/templates/reader.html:99
+#, fuzzy
+msgid "Télécharger (PDF)"
+msgstr "Download (PDF)"
 
 #: app/templates/auth/auth_needed.html:11
 msgid "Un compte est nécessaire pour accéder à cette page."
@@ -1443,7 +1482,6 @@ msgstr "Your account has successfully been created"
 
 #: app/templates/auth/mails/account_registered.html:12
 #: app/templates/auth/mails/reset_password.html:12
-#: app/templates/club_q/mails/reservation.html:10
 #: app/templates/gris/mails/role_switch.html:12
 #: app/templates/payments/mails/internet_cut.html:12
 #: app/templates/payments/mails/new_subscription.html:12
@@ -1481,7 +1519,6 @@ msgstr "Mail address:"
 
 #: app/templates/auth/mails/account_registered.html:45
 #: app/templates/auth/mails/reset_password.html:42
-#: app/templates/club_q/mails/reservation.html:38
 #: app/templates/gris/mails/role_switch.html:65
 #: app/templates/payments/mails/internet_cut.html:80
 #: app/templates/payments/mails/new_subscription.html:50
@@ -1539,11 +1576,11 @@ msgstr ""
 msgid "Exporter les données"
 msgstr "Export data"
 
-#: app/templates/bar/export.html:15 app/templates/club_q/saisons.html:103
+#: app/templates/bar/export.html:15 app/templates/club_q/saisons.html:104
 msgid "Début"
 msgstr "Start"
 
-#: app/templates/bar/export.html:16 app/templates/club_q/saisons.html:121
+#: app/templates/bar/export.html:16 app/templates/club_q/saisons.html:122
 msgid "Fin"
 msgstr "End"
 
@@ -1561,7 +1598,7 @@ msgid "Total :"
 msgstr "Total:"
 
 #: app/templates/bar/items.html:60 app/templates/cards/offer.html:22
-#: app/templates/club_q/id/salle.html:167 app/templates/club_q/main.html:228
+#: app/templates/club_q/id/salle.html:167 app/templates/club_q/main.html:236
 #: app/templates/club_q/spectacles.html:140
 msgid "Prix"
 msgstr "Price"
@@ -1580,14 +1617,14 @@ msgstr "New item || Edit _name_"
 
 #: app/templates/bar/items.html:183 app/templates/bar/transactions.html:42
 #: app/templates/bar/user.html:202 app/templates/bar/user.html:292
-#: app/templates/bar/user.html:319 app/templates/bekk/main.html:155
-#: app/templates/bekk/main.html:226
-#: app/templates/club_q/modals/modals_spectacles.html:83
-#: app/templates/club_q/modals/modals_spectacles.html:175
+#: app/templates/bar/user.html:319 app/templates/bekk/main.html:165
+#: app/templates/bekk/main.html:236 app/templates/club_q/brochures.html:127
+#: app/templates/club_q/modals/modals_spectacles.html:87
+#: app/templates/club_q/modals/modals_spectacles.html:183
 #: app/templates/club_q/modals/modals_voeux.html:68
 #: app/templates/club_q/modals/modals_voeux.html:135
-#: app/templates/club_q/pceens.html:290 app/templates/club_q/saisons.html:347
-#: app/templates/club_q/saisons.html:419 app/templates/club_q/salles.html:331
+#: app/templates/club_q/pceens.html:290 app/templates/club_q/saisons.html:348
+#: app/templates/club_q/saisons.html:420 app/templates/club_q/salles.html:331
 #: app/templates/club_q/salles.html:408 app/templates/devices/modify.html:79
 msgid "Annuler"
 msgstr "Cancel"
@@ -1716,9 +1753,9 @@ msgstr "Bar Profile:"
 msgid "Recharger"
 msgstr "Top up"
 
-#: app/templates/bar/user.html:43 app/templates/cards/subscription.html:106
-#: app/templates/cards/subscription.html:114
+#: app/templates/bar/user.html:43 app/templates/cards/subscription.html:113
 #: app/templates/cards/subscription.html:121
+#: app/templates/cards/subscription.html:128
 #: app/templates/payments/main.html:86 app/templates/payments/main.html:94
 #: app/templates/payments/main.html:101
 msgid "Payer"
@@ -1867,16 +1904,16 @@ msgstr "If any problem, do not hesitate to "
 msgid "contacter les GRI"
 msgstr "contact GRI"
 
-#: app/templates/bekk/main.html:30 app/templates/bekk/main.html:180
+#: app/templates/bekk/main.html:41 app/templates/bekk/main.html:190
 #, fuzzy
 msgid "Ajouter un bekk"
 msgstr "Add bekk"
 
-#: app/templates/bekk/main.html:54
+#: app/templates/bekk/main.html:65
 msgid "Bienvenue sur la page du Bekk de l'ESPCI."
 msgstr "Welcome on the Bekk page"
 
-#: app/templates/bekk/main.html:56
+#: app/templates/bekk/main.html:67
 msgid ""
 "Le Bekk est l'association journalistique de l'école, et produit plusieurs"
 " numéros par an, à des occasions et\n"
@@ -1887,25 +1924,20 @@ msgid ""
 "    la tâche. Tu retrouveras ici les Bekks triés par promotion, avec la "
 "possibilité de les lire ou de les télécharger.\n"
 "    "
-msgstr "The Bekk is the newspaper student club of the ESPCI, with several iterations per year at specials occasions. You can find here all the bekks for the actual and previous year, download them and read them onsite."
+msgstr ""
+"The Bekk is the newspaper student club of the ESPCI, with several "
+"iterations per year at specials occasions. You can find here all the "
+"bekks for the actual and previous year, download them and read them "
+"onsite."
 
-#: app/templates/bekk/main.html:80 app/templates/gris/pceens.html:40
+#: app/templates/bekk/main.html:91 app/templates/gris/pceens.html:40
 msgid "Tous"
 msgstr "Everyone"
 
-#: app/templates/bekk/main.html:118
+#: app/templates/bekk/main.html:128
 #, fuzzy
 msgid "Editer bekk"
 msgstr "Edit bekk"
-
-#: app/templates/bekk/reader.html:85
-msgid "Retour aux bekks "
-msgstr "Back to main page"
-
-#: app/templates/bekk/reader.html:94 app/templates/cards/bekk.html:46
-#, fuzzy
-msgid "Télécharger (PDF)"
-msgstr "Download (PDF)"
 
 #: app/templates/cards/account.html:5 app/templates/devices/register.html:10
 #: app/templates/devices/transfer.html:10
@@ -1948,7 +1980,7 @@ msgstr "(count)s/%(limit)s today"
 msgid "Dépensé aujourd’hui"
 msgstr "Spent today"
 
-#: app/templates/cards/bar.html:35 app/templates/cards/club_q.html:51
+#: app/templates/cards/bar.html:35 app/templates/cards/club_q_accueil.html:51
 #: app/templates/cards/device.html:109
 msgid "Détails"
 msgstr "Details"
@@ -1981,25 +2013,33 @@ msgstr "Bekks"
 msgid "Lire le dernier"
 msgstr "Read last"
 
-#: app/templates/cards/club_q.html:14 app/templates/gris/pceens.html:254
+#: app/templates/cards/club_q.html:18
+#, fuzzy
+msgid "Lire"
+msgstr "Title"
+
+#: app/templates/cards/club_q_accueil.html:14
+#: app/templates/gris/pceens.html:254
 msgid "Aucune"
 msgstr "None"
 
-#: app/templates/cards/club_q.html:22
+#: app/templates/cards/club_q_accueil.html:22
 #, fuzzy
 msgid "Prochain spectacle"
 msgstr "Next spectacle"
 
-#: app/templates/cards/club_q.html:27 app/templates/gris/pceens.html:296
+#: app/templates/cards/club_q_accueil.html:27
+#: app/templates/gris/pceens.html:296
 msgid "Aucun"
 msgstr "None"
 
-#: app/templates/cards/club_q.html:35 app/templates/club_q/pceens.html:151
+#: app/templates/cards/club_q_accueil.html:35
+#: app/templates/club_q/pceens.html:151
 #, fuzzy
 msgid "À payer"
 msgstr "To pay"
 
-#: app/templates/cards/club_q.html:44
+#: app/templates/cards/club_q_accueil.html:44
 #, fuzzy
 msgid "Réserver"
 msgstr "Reserve"
@@ -2152,7 +2192,8 @@ msgid "Location actuelle"
 msgstr "Current rental"
 
 #: app/templates/cards/room.html:29 app/templates/cards/subscription.html:59
-#: app/templates/cards/subscription.html:83
+#: app/templates/cards/subscription.html:84
+#: app/templates/cards/subscription.html:89
 msgid "Depuis le"
 msgstr "From"
 
@@ -2173,7 +2214,7 @@ msgid "Modifier les dates"
 msgstr "Edit dates"
 
 #: app/templates/cards/subscription.html:5
-#: app/templates/cards/subscription.html:87
+#: app/templates/cards/subscription.html:94
 msgid "Accès Internet"
 msgstr "Internet Access"
 
@@ -2198,15 +2239,19 @@ msgstr "Cut on"
 msgid "Mois offert"
 msgstr "Free month"
 
-#: app/templates/cards/subscription.html:88 app/templates/payments/main.html:72
+#: app/templates/cards/subscription.html:85
+msgid "Big bang"
+msgstr "Never"
+
+#: app/templates/cards/subscription.html:95 app/templates/payments/main.html:72
 msgid "Suspendu"
 msgstr "Suspended"
 
-#: app/templates/cards/subscription.html:98
+#: app/templates/cards/subscription.html:105
 msgid "Plus d'informations"
 msgstr "More information"
 
-#: app/templates/cards/subscription.html:103
+#: app/templates/cards/subscription.html:110
 #: app/templates/payments/main.html:83
 msgid "Renouvellement possible à partir de la fin de l'abonnement actuel"
 msgstr "Renewal possible from the end of the current subscription"
@@ -2251,6 +2296,19 @@ msgid ""
 "        données"
 msgstr "If checked, following algorithm run, results will be saved in database"
 
+#: app/templates/club_q/brochures.html:39
+#: app/templates/club_q/brochures.html:91
+#, fuzzy
+msgid "Ajouter une plaquette"
+msgstr "Add a brochure"
+
+#: app/templates/club_q/brochures.html:63
+msgid ""
+"Cette page répertorie les plaquettes du Club Q, à des fins de "
+"présentation de la saison actuelle autant bien\n"
+"    que pour les archives."
+msgstr "This page gives access to all Club Q brochures."
+
 #: app/templates/club_q/common.html:24
 #, fuzzy
 msgid "Réservations"
@@ -2261,12 +2319,12 @@ msgstr "My bookings"
 msgid "Mes réservations"
 msgstr "My bookings"
 
-#: app/templates/club_q/common.html:39 app/templates/club_q/saisons.html:158
+#: app/templates/club_q/common.html:39 app/templates/club_q/saisons.html:159
 #: app/templates/gris/menu.html:10
 msgid "PCéens"
 msgstr "PCéens"
 
-#: app/templates/club_q/common.html:47 app/templates/club_q/saisons.html:176
+#: app/templates/club_q/common.html:47 app/templates/club_q/saisons.html:177
 msgid "Spectacles"
 msgstr "Spectacles"
 
@@ -2274,7 +2332,7 @@ msgstr "Spectacles"
 msgid "Salles"
 msgstr "Locations"
 
-#: app/templates/club_q/common.html:62 app/templates/club_q/saisons.html:194
+#: app/templates/club_q/common.html:62 app/templates/club_q/saisons.html:195
 msgid "Voeux"
 msgstr "Wishes"
 
@@ -2283,17 +2341,21 @@ msgstr "Wishes"
 msgid "Saisons"
 msgstr "Seasons"
 
-#: app/templates/club_q/common.html:78
+#: app/templates/club_q/common.html:77
+msgid "Plaquettes"
+msgstr "Brochures"
+
+#: app/templates/club_q/common.html:85
 #, fuzzy
 msgid "Attribution"
 msgstr "Attribution"
 
-#: app/templates/club_q/common.html:85
+#: app/templates/club_q/common.html:92
 #, fuzzy
 msgid "Mails"
 msgstr "Mails"
 
-#: app/templates/club_q/common.html:92
+#: app/templates/club_q/common.html:99
 #, fuzzy
 msgid "Options"
 msgstr "Settings"
@@ -2363,26 +2425,30 @@ msgstr "Detailed message"
 msgid "Version compacte"
 msgstr "My account"
 
-#: app/templates/club_q/main.html:110
+#: app/templates/club_q/main.html:78
+msgid "Lire la plaquette"
+msgstr "Read brochure"
+
+#: app/templates/club_q/main.html:118
 #, fuzzy
 msgid "Nombre de places"
 msgstr "No. of wanted seats"
 
-#: app/templates/club_q/main.html:133 app/templates/club_q/main.html:336
+#: app/templates/club_q/main.html:141 app/templates/club_q/main.html:344
 #, fuzzy
 msgid "Mise à jour"
 msgstr "Update"
 
-#: app/templates/club_q/id/salle.html:131 app/templates/club_q/main.html:192
+#: app/templates/club_q/id/salle.html:131 app/templates/club_q/main.html:200
 #: app/templates/club_q/spectacles.html:104
 msgid "Catégorie"
 msgstr "Category"
 
-#: app/templates/club_q/main.html:264
+#: app/templates/club_q/main.html:272
 msgid "Places voulues"
-msgstr ""
+msgstr "Places wanted"
 
-#: app/templates/club_q/main.html:346
+#: app/templates/club_q/main.html:354
 msgid "Les réservations ne sont pas ouvertes en ce moment."
 msgstr "Booking for Club Q is not open for the moment."
 
@@ -2394,9 +2460,9 @@ msgstr "Wishes page: "
 msgid "PCéens : "
 msgstr "PCéens: "
 
-#: app/templates/club_q/id/pceen.html:66 app/templates/club_q/id/salle.html:77
+#: app/templates/club_q/id/pceen.html:67 app/templates/club_q/id/salle.html:77
 #: app/templates/club_q/id/spectacle.html:85
-#: app/templates/club_q/pceens.html:25 app/templates/club_q/saisons.html:49
+#: app/templates/club_q/pceens.html:25 app/templates/club_q/saisons.html:50
 #: app/templates/club_q/salles.html:51 app/templates/club_q/spectacles.html:50
 #: app/templates/club_q/voeux.html:50 app/templates/gris/pceens.html:69
 #: app/templates/gris/roles.html:25 app/templates/payments/main.html:195
@@ -2413,11 +2479,11 @@ msgstr "No. of wanted seats"
 msgid "Éditer le mécontement"
 msgstr "Edit discontent"
 
-#: app/templates/club_q/id/pceen.html:301
-#: app/templates/club_q/id/salle.html:336
+#: app/templates/club_q/id/pceen.html:304
+#: app/templates/club_q/id/salle.html:335
 #: app/templates/club_q/id/spectacle.html:277
 #: app/templates/club_q/pceens.html:233
-#: app/templates/club_q/spectacles.html:331
+#: app/templates/club_q/spectacles.html:330
 #, fuzzy
 msgid "Total"
 msgstr "Total:"
@@ -2427,23 +2493,23 @@ msgstr "Total:"
 msgid "Nb de PCéens : "
 msgstr "No. of PCéens: "
 
-#: app/templates/club_q/id/pceen.html:303
-#: app/templates/club_q/id/pceen.html:305
+#: app/templates/club_q/id/pceen.html:306
 #: app/templates/club_q/id/pceen.html:308
-#: app/templates/club_q/id/pceen.html:309
+#: app/templates/club_q/id/pceen.html:311
+#: app/templates/club_q/id/pceen.html:312
+#: app/templates/club_q/id/salle.html:337
 #: app/templates/club_q/id/salle.html:338
 #: app/templates/club_q/id/salle.html:339
 #: app/templates/club_q/id/salle.html:340
-#: app/templates/club_q/id/salle.html:341
-#: app/templates/club_q/id/salle.html:346
+#: app/templates/club_q/id/salle.html:345
 #: app/templates/club_q/id/spectacle.html:279
 #: app/templates/club_q/id/spectacle.html:281
 #: app/templates/club_q/pceens.html:235 app/templates/club_q/pceens.html:239
+#: app/templates/club_q/spectacles.html:332
 #: app/templates/club_q/spectacles.html:333
 #: app/templates/club_q/spectacles.html:334
 #: app/templates/club_q/spectacles.html:335
-#: app/templates/club_q/spectacles.html:336
-#: app/templates/club_q/spectacles.html:342
+#: app/templates/club_q/spectacles.html:341
 msgid "-"
 msgstr "-"
 
@@ -2456,26 +2522,26 @@ msgstr "Payements summary"
 msgid "Saisons : "
 msgstr "Seasons: "
 
-#: app/templates/club_q/saisons.html:20 app/templates/club_q/saisons.html:372
+#: app/templates/club_q/saisons.html:20 app/templates/club_q/saisons.html:373
 #, fuzzy
 msgid "Ajouter une saison"
 msgstr "Add a season"
 
-#: app/templates/club_q/saisons.html:85
+#: app/templates/club_q/saisons.html:86
 msgid "Promo orga."
 msgstr "Organiser promo"
 
-#: app/templates/club_q/saisons.html:139
+#: app/templates/club_q/saisons.html:140
 #, fuzzy
 msgid "Fin inscription"
 msgstr "End of subscriptions"
 
-#: app/templates/club_q/saisons.html:253
+#: app/templates/club_q/saisons.html:254
 #, fuzzy
 msgid "Éditer la saison"
 msgstr "Edit season"
 
-#: app/templates/club_q/saisons.html:300
+#: app/templates/club_q/saisons.html:301
 msgid "Editer saison ID"
 msgstr "Edit season ID"
 
@@ -2524,7 +2590,7 @@ msgstr "Wsh."
 msgid "Pl."
 msgstr "Pl."
 
-#: app/templates/club_q/id/pceen.html:120
+#: app/templates/club_q/id/pceen.html:121
 #: app/templates/club_q/id/salle.html:204
 #: app/templates/club_q/spectacles.html:195
 msgid "Dem."
@@ -2540,16 +2606,16 @@ msgstr "Giv."
 msgid "Rst."
 msgstr "Rem."
 
-#: app/templates/club_q/spectacles.html:332
+#: app/templates/club_q/spectacles.html:331
 msgid "Nb de spectacles : "
 msgstr "Nb of spectacles :"
 
-#: app/templates/club_q/spectacles.html:358
+#: app/templates/club_q/spectacles.html:357
 #, fuzzy
 msgid "Exporter les PDFs "
 msgstr "Export data"
 
-#: app/templates/club_q/spectacles.html:365
+#: app/templates/club_q/spectacles.html:364
 #, fuzzy
 msgid "Exporter les Excels"
 msgstr "Export Excels"
@@ -2584,13 +2650,13 @@ msgstr "Minimum"
 msgid "Attribuées"
 msgstr "Allocated"
 
-#: app/templates/club_q/id/pceen.html:212
+#: app/templates/club_q/id/pceen.html:213
 #: app/templates/club_q/id/spectacle.html:193
 #: app/templates/club_q/voeux.html:176
 msgid "Prix total"
 msgstr "Total price"
 
-#: app/templates/club_q/id/pceen.html:272
+#: app/templates/club_q/id/pceen.html:274
 #: app/templates/club_q/id/spectacle.html:248
 #: app/templates/club_q/voeux.html:235
 msgid "Éditer le voeu"
@@ -2617,28 +2683,28 @@ msgstr "Mail: "
 msgid "Mécontentement : "
 msgstr "Discontent:"
 
-#: app/templates/club_q/id/pceen.html:138
+#: app/templates/club_q/id/pceen.html:139
 msgid "Min."
 msgstr "Min."
 
-#: app/templates/club_q/id/pceen.html:156
+#: app/templates/club_q/id/pceen.html:157
 msgid "Attr."
 msgstr "All."
 
-#: app/templates/club_q/id/pceen.html:175
+#: app/templates/club_q/id/pceen.html:176
 #, fuzzy
 msgid "Places"
 msgstr "Pl."
 
-#: app/templates/club_q/id/pceen.html:193
+#: app/templates/club_q/id/pceen.html:194
 msgid "Rest."
 msgstr "Rem."
 
-#: app/templates/club_q/id/pceen.html:302
+#: app/templates/club_q/id/pceen.html:305
 msgid "Nb de voeux : "
 msgstr "Nb of whishes: "
 
-#: app/templates/club_q/id/pceen.html:323
+#: app/templates/club_q/id/pceen.html:328
 #, fuzzy
 msgid "Imprimer la facture"
 msgstr "Print invoice"
@@ -2649,7 +2715,7 @@ msgid "Adresse : "
 msgstr "Address: "
 
 #: app/templates/club_q/id/salle.html:45
-#: app/templates/club_q/modals/modals_spectacles.html:108
+#: app/templates/club_q/modals/modals_spectacles.html:112
 #, fuzzy
 msgid "Ajouter un spectacle"
 msgstr "Add spectacle"
@@ -2658,7 +2724,7 @@ msgstr "Add spectacle"
 msgid "Nbr."
 msgstr "Nbr."
 
-#: app/templates/club_q/id/salle.html:337
+#: app/templates/club_q/id/salle.html:336
 #, fuzzy
 msgid "Nb spectacles : "
 msgstr "Nb of spectacles: "
@@ -2714,59 +2780,14 @@ msgstr "Generate PDF"
 msgid "Générer l'Excel"
 msgstr "Generate Excel"
 
-#: app/templates/club_q/mails/reservation.html:5
-#, python-format
-msgid "TEST - Réservations places Club Q %(nom)s"
-msgstr "TEST - Places booking Club Q %(nom)s"
-
-#: app/templates/club_q/mails/reservation.html:12
-msgid ""
-"L'attribution de places pour cette saison du Club Q a été effectuée et tu"
-" peux retrouver les places qui\n"
-"      t'ont été attribuées sur "
-msgstr ""
-"This season's Club Q tickets have been allocated and you can find them\n"
-"      on \""
-
-#: app/templates/club_q/mails/reservation.html:14
-msgid "ta page personnelle"
-msgstr "your personal page"
-
-#: app/templates/club_q/mails/reservation.html:21
-#, python-format
-msgid ""
-"Concernant le paiement, merci de le faire avant le %(date_here)s pour "
-"faciliter le travail du trésorier du\n"
-"      Club Q. Deux moyens de paiement sont possibles :"
-msgstr ""
-"About payement, you must do it before the %(date_here)s to make the "
-"treasurer's work easier. You can pay by two ways: "
-
-#: app/templates/club_q/mails/reservation.html:26
-msgid ""
-"Par chèque à l'ordre <i>BDE Physique Chimie Paris Club Q</i> en le "
-"déposant dans l'enveloppe prévue à cet\n"
-"        effet au foyer."
-msgstr ""
-"By cheque made payable to <i>BDE Physique Chimie Paris Club Q</i> and "
-"deposited in the envelope provided in the foyer."
-
-#: app/templates/club_q/mails/reservation.html:30
-msgid ""
-"Par virement bancaire en précisant \"Club Q\" et votre nom dans l'ordre "
-"du virement. Le RIB du compte\n"
-"        bancaire du Club Q est le suivant :"
-msgstr ""
-"By bank transfer, specifying \"Club Q\" and your name in the of the "
-"transfer. The RIB of the Club "
-
-#: app/templates/club_q/mails/reservation.html:39
-msgid "Le Club Q"
-msgstr "Club Q"
-
 #: app/templates/club_q/modals/modals_spectacles.html:16
 msgid "Editer spectacle ID"
 msgstr "Edit spectacle ID"
+
+#: app/templates/club_q/modals/modals_spectacles.html:75
+#: app/templates/club_q/modals/modals_spectacles.html:171
+msgid "Image : "
+msgstr "Image : "
 
 #: app/templates/club_q/modals/modals_voeux.html:93
 msgid "Editer voeu"
@@ -2826,13 +2847,6 @@ msgstr "the registration page"
 #: app/templates/devices/modify.html:43 app/templates/devices/modify.html:82
 msgid "Supprimer l'appareil"
 msgstr "Delete device"
-
-#: app/templates/devices/modify.html:55
-#: app/templates/profile/modify_account.html:34
-#: app/templates/profile/update_password.html:31
-#: app/templates/rooms/modify.html:31
-msgid "Retour"
-msgstr "Back"
 
 #: app/templates/devices/modify.html:64
 msgid "Supprimer l'appareil ?"
@@ -3489,7 +3503,9 @@ msgstr "on GitHub"
 msgid ""
 "Ajout du module du Bekk sur pc-est-magique : possibilité de le lire en "
 "ligne, de le télécharger. Outils d'administration pour l'équipe du Bekk."
-msgstr "Added Bekk (ESPCI Student newspaper) on website with a viewer. Administrative tools for managing team."
+msgstr ""
+"Added Bekk (ESPCI Student newspaper) on website with a viewer. "
+"Administrative tools for managing team."
 
 #: app/templates/main/changelog.html:33
 msgid ""

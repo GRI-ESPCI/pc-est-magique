@@ -1,7 +1,13 @@
-{% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} {{ super() }}
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block styles %}{{ super() }}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{{ url_for('static', filename='css/magazine.css') }}"
+/>
+{% endblock %}{% block scripts %} {{ super() }}
 
 <script defer>
-  var bekk_id_list = {{ bekk_id_list|tojson }}
+  var pdf_id_list = {{ bekk_id_list|tojson }}
 
   var url_list = [];
   {% for bekk in bekks %}
@@ -14,12 +20,12 @@
 ></script>
 {% if can_edit %}
 <script
-  src="{{url_for('static', filename='js/bekk/bekk.js') }}"
+  src="{{url_for('static', filename='js/bekk/bekks.js') }}"
   defer
 ></script>
 {% endif %}
 <script
-  src="{{url_for('static', filename='js/bekk/first_page.js') }}"
+  src="{{url_for('static', filename='js/pdf_reader/first_page.js') }}"
   defer
 ></script>
 
@@ -98,8 +104,7 @@
 </div>
 <div class="row">
   {% for bekk in bekks %}
-  <div class="col-sm-8 col-md-6 col-lg-4">{% include "cards/bekk.html" %}</div>
-
+  <div class="col-sm-8 col-md-6 col-lg-4 bottom-margin">{% include "cards/bekk.html" %}</div>
   {% endfor %}
 </div>
 {% if can_edit %}

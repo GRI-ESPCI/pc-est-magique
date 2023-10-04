@@ -41,7 +41,7 @@
 
 <br />
 <br />
-<div class="container mb-3">
+<div class="d-flex justify-content-between align-items-center">
   <div
     class="btn-toolbar"
     role="toolbar"
@@ -69,6 +69,15 @@
       </div>
     </div>
   </div>
+  {% if brochure != None %}
+  <a
+    role="button"
+    href="{{ url_for('club_q.brochure_reader', id=brochure.id) }}"
+    class="btn btn-primary"
+  >
+    {{_("Lire la plaquette")}}
+  </a>
+  {% endif %}
 </div>
 <br />
 {% if compact == 0 %}
@@ -79,17 +88,16 @@
 >
   {{ form.hidden_tag() }} {% for spect in spectacles %}
   <div class="row">
-    <div class="col-2 d-flex align-items-center justify-content-center">
+    <div class="col-3 d-flex align-items-center justify-content-center">
       <img
-        src="/club_q_images/{{spect.season.nom }}/{{ spect.image_name }}.jpg"
+        src="{{spect.src}}"
         alt="{{ spect.nom }}"
         class="img-thumbnail"
       />
     </div>
-    <div class="col-10">
+    <div class="col-9">
       <h3 onclick="window.location='{{ url_for('club_q.spectacle_id', id=spect.id) }}';"><b>{{ spect.nom }}</b></h3>
       <h5> <span onclick="window.location='{{ url_for('club_q.salle_id', id=spect.salle.id) }}';">{{ spect.salle.nom }} </span>- <em>{{spect.date}}</em> - {{ babel.format_currency(spect.unit_price, "EUR") }}
-        <br />
         <br />
         <h7>
         {{ spect.categorie }}

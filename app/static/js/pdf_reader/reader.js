@@ -1,6 +1,9 @@
+
 // turn.js code
-$(window).ready(function () {
+$(function () {
   $("#magazine").turn({
+    width: page_width*2,
+		height: page_height,
     display: "double",
     acceleration: true,
     gradients: !$.isTouch,
@@ -32,15 +35,18 @@ $(window).on("keydown", function (event) {
 });
 
 
+
 //PDF plotting part
 var pdfjsLib = window['pdfjs-dist/build/pdf'];
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/static/js/pdf.worker.js';
-
 // Asynchronous download of PDF
 var loadingTask = pdfjsLib.getDocument(url);
 loadingTask.promise.then(function(pdf) {
   var init = [1, 2, 3];
+
+  
+  
   for (var i in init) {
     (function (page) {
       renderPage(page);
@@ -50,9 +56,9 @@ loadingTask.promise.then(function(pdf) {
     //Render page code from https://mozilla.github.io/pdf.js/examples/
     pdf.getPage(i).then(function(page) {
   
-      var scale = 1.5;
+      var scale = 1;
       var viewport = page.getViewport({scale: scale});
-  
+
       // Prepare canvas using PDF page dimensions
       var canvas = document.getElementById('page-'+i);
       var context = canvas.getContext('2d');
@@ -103,9 +109,3 @@ loadingTask.promise.then(function(pdf) {
     }
   });
 });
-
-
-
-
-
-

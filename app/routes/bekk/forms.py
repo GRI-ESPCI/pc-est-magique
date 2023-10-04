@@ -10,7 +10,7 @@ from app.utils.validators import DataRequired
 
 
 class Bekk(FlaskForm):
-    """WTForm used to edit a photo."""
+    """WTForm used to manage Bekks."""
 
     id = wtforms.HiddenField("")
     bekk_name = wtforms.StringField(_l("Nom du Bekk"), validators=[DataRequired()])
