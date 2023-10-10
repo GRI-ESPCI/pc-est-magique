@@ -24,7 +24,6 @@ from app.routes.club_q import bp, forms
 from app.utils import typing
 from app.utils.validators import Optional, DataRequired
 from app.utils.nginx import get_nginx_access_token
-from datetime import datetime
 
 import wtforms
 import PyPDF2
@@ -216,7 +215,7 @@ def main() -> typing.RouteReturn:
 
 
 @bp.route("/pceens", methods=["GET", "POST"])
-@context.permission_only(PermissionType.all, PermissionScope.club_q)
+@context.permission_only(PermissionType.write, PermissionScope.club_q)
 def pceens() -> typing.RouteReturn:
     """Administration page for Club Q."""
 
@@ -278,7 +277,7 @@ def pceens() -> typing.RouteReturn:
 
 
 @bp.route("/pceens/generate_excel", methods=["GET", "POST"])
-@context.permission_only(PermissionType.all, PermissionScope.club_q)
+@context.permission_only(PermissionType.write, PermissionScope.club_q)
 def pceens_generate_excel():
     """Generate the resume of required payements from PCeens to the Club Q"""
 
@@ -361,7 +360,7 @@ def spectacles() -> typing.RouteReturn:
 
 
 @bp.route("/spectacles/export_pdfs", methods=["GET", "POST"])
-@context.permission_only(PermissionType.all, PermissionScope.club_q)
+@context.permission_only(PermissionType.write, PermissionScope.club_q)
 def spect_export_pdfs():
     """Export the PDF spectacle resume for the given id season (or the actual one in the db)"""
 
@@ -401,7 +400,7 @@ def spect_export_pdfs():
 
 
 @bp.route("/spectacles/<int:id>/generate_excel", methods=["GET", "POST"])
-@context.permission_only(PermissionType.all, PermissionScope.club_q)
+@context.permission_only(PermissionType.write, PermissionScope.club_q)
 def spect_export_excels(id: str):
     """Export the excel spectacle resume for the given id season (or the actual one in the db)"""
 
@@ -528,7 +527,7 @@ def salles() -> typing.RouteReturn:
 
 
 @bp.route("/voeux", methods=["GET", "POST"])
-@context.permission_only(PermissionType.all, PermissionScope.club_q)
+@context.permission_only(PermissionType.write, PermissionScope.club_q)
 def voeux() -> typing.RouteReturn:
 
     season_id = flask.request.args.get("season_id")
@@ -653,13 +652,14 @@ def saisons() -> typing.RouteReturn:
 
 
 @bp.route("/attribution", methods=["GET", "POST"])
-@context.permission_only(PermissionType.all, PermissionScope.club_q)
+@context.permission_only(PermissionType.write, PermissionScope.club_q)
 def attribution_manager() -> typing.RouteReturn:
     season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
     subquery = ClubQVoeu.query.filter_by(_season_id=season_id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
 
     voeux = ClubQVoeu.query.filter_by(_season_id=season_id).all()
-    pceens = PCeen.query.filter(subquery)
+    pceens = PCeen.query.filter(subquery).all()
+    spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
 
     # Ajout des forms pour choisir les mécontentements bonus
     discontent_bonus = [
@@ -721,7 +721,7 @@ def attribution_manager() -> typing.RouteReturn:
             corruption = form_algo_setting["corruption"].data
 
             # Place attribution
-            voeux, pceens = attribution(voeux, pceens, promo_1A, bonus, corruption)
+            voeux, pceens = attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption)
 
             if save_results:  # Save algorithm results in database ?
                 # Commit the changes to the database
@@ -750,7 +750,7 @@ def attribution_manager() -> typing.RouteReturn:
 
 
 @bp.route("/mails", methods=["GET", "POST"])
-@context.permission_only(PermissionType.all, PermissionScope.club_q)
+@context.permission_only(PermissionType.write, PermissionScope.club_q)
 def mails() -> typing.RouteReturn:
 
     season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
@@ -798,7 +798,7 @@ def mails() -> typing.RouteReturn:
 
 
 @bp.route("/options", methods=["GET", "POST"])
-@context.permission_only(PermissionType.all, PermissionScope.club_q)
+@context.permission_only(PermissionType.write, PermissionScope.club_q)
 def options() -> typing.RouteReturn:
     season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
     seasons = ClubQSeason.query.order_by(ClubQSeason.id).all()
@@ -988,7 +988,7 @@ def spectacle_id(id: int):
 
 
 @bp.route("/spectacles/<int:id>/generate_pdf", methods=["GET", "POST"])
-@context.permission_only(PermissionType.all, PermissionScope.club_q)
+@context.permission_only(PermissionType.write, PermissionScope.club_q)
 def spect_generate_pdf(id: int):
     """Sum up of informations concerning the club Q spectacle of the given id"""
     # Get spectacle
@@ -1022,7 +1022,7 @@ def spect_generate_pdf(id: int):
 
 
 @bp.route("/spectacles/<int:id>/generate_excel", methods=["GET", "POST"])
-@context.permission_only(PermissionType.all, PermissionScope.club_q)
+@context.permission_only(PermissionType.write, PermissionScope.club_q)
 def spect_generate_excel(id: int):
     """Sum up of informations concerning the club Q spectacle of the given id"""
     # Get spectacle

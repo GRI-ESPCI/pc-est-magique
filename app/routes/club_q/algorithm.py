@@ -2,6 +2,7 @@ import logging
 import os
 import random
 import flask
+from flask_babel import _
 
 # Set up specific logging for the club q algorithm
 club_q_algo_logger = logging.Logger("club_q_algo")
@@ -13,7 +14,7 @@ club_q_algo_logger.addHandler(_club_q_algo_handler)
 app = flask.Flask(__name__)
 
 
-def attribution(voeux, pceens, promo_1A, bonus, corruption):
+def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
     """
     Algorithme d'attribution des places du Club Q :
 
@@ -60,88 +61,114 @@ def attribution(voeux, pceens, promo_1A, bonus, corruption):
             pceen.discontent += -10
 
     i = 0
-    while i < len(voeux):
-        voeux, pceens = current_discontent(voeux, pceens)
+    voeux_update = []
+
+    spectacles_places_attribuees = initialized_attributed_spectacles_places(spectacles, voeux)
+
+    while len(voeux) != 0:
         voeux.sort(key=lambda x: (x.priorite, -x.pceen.discontent))
         i = 0
         for voeu in voeux:
             if corruption and random.random() > 0.99:
                 i = random.randint(0, len(efioohze) - 1)
-                print(i)
                 club_q_algo_logger.info(efioohze[i])
+            
+
+            for j in range(len(spectacles_places_attribuees)):
+                if voeu.spectacle.id == spectacles_places_attribuees[j][0]:
+                    id_list_spect_attrib = j
+                    break
 
             if voeu.places_attribuees == 0:
                 if (
                     voeu.spectacle.nb_tickets
-                    - sum_places_attribuees_spect(voeu.spectacle, voeux)
+                    - spectacles_places_attribuees[id_list_spect_attrib][1]
                     - voeu.places_demandees
                     >= 0
                 ):
                     voeu.places_attribuees = voeu.places_demandees
+                    spectacles_places_attribuees[id_list_spect_attrib][1] += voeu.places_demandees
                     club_q_algo_logger.info(
-                        f"Full - {voeu.places_attribuees} places - {voeu.pceen.full_name} - {voeu.spectacle.nom} - Priority {voeu.priorite} - Discontent {voeu.pceen.discontent :.2f}"
+                        _(f"Plein - {voeu.places_attribuees} places - {voeu.pceen.full_name} - {voeu.spectacle.nom} - Priorité {voeu.priorite} - Mécontentement {voeu.pceen.discontent :.2f}")
                     )
                     if voeu.priorite < 6:
                         for pceen in pceens:
                             if voeu.pceen.id == pceen.id:
                                 pceen.discontent = pceen.discontent + 1 / 3 * voeu.priorite - 2
+                                voeu.pceen.discontent = pceen.discontent
                                 club_q_algo_logger.info(
-                                    f"Substracted {1/3*voeu.priorite-2 :.2f} discontent. New discontent : {pceen.discontent :.2f}"
+                                    _(f"Réduction mécontentement de {1/3*voeu.priorite-2 :.2f} . Nouveau mécontentement : {pceen.discontent :.2f}")
                                 )
+                    voeux_update.append(voeu)
+                    voeux.remove(voeu)
+
                 elif (
                     voeu.spectacle.nb_tickets
-                    - sum_places_attribuees_spect(voeu.spectacle, voeux)
+                    - spectacles_places_attribuees[id_list_spect_attrib][1]
                     - places_minimum_handle(voeu.places_minimum)
-                    >= 0
+                    > 0
                 ):
-                    voeu.places_attribuees = voeu.spectacle.nb_tickets - sum_places_attribuees_spect(
-                        voeu.spectacle, voeux
-                    )
+                    voeu.places_attribuees = voeu.spectacle.nb_tickets - spectacles_places_attribuees[id_list_spect_attrib][1]
+                    spectacles_places_attribuees[id_list_spect_attrib][1] += voeu.places_attribuees
                     club_q_algo_logger.info(
-                        f"Partial - {voeu.places_attribuees} places - {voeu.pceen.full_name} - {voeu.spectacle.nom} - Priority {voeu.priorite} - Discontent {voeu.pceen.discontent :.2f} - {voeu.places_demandees} asked."
+                        _(f"Partiel - {voeu.places_attribuees} places - {voeu.pceen.full_name} - {voeu.spectacle.nom} - Priorité {voeu.priorite} - Mécontentement {voeu.pceen.discontent :.2f} - {voeu.places_demandees} demandées.")
                     )
                     if voeu.priorite < 6:
                         for pceen in pceens:
                             if voeu.pceen.id == pceen.id:
                                 pceen.discontent = pceen.discontent + 1 / 6 * voeu.priorite - 1
+                                voeu.pceen.discontent = pceen.discontent
                                 club_q_algo_logger.info(
-                                    f"Substracted {1/6*voeu.priorite-1 :.2f} discontent. New discontent : {pceen.discontent :.2f}"
+                                    _(f"Réduction mécontentement de {1/6*voeu.priorite-1 :.2f}. Nouveau mécontentement : {pceen.discontent :.2f}")
                                 )
+                    voeux_update.append(voeu)
+                    voeux.remove(voeu)
+
                 else:
                     club_q_algo_logger.info(
-                        f"Refused - {voeu.pceen.full_name} - {voeu.spectacle.nom} - Priority {voeu.priorite} - {sum_places_attribuees_spect(voeu.spectacle, voeux)} left - {voeu.places_demandees} asked"
+                        _(f"Refusé - {voeu.pceen.full_name} - {voeu.spectacle.nom} - Priorité {voeu.priorite} - {spectacles_places_attribuees[id_list_spect_attrib][1]} places restantes - {voeu.places_demandees} places demandées")
                     )
                     if voeu.priorite < 5:
                         for pceen in pceens:
                             if voeu.pceen.id == pceen.id:
                                 pceen.discontent = pceen.discontent - 2 / 3 * voeu.priorite + 8 / 3
+                                voeu.pceen.discontent = pceen.discontent
                                 club_q_algo_logger.info(
-                                    f"Added {-2/3*voeu.priorite+8/3 :.2f} discontent. New discontent : {pceen.discontent :.2f}"
+                                    _(f"Ajout de {-2/3*voeu.priorite+8/3 :.2f} de mécontentement. Nouveau mécontentement : {pceen.discontent :.2f}")
                                 )
                     a = 0
                     for voeu_c in voeux:
                         if voeu._pceen_id == voeu_c._pceen_id and voeu_c != voeu and voeu_c.priorite > voeu.priorite:
                             voeu_c.priorite = voeu_c.priorite - 1
                             club_q_algo_logger.info(
-                                f"Upgraded priority of Voeu {voeu_c.id} - {voeu_c.spectacle.nom} - Priority {voeu_c.priorite:} - Old priority : {voeu_c.priorite+1}"
+                                f"Incrémentation priorité voeu {voeu_c.id} - {voeu_c.spectacle.nom} - Nouvelle priorité : {voeu_c.priorite:} - Ancienne priorité : {voeu_c.priorite+1}"
                             )
                             a = 1
                     if a == 0:
                         club_q_algo_logger.info(
-                            f"Did not find any more voeu for {voeu.pceen.full_name} after priority {voeu.priorite}"
+                            f"Plus de voeux pour {voeu.pceen.full_name} après la priorité {voeu.priorite}"
                         )
+                    voeux.remove(voeu)
                     break
             i += 1
-        if i == 0:
-            voeux = voeux[1:]
-        elif i < len(voeux):
-            voeux = voeux[:i] + voeux[i + 1 :]
 
     # Sum up for logs
     club_q_algo_logger.info("\n")
-    sum_up(voeux, pceens, corruption)
+    sum_up(voeux_update, pceens, corruption)
 
-    return (voeux, pceens)
+    return (voeux_update, pceens)
+
+
+def initialized_attributed_spectacles_places(spectacles, voeux):
+    """
+    Gives the list of attributed places for each spectacles
+    """
+    spectacles_places_attribuees = [[spectacles[i].id, 0] for i in range(len(spectacles))]
+    
+    for i, spectacle in enumerate(spectacles):
+            spectacles_places_attribuees[i][1] = sum_places_attribuees_spect(spectacle, voeux)
+
+    return spectacles_places_attribuees
 
 
 def sum_places_attribuees_spect(spectacle, voeux):
@@ -164,17 +191,6 @@ def sum_places_attribuees_pceen(pceen, voeux):
         if voeu._pceen_id == pceen.id:
             sum += voeu.places_attribuees
     return sum
-
-
-def current_discontent(voeux, pceens):
-    """
-    Correlate the current discontent of a pceen based on the voeu studied (not yet registered in database)
-    """
-    for voeu in voeux:
-        for pceen in pceens:
-            if pceen.id == voeu.pceen.id:
-                voeu.pceen.discontent = pceen.discontent
-    return (voeux, pceens)
 
 
 def clear_log_file():
