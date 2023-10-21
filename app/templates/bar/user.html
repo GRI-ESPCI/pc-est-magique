@@ -169,12 +169,12 @@
                         </svg>
                     </td>
                     <td class="container"><div class="row align-middle"><div class="col col-4 col-sm-3 col-lg-2">
-                        {{ alcohol_bought_count }}/{{ Settings.max_daily_alcoholic_drinks_per_user }}
+                        {{ alcohol_bought_count }}{{_("°")}}/{{ Settings.max_daily_alcoholic_drinks_per_user }}{{_("°")}}
                         </div><div class="col">
                             <div class="progress bg-success" style="height: 24px;">
                                 <div class="progress-bar bg-danger" role="progressbar"
                                 aria-valuenow="{{ pceen.bar_balance }}" aria-valuemin="0" aria-valuemax="100"
-                                style="width: {{ alcohol_bought_count * 25 }}%; max-width: 100%">
+                                style="width: {{ alcohol_bought_count * 5 }}%; max-width: 100%">
                             </div>
                         </div>
                     </div></div></td>

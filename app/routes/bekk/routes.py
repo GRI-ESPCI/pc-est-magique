@@ -95,6 +95,9 @@ def main() -> typing.RouteReturn:
 
     can_edit = context.has_permission(PermissionType.write, PermissionScope.bekk)
 
+    folder = "bekk"
+    filename = "introduction.html"
+
     return flask.render_template(
         "bekk/main.html",
         title=_("Page du Bekk ESPCI"),
@@ -104,6 +107,8 @@ def main() -> typing.RouteReturn:
         form=form,
         bekk_id_list=bekk_id_list,
         can_edit=can_edit,
+        folder=folder,
+        filename=filename
     )
 
 
@@ -128,3 +133,15 @@ def reader(id: int) -> typing.RouteReturn:
         dim = [width, height]
 
     return flask.render_template("reader.html", title=bekk.name, bekk=bekk, nb_pages=nb_pages, dim=dim, redirect=redirect, url=url, download_name=download_name)
+
+
+@bp.route('/edit_text', methods=['POST'])
+@context.permission_only(PermissionType.write, PermissionScope.bekk)
+def edit_text():
+    content = flask.request.form.get('content')  # Retrieve the content from the POST request
+    path = os.path.join('app', 'templates', 'bekk', 'introduction.html')
+    with open(path, 'w') as file:
+        file.write(content)
+
+    flask.flash(_("Introduction mise à jour."))
+    return flask.redirect(flask.url_for("club_q.main"))

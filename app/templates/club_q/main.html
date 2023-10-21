@@ -1,10 +1,32 @@
+<!DOCTYPE html>
 {% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} {{ super() }}
+
+
+{% if can_edit %}
+<script defer>
+  var folder = {{folder|tojson}}
+</script>
+<script
+  src='{{url_for("static", filename="js/quill.js") }}'
+  defer
+></script>
+<script
+  src='{{url_for("static", filename="js/wysiwyg_editor.js") }}'
+  defer
+></script>
+{% endif %}
+
+{% if compact == 1 %}
 <script
   src='{{url_for("static", filename="js/sort-table.js") }}'
   defer
 ></script>
+{% endif %}
 
-{% endblock %} {% block app_content %} {% include 'club_q/common.html' %}
+{% endblock %} {% if can_edit %}{% block styles %}{{ super() }}
+
+<link defer href='{{url_for("static", filename="css/quill.snow.css") }}' rel="stylesheet">
+{% endblock %} {% endif %}{% block app_content %} {% include 'club_q/common.html' %}
 
 
 <div class="row mb-3">
@@ -13,26 +35,7 @@
   </div>
 </div>
 
-<div class="row">
-  <p>
-    {{ _("Bienvenue sur la page de commande du Club Q-ulture.
-    <br />
-    Le Club Q est un club de l'ESPCI cherchant à proposer des spectacles de la vie culturelle parisienne à ses membres.
-    De la danse aux concerts, en passant par l'opéra, le Club Q propose ces spectacles à prix réduit grâce aux tarifs de
-    groupes et étudiants, et en profitant de plus de subventions du Crous, des Alumnis et du BDE.
-    <br />
-    Les places sont prioritairement attribués aux étudiants actuels de l'école, et seulement ensuite à d'autres membres
-    de l'école.
-    <br />
-    Pour passer commande, classez vos voeux pour les spectacles par ordre de préférence (en commençant par 1, ne mettez
-    pas deux spectacles à la même priorité). Vous pouvez demander plusieurs places, mais en cas de demande importante
-    sur un spectacle, vos chances de l'avoir seront diminuées.
-    <br />
-    En cas de problème technique ou de doute, vous pouvez contacter les responsables du Club Q ou les GRIs.
-    <br />
-    Le Club Q") }} {{saison.promo_orga}} {{ _(" vous souhaite une bonne saison artistique !") }}
-  </p>
-</div>
+{% include 'wysiwyg.html' %}
 
 <br />
 {% if visibility == 1 %}
@@ -130,8 +133,8 @@
     </div>
   </div>
   <hr align="CENTER" />
-
   {% endfor %}
+
   <div class="row mt-3">
     <div class="col text-center">
       <button

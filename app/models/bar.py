@@ -27,6 +27,7 @@ class BarItem(db.Model):
     price: Column[float] = column(sa.Numeric(6, 2, asdecimal=False), nullable=False)
 
     is_alcohol: Column[bool] = column(sa.Boolean(), nullable=False)
+    alcohol_degree: Column[bool] = column(sa.Numeric(4, 2), nullable=True)
     is_quantifiable: Column[bool] = column(sa.Boolean(), nullable=False)
     quantity: Column[int] = column(sa.Integer(), nullable=True)
 
@@ -82,10 +83,12 @@ class BarTransaction(db.Model):
         daily_data = BarDailyData.from_pceen_and_timestamp(self.client, self.date, create=True)
         daily_data.balance_change += factor * self.balance_change
         if self.item:
-            daily_data.items_bought_count += factor * 1
+            daily_data.items_bought_count += factor * 0
             daily_data.total_spent -= factor * self.balance_change
             if self.item.is_alcohol:
-                daily_data.alcohol_bought_count += factor * 1
+                degree = 5 if self.item.alcohol_degree is None else self.item.alcohol_degree
+                daily_data.alcohol_bought_count += factor * degree
+
 
     @classmethod
     def create_from_item_bought(
@@ -136,7 +139,7 @@ class BarDailyData(db.Model):
 
     balance_change: Column[float] = column(sa.Numeric(6, 2, asdecimal=False), nullable=False, default=0.0)
     items_bought_count: Column[int] = column(sa.Integer(), nullable=False, default=0)
-    alcohol_bought_count: Column[int] = column(sa.Integer(), nullable=False, default=0)
+    alcohol_bought_count: Column[int] = column(sa.Numeric(4, 2, asdecimal=False), nullable=False, default=0.0)
     total_spent: Column[float] = column(sa.Numeric(6, 2, asdecimal=False), nullable=False, default=0.0)
 
     pceen_date_unique = sa.UniqueConstraint(_pceen_id, date)

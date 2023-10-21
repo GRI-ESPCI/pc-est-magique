@@ -66,6 +66,8 @@ def main() -> typing.RouteReturn:
         visibility = 1
 
 
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+
     # Ajout dynamique de 1 form par spectacle de la saison
     season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
     spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
@@ -115,6 +117,9 @@ def main() -> typing.RouteReturn:
     if compact is None:
         compact = 0
     compact = int(compact)
+
+    folder = 'club_q'
+    filename = 'introduction.html'
 
     # Gestion des requêtes
     form = forms.ClubQForm()
@@ -210,7 +215,10 @@ def main() -> typing.RouteReturn:
         visibility=visibility,
         saison=saison,
         compact=compact,
-        brochure=brochure
+        brochure=brochure,
+        can_edit=can_edit,
+        folder=folder,
+        filename=filename
     )
 
 
@@ -657,7 +665,7 @@ def attribution_manager() -> typing.RouteReturn:
     season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
     subquery = ClubQVoeu.query.filter_by(_season_id=season_id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
 
-    voeux = ClubQVoeu.query.filter_by(_season_id=season_id).all()
+    voeux = ClubQVoeu.query.filter_by(_season_id=season_id).order_by(ClubQVoeu.priorite).all()
     pceens = PCeen.query.filter(subquery).all()
     spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
 
@@ -1221,3 +1229,16 @@ def brochure_delete(id: int) -> typing.RouteReturn:
 
     flask.flash(_("Plaquette supprimée."))
     return flask.redirect(flask.url_for("club_q.brochures"))
+
+
+@bp.route('/edit_text', methods=['POST'])
+@context.permission_only(PermissionType.write, PermissionScope.club_q)
+def edit_text():
+
+    content = flask.request.form.get('content')  # Retrieve the content from the POST request
+    path = os.path.join('app', 'templates', 'club_q', 'introduction.html')
+    with open(path, 'w') as file:
+        file.write(content)
+
+    flask.flash(_("Introduction mise à jour."))
+    return flask.redirect(flask.url_for("club_q.main"))

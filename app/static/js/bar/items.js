@@ -13,6 +13,8 @@ modal.addEventListener("show.bs.modal", function (event) {
   update_quantifiable_checkbox();
   modal.querySelector("#is_favorite").checked = false;
   update_favorite_checkbox();
+  modal.querySelector("#is_alcohol").checked = false;
+  update_alcohol_checkbox();
 
   if (button.dataset["itemId"]) {
     // Update existing item
@@ -25,6 +27,17 @@ modal.addEventListener("show.bs.modal", function (event) {
     }
     modal.querySelector("#price").value = button.dataset["price"];
     modal.querySelector("#is_alcohol").checked = button.dataset["isAlcohol"] == "True";
+    if (button.dataset["isAlcohol"] == "True") {
+      modal.querySelector("#is_alcohol").checked = true;
+      update_alcohol_checkbox();
+      if (button.dataset["alcoholDegree"] == "None") {
+        modal.querySelector("#alcohol_degree").value = 5;
+
+      }
+      else {
+        modal.querySelector("#alcohol_degree").value = button.dataset["alcoholDegree"];
+      }
+    }
     if (button.dataset["favoriteIndex"] != "0") {
       modal.querySelector("#is_favorite").checked = true;
       update_favorite_checkbox();
@@ -56,8 +69,23 @@ function update_quantifiable_checkbox() {
   }
 }
 
+function update_alcohol_checkbox() {
+  if (isAlcoholCheckbox.checked) {
+    modal.querySelector("#alcoholDegreeInput").classList.remove("text-muted");
+    modal.querySelector("#alcohol_degree").disabled = false;
+  } else {
+    modal.querySelector("#alcohol_degree").value = null
+    modal.querySelector("#alcoholDegreeInput").classList.add("text-muted");
+    modal.querySelector("#alcohol_degree").disabled = true;
+  }
+}
+
+
 favoriteCheckbox = modal.querySelector("#is_favorite");
 favoriteCheckbox.addEventListener("change", update_favorite_checkbox);
 
 quantifiableCheckbox = modal.querySelector("#is_quantifiable");
 quantifiableCheckbox.addEventListener("change", update_quantifiable_checkbox);
+
+isAlcoholCheckbox = modal.querySelector("#is_alcohol");
+isAlcoholCheckbox.addEventListener("change", update_alcohol_checkbox);

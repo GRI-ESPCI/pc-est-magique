@@ -33,14 +33,17 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
             Si le voeu n'a pas encore des places attribuées :
                 S'il y a suffisament de places restantes pour donner toutes les places voulues par le pceen :
                     Attribuer toutes les places voulues
+                    Enlever le voeu de la liste et l'ajouter à celui des voeux à mettre à jour
                 Sinon si y a que partiellement assez de places restantes pour donner le maximum de places entre le nombre de places minimum voulues et le nombre de places voulues :
                     Attribuer le maximum de places possible
+                    Enlever le voeu de la liste et l'ajouter à celui des voeux à mettre à jour
                 Sinon
                     Ajouter le mécontentement au pcéen fois l'exponentielle inverse de la priorité + 1
                     Regarder si le pcéen a fait un voeu avec une priorité plus basse et l'augmenter de 1
+                    Enlever le voeu de la liste
                     Sortir de la boucle des voeux
-        Si voeu avec places non attribuées, récupérer la liste des voeux excepté celui qui n'a pas pu être attribué et recommencer la boucle.
-
+            Sinon
+                Enlever le voeu de la liste
     """
     for pceen in pceens:
         if pceen.discontent == None:
@@ -60,26 +63,27 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
         else:
             pceen.discontent += -10
 
-    i = 0
     voeux_update = []
 
     spectacles_places_attribuees = initialized_attributed_spectacles_places(spectacles, voeux)
 
     while len(voeux) != 0:
         voeux.sort(key=lambda x: (x.priorite, -x.pceen.discontent))
-        i = 0
-        for voeu in voeux:
+        
+        while len(voeux) != 0:
+            voeu = voeux[0]
+
             if corruption and random.random() > 0.99:
                 i = random.randint(0, len(efioohze) - 1)
                 club_q_algo_logger.info(efioohze[i])
             
-
-            for j in range(len(spectacles_places_attribuees)):
-                if voeu.spectacle.id == spectacles_places_attribuees[j][0]:
-                    id_list_spect_attrib = j
-                    break
-
             if voeu.places_attribuees == 0:
+
+                for j in range(len(spectacles_places_attribuees)):
+                    if voeu.spectacle.id == spectacles_places_attribuees[j][0]:
+                        id_list_spect_attrib = j
+                        break
+                    
                 if (
                     voeu.spectacle.nb_tickets
                     - spectacles_places_attribuees[id_list_spect_attrib][1]
@@ -94,13 +98,13 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
                     if voeu.priorite < 6:
                         for pceen in pceens:
                             if voeu.pceen.id == pceen.id:
-                                pceen.discontent = pceen.discontent + 1 / 3 * voeu.priorite - 2
+                                pceen.discontent = round(pceen.discontent + 1 / 3 * voeu.priorite - 2, 1)
                                 voeu.pceen.discontent = pceen.discontent
                                 club_q_algo_logger.info(
                                     _(f"Réduction mécontentement de {1/3*voeu.priorite-2 :.2f} . Nouveau mécontentement : {pceen.discontent :.2f}")
                                 )
                     voeux_update.append(voeu)
-                    voeux.remove(voeu)
+                    voeux.pop(0)
 
                 elif (
                     voeu.spectacle.nb_tickets
@@ -116,13 +120,13 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
                     if voeu.priorite < 6:
                         for pceen in pceens:
                             if voeu.pceen.id == pceen.id:
-                                pceen.discontent = pceen.discontent + 1 / 6 * voeu.priorite - 1
+                                pceen.discontent = round(pceen.discontent + 1 / 6 * voeu.priorite - 1, 1)
                                 voeu.pceen.discontent = pceen.discontent
                                 club_q_algo_logger.info(
                                     _(f"Réduction mécontentement de {1/6*voeu.priorite-1 :.2f}. Nouveau mécontentement : {pceen.discontent :.2f}")
                                 )
                     voeux_update.append(voeu)
-                    voeux.remove(voeu)
+                    voeux.pop(0)
 
                 else:
                     club_q_algo_logger.info(
@@ -131,7 +135,7 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
                     if voeu.priorite < 5:
                         for pceen in pceens:
                             if voeu.pceen.id == pceen.id:
-                                pceen.discontent = pceen.discontent - 2 / 3 * voeu.priorite + 8 / 3
+                                pceen.discontent = round(pceen.discontent - 2 / 3 * voeu.priorite + 8 / 3, 1)
                                 voeu.pceen.discontent = pceen.discontent
                                 club_q_algo_logger.info(
                                     _(f"Ajout de {-2/3*voeu.priorite+8/3 :.2f} de mécontentement. Nouveau mécontentement : {pceen.discontent :.2f}")
@@ -148,9 +152,10 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
                         club_q_algo_logger.info(
                             f"Plus de voeux pour {voeu.pceen.full_name} après la priorité {voeu.priorite}"
                         )
-                    voeux.remove(voeu)
+                    voeux.pop(0)
                     break
-            i += 1
+            else:
+                voeux.pop(0)
 
     # Sum up for logs
     club_q_algo_logger.info("\n")

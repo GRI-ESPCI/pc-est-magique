@@ -29,6 +29,7 @@ from app.routes.bar.utils import get_avatar_token_args, get_export_data, get_ite
 from app.utils import helpers, roles
 from app.utils.global_settings import Settings
 
+app = flask.Flask(__name__)
 
 @bp.before_app_first_request
 def retrieve_bar_settings():
@@ -280,6 +281,7 @@ def items():
         if form.validate():
             favorite_index = form.favorite_index.data if form.is_favorite.data else 0
             quantity = (form.quantity.data or 0) if form.is_quantifiable.data else None
+            alcohol_degree = (form.alcohol_degree.data or 5) if form.is_alcohol.data else None
             if form.id.data:
                 # Edit existing item
                 item: BarItem = BarItem.query.get(form.id.data)
@@ -288,9 +290,11 @@ def items():
                 item.quantity = quantity
                 item.price = form.price.data
                 item.is_alcohol = form.is_alcohol.data
+                item.alcohol_degree = form.alcohol_degree.data
                 item.favorite_index = favorite_index
                 flask.flash(_("Article %(item)s modifié.", item=item.name), "success")
             else:
+                app.logger.info(alcohol_degree)
                 # Create item
                 item = BarItem(
                     name=form.name.data,
@@ -298,6 +302,7 @@ def items():
                     quantity=quantity,
                     price=form.price.data,
                     is_alcohol=form.is_alcohol.data,
+                    alcohol_degree=alcohol_degree,
                     favorite_index=favorite_index,
                 )
                 db.session.add(item)
@@ -319,7 +324,7 @@ def items():
         .order_by(
             (BarItem.quantity.desc() if way == "desc" else BarItem.quantity.asc())
             if sort == "quantity"
-            else (BarItem.name.desc() if way == "desc" else BarItem.name.asc())
+            else (sqlalchemy.func.lower(BarItem.name).desc() if way == "desc" else sqlalchemy.func.lower(BarItem.name).asc())
         )
         .paginate(page, flask.current_app.config["BAR_ITEMS_PER_PAGE"], True)
     )
