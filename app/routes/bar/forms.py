@@ -3,7 +3,17 @@
 import operator
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, FloatField, IntegerField, BooleanField, HiddenField, DateField, FileField, DecimalField
+from wtforms import (
+    StringField,
+    SubmitField,
+    FloatField,
+    IntegerField,
+    BooleanField,
+    HiddenField,
+    DateField,
+    FileField,
+    DecimalField,
+)
 from wtforms.validators import DataRequired, Optional, NumberRange, Length
 
 from app.utils.validators import CompareFields, NewBarItemName, PastDate, ValidBarItemID

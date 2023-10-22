@@ -50,6 +50,7 @@ from app.routes.club_q.algorithm import attribution
 
 from app.email import send_email
 
+
 @bp.route("", methods=["GET", "POST"])
 @bp.route("/", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
@@ -64,7 +65,6 @@ def main() -> typing.RouteReturn:
 
     if context.g.pceen.has_permission(PermissionType.all, PermissionScope.club_q):
         visibility = 1
-
 
     can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
 
@@ -118,8 +118,8 @@ def main() -> typing.RouteReturn:
         compact = 0
     compact = int(compact)
 
-    folder = 'club_q'
-    filename = 'introduction.html'
+    folder = "club_q"
+    filename = "introduction.html"
 
     # Gestion des requêtes
     form = forms.ClubQForm()
@@ -218,7 +218,7 @@ def main() -> typing.RouteReturn:
         brochure=brochure,
         can_edit=can_edit,
         folder=folder,
-        filename=filename
+        filename=filename,
     )
 
 
@@ -627,10 +627,10 @@ def saisons() -> typing.RouteReturn:
 
         if delete:
             db.session.delete(saison)
-            
+
             path = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], str(saison.id))
             os.rmdir(path)
-            
+
             db.session.commit()
             flask.flash(_("Saison supprimée."))
             return flask.redirect(flask.url_for("club_q.saisons"))
@@ -775,7 +775,7 @@ def mails() -> typing.RouteReturn:
 
     form_mail = forms.Mail()
 
-    #Get access to Club Q RIB
+    # Get access to Club Q RIB
     src_rib = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "RIB_Club_Q.jpg")
     ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]
     token_args = get_nginx_access_token(src_rib, ip)
@@ -786,11 +786,7 @@ def mails() -> typing.RouteReturn:
         subject = f"Attribution Club Q {saison.nom}"
         for pceen in pceens:
             html_body = flask.render_template(
-                "club_q/mails/reservation.html",
-                saison=saison,
-                pceen=pceen,
-                date=date,
-                rib=rib
+                "club_q/mails/reservation.html", saison=saison, pceen=pceen, date=date, rib=rib
             )
 
             send_email(
@@ -799,7 +795,7 @@ def mails() -> typing.RouteReturn:
                 subject=f"[PC est magique - Club - Q] {subject}",
                 recipients={pceen.email: pceen.full_name},
                 html_body=html_body,
-                reply_to=form_mail["reply_to"].data
+                reply_to=form_mail["reply_to"].data,
             )
 
     return flask.render_template("club_q/mails.html", view="mails", form_mail=form_mail, user=context.g.pceen)
@@ -1134,11 +1130,12 @@ def brochures() -> typing.RouteReturn:
     brochures = ClubQBrochure.query.join(ClubQBrochure.season).order_by(ClubQSeason.debut.desc()).all()
     saisons = ClubQSeason.query.order_by(ClubQSeason.debut.desc()).all()
 
-    forms.Brochure.season_id = wtforms.SelectField(_("Saison"),
-                choices=[[saison.id, saison.nom] for saison in saisons],
-                default=GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value,
-                validators=[DataRequired()],
-            )
+    forms.Brochure.season_id = wtforms.SelectField(
+        _("Saison"),
+        choices=[[saison.id, saison.nom] for saison in saisons],
+        default=GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value,
+        validators=[DataRequired()],
+    )
 
     form = forms.Brochure()
 
@@ -1163,12 +1160,13 @@ def brochures() -> typing.RouteReturn:
 
                 db.session.add(brochure)
                 db.session.commit()
-                path = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "plaquettes" , str(brochure.id) + ".pdf")
+                path = os.path.join(
+                    flask.current_app.config["CLUB_Q_BASE_PATH"], "plaquettes", str(brochure.id) + ".pdf"
+                )
                 form["pdf_file"].data.save(path)
 
                 flask.flash(_("Plaquette ajoutée."))
                 return flask.redirect(flask.url_for("club_q.brochures"))
-
 
     brochure_id_list = [brochure.id for brochure in brochures]
 
@@ -1182,7 +1180,7 @@ def brochures() -> typing.RouteReturn:
         form=form,
         brochure_id_list=brochure_id_list,
         can_edit=can_edit,
-        user=context.g.pceen
+        user=context.g.pceen,
     )
 
 
@@ -1195,8 +1193,7 @@ def brochure_reader(id: int) -> typing.RouteReturn:
     if brochure is None:
         flask.abort(404)
 
-
-    filepath = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "plaquettes" , str(brochure.id) + ".pdf")
+    filepath = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "plaquettes", str(brochure.id) + ".pdf")
 
     redirect = flask.url_for("club_q.brochures")
     url = brochure.pdf_src_with_token
@@ -1209,7 +1206,15 @@ def brochure_reader(id: int) -> typing.RouteReturn:
         width = reader.pages[0].mediabox.width
         dim = [width, height]
 
-    return flask.render_template("reader.html", brochure=brochure,  nb_pages=nb_pages, dim=dim, redirect=redirect, url=url, download_name=download_name)
+    return flask.render_template(
+        "reader.html",
+        brochure=brochure,
+        nb_pages=nb_pages,
+        dim=dim,
+        redirect=redirect,
+        url=url,
+        download_name=download_name,
+    )
 
 
 @bp.route("/reader/delete/<int:id>", methods=["GET", "POST"])
@@ -1220,7 +1225,7 @@ def brochure_delete(id: int) -> typing.RouteReturn:
     if brochure is None:
         flask.abort(404)
 
-    path = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "plaquettes" , str(brochure.id) + ".pdf")
+    path = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "plaquettes", str(brochure.id) + ".pdf")
 
     db.session.delete(brochure)
     db.session.commit()
@@ -1231,13 +1236,13 @@ def brochure_delete(id: int) -> typing.RouteReturn:
     return flask.redirect(flask.url_for("club_q.brochures"))
 
 
-@bp.route('/edit_text', methods=['POST'])
+@bp.route("/edit_text", methods=["POST"])
 @context.permission_only(PermissionType.write, PermissionScope.club_q)
 def edit_text():
 
-    content = flask.request.form.get('content')  # Retrieve the content from the POST request
-    path = os.path.join('app', 'templates', 'club_q', 'introduction.html')
-    with open(path, 'w') as file:
+    content = flask.request.form.get("content")  # Retrieve the content from the POST request
+    path = os.path.join("app", "templates", "club_q", "introduction.html")
+    with open(path, "w") as file:
         file.write(content)
 
     flask.flash(_("Introduction mise à jour."))

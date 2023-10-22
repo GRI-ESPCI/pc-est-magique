@@ -87,7 +87,11 @@ def get_items_descriptions(pceen: PCeen) -> typing.Iterator[tuple[BarItem, tuple
     can_buy_anything = _pceen_can_buy_anything(pceen, False)
 
     no_favorites_seen = True
-    for item in BarItem.query.filter(BarItem.archived==False).order_by(BarItem.favorite_index.desc(), BarItem.name.asc()).all():
+    for item in (
+        BarItem.query.filter(BarItem.archived == False)
+        .order_by(BarItem.favorite_index.desc(), BarItem.name.asc())
+        .all()
+    ):
         item: BarItem
         can_be_bought = True
         limit_message = ""

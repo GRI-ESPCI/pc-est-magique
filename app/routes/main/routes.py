@@ -265,12 +265,13 @@ def bekks(filename: str) -> typing.RouteReturn:
 
 
 @bp.route("/club_q_images/<season_id>/<filename>")
-def club_q_images(season_id : str, filename: str) -> typing.RouteReturn:
+def club_q_images(season_id: str, filename: str) -> typing.RouteReturn:
     """Serve Club Q files (fallback if no Nginx, should NOT be used!)"""
     logging.warning("Club Q served by Flask and not nginx!")
 
     filepath = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], season_id, filename)
     return flask.send_file(filepath)
+
 
 @bp.route("/club_q_plaquettes/<filename>")
 def club_q_plaquettes(filename: str) -> typing.RouteReturn:

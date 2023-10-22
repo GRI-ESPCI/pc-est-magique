@@ -31,6 +31,7 @@ from app.utils.global_settings import Settings
 
 app = flask.Flask(__name__)
 
+
 @bp.before_app_first_request
 def retrieve_bar_settings():
     # Call getter for all settings to load cache
@@ -324,7 +325,11 @@ def items():
         .order_by(
             (BarItem.quantity.desc() if way == "desc" else BarItem.quantity.asc())
             if sort == "quantity"
-            else (sqlalchemy.func.lower(BarItem.name).desc() if way == "desc" else sqlalchemy.func.lower(BarItem.name).asc())
+            else (
+                sqlalchemy.func.lower(BarItem.name).desc()
+                if way == "desc"
+                else sqlalchemy.func.lower(BarItem.name).asc()
+            )
         )
         .paginate(page, flask.current_app.config["BAR_ITEMS_PER_PAGE"], True)
     )

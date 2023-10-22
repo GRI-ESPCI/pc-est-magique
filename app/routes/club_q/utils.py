@@ -654,7 +654,6 @@ def spectacle_form(salles, salle, season_id, redirect, can_edit):
             except FileNotFoundError:
                 pass
 
-
             db.session.delete(spectacle)
             db.session.commit()
 

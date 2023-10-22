@@ -108,7 +108,7 @@ def main() -> typing.RouteReturn:
         bekk_id_list=bekk_id_list,
         can_edit=can_edit,
         folder=folder,
-        filename=filename
+        filename=filename,
     )
 
 
@@ -132,15 +132,24 @@ def reader(id: int) -> typing.RouteReturn:
         width = reader.pages[0].mediabox.width
         dim = [width, height]
 
-    return flask.render_template("reader.html", title=bekk.name, bekk=bekk, nb_pages=nb_pages, dim=dim, redirect=redirect, url=url, download_name=download_name)
+    return flask.render_template(
+        "reader.html",
+        title=bekk.name,
+        bekk=bekk,
+        nb_pages=nb_pages,
+        dim=dim,
+        redirect=redirect,
+        url=url,
+        download_name=download_name,
+    )
 
 
-@bp.route('/edit_text', methods=['POST'])
+@bp.route("/edit_text", methods=["POST"])
 @context.permission_only(PermissionType.write, PermissionScope.bekk)
 def edit_text():
-    content = flask.request.form.get('content')  # Retrieve the content from the POST request
-    path = os.path.join('app', 'templates', 'bekk', 'introduction.html')
-    with open(path, 'w') as file:
+    content = flask.request.form.get("content")  # Retrieve the content from the POST request
+    path = os.path.join("app", "templates", "bekk", "introduction.html")
+    with open(path, "w") as file:
         file.write(content)
 
     flask.flash(_("Introduction mise à jour."))

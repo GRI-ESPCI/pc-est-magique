@@ -51,7 +51,7 @@ def send_email(
     recipients: dict[str | None, str],
     html_body: str,
     text_body: str | None = None,
-    reply_to: str | None = None
+    reply_to: str | None = None,
 ) -> None:
     """Send an email using Flask-Mail, asynchronously.
 

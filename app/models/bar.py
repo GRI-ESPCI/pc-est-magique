@@ -89,7 +89,6 @@ class BarTransaction(db.Model):
                 degree = 5 if self.item.alcohol_degree is None else self.item.alcohol_degree
                 daily_data.alcohol_bought_count += factor * degree
 
-
     @classmethod
     def create_from_item_bought(
         cls, client: models.PCeen, barman: models.PCeen, item: models.PCeen, date: datetime.datetime
