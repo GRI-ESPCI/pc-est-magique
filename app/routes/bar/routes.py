@@ -29,8 +29,6 @@ from app.routes.bar.utils import get_avatar_token_args, get_export_data, get_ite
 from app.utils import helpers, roles
 from app.utils.global_settings import Settings
 
-app = flask.Flask(__name__)
-
 
 @bp.before_app_first_request
 def retrieve_bar_settings():
@@ -295,7 +293,6 @@ def items():
                 item.favorite_index = favorite_index
                 flask.flash(_("Article %(item)s modifié.", item=item.name), "success")
             else:
-                app.logger.info(alcohol_degree)
                 # Create item
                 item = BarItem(
                     name=form.name.data,

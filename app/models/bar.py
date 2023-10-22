@@ -83,7 +83,7 @@ class BarTransaction(db.Model):
         daily_data = BarDailyData.from_pceen_and_timestamp(self.client, self.date, create=True)
         daily_data.balance_change += factor * self.balance_change
         if self.item:
-            daily_data.items_bought_count += factor * 0
+            daily_data.items_bought_count += factor * 1
             daily_data.total_spent -= factor * self.balance_change
             if self.item.is_alcohol:
                 degree = 5 if self.item.alcohol_degree is None else self.item.alcohol_degree
