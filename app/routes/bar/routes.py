@@ -65,17 +65,17 @@ def stats():
 
     # Compute number of clients this month
     clients_this_month = [
-        PCeen.query.join(PCeen.bar_transactions_made)
-        .filter(BarDailyData.date == date.replace(day=day), BarDailyData.total_spent != 0)
-        .count()
+        BarDailyData.query.filter(
+            BarDailyData.date == date.replace(day=day), BarDailyData.items_bought_count > 0
+        ).count()
         for day in days_range
         if day <= date.day
     ]
 
     clients_alcohol_this_month = [
-        PCeen.query.join(PCeen.bar_transactions_made)
-        .filter(BarDailyData.date == date.replace(day=day), BarDailyData.alcohol_bought_count > 0)
-        .count()
+        BarDailyData.query.filter(
+            BarDailyData.date == date.replace(day=day), BarDailyData.alcohol_bought_count > 0
+        ).count()
         for day in days_range
         if day <= date.day
     ]
@@ -185,14 +185,15 @@ def main():
 @bp.route("/me")
 @context.permission_only(PermissionType.read, PermissionScope.bar)
 def me():
+    page = flask.request.args.get("page", 1, type=int)
     if context.has_permission(PermissionType.write, PermissionScope.bar):
-        return helpers.ensure_safe_redirect("bar.user", username=context.g.pceen.username, next=None)
-    return _user(context.g.pceen)
+        return helpers.ensure_safe_redirect("bar.user", username=context.g.pceen.username, page=page, next=None)
+    return _user(context.g.pceen, page=page)
 
 
 @bp.route("/user/<username>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.bar)
-def user(username: str):
+def user(username: str, page: int | None = None):
     # Get user
     pceen: PCeen | None = PCeen.query.filter_by(username=username).one_or_none()
     if not pceen or not pceen.has_permission(PermissionType.read, PermissionScope.bar):
@@ -225,13 +226,14 @@ def user(username: str):
             else:
                 flask.flash(_("L'avatar de %(name)s a bien été modifié", name=pceen.full_name), "success")
 
-    return _user(pceen, form=form)
+    return _user(pceen, form=form, page=page)
 
 
-def _user(pceen: PCeen, form: EditBarUserForm | None = None):
+def _user(pceen: PCeen, form: EditBarUserForm | None = None, page: int | None = None):
     """Render the user profile page."""
     # Get pceen transactions
-    page = flask.request.args.get("page", 1, type=int)
+    if page == None:
+        page = flask.request.args.get("page", 1, type=int)
     transactions_paginator = pceen.bar_transactions_made.order_by(BarTransaction.date.desc()).paginate(page, 5, True)
 
     # Get inventory
@@ -239,6 +241,11 @@ def _user(pceen: PCeen, form: EditBarUserForm | None = None):
 
     # Get quick access item
     quick_access_item = Settings.quick_access_item
+
+    # Is it the bar page of the connected pceen?
+    personal_page = False
+    if context.g.pceen == pceen:
+        personal_page = True
 
     return flask.render_template(
         "bar/user.html",
@@ -249,6 +256,7 @@ def _user(pceen: PCeen, form: EditBarUserForm | None = None):
         paginator=transactions_paginator,
         avatar_token_args=get_avatar_token_args(),
         form=form,
+        personal_page=personal_page,
     )
 
 
@@ -280,7 +288,7 @@ def items():
         if form.validate():
             favorite_index = form.favorite_index.data if form.is_favorite.data else 0
             quantity = (form.quantity.data or 0) if form.is_quantifiable.data else None
-            alcohol_degree = (form.alcohol_degree.data or 5) if form.is_alcohol.data else None
+            alcohol_mass = form.alcohol_mass.data or 0
             if form.id.data:
                 # Edit existing item
                 item: BarItem = BarItem.query.get(form.id.data)
@@ -288,8 +296,7 @@ def items():
                 item.is_quantifiable = form.is_quantifiable.data
                 item.quantity = quantity
                 item.price = form.price.data
-                item.is_alcohol = form.is_alcohol.data
-                item.alcohol_degree = form.alcohol_degree.data
+                item.alcohol_mass = alcohol_mass
                 item.favorite_index = favorite_index
                 flask.flash(_("Article %(item)s modifié.", item=item.name), "success")
             else:
@@ -299,8 +306,7 @@ def items():
                     is_quantifiable=form.is_quantifiable.data,
                     quantity=quantity,
                     price=form.price.data,
-                    is_alcohol=form.is_alcohol.data,
-                    alcohol_degree=alcohol_degree,
+                    alcohol_mass=alcohol_mass,
                     favorite_index=favorite_index,
                 )
                 db.session.add(item)

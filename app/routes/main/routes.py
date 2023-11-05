@@ -280,3 +280,15 @@ def club_q_plaquettes(filename: str) -> typing.RouteReturn:
 
     filepath = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "plaquettes", filename)
     return flask.send_file(filepath)
+
+
+@bp.route("/custom_files/<folder>/<filename>")
+def custom_files(folder: str, filename: str) -> typing.RouteReturn:
+    """Serve WYSIYG files (fallback if no Nginx, should NOT be used!)"""
+    logging.warning("WYSIYG served by Flask and not nginx!")
+    if folder == "club_q":
+        path = flask.current_app.config["CLUB_Q_BASE_PATH"]
+    elif folder == "bekk":
+        path = flask.current_app.config["BEKK_BASE_PATH"]
+    filepath = os.path.join(path, filename)
+    return flask.send_file(filepath)

@@ -16,7 +16,7 @@
   id="wysiwyg_editor"
   class="col"
 >
-  <div id="editor">{% include folder + '/' + filename %}</div>
+  <div id="editor">{{html_file | safe}}</div>
   <button
     type="submit"
     class="btn btn-primary"
@@ -29,4 +29,4 @@
 <br />
 {% endif %}
 
-<div id="intro_text">{% include folder + '/' + filename %}</div>
+<div id="intro_text">{{html_file | safe}}</div>

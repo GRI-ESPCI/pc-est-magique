@@ -36,8 +36,10 @@ def _pceen_can_buy_anything(pceen: PCeen, flash: bool) -> bool:
 
 
 def _pceen_can_buy_alcohol(pceen: PCeen, flash: bool, item: BarItem) -> bool:
-    degree = 5 if item.alcohol_degree is None else float(item.alcohol_degree)
-    if pceen.current_bar_daily_data.alcohol_bought_count + degree > Settings.max_daily_alcoholic_drinks_per_user:
+    if (
+        pceen.current_bar_daily_data.alcohol_bought_count + float(item.alcohol_mass)
+        > Settings.max_daily_alcoholic_drinks_per_user
+    ):
         if flash:
             flask.flash(
                 _(
@@ -76,7 +78,7 @@ def can_buy(pceen: PCeen, item: BarItem | None, flash: bool = False) -> str | bo
             )
         return False
 
-    if item.is_alcohol and not _pceen_can_buy_alcohol(pceen, flash, item):
+    if item.alcohol_mass > 0 and not _pceen_can_buy_alcohol(pceen, flash, item):
         return False
 
     return True
@@ -106,7 +108,7 @@ def get_items_descriptions(pceen: PCeen) -> typing.Iterator[tuple[BarItem, tuple
         elif balance < item.price:
             can_be_bought = False
             limit_message = _("Fonds insuffisants")
-        elif item.is_alcohol and not _pceen_can_buy_alcohol(pceen, False, item):
+        elif item.alcohol_mass > 0 and not _pceen_can_buy_alcohol(pceen, False, item):
             can_be_bought = False
             limit_message = _("Limite d'alcool quotidienne atteinte")
         elif not _item_can_be_bought(item, False):

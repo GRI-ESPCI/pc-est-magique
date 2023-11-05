@@ -124,8 +124,16 @@
         <td>{% if item.is_quantifiable %}{{ item.quantity }}{% else %}{{ _("N/A") }}{% endif %}</td>
         <td>{{ babel.format_currency(item.price, "EUR") }}</td>
         <td>
-          {% if item.is_alcohol %} {% if item.alcohol_degree == None %} {{ _("5°") }} {% else %} {{item.alcohol_degree}}
-          {{ _("°")}} {% endif %} {% endif %}
+          {% if item.alcohol_mass > 0 %} {{item.alcohol_mass}} {{ _("g")}} {% else %}
+          <svg
+            class="bi flex-shrink-0"
+            width="12"
+            height="12"
+            role="img"
+          >
+            {{ macros.bootstrap_icon("x") }}
+          </svg>
+          {% endif %}
         </td>
         <td>{% if item.favorite_index %}{{ item.favorite_index }}{% else %}-{% endif %}</td>
         <td>
@@ -158,8 +166,7 @@
               data-item-name="{{ item.name }}"
               data-quantity='{{ item.quantity if item.is_quantifiable else "" }}'
               data-price="{{ item.price }}"
-              data-is-alcohol="{{ item.is_alcohol }}"
-              data-alcohol-degree="{{ item.alcohol_degree }}"
+              data-alcohol-mass="{{ item.alcohol_mass }}"
               data-favorite-index="{{ item.favorite_index }}"
             >
               <svg
@@ -269,9 +276,9 @@
             <div class="col-8">
               <div
                 class="form-floating text-muted"
-                id="alcoholDegreeInput"
+                id="alcoholMassInput"
               >
-                {{ wtf.form_field(form.alcohol_degree) }}
+                {{ wtf.form_field(form.alcohol_mass) }}
               </div>
             </div>
           </div>

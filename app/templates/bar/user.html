@@ -169,12 +169,12 @@
                         </svg>
                     </td>
                     <td class="container"><div class="row align-middle"><div class="col col-4 col-sm-3 col-lg-2">
-                        {{ alcohol_bought_count }}{{_("°")}}/{{ Settings.max_daily_alcoholic_drinks_per_user }}{{_("°")}}
+                        {{ alcohol_bought_count }}{{_("g")}}/{{ Settings.max_daily_alcoholic_drinks_per_user }}{{_("g")}}
                         </div><div class="col">
                             <div class="progress bg-success" style="height: 24px;">
                                 <div class="progress-bar bg-danger" role="progressbar"
                                 aria-valuenow="{{ pceen.bar_balance }}" aria-valuemin="0" aria-valuemax="100"
-                                style="width: {{ alcohol_bought_count * 5 }}%; max-width: 100%">
+                                style="width: {{ alcohol_bought_count * 100/Settings.max_daily_alcoholic_drinks_per_user }}%; max-width: 100%">
                             </div>
                         </div>
                     </div></div></td>
@@ -244,11 +244,19 @@
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
             {% for page in paginator.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
-                <li class="page-item{% if page == paginator.page %} active{% endif %}{%if not page %} disabled{% endif %}">
-                    <a class="page-link" href="{{ url_for("bar.user", username=pceen.username, page=page) }}">
-                        {% if page %}{{ page }}{% else %}<span class=ellipsis>…</span>{% endif %}
-                    </a>
-                </li>
+                {% if personal_page %}
+                    <li class="page-item{% if page == paginator.page %} active{% endif %}{%if not page %} disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for("bar.me", page=page) }}">
+                            {% if page %}{{ page }}{% else %}<span class=ellipsis>…</span>{% endif %}
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item{% if page == paginator.page %} active{% endif %}{%if not page %} disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for("bar.user", username=pceen.username, page=page) }}">
+                            {% if page %}{{ page }}{% else %}<span class=ellipsis>…</span>{% endif %}
+                        </a>
+                    </li>
+                {% endif %}
             {% endfor %}
             </ul>
         </nav>

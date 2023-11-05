@@ -97,6 +97,11 @@ def main() -> typing.RouteReturn:
 
     folder = "bekk"
     filename = "introduction.html"
+    filepath = os.path.join(flask.current_app.config["BEKKS_BASE_PATH"], filename)
+    if not os.path.exists(filepath):
+        open(filepath, "w").close()
+    with open(filepath, "r") as f:
+        html_file = f.read()
 
     return flask.render_template(
         "bekk/main.html",
@@ -108,7 +113,7 @@ def main() -> typing.RouteReturn:
         bekk_id_list=bekk_id_list,
         can_edit=can_edit,
         folder=folder,
-        filename=filename,
+        html_file=html_file,
     )
 
 
@@ -148,9 +153,9 @@ def reader(id: int) -> typing.RouteReturn:
 @context.permission_only(PermissionType.write, PermissionScope.bekk)
 def edit_text():
     content = flask.request.form.get("content")  # Retrieve the content from the POST request
-    path = os.path.join("app", "templates", "bekk", "introduction.html")
+    path = os.path.join(flask.current_app.config["BEKKS_BASE_PATH"], "introduction.html")
     with open(path, "w") as file:
         file.write(content)
 
     flask.flash(_("Introduction mise à jour."))
-    return flask.redirect(flask.url_for("club_q.main"))
+    return flask.redirect(flask.url_for("bekk.main"))

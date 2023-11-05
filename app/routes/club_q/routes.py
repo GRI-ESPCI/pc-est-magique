@@ -120,6 +120,11 @@ def main() -> typing.RouteReturn:
 
     folder = "club_q"
     filename = "introduction.html"
+    filepath = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], filename)
+    if not os.path.exists(filepath):
+        open(filepath, "w").close()
+    with open(filepath, "r") as f:
+        html_file = f.read()
 
     # Gestion des requêtes
     form = forms.ClubQForm()
@@ -218,7 +223,7 @@ def main() -> typing.RouteReturn:
         brochure=brochure,
         can_edit=can_edit,
         folder=folder,
-        filename=filename,
+        html_file=html_file,
     )
 
 
@@ -1241,7 +1246,7 @@ def brochure_delete(id: int) -> typing.RouteReturn:
 def edit_text():
 
     content = flask.request.form.get("content")  # Retrieve the content from the POST request
-    path = os.path.join("app", "templates", "club_q", "introduction.html")
+    path = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "introduction.html")
     with open(path, "w") as file:
         file.write(content)
 
