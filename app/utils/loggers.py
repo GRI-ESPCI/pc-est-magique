@@ -120,7 +120,8 @@ class DiscordErrorFormatter(DiscordFormatter):
             except AttributeError:
                 pass
 
-        return f"{self.role_mention}ALED ça a planté ! (chez {remote_ip})\n" f"```{msg}```"
+        # return f"{self.role_mention}ALED ça a planté ! (chez {remote_ip})\n" f"```{msg}```"
+        return f"ALED ça a planté ! (chez {remote_ip})\n" f"```{msg}```"
 
 
 # Custom formatter
