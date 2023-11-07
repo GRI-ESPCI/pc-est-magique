@@ -13,12 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Alcohol bar limit is now counted in °
+- Alcohol bar limit is now counted in grams
 
 ### Fixed
 
 - Club Q pages visibility fix
 - Club Q algorithm speed improved
+- Bar stats number of clients
 
 # v2.7.1 (2023-10-02)
 
