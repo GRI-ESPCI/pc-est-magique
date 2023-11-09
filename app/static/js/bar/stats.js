@@ -47,24 +47,25 @@ var transactionsChart = new Chart(ctx, {
       intersect: true,
     },
     scales: {
-      xAxes: [
+      x:
         {
           display: true,
-          scaleLabel: {
+          title: {
             display: true,
-            labelString: "Day",
+            text: "Day",
           },
         },
-      ],
-      yAxes: [
+      y: 
         {
           display: true,
-          scaleLabel: {
+          title: {
             display: true,
-            labelString: "Clients",
+            text: "Clients",
           },
+          ticks: {
+            callback: function (value) { if (Number.isInteger(value)) { return value; } },
+        }
         },
-      ],
     },
   },
 });
@@ -99,24 +100,22 @@ var revenuesChart = new Chart(ctx, {
       intersect: true,
     },
     scales: {
-      xAxes: [
+      x:
         {
           display: true,
-          scaleLabel: {
+          title: {
             display: true,
-            labelString: "Day",
+            text: "Day",
           },
         },
-      ],
-      yAxes: [
+      y:
         {
           display: true,
-          scaleLabel: {
+          title: {
             display: true,
-            labelString: "Moula (in €)",
+            text: "Moula (in €)",
           },
         },
-      ],
     },
   },
 });

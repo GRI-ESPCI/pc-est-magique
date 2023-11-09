@@ -29,29 +29,47 @@
 <div class="container mb-3">
   <div class="btn-toolbar justify-content-between">
     <h4>{{ _("Voeux : ")}}</h4>
-    {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
-    <div
-      data-bs-toggle="tooltip"
-      data-bs-placement="right"
-      title="{{ _('Ajouter un voeu') }}"
-    >
-      <button
-        type="button"
-        class="btn btn-success"
-        data-bs-target="#mo-voeu-add"
-        data-bs-toggle="modal"
+    <div>
+      <div
+        data-bs-toggle="tooltip"
+        data-bs-placement="right"
+        title="{{ _('Imprimer la facture') }}"
+        class="float-right d-inline-block"
       >
-        <svg
-          class="bi flex-shrink-0"
-          width="24"
-          height="24"
-          role="img"
+        <a
+          class="btn btn-primary"
+          href="{{ url_for('club_q.user_generate_pdf', id=pceen.id, season_id=season_id) }}"
+          target="_blank"
         >
-          {{ macros.bootstrap_icon("plus-circle") }}
-        </svg>
-      </button>
+          {{ _("Facture") }}
+        </a>
+      </div>
+      {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
+
+      <div
+        data-bs-toggle="tooltip"
+        data-bs-placement="right"
+        title="{{ _('Ajouter un voeu') }}"
+        class="float-right d-inline-block mr-2"
+      >
+        <button
+          type="button"
+          class="btn btn-success"
+          data-bs-target="#mo-voeu-add"
+          data-bs-toggle="modal"
+        >
+          <svg
+            class="bi flex-shrink-0"
+            width="24"
+            height="24"
+            role="img"
+          >
+            {{ macros.bootstrap_icon("plus-circle") }}
+          </svg>
+        </button>
+      </div>
+      {% endif %}
     </div>
-    {% endif %}
   </div>
 </div>
 <div class="row mb-3">
@@ -320,13 +338,6 @@
     </table>
   </div>
 </div>
-
-<a
-  class="btn btn-primary"
-  href="{{ url_for('club_q.user_generate_pdf', id=pceen.id, season_id=season_id) }}"
->
-  {{ _("Imprimer la facture") }}
-</a>
 
 <!-- Modals -->
 

@@ -38,4 +38,4 @@ class Bekk(db.Model):
         """The online query to the pdf with md5 args."""
         ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]
         token_args = get_nginx_access_token(self.src, ip)
-        return f"{self.src}?{token_args}"
+        return f"/bekks?{token_args}"

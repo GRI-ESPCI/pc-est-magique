@@ -35,8 +35,11 @@ def _pceen_can_buy_anything(pceen: PCeen, flash: bool) -> bool:
     return True
 
 
-def _pceen_can_buy_alcohol(pceen: PCeen, flash: bool) -> bool:
-    if pceen.current_bar_daily_data.alcohol_bought_count >= Settings.max_daily_alcoholic_drinks_per_user:
+def _pceen_can_buy_alcohol(pceen: PCeen, flash: bool, item: BarItem) -> bool:
+    if (
+        pceen.current_bar_daily_data.alcohol_bought_count + float(item.alcohol_mass)
+        > Settings.max_daily_alcoholic_drinks_per_user
+    ):
         if flash:
             flask.flash(
                 _(
@@ -75,7 +78,7 @@ def can_buy(pceen: PCeen, item: BarItem | None, flash: bool = False) -> str | bo
             )
         return False
 
-    if item.is_alcohol and not _pceen_can_buy_alcohol(pceen, flash):
+    if item.alcohol_mass > 0 and not _pceen_can_buy_alcohol(pceen, flash, item):
         return False
 
     return True
@@ -84,10 +87,13 @@ def can_buy(pceen: PCeen, item: BarItem | None, flash: bool = False) -> str | bo
 def get_items_descriptions(pceen: PCeen) -> typing.Iterator[tuple[BarItem, tuple[bool, str, bool]]]:
     balance = pceen.bar_balance
     can_buy_anything = _pceen_can_buy_anything(pceen, False)
-    can_buy_alcohol = can_buy_anything and _pceen_can_buy_alcohol(pceen, False)
 
     no_favorites_seen = True
-    for item in BarItem.query.order_by(BarItem.favorite_index.desc(), BarItem.name.asc()).all():
+    for item in (
+        BarItem.query.filter(BarItem.archived == False)
+        .order_by(BarItem.favorite_index.desc(), BarItem.name.asc())
+        .all()
+    ):
         item: BarItem
         can_be_bought = True
         limit_message = ""
@@ -102,7 +108,7 @@ def get_items_descriptions(pceen: PCeen) -> typing.Iterator[tuple[BarItem, tuple
         elif balance < item.price:
             can_be_bought = False
             limit_message = _("Fonds insuffisants")
-        elif not can_buy_alcohol and item.is_alcohol:
+        elif item.alcohol_mass > 0 and not _pceen_can_buy_alcohol(pceen, False, item):
             can_be_bought = False
             limit_message = _("Limite d'alcool quotidienne atteinte")
         elif not _item_can_be_bought(item, False):

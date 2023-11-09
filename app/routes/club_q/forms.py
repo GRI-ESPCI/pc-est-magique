@@ -113,6 +113,7 @@ class Mail(FlaskForm):
     )
     submit_mail = wtforms.SubmitField(_l("Envoyer les e-mails"))
 
+
 class Brochure(FlaskForm):
     """WTForm used to upload club Q brochures."""
 

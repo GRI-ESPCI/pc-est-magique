@@ -42,29 +42,30 @@ def pceens(view: str = "active") -> typing.RouteReturn:
     roles_form = forms.AddRemoveRoleForm()
     ban_form = forms.BanForm()
 
-    if roles_form.is_submitted():
-        # Check request is well formed
-        if roles_form.validate():
-            return add_remove_role(
-                roles_form.action.data,
-                roles_form.pceen_id.data,
-                roles_form.role_id.data,
+    if ban_form["submit"].data or ban_form["unban"].data:
+        if ban_form.validate_on_submit():
+            add_edit_ban(
+                unban=ban_form.unban.data,
+                pceen=ban_form.pceen.data,
+                ban_id=ban_form.ban_id.data,
+                infinite=ban_form.infinite.data,
+                hours=ban_form.hours.data,
+                days=ban_form.days.data,
+                months=ban_form.months.data,
+                reason=ban_form.reason.data,
+                message=ban_form.message.data,
             )
-        else:
-            return {"message": "Bad formed request", "detail": roles_form.errors}, 400
-
-    if ban_form.validate_on_submit():
-        add_edit_ban(
-            unban=ban_form.unban.data,
-            pceen=ban_form.pceen.data,
-            ban_id=ban_form.ban_id.data,
-            infinite=ban_form.infinite.data,
-            hours=ban_form.hours.data,
-            days=ban_form.days.data,
-            months=ban_form.months.data,
-            reason=ban_form.reason.data,
-            message=ban_form.message.data,
-        )
+    else:
+        if roles_form.is_submitted():
+            # Check request is well formed
+            if roles_form.validate():
+                return add_remove_role(
+                    roles_form.action.data,
+                    roles_form.pceen_id.data,
+                    roles_form.role_id.data,
+                )
+            else:
+                return {"message": "Bad formed request", "detail": roles_form.errors}, 400
 
     query = PCeen.query
     match view:

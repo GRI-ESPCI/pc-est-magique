@@ -11,6 +11,8 @@ from app import models
 from app.models import Ban, PCeen, Permission, Role, PermissionScope, PermissionType
 from app.utils import helpers
 
+app = flask.Flask(__name__)
+
 
 def add_remove_role(action: str, pceen_id: str, role_id: str) -> tuple[str | dict, int]:
     """Process a role add/remove request, or return an error.
@@ -285,6 +287,7 @@ def add_edit_ban(
             flask.flash(_("Le ban a bien été modifié."), "success")
     else:
         # New ban
+        app.logger.info(pceen, infinite, message)
         pceen = PCeen.query.get(int(pceen))
         if pceen.is_banned:
             flask.flash(_("Ce PCéén est déjà banni !"), "danger")

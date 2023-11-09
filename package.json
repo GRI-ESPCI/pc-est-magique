@@ -1,8 +1,6 @@
 {
   "name": "pc-est-magique",
-
-
-  "version": "2.7.0",
+  "version": "2.7.2",
   "description": "PC est magique Flask Web App",
   "main": "n/a",
   "scripts": {

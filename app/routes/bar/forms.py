@@ -3,7 +3,17 @@
 import operator
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, FloatField, IntegerField, BooleanField, HiddenField, DateField, FileField
+from wtforms import (
+    StringField,
+    SubmitField,
+    FloatField,
+    IntegerField,
+    BooleanField,
+    HiddenField,
+    DateField,
+    FileField,
+    DecimalField,
+)
 from wtforms.validators import DataRequired, Optional, NumberRange, Length
 
 from app.utils.validators import CompareFields, NewBarItemName, PastDate, ValidBarItemID
@@ -26,9 +36,9 @@ class AddOrEditItemForm(FlaskForm):
     name = StringField(_l("Nom"), validators=[DataRequired(), Length(max=64), NewBarItemName()])
     is_quantifiable = BooleanField(_l("Quantifiable"))
     quantity = IntegerField(_l("Quantité"), validators=[Optional(), NumberRange(min=0)])
-    price = FloatField(_l("Prix (en euros)"), validators=[DataRequired(), NumberRange(min=0)])
-    is_alcohol = BooleanField(_l("Article alcoolisé"))
-    is_quantifiable = BooleanField(_l("Quantifiable"))
+    price = FloatField(_l("Prix (€)"), validators=[DataRequired(), NumberRange(min=0)])
+    is_alcohol = BooleanField(_l("Alcoolisé"))
+    alcohol_mass = DecimalField(_l("Masse d'alcool (g)"), validators=[DataRequired(), NumberRange(min=0)], default=0)
     is_favorite = BooleanField(_l("Favori"))
     favorite_index = IntegerField(_l("Priorité dans la liste"), validators=[Optional(), NumberRange(min=0)])
 

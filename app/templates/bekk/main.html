@@ -4,7 +4,14 @@
   type="text/css"
   href="{{ url_for('static', filename='css/magazine.css') }}"
 />
-{% endblock %}{% block scripts %} {{ super() }}
+{% if can_edit %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href='{{url_for("static", filename="css/quill.snow.css") }}'
+  rel="stylesheet"
+/>
+{% endif %} {% endblock %}{% block scripts %} {{ super() }}
 
 <script defer>
   var pdf_id_list = {{ bekk_id_list|tojson }}
@@ -13,6 +20,10 @@
   {% for bekk in bekks %}
     url_list.push({{ bekk.pdf_src_with_token |tojson }})
   {% endfor %}
+    var url_list = []
+  {% if can_edit %}
+    var folder = {{folder |tojson}}
+  {% endif %}
 </script>
 <script
   src="{{url_for('static', filename='js/pdf.js') }}"
@@ -21,6 +32,14 @@
 {% if can_edit %}
 <script
   src="{{url_for('static', filename='js/bekk/bekks.js') }}"
+  defer
+></script>
+<script
+  src='{{url_for("static", filename="js/quill.js") }}'
+  defer
+></script>
+<script
+  src='{{url_for("static", filename="js/wysiwyg_editor.js") }}'
   defer
 ></script>
 {% endif %}
@@ -60,17 +79,7 @@
   </div>
 </div>
 
-<div class="row">
-  <p>
-    {{ _("Bienvenue sur la page du Bekk de l'ESPCI.") }}
-    <br />
-    {{ _("Le Bekk est l'association journalistique de l'école, et produit plusieurs numéros par an, à des occasions et
-    des buts bien spécifiques (Bekk Bibi, Noël, Saint-Valentin, Pré-campagne, Post-campagne et pour finir le Bekk
-    Alpha). Ce club est le premier à être passationné à la toute nouvelle génération de 1A qui s'attaquent directement à
-    la tâche. Tu retrouveras ici les Bekks triés par promotion, avec la possibilité de les lire ou de les télécharger.
-    ")}}
-  </p>
-</div>
+{% include 'wysiwyg.html' %}
 
 <!-- Bekk navbar -->
 <div class="container mb-3">

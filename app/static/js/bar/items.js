@@ -13,6 +13,8 @@ modal.addEventListener("show.bs.modal", function (event) {
   update_quantifiable_checkbox();
   modal.querySelector("#is_favorite").checked = false;
   update_favorite_checkbox();
+  modal.querySelector("#is_alcohol").checked = false;
+  update_alcohol_checkbox();
 
   if (button.dataset["itemId"]) {
     // Update existing item
@@ -24,7 +26,19 @@ modal.addEventListener("show.bs.modal", function (event) {
       modal.querySelector("#quantity").value = button.dataset["quantity"];
     }
     modal.querySelector("#price").value = button.dataset["price"];
-    modal.querySelector("#is_alcohol").checked = button.dataset["isAlcohol"] == "True";
+
+    modal.querySelector("#alcohol_mass").value = button.dataset["alcoholMass"];
+    if (button.dataset["alcoholMass"] == 0) {
+      modal.querySelector("#alcohol_mass").value = null;
+      modal.querySelector("#is_alcohol").checked = false
+
+    }
+    else {
+      modal.querySelector("#is_alcohol").checked = true;
+      update_alcohol_checkbox();
+      modal.querySelector("#alcohol_mass").value = button.dataset["alcoholMass"];
+    }
+
     if (button.dataset["favoriteIndex"] != "0") {
       modal.querySelector("#is_favorite").checked = true;
       update_favorite_checkbox();
@@ -56,8 +70,23 @@ function update_quantifiable_checkbox() {
   }
 }
 
+function update_alcohol_checkbox() {
+  if (isAlcoholCheckbox.checked) {
+    modal.querySelector("#alcoholMassInput").classList.remove("text-muted");
+    modal.querySelector("#alcohol_mass").disabled = false;
+  } else {
+    modal.querySelector("#alcohol_mass").value = null
+    modal.querySelector("#alcoholMassInput").classList.add("text-muted");
+    modal.querySelector("#alcohol_mass").disabled = true;
+  }
+}
+
+
 favoriteCheckbox = modal.querySelector("#is_favorite");
 favoriteCheckbox.addEventListener("change", update_favorite_checkbox);
 
 quantifiableCheckbox = modal.querySelector("#is_quantifiable");
 quantifiableCheckbox.addEventListener("change", update_quantifiable_checkbox);
+
+isAlcoholCheckbox = modal.querySelector("#is_alcohol");
+isAlcoholCheckbox.addEventListener("change", update_alcohol_checkbox);

@@ -5,7 +5,7 @@
       "fr": "Responsable Pipo",
       "en": "Chief Pipo Officier"
     },
-    "room": 718,
+    "room": null,
     "messenger": {
       "name": "Alec Cochard",
       "id": 100006923688525
@@ -22,7 +22,7 @@
       "fr": "Responsable Opérationnel",
       "en": "Chief Operating Officier"
     },
-    "room": 324,
+    "room": null,
     "messenger": {
       "name": "Louis Destruel",
       "id": 100009330929622
@@ -56,7 +56,7 @@
       "fr": "Responsable Poulet",
       "en": "Chief Chicken Officier"
     },
-    "room": 310,
+    "room": null,
     "messenger": {
       "name": "Loïc Simon",
       "id": 100013717094493
