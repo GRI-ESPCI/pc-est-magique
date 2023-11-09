@@ -27,8 +27,8 @@
                     </svg>
                 </div>
                 <div class="col">
-                    <h5 class="card-title mt-0">{{ nb_daily_clients }}</h5>
-                    <h6 class="card-subtitle">{{ macros.s(nb_daily_clients, "Client", False) }} {{ date_descr }}</h6>
+                    <h5 class="card-title mt-0">{{ nb_daily_clients }} / {{ nb_daily_clients_alcohol }}</h5>
+                    <h6 class="card-subtitle">{{ macros.s(nb_daily_clients, "Client", False) }} / {{ macros.s(nb_daily_clients_alcohol, "Clients alcoolisés", False) }}, {{ date_descr }}</h6>
                 </div>
             </div></div>
         </div>

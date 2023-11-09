@@ -54,6 +54,7 @@ def stats():
     daily_data: list[BarDailyData] = BarDailyData.query.filter(
         BarDailyData.date == date, BarDailyData.total_spent != 0
     ).all()
+    nb_daily_clients_alcohol = sum(1 if data.alcohol_bought_count != 0 else 0 for data in daily_data)
 
     # Daily alcohol consumption
     alcohol_qty = sum(data.alcohol_bought_count for data in daily_data)
@@ -117,6 +118,7 @@ def stats():
         revenues_this_month=",".join(str(nb) for nb in revenues_this_month),
         days_labels=",".join(format_date(date.replace(day=day), "medium") for day in days_range),
         nb_daily_clients=len(daily_data),
+        nb_daily_clients_alcohol=nb_daily_clients_alcohol,
         alcohol_qty=alcohol_qty,
         daily_revenue=daily_revenue,
         best_customer_name=best_customer_name,
