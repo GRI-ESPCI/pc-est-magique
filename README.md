@@ -100,7 +100,7 @@ Seules les fonctionnalités majeures sont listées ici ; voir
 
 ## Exigences
 
-- Python >= 3.10 ;
+- Python == 3.10 (dépendances ne supportent pas encore python 3.11);
 - Autres packages Linux : `postgresql postfix git npm xmlsec1`, plus pour le
   déploiement : `supervisor nginx` ;
 - Package npm : `bower sass`
@@ -116,10 +116,22 @@ Seules les fonctionnalités majeures sont listées ici ; voir
 Je reprends pour l'essentiel le déploiement conseillé dans le tutoriel :
 https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deployment-on-linux
 
+- Installer python :
+
+```
+sudo apt install python3 python3-venv
+```
+
+Si la version de Python disponible n'est pas la bonne alors il faut télécharger l'archive depuis [python.org](http://python.org). Pour l'installer en parallèle d'une version existante, utiliser :
+
+```
+sudo make altinstall
+```
+
 - Installer les dépendances :
 
   ```
-  sudo apt install postgresql postgresql-client postfix git npm [supervisor nginx]
+  sudo apt install postgresql postgresql-client postfix git npm sass [supervisor nginx]
   ```
 
 - Installer l'application :
@@ -130,9 +142,9 @@ https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deploymen
   cd pc-est-magique
   npm install
   python3 -m venv env
-  source env/bin/activate
+  source venv/bin/activate
   pip install -r requirements.txt
-  pip install gunicorn pymysql cryptography
+  pip install gunicorn cryptography
   cp .conf_models/model.env .env
   mkdir logs
   ```
@@ -155,6 +167,12 @@ https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deploymen
     pip install psycopg2 # ==2.9.2
     ```
 
+    or directly for binary (easier to install) :
+
+    ```
+    pip install psycopg2-binary
+    ```
+
   - MySQL :
     ```
     sudo mysql -u root
@@ -165,6 +183,10 @@ https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deploymen
     GRANT ALL PRIVILEGES ON pc_est_magique.* TO 'pc_est_magique'@'localhost';
     FLUSH PRIVILEGES;
     QUIT;
+    ```
+
+    ```
+    pip install pymysql
     ```
 
   Puis

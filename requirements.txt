@@ -32,6 +32,7 @@ Jinja2==3.0.1
 lxml==4.7.1
 Mako==1.1.5
 MarkupSafe==2.0.1
+openpyxl==3.1.2
 Pillow==9.0.1
 plum-py==0.7.3
 premailer==3.10.0
