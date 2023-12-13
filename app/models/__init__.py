@@ -27,3 +27,4 @@ from app.models.rooms import Rental, Room
 from app.models.theatre import Spectacle, Representation
 from app.models.club_q import ClubQSeason, ClubQSalle, ClubQSpectacle, ClubQVoeu, ClubQBrochure
 from app.models.bekk import Bekk
+from app.models.v4a import V4A, V4APricing, V4ARepresentation, V4ATicket
