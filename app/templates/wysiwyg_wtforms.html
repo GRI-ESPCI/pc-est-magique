@@ -1,0 +1,30 @@
+<div class="col">
+    <div id="{{ editor_name }}">
+        {{ editor_text }}
+    </div>
+</div>
+<script>
+    // Wait for Quill to be laoded and create the editor
+    var interval = 10; // ms
+    function waitForQuill(callback) {
+        window.setTimeout(function() {
+            if (window['Quill']) {
+                callback();
+            } else {
+                waitForQuill(callback);
+            }
+        }, interval);
+    }
+
+    waitForQuill(function() {
+        var quill = new Quill('#{{ editor_name }}', {
+            theme: 'snow'
+        });
+        const form = document.getElementById("{{ form_name }}")
+        const hidden_field = document.getElementById("{{ hidden_field }}");
+        form.addEventListener("submit", function(event) {
+            var content = JSON.stringify(quill.getContents());
+            hidden_field.value = content;
+        });
+    });
+</script>
