@@ -8,6 +8,7 @@ import typing
 import sqlalchemy as sa
 
 from app import db
+from flask_babel import lazy_gettext as _l
 from app.utils.columns import (
     column,
     Column,
@@ -24,7 +25,10 @@ class V4A(Model):
 
     __tablename__ = "v4a"
     id: Column[int] = column(sa.Integer(), primary_key=True)
-    visible: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
+    visible: Column[bool] = column(
+        sa.Boolean(),
+        nullable=False,
+        default=False)
     name: Column[str] = column(sa.String(120), nullable=False)
     description: Column[str] = column(sa.String(500), nullable=True)
     ticketing_open: Column[bool] = column(sa.Boolean(), nullable=False, default=False)

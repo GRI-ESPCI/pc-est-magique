@@ -7,6 +7,7 @@ from app.routes.v4a import bp
 from app.utils import typing
 
 from app.models import V4A
+from app.routes.v4a import forms
 
 @bp.route("")
 @bp.route("/")
@@ -28,17 +29,23 @@ def full_description(v4a_id: int) -> typing.RouteReturn:
     return flask.render_template(
         "v4a/full_description.html",
         title=v4a.name,
-        v4a=v4a
+        v4a=v4a,
+        can_edit=True
     )
 
-@bp.route("/<v4a_id>/edit")
+@bp.route("/<v4a_id>/edit", methods=["GET", "POST"])
 def edit(v4a_id: int) -> typing.RouteReturn:
     """Edit page of V4A"""
 
     v4a = V4A.query.filter_by(id=v4a_id).first()
+    edit_form = forms.EditV4A(obj=v4a)
+
+    if edit_form.validate_on_submit():
+        pass
 
     return flask.render_template(
         "v4a/edit.html",
         title=v4a.name,
-        v4a=v4a
+        v4a=v4a,
+        edit_form=edit_form
     )

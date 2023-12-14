@@ -1,10 +1,53 @@
-{% extends "base.html" %} {% block app_content %}
+{% extends "base.html" %}
 
-<div class="row mb-3">
-    <div class="col">
+{% block styles %}
 
-        <h1>{{"Test - " ~ v4a.name }}</h1>
+{{ super() }}
+
+<link rel="stylesheet" type="text/css" href='{{url_for("static", filename="css/quill.snow.css") }}' rel="stylesheet"/>
+
+{% endblock %}
+{% block scripts %}
+
+{{ super() }}
+
+<script src='{{url_for("static", filename="js/quill.js") }}' defer></script>
+
+{% endblock %}
+
+{% block app_content %}
+
+<h1>{{ _("Édition - ") ~ v4a.name }}</h1>
+
+<form action="" method="post" enctype="multipart/form-data" id="edit-form">
+    {{ edit_form.hidden_tag() }}
+    <div class="mb-3 form-check form-switch">
+        {{ edit_form.visible(class_="form-check-input") }}
+        <label for="visible" class="form-check-label">{{ edit_form.visible.label }}</label>
     </div>
-</div>
+    <div class="mb-3 form-check form-switch">
+        {{ edit_form.ticketing_open(class_="form-check-input", value="") }}
+        <label for="ticketing_open" class="form-check-label">{{ edit_form.ticketing_open.label }}</label>
+    </div>
+    <div class="mb-3">
+        <label for="name" class="form-label">{{ edit_form.name.label }}</label>
+        {{ edit_form.name(class_="form-control")}}
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">{{ edit_form.description.label }}</label>
+        {{ edit_form.description(class_="form-control")}}
+    </div>
+    <div class="mb-3">
+        {% with editor_text=v4a.full_description, editor_name="full_description", form_name="edit-form", hidden_field="delta_full_description" %}
+            <label for="{{ editor_name }}">{{ _("Description complète") }}</label>
+            {% include "wysiwyg_wtforms.html" %}
+        {% endwith %}
+    </div>
+    <div class="mb-3">
+        <label for="image_file" class="form-label">{{ edit_form.image_file.label }}</label>
+        {{ edit_form.image_file(class_="form-control") }}
+    </div>
+    {{ edit_form.submit(class_="btn btn-primary") }}
+</form>
 
 {% endblock %}
