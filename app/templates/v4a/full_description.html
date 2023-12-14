@@ -1,0 +1,35 @@
+{% extends "base.html" %} {% block app_content %}
+
+<div class="row mb-3">
+    <div class="col">
+
+        <a href="{{ url_for('v4a.edit', v4a_id=v4a.id) }}" class="btn btn-pc5 ms-3"
+            title={{ _("Modifier") }}>
+            <svg class="bi flex-shrink-0 text-secondary"
+                width="20" height="20">
+                {{ macros.bootstrap_icon("pencil") }}
+            </svg>
+        </a>
+
+        <h1>{{ v4a.name }}</h1>
+
+        <h2>{{ _("Synopsis") }}</h2>
+
+        <p>
+            {{ v4a.full_description }}
+        <p>
+
+
+        <h2>{{ _("Liste des représentations") }}</h2>
+
+        <ul>
+            {% for rep in v4a.representations %}
+                <li>{{ moment(rep.date).format('dddd DD MMMM YYYY')}} - {{ moment(rep.date).format('HH:mm')}}</li>
+            {% endfor %}
+        </ul>
+
+        <a href="" class="btn btn-primary">{{ _("Prendre une place") }}</a>
+
+        {% endblock %}
+    </div>
+</div>

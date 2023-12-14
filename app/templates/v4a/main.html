@@ -19,6 +19,7 @@
                 <p class="card-text">{{ v.description }}</p>
                 {% endif %}
             </div>
+            <a href="{{ url_for('v4a.full_description', v4a_id=v.id) }}" class="btn btn-primary">{{ _("Voir la page") }}</a>
         </div>
     </div>
 

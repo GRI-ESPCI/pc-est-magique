@@ -26,9 +26,10 @@ class V4A(Model):
     id: Column[int] = column(sa.Integer(), primary_key=True)
     visible: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
     name: Column[str] = column(sa.String(120), nullable=False)
-    description: Column[datetime.date] = column(sa.String(500), nullable=True)
+    description: Column[str] = column(sa.String(500), nullable=True)
     ticketing_open: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
     image_name: Column[str | None] = column(sa.String(120), nullable=True)
+    full_description: Column[str] = column(sa.Text(), nullable=True)
 
     representations: Relationship[list[V4ARepresentation]] = one_to_many(
         "V4ARepresentation.v4a", order_by="V4ARepresentation.date"
@@ -51,6 +52,7 @@ class V4ARepresentation(Model):
     __tablename__ = "v4a_representation"
     id: Column[int] = column(sa.Integer(), primary_key=True)
     date: Column[datetime.datetime] = column(sa.DateTime(), nullable=False)
+    sits: Column[int] = column(sa.Integer(), nullable=False)
 
     _v4a_id: Column[int] = column(sa.ForeignKey("v4a.id"), nullable=False)
     v4a: Relationship[V4A] = many_to_one("V4A.representations")
@@ -59,11 +61,11 @@ class V4ARepresentation(Model):
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
-        return f"<V4A Representation #{self.id} ('{self.name}')>"
+        return f"<V4A Representation #{self.id} ('{self.date}')>"
 
     def __str__(self) -> str:
         """Human-readible description of the V4A."""
-        return self.name
+        return self.date
 
 
 class V4APricing(Model):
