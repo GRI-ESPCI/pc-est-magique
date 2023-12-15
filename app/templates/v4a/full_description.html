@@ -4,10 +4,12 @@
 
 <h1>{{ v4a.name }}</h1>
 
+<img class="img-fluid mx-auto d-block" src="{{ url_for('static', filename='img/v4a/'~v4a.id~'.png') }}" alt="[[NO IMAGE]]">
+
 <h2>{{ _("Synopsis") }}</h2>
 
 <p>
-    {{ v4a.full_description }}
+    {{ v4a.full_description|safe }}
 <p>
 
 
