@@ -44,6 +44,8 @@ def permissions() -> dict[str, dict[str, typing.Any]]:
         "manage_collections": dict(type=PermissionType.all, scope=PermissionScope.collection, ref_id=None),
         "manage_bar": dict(type=PermissionType.all, scope=PermissionScope.bar, ref_id=None),
         "manage_bekk": dict(type=PermissionType.all, scope=PermissionScope.bekk, ref_id=None),
+        "manage_v4a": dict(type=PermissionType.all,
+        scope=PermissionScope.v4a, ref_id=None)
     }
 
 
@@ -130,6 +132,13 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["manage_bekk"],
             ],
         ),
+        "V4A": dict(
+            index=20,
+            color="cc3b7a",
+            permissions=[
+                perms['manage_v4a']
+            ]
+        )
     }
 
 

@@ -7,9 +7,9 @@ from flask import jsonify
 from flask_babel import _
 
 from app.routes.v4a import bp
-from app import helpers, db
+from app import helpers, db, context
 from app.utils import typing, wysiwyg
-from app.models import V4A
+from app.models import V4A, PermissionScope, PermissionType
 from app.routes.v4a import forms
 
 @bp.route("")
@@ -37,6 +37,7 @@ def full_description(v4a_id: int) -> typing.RouteReturn:
     )
 
 @bp.route("/<v4a_id>/edit", methods=["GET", "POST"])
+@context.permission_only(PermissionType.write, PermissionScope.v4a)
 def edit(v4a_id: int) -> typing.RouteReturn:
     """Edit page of V4A"""
 
