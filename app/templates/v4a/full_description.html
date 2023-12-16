@@ -1,8 +1,28 @@
 {% extends "base.html" %}
 
+{% block scripts %}
+
+{{ super() }}
+
+<script src='{{url_for("static", filename="js//v4a/full_description.js") }}' defer></script>
+
+{% endblock %}
+
 {% block app_content %}
 
-<h1>{{ v4a.name }}</h1>
+<div class="row row-cols-auto">
+    <div class="col">
+        <h1>{{ v4a.name }}</h1>
+    </div>
+    <div class="col">
+        <a  href="{{ url_for('v4a.edit', v4a_id=v4a.id) }}" class="btn btn-outline-primary" id="edit-v4a" style="margin-top: 5px; margin-bottom: 5px">
+            <svg class="bi flex-shrink-0" width="18" height="18">
+                {{ macros.bootstrap_icon("pen") }}
+            </svg>
+        </a>
+    </div>
+</div>
+
 
 <img class="img-fluid mx-auto d-block" src="{{ url_for('static', filename='img/v4a/'~v4a.id~'.png') }}" alt="[[NO IMAGE]]">
 
@@ -12,15 +32,135 @@
     {{ v4a.full_description|safe }}
 <p>
 
+<div class="row row-cols-auto">
+    <div class="col">
+        <h2>{{ _("Liste des représentations") }}</h2>
+    </div>
+    {% if can_edit %}
+    <div class="col">
+        <button type="button" class="btn btn-success" id="new-representation" data-bs-target="#mo-v4a-rep-add" data-bs-toggle="modal">
+            <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                {{ macros.bootstrap_icon("plus-circle") }}
+            </svg>
+        </button>
+    </div>
+    <div class="col">
+        <button class="btn btn-danger" id="del-representations">
+            <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                {{ macros.bootstrap_icon("trash") }}
+            </svg>
+        </button>
+    </div>
+    <div class="col">
+        <button class="btn btn-primary" id="edit-representations">
+            <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                {{ macros.bootstrap_icon("pen") }}
+            </svg>
+        </button>
+    </div>
+    {% endif %}
+</div>
 
-<h2>{{ _("Liste des représentations") }}</h2>
-
-<ul>
+<ul id="representations">
     {% for rep in v4a.representations %}
-        <li>{{ moment(rep.date).format('dddd DD MMMM YYYY')}} - {{ moment(rep.date).format('HH:mm')}}</li>
+        <li>
+            <div class="row row-cols-auto">
+                <div class="cols">
+                    <span class="rep-date">{{ moment(rep.date).format('dddd DD MMMM YYYY')}}</span> - <span class="rep-time">{{ moment(rep.date).format('HH:mm')}}</span>
+                    <button class="btn btn-danger del-representation" style="display: none;" data-url="{{ url_for('v4a.del_representation', rep_id=rep.id) }}">
+                        <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+                            {{ macros.bootstrap_icon("trash") }}
+                        </svg>
+                    </button>
+                    <button class="btn btn-primary edit-representation" style="display: none;" data-url="{{ url_for('v4a.edit_representation', rep_id=rep.id) }}" data-id="{{ rep.id }}" data-date="{{ rep.date }}", data-sits="{{ rep.sits }}">
+                        <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+                            {{ macros.bootstrap_icon("pen") }}
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </li>
     {% endfor %}
 </ul>
 
 <a href="" class="btn btn-primary">{{ _("Prendre une place") }}</a>
+
+{% if can_edit %}
+
+<div class="modal fade" id="mo-v4a-rep-add" tabindex="-1" aria-labelledby="mo-v4a-rep-add-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mo-v4a-rep-add-label">{{ _("Ajouter une représentation") ~ " - " ~  v4a.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Fermer') }}"></button>
+            </div>
+            <form action="{{ url_for('v4a.add_representation', v4a_id=v4a.id) }}" method="post" >
+                <div class="modal-body">
+                    {{ add_rep_form.hidden_tag() }}
+                    <div class="mb-3">
+                        <label for="date" class="form-check-label">{{ add_rep_form.date.label }}</label>
+                        {{ add_rep_form.date(class_="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="sits" class="form-check-label">{{ add_rep_form.sits.label }}</label>
+                        {{ add_rep_form.sits(class_="form-control") }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Fermer") }}</button>
+                    {{ add_rep_form.submit(class_="btn btn-primary")}}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" id="confirm-del">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ _("Suppression d'une représetentation")}}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ _("Êtes-vous sûr ?")}}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Annuler")}}</button>
+        <button type="button" class="btn btn-danger" id="confirm-del-btn">{{ _("Supprimer")}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="mo-v4a-rep-edit" tabindex="-1" aria-labelledby="mo-v4a-rep-edit-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mo-v4a-rep-edit-label">{{ _("Modifier une représentation") ~ " - " ~  v4a.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Fermer') }}"></button>
+            </div>
+            <form action="" method="post" id="edit-form">
+                <div class="modal-body">
+                    {{ add_rep_form.hidden_tag() }}
+                    <div class="mb-3">
+                        <label for="date" class="form-check-label">{{ add_rep_form.date.label }}</label>
+                        {{ add_rep_form.date(class_="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="sits" class="form-check-label">{{ add_rep_form.sits.label }}</label>
+                        {{ add_rep_form.sits(class_="form-control") }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Fermer") }}</button>
+                    <button type="button" class="btn btn-primary" id="confirm-edit-btn">{{ _("Modifier") }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endif %}
 
 {% endblock %}

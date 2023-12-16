@@ -3,14 +3,18 @@ from wtforms import (
     SubmitField,
     FileField,
     BooleanField,
-    StringField
+    StringField,
+    IntegerField
 )
 from app.utils.validators import(
     DataRequired,
-    Length
+    Length,
+    FutureDate,
+    NumberRange
 )
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
+from wtforms.fields import html5
 
 class EditV4A(FlaskForm):
     """WTForm for editing V4A content"""
@@ -38,3 +42,26 @@ class EditV4A(FlaskForm):
     image_file = FileField(_l("Image de couverture"))
 
     submit = SubmitField(_l("Modifier"))
+
+class EditRepresentation(FlaskForm):
+    """WTForms for editing V4A representation"""
+
+    date = html5.DateTimeLocalField(
+        _l("Date et heure de la représentation"),
+        validators=[
+            DataRequired(),
+            FutureDate()
+        ],
+        format="%Y-%m-%dT%H:%M"
+    )
+    sits = IntegerField(
+        _l("Nombre de places"),
+        validators=[
+            DataRequired(),
+            NumberRange(
+                min=0,
+                message=_l("Le nombre de places doit être supérieur ou égal à zéro.")
+            )
+        ]
+    )
+    submit = SubmitField(_l("Ajouter"))
