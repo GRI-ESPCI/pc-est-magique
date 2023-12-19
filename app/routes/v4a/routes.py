@@ -5,6 +5,7 @@ import os
 import flask
 from flask import jsonify
 from flask_babel import _
+from flask_moment import Moment
 
 from app.routes.v4a import bp
 from app import helpers, db, context
@@ -116,3 +117,18 @@ def edit_representation(rep_id: int) -> typing.RouteReturn:
         db.session.commit()
         return jsonify({'edited': 'success', 'date': rep.date, 'sits': rep.sits})
     return jsonify({'edited': 'failed'})
+
+@bp.route("/<v4a_id>/ticketing")
+def ticketing(v4a_id: int) -> typing.RouteReturn:
+
+    v4a = V4A.query.get(v4a_id)
+    form = forms.TicketingForm()
+    form.pricing.choices = [
+        (p.id, f"{p.name} - {p.price} €") for p in v4a.pricings
+    ]
+
+    return flask.render_template(
+        "v4a/ticketing.html",
+        v4a=v4a,
+        form=form
+    )

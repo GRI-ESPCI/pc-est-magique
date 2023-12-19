@@ -4,13 +4,16 @@ from wtforms import (
     FileField,
     BooleanField,
     StringField,
-    IntegerField
+    IntegerField,
+    SelectField
 )
 from app.utils.validators import(
     DataRequired,
     Length,
     FutureDate,
-    NumberRange
+    NumberRange,
+    Email,
+    PhoneNumber
 )
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
@@ -65,3 +68,47 @@ class EditRepresentation(FlaskForm):
         ]
     )
     submit = SubmitField(_l("Ajouter"))
+
+class TicketingForm(FlaskForm):
+
+    first_name = StringField(
+        _l("Prénom"),
+        validators=[
+            DataRequired(),
+            Length(max=100)
+        ]
+    )
+    last_name = StringField(
+        _l("Nom"),
+        validators=[
+            DataRequired(),
+            Length(max=100)
+        ]
+    )
+    email = html5.EmailField(
+        _l("Adresse de courriel"),
+        validators=[
+            DataRequired(),
+            Email()
+        ]
+    )
+    phone_number = html5.TelField(
+        _l("Numéro de téléphone"),
+        validators=[
+            PhoneNumber()
+        ]
+    )
+    representation = SelectField(
+        _l("Sélection de la représentation"),
+        validators=[
+            DataRequired()
+        ]
+    )
+    pricing = SelectField(
+        _l("Choix du tarif"),
+        validators=[
+            DataRequired()
+        ],
+        validate_choice=True
+    )
+    submit = SubmitField(_l("Confirmer la réservation"))

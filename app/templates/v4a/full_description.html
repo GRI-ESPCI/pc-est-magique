@@ -83,7 +83,15 @@
     {% endfor %}
 </ul>
 
-<a href="" class="btn btn-primary">{{ _("Prendre une place") }}</a>
+<h2>{{ _("Tarifs") }}</h2><!-- Perte de toutes les dégustations -->
+
+<ul>
+    {% for p in v4a.pricings %}
+        <li>{{ p.name }} - {{ p.price }}€</li>
+    {% endfor %}
+</ul>
+
+<a href="{{ url_for('v4a.ticketing', v4a_id=v4a.id) }}" class="btn btn-primary">{{ _("Prendre une place") }}</a>
 
 {% if can_edit %}
 
