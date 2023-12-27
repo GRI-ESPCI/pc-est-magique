@@ -188,11 +188,15 @@ def sync_photos(album: Album, filenames: list[str]) -> None:
             ok += 1
         elif file_name.endswith(".gz"):
             continue
+        elif file_name in (".DS_Store", "Thumbs.db"):
+            # Remove non-photos
+            os.remove(f"{album.full_path}/{file_name}")
+            continue
         else:
             try:
                 photo = register_new_photo(album, file_name)
             except PhotoRegistrationError as exc:
-                print(f"    WARNING: {file_name}: ", *exc.args)
+                print(f"    WARNING: {album.full_path}/{file_name}: ", *exc.args)
             else:
                 print(f"    + NEW PHOTO: {file_name}")
                 ok += 1
