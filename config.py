@@ -62,6 +62,8 @@ class Config:
 
     BEKKS_BASE_PATH = os.environ.get("BEKKS_BASE_PATH")
 
+    PANIER_BIO_BASE_PATH = os.environ.get("PANIER_BIO_BASE_PATH")
+
     PHOTOS_BASE_PATH = os.environ.get("PHOTOS_BASE_PATH")
     PHOTOS_SECRET_KEY = os.environ.get("PHOTOS_SECRET_KEY")
     _delay_str = os.environ.get("PHOTOS_EXPIRES_DELAY")

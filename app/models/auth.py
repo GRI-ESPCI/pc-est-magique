@@ -107,6 +107,8 @@ class PCeen(flask_login.UserMixin, Model):
 
     clubq_voeux: Relationship[Query[models.ClubQVoeu]] = one_to_many("ClubQVoeu.pceen", lazy="dynamic")
 
+    order_panier_bio: Relationship[Query[models.OrderPanierBio]] = one_to_many("OrderPanierBio.pceen", lazy="dynamic")
+
     def __repr__(self) -> str:
         """Returns repr(self)."""
         return f"<PCeen #{self.id} ('{self.username}')>"

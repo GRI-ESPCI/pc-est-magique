@@ -36,6 +36,7 @@ def permissions() -> dict[str, dict[str, typing.Any]]:
         "access_bar_stats": dict(type=PermissionType.read, scope=PermissionScope.bar_stats, ref_id=None),
         "access_club_q": dict(type=PermissionType.read, scope=PermissionScope.club_q, ref_id=None),
         "access_bekk": dict(type=PermissionType.read, scope=PermissionScope.bekk, ref_id=None),
+        "access_panier_bio": dict(type=PermissionType.read, scope=PermissionScope.panier_bio, ref_id=None),
         "manage_club_q": dict(type=PermissionType.all, scope=PermissionScope.club_q, ref_id=None),
         "manage_photos": dict(type=PermissionType.all, scope=PermissionScope.photos, ref_id=None),
         "manage_intrarez": dict(type=PermissionType.all, scope=PermissionScope.intrarez, ref_id=None),
@@ -44,6 +45,7 @@ def permissions() -> dict[str, dict[str, typing.Any]]:
         "manage_collections": dict(type=PermissionType.all, scope=PermissionScope.collection, ref_id=None),
         "manage_bar": dict(type=PermissionType.all, scope=PermissionScope.bar, ref_id=None),
         "manage_bekk": dict(type=PermissionType.all, scope=PermissionScope.bekk, ref_id=None),
+        "manage_panier_bio": dict(type=PermissionType.all, scope=PermissionScope.panier_bio, ref_id=None),
     }
 
 
@@ -66,6 +68,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["manage_bar"],
                 perms["manage_club_q"],
                 perms["manage_bekk"],
+                perms["manage_panier_bio"],
                 perms["access_bar_stats"],
             ],
         ),
@@ -84,6 +87,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["access_bar"],
                 perms["access_club_q"],
                 perms["access_bekk"],
+                perms["access_panier_bio"],
             ],
         ),
         "Alumni": dict(
@@ -128,6 +132,13 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
             color="546211",
             permissions=[
                 perms["manage_bekk"],
+            ],
+        ),
+        "Panier Bio": dict(
+            index=19,
+            color="014421",
+            permissions=[
+                perms["manage_panier_bio"],
             ],
         ),
     }

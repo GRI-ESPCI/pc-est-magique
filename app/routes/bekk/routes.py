@@ -1,4 +1,4 @@
-"""PC est magique - Bekk Gallery Routes"""
+"""PC est magique - Bekk Routes"""
 
 import flask
 from flask_babel import _
@@ -89,9 +89,7 @@ def main() -> typing.RouteReturn:
                 flask.flash(_("Bekk édité."))
                 return flask.redirect(flask.url_for("bekk.main", promo=promo))
 
-    bekk_id_list = []
-    for bekk in bekks:
-        bekk_id_list.append(bekk.id)
+    bekk_id_list = [bekk.id for bekk in bekks]
 
     can_edit = context.has_permission(PermissionType.write, PermissionScope.bekk)
 
