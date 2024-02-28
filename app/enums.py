@@ -72,6 +72,7 @@ class PermissionScope(enum.Enum):
     bar_stats = _PSParams(allow_elem=False, need_elem=False)
     club_q = _PSParams(allow_elem=False, need_elem=False)
     bekk = _PSParams(allow_elem=False, need_elem=False)
+    theatre = _PSParams(allow_elem=False, need_elem=False)
 
     # Elements scopes
     pceen = _PSParams(
