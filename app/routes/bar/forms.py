@@ -38,7 +38,7 @@ class AddOrEditItemForm(FlaskForm):
     quantity = IntegerField(_l("Quantité"), validators=[Optional(), NumberRange(min=0)])
     price = FloatField(_l("Prix (€)"), validators=[DataRequired(), NumberRange(min=0)])
     is_alcohol = BooleanField(_l("Alcoolisé"))
-    alcohol_mass = DecimalField(_l("Masse d'alcool (g)"), validators=[DataRequired(), NumberRange(min=0)], default=0)
+    alcohol_mass = DecimalField(_l("Masse d'alcool (g)"), validators=[Optional(), NumberRange(min=0)], default=0)
     is_favorite = BooleanField(_l("Favori"))
     favorite_index = IntegerField(_l("Priorité dans la liste"), validators=[Optional(), NumberRange(min=0)])
 

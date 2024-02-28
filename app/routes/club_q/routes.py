@@ -57,16 +57,17 @@ from app.email import send_email
 def main() -> typing.RouteReturn:
     """PC est magique Club Q page."""
 
-    visibility = GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value
 
-    "If the page visibility is set at 0 in the admin parameters, don't show it"
     if not context.g.pceen.has_permission(PermissionType.read, PermissionScope.club_q):
         flask.abort(404)
 
-    if context.g.pceen.has_permission(PermissionType.all, PermissionScope.club_q):
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+
+    visibility = GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value
+    if can_edit:
         visibility = 1
 
-    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+    
 
     # Ajout dynamique de 1 form par spectacle de la saison
     season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
@@ -552,7 +553,7 @@ def voeux() -> typing.RouteReturn:
     pceens = (
         PCeen.query.join(PCeen.roles)
         .join(Role.permissions)
-        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q)
+        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q).order_by(PCeen.prenom)
     )
     voeux = ClubQVoeu.query.filter_by(_season_id=season_id).order_by(ClubQVoeu.id).all()
 

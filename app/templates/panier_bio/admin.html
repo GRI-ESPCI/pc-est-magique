@@ -1,0 +1,113 @@
+{% extends "base.html" %} {% import "_form.html" as wtf %} 
+{% endif %}
+{% block app_content %}
+
+<div class="container mb-3">
+    <h2>{{title}}</h2>
+</div>
+
+{% include 'wysiwyg.html' %} {% if visibility == 0 %} {{ _("La réservation pour le panier bio n'est pas possible pour le
+moment.")}} {% else %} {% if not can_command %}
+<div class="row">
+  {{ _("Les réservations pour le Panier Bio sont fermées entre le Dimanche 23h et le Mercredi matin.")}}
+</div>
+{% else %}
+<br />
+<h5><b>Prochain Panier-Bio : {{ next_tuesday }}</b></h5>
+<br />
+{% if next_order == None %}
+<div class="col-lg-4">
+  <div class="card align-items-center bg-pc5 border-pc4">
+    <div class="container mb-3" style="margin-top: 15px;">
+      <h5><b>{{_("Formulaire de commande")}}</b></h5>
+    </div>
+    <div style="margin-left: 15px; margin-right: 15px;">
+    <form
+      action=""
+      method="post"
+      role="form"
+    >
+      {{ form.hidden_tag() }}
+      <div class="row mb-3">
+        <div class="col-6">
+          <div class="form-floating text-muted">{{ wtf.form_field(form.date) }}</div>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-6">
+          <div class="form-floating text-muted">{{ wtf.form_field(form.nom) }}</div>
+        </div>
+        <div class="col-6">
+          <div class="form-floating text-muted">{{ wtf.form_field(form.prenom) }}</div>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-12">
+          <div class="form-floating">{{ wtf.form_field(form.payment_method) }}</div>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-12">
+          <div class="form-floating">{{ wtf.form_field(form.comment) }}</div>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-12">
+          <div class="form-check">{{ wtf.form_field(form.consent) }}</div>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-4">
+          {{ form.add(class="btn btn-primary") }}</div>
+        </div>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+{% else %}
+<svg
+          class="bi flex-shrink-0"
+          style="color: green;"
+          width="64"
+          height="64"
+          role="img"
+        >
+          {{ macros.bootstrap_icon("check-lg") }}
+  </svg>
+  
+ <p> {{ _("Vous avez commandé un Panier Bio pour le ")}} <b>{{next_tuesday}}</b> {{" en payant par "}} <b>{{next_order.payment_method}}</b>.
+ </p>
+{% endif %}
+<div><br /></div>
+<div class="container">
+
+    <h3>{{_("Historique des commandes")}}</h3>
+  <div class="row mb-3">
+    <div class="col table-responsive">
+      <table class="table table-striped table-hover table-bordered">
+        <thead>
+          <tr>
+            <th scope = "col">
+              <span>{{ _("Date") }}</span>
+            </th>
+            <th scope="col">
+                <span>{{ _("Payement") }}</span>
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for order in all_orders %}
+          <tr>
+            <td>{{ order.date }}</td>
+            <td>{{ order.payment_method }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}{% endif %}
+{% endblock %}
