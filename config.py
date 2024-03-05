@@ -61,7 +61,6 @@ class Config:
     CLUB_Q_BASE_PATH = os.environ.get("CLUB_Q_BASE_PATH")
     THEATRE_BASE_PATH = os.environ.get("THEATRE_BASE_PATH")
     BEKKS_BASE_PATH = os.environ.get("BEKKS_BASE_PATH")
-
     PANIER_BIO_BASE_PATH = os.environ.get("PANIER_BIO_BASE_PATH")
 
     PHOTOS_BASE_PATH = os.environ.get("PHOTOS_BASE_PATH")

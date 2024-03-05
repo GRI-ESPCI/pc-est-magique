@@ -32,6 +32,8 @@ class OrderPanierBio(db.Model):
 
     #Administration informations
     payment_made: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
+    name: Column[str] = column(sa.String(50), nullable=False) #For non-connected uses
+    service: Column[str] = column(sa.String(50), nullable=False) #For non-connected uses
 
     _pceen_id: Column[int] = column(sa.ForeignKey("pceen.id"), nullable=True)
     pceen: Relationship[models.PCeen] = many_to_one("PCeen.order_panier_bio", foreign_keys=[_pceen_id])

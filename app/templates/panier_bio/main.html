@@ -1,4 +1,5 @@
-{% extends "base.html" %} {% import "_form.html" as wtf %} {% block styles %}{{ super() }} {% if can_edit %}
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block styles %}{{
+super() }} {% if can_edit %}
 <link
   rel="stylesheet"
   type="text/css"
@@ -9,30 +10,45 @@
 <script defer>
   var folder = {{folder |tojson}}
 </script>
-<script
-  src='{{url_for("static", filename="js/quill.js") }}'
-  defer
-></script>
+<script src='{{url_for("static", filename="js/quill.js") }}' defer></script>
 <script
   src='{{url_for("static", filename="js/wysiwyg_editor.js") }}'
   defer
 ></script>
-{% endif %}
-
-{% if not connected %}
+{% endif %} {% if not connected %}
 <script src="https://www.google.com/recaptcha/api.js" defer></script>
-<script src="{{ url_for("static", filename="js/captcha.js") }}" defer></script>
-{% endif %}
-{% endblock %} {% block app_content %}
+<script src="{{ url_for('static', filename='js/captcha.js') }}" defer></script>
+{% endif %} {% endblock %} {% block app_content %}
 
 <div class="container mb-3">
-  <h2>{{title}}</h2>
+  <div class="btn-toolbar justify-content-between">
+    <h4>{{title}}</h4>
+    {% if can_edit %}
+    <div
+      data-bs-toggle="tooltip"
+      data-bs-placement="right"
+      title="{{ _('Administration') }}"
+    >
+      <a
+        role="button"
+        href="{{ url_for('panier_bio.admin') }}"
+        class="btn btn-danger"
+      >
+        <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+          {{ macros.bootstrap_icon("gear-fill") }}
+        </svg>
+      </a>
+    </div>
+    {% endif %}
+  </div>
 </div>
 
-{% include 'wysiwyg.html' %} {% if visibility == 0 %} {{ _("La réservation pour le panier bio n'est pas possible pour le
-moment.")}} {% else %} {% if not can_command %}
+{% include 'wysiwyg.html' %} {% if visibility == 0 %} {{ _("La réservation pour
+le panier bio n'est pas possible pour le moment.")}} {% else %} {% if not
+can_command %}
 <div class="row">
-  {{ _("Les réservations pour le Panier Bio sont fermées entre le Dimanche 23h et le Mercredi matin.")}}
+  {{ _("Les réservations pour le Panier Bio sont fermées entre le Dimanche 23h
+  et le Mercredi matin.")}}
 </div>
 {% else %}
 <br />
@@ -41,43 +57,30 @@ moment.")}} {% else %} {% if not can_command %}
 {% if next_order == None %}
 <div class="col-lg-4">
   <div class="card align-items-center bg-pc5 border-pc4">
-    <div
-      class="container mb-3"
-      style="margin-top: 15px"
-    >
+    <div class="container mb-3" style="margin-top: 15px">
       <h5><b>{{_("Formulaire de commande")}}</b></h5>
     </div>
     <div style="margin-left: 15px; margin-right: 15px">
-      <form
-        action=""
-        method="post"
-        role="form"
-      >
+      <form action="" method="post" role="form">
         {{ form.hidden_tag() }}
         <div class="row mb-3">
           <div class="col-6">
-            <div class="form-floating text-muted">{{ wtf.form_field(form.date) }}</div>
+            <div class="form-floating text-muted">
+              {{ wtf.form_field(form.date, disabled=true) }}
+            </div>
           </div>
         </div>
-        {% if connected %}
         <div class="row mb-3">
-          <div class="col-6">
-            <div class="form-floating text-muted">{{ wtf.form_field(form.nom) }}</div>
-          </div>
-          <div class="col-6">
-            <div class="form-floating text-muted">{{ wtf.form_field(form.prenom) }}</div>
-          </div>
-        </div>
-        {% else %}
-        <div class="row mb-3">
-          <div class="col-6">
-            <div class="form-floating">{{ wtf.form_field(form.nom) }}</div>
-          </div>
-          <div class="col-6">
+          <div class="col-4">
             <div class="form-floating">{{ wtf.form_field(form.prenom) }}</div>
           </div>
+          <div class="col-4">
+            <div class="form-floating">{{ wtf.form_field(form.nom) }}</div>
+          </div>
+          <div class="col-4">
+            <div class="form-floating">{{ wtf.form_field(form.service) }}</div>
+          </div>
         </div>
-        {% endif %}
         <div class="row mb-3">
           <div class="col-12">
             <div class="form-floating">{{ wtf.form_field(form.phone) }}</div>
@@ -85,7 +88,9 @@ moment.")}} {% else %} {% if not can_command %}
         </div>
         <div class="row mb-3">
           <div class="col-12">
-            <div class="form-floating">{{ wtf.form_field(form.payment_method) }}</div>
+            <div class="form-floating">
+              {{ wtf.form_field(form.payment_method) }}
+            </div>
           </div>
         </div>
         <div class="row mb-3">
@@ -126,8 +131,8 @@ moment.")}} {% else %} {% if not can_command %}
 </svg>
 
 <p>
-  {{ _("Vous avez commandé un Panier Bio pour le ")}} <b>{{next_day}}</b> {{" en payant par "}}
-  <b>{{next_order.payment_method}}</b>.
+  {{ _("Vous avez commandé un Panier Bio pour le ")}} <b>{{next_day}}</b> {{" en
+  payant par "}} <b>{{next_order.payment_method}}</b>.
 </p>
 {% endif %} {% if connected %}
 <div><br /></div>
