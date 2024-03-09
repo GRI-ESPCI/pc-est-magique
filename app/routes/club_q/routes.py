@@ -57,17 +57,16 @@ from app.email import send_email
 def main() -> typing.RouteReturn:
     """PC est magique Club Q page."""
 
+    visibility = GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value
 
+    "If the page visibility is set at 0 in the admin parameters, don't show it"
     if not context.g.pceen.has_permission(PermissionType.read, PermissionScope.club_q):
         flask.abort(404)
 
-    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
-
-    visibility = GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value
-    if can_edit:
+    if context.g.pceen.has_permission(PermissionType.all, PermissionScope.club_q):
         visibility = 1
 
-    
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
 
     # Ajout dynamique de 1 form par spectacle de la saison
     season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
@@ -150,7 +149,6 @@ def main() -> typing.RouteReturn:
         # Cheking if the minimum number of places is not superior to the number of asked places
         for spect in spectacles:
             if form[f"nb_places_{spect.id}"].data != None:
-                form[f"nb_places_minimum_{spect.id}"].data = 0
                 if form[f"nb_places_minimum_{spect.id}"].data > form[f"nb_places_{spect.id}"].data:
                     flask.flash(
                         _(
@@ -553,7 +551,7 @@ def voeux() -> typing.RouteReturn:
     pceens = (
         PCeen.query.join(PCeen.roles)
         .join(Role.permissions)
-        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q).order_by(PCeen.prenom)
+        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q)
     )
     voeux = ClubQVoeu.query.filter_by(_season_id=season_id).order_by(ClubQVoeu.id).all()
 

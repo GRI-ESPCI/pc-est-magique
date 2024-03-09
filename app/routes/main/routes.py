@@ -24,11 +24,14 @@ from app.models import (
     ClubQVoeu,
     ClubQSpectacle,
     Bekk,
+    OrderPanierBio,
 )
 from app.routes.main import bp, forms
 from app.utils import captcha, helpers, typing
 from datetime import date
 from app.routes.club_q.utils import pceen_prix_total
+from app.routes.panier_bio.utils import command_open, what_is_next_day
+
 
 
 @bp.route("/")
@@ -90,6 +93,13 @@ def index() -> typing.RouteReturn:
             bekk_infos = namedtuple("BekkInfos", ["last_bekk", "promo", "nb_bekks", "last_bekk_id"])(
                 last_bekk.name, last_bekk.promo, bekks.count(), last_bekk.id
             )
+
+    panier_bio_infos = None
+
+    panier_bio_orders = OrderPanierBio.query.filter_by(_pceen_id=pceen.id).filter_by(date=what_is_next_day(GlobalSetting.query.filter_by(key="PANIER_BIO_DAY").one().value)).all()
+    visibility = GlobalSetting.query.filter_by(key="ACCESS_PANIER_BIO").one().value
+
+
 
     return flask.render_template(
         "main/index.html",

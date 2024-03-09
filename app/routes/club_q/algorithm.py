@@ -64,8 +64,11 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
             pceen.discontent += -10
 
     voeux_update = []
+    voeux_copy = voeux.copy()
 
     spectacles_places_attribuees = initialized_attributed_spectacles_places(spectacles, voeux)
+
+    random.shuffle(voeux)
 
     while len(voeux) != 0:
         voeux.sort(key=lambda x: (x.priorite, -x.pceen.discontent))
@@ -158,6 +161,13 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
                     break
             else:
                 voeux.pop(0)
+
+    #Reattribuate correct proprities
+    for voeu in voeux:
+        for voeu_init in voeux_copy:
+            if voeu.id == voeu_init.id:
+                app.logger.infos('here')
+                voeu.priorite = voeu_init.priorite
 
     # Sum up for logs
     club_q_algo_logger.info("\n")
