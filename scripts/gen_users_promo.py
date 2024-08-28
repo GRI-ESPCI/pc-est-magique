@@ -47,7 +47,7 @@ def main():
             letters = string.ascii_lowercase
             user.set_password("".join(random.choice(letters) for i in range(32)))
 
-            grant_rezident_role(user)
+            grant_student_role(user)
             db.session.add(user)
             db.session.commit()
             helpers.log_action(
