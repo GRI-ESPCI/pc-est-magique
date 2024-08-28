@@ -41,7 +41,7 @@ def main():
     with open("new_promo.csv", "r", newline="") as file:
         reader = csv.reader(file, delimiter=",")
         for row in reader:
-            user = PCeen(username=new_username(row[2], row[1]), nom=row[1], prenom=row[2], promo=142, email=row[3])
+            user = PCeen(username=new_username(row[2], row[1]), nom=row[1], prenom=row[2], promo=143, email=row[3])
 
             # Generate random password
             letters = string.ascii_lowercase
