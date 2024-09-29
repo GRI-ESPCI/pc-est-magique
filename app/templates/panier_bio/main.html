@@ -1,5 +1,4 @@
-{% extends "base.html" %} {% import "_form.html" as wtf %} {% block styles %}{{
-super() }} {% if can_edit %}
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block styles %}{{ super() }} {% if can_edit %}
 <link
   rel="stylesheet"
   type="text/css"
@@ -10,14 +9,27 @@ super() }} {% if can_edit %}
 <script defer>
   var folder = {{folder |tojson}}
 </script>
-<script src='{{url_for("static", filename="js/quill.js") }}' defer></script>
+<script
+  src="{{url_for('static', filename='js/panier_bio/panier_bio_order_user_delete.js') }}"
+  defer
+></script>
+<script
+  src='{{url_for("static", filename="js/quill.js") }}'
+  defer
+></script>
 <script
   src='{{url_for("static", filename="js/wysiwyg_editor.js") }}'
   defer
 ></script>
 {% endif %} {% if not connected %}
-<script src="https://www.google.com/recaptcha/api.js" defer></script>
-<script src="{{ url_for('static', filename='js/captcha.js') }}" defer></script>
+<script
+  src="https://www.google.com/recaptcha/api.js"
+  defer
+></script>
+<script
+  src="{{ url_for('static', filename='js/captcha.js') }}"
+  defer
+></script>
 {% endif %} {% endblock %} {% block app_content %}
 
 <div class="container mb-3">
@@ -34,7 +46,12 @@ super() }} {% if can_edit %}
         href="{{ url_for('panier_bio.admin') }}"
         class="btn btn-danger"
       >
-        <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+        <svg
+          class="bi flex-shrink-0"
+          width="24"
+          height="24"
+          role="img"
+        >
           {{ macros.bootstrap_icon("gear-fill") }}
         </svg>
       </a>
@@ -43,30 +60,51 @@ super() }} {% if can_edit %}
   </div>
 </div>
 
-{% include 'wysiwyg.html' %} {% if visibility == 0 %} {{ _("La réservation pour
-le panier bio n'est pas possible pour le moment.")}} {% else %} {% if not
-can_command %}
-<div class="row">
-  {{ _("Les réservations pour le Panier Bio sont fermées entre le Dimanche 23h
-  et le Mercredi matin.")}}
-</div>
-{% else %}
+{% include 'wysiwyg.html' %} {% if visibility == 0 %} {{ _("La réservation pour le panier bio n'est pas possible pour le
+moment.")}} {% else %}
 <br />
 <h5><b>Prochain Panier-Bio : {{ next_day }}</b></h5>
 <br />
-{% if next_order == None %}
+{% if next_day != None and next_day == next_order.date %}
+<svg
+  class="bi flex-shrink-0"
+  style="color: green"
+  width="64"
+  height="64"
+  role="img"
+>
+  {{ macros.bootstrap_icon("check-lg") }}
+</svg>
+
+<p>
+  {{ _("Vous avez commandé un Panier Bio pour le ")}} <b>{{next_day.strftime("%A %d %B %Y")}}</b> {{" en payant par "}}
+  <b>{{next_order.payment_method}}</b>.
+</p>
+{% endif %}
 <div class="col-lg-4">
+  {% if form_visibility %}
+  <p>{{ _("Vous pouvez commander les paniers bios pour ces prochains jours :")}}</p>
   <div class="card align-items-center bg-pc5 border-pc4">
-    <div class="container mb-3" style="margin-top: 15px">
+    <div
+      class="container mb-3"
+      style="margin-top: 15px"
+    >
       <h5><b>{{_("Formulaire de commande")}}</b></h5>
     </div>
     <div style="margin-left: 15px; margin-right: 15px">
-      <form action="" method="post" role="form">
+      <form
+        action=""
+        method="post"
+        role="form"
+      >
         {{ form.hidden_tag() }}
         <div class="row mb-3">
-          <div class="col-6">
-            <div class="form-floating text-muted">
-              {{ wtf.form_field(form.date, disabled=true) }}
+          <div class="col-9">
+            <div
+              class="multiple_checkbox"
+              style="font-size: 120%"
+            >
+              {{ form.dates }}
             </div>
           </div>
         </div>
@@ -88,9 +126,7 @@ can_command %}
         </div>
         <div class="row mb-3">
           <div class="col-12">
-            <div class="form-floating">
-              {{ wtf.form_field(form.payment_method) }}
-            </div>
+            <div class="form-floating">{{ wtf.form_field(form.payment_method) }}</div>
           </div>
         </div>
         <div class="row mb-3">
@@ -118,23 +154,12 @@ can_command %}
       </form>
     </div>
   </div>
+  {% else %}
+  <p><i>{{ _("Vous avez commandé des paniers bios pour tous les jours réservables pour le moment.")}}</i></p>
+  {% endif %}
 </div>
-{% else %}
-<svg
-  class="bi flex-shrink-0"
-  style="color: green"
-  width="64"
-  height="64"
-  role="img"
->
-  {{ macros.bootstrap_icon("check-lg") }}
-</svg>
 
-<p>
-  {{ _("Vous avez commandé un Panier Bio pour le ")}} <b>{{next_day}}</b> {{" en
-  payant par "}} <b>{{next_order.payment_method}}</b>.
-</p>
-{% endif %} {% if connected %}
+{% if connected %}
 <div><br /></div>
 <div class="container">
   <h3>{{_("Historique des commandes")}}</h3>
@@ -149,14 +174,55 @@ can_command %}
             <th scope="col">
               <span>{{ _("Payement") }}</span>
             </th>
+            <th
+              class="centered"
+              scope="col"
+            >
+              <div class="centered-content">
+                <span>
+                  <svg
+                    class="bi flex-shrink-0"
+                    width="22"
+                    height="22"
+                  >
+                    {{ macros.bootstrap_icon("wrench") }}
+                  </svg>
+                </span>
+              </div>
+            </th>
           </tr>
         </thead>
 
         <tbody>
-          {% for order in all_orders %}
+          {% for i, order in enumerate(all_orders) %}
           <tr>
-            <td>{{ order.date }}</td>
+            <td>{{ order.date.strftime("%A %d %B %Y") }}</td>
             <td>{{ order.payment_method }}</td>
+            <td>
+              {% if can_delete_orders[i] %}
+              <div
+                data-bs-toggle="tooltip"
+                title="{{ _('Supprimer la commande') }}"
+              >
+                <button
+                  class="btn btn-outline-danger p-1 pt-0"
+                  data-bs-target="#mo-order-delete"
+                  data-bs-toggle="modal"
+                  data-order-id="{{ order.id }}"
+                  data-order-date="{{ order.date }}"
+                  data-form-visibility="{{form_visibility}}"
+                >
+                  <svg
+                    class="bi flex-shrink-0"
+                    width="18"
+                    height="18"
+                  >
+                    {{ macros.bootstrap_icon("x-lg") }}
+                  </svg>
+                </button>
+              </div>
+              {% endif %}
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -164,4 +230,51 @@ can_command %}
     </div>
   </div>
 </div>
-{% endif %}{% endif %} {% endif %} {% endblock %}
+{% endif %} {% endif %}
+
+<!-- Order delete modal -->
+<div
+  class="modal fade"
+  id="mo-order-delete"
+  tabindex="-1"
+  aria-labelledby="mo-order-delete"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5
+          class="modal-title"
+          id="mo-order-delete"
+        >
+          {{ _("Supprimer commande") }} {{"{order_date}"}}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Fermer') }}"
+        ></button>
+      </div>
+      <form
+        action=""
+        method="post"
+        role="form"
+      >
+        {{ form.hidden_tag() }}
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            {{ _("Annuler") }}
+          </button>
+          {{ form.delete(class="btn btn-danger") }}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

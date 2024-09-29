@@ -15,7 +15,6 @@ def main() -> typing.RouteReturn:
     """PC est magique profile page."""
     spectacles = Spectacle.query.order_by(Spectacle.id).all()
 
-
     can_edit = context.has_permission(PermissionType.write, PermissionScope.theatre)
 
     folder = "theatre"
@@ -26,11 +25,12 @@ def main() -> typing.RouteReturn:
     with open(filepath, "r") as f:
         html_file = f.read()
 
-
-
-
     return flask.render_template(
-        "theatre/main.html", title=_("Saison Théâtrale du Club Théâtre 140"), spectacles=spectacles, can_edit=can_edit, folder=folder,
+        "theatre/main.html",
+        title=_("Saison Théâtrale du Club Théâtre 140"),
+        spectacles=spectacles,
+        can_edit=can_edit,
+        folder=folder,
         html_file=html_file,
     )
 

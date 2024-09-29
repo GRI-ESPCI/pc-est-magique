@@ -162,11 +162,11 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
             else:
                 voeux.pop(0)
 
-    #Reattribuate correct proprities
+    # Reattribuate correct proprities
     for voeu in voeux:
         for voeu_init in voeux_copy:
             if voeu.id == voeu_init.id:
-                app.logger.infos('here')
+                app.logger.infos("here")
                 voeu.priorite = voeu_init.priorite
 
     # Sum up for logs

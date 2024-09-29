@@ -1,27 +1,41 @@
-{% extends "base.html" %} {% import "_form.html" as wtf %}{% block scripts %} {{
-super() }}
+{% extends "base.html" %} {% import "_form.html" as wtf %}{% block scripts %} {{ super() }}
 <script
-  src="{{url_for('static', filename='js/panier_bio/panier_bio.js') }}"
+  src="{{url_for('static', filename='js/panier_bio/panier_bio_order.js') }}"
   defer
 ></script>
 
 {% endblock %}{% block app_content %}
 
 <div class="container mb-3">
-  <div class="btn-toolbar justify-content-between">
+  <div class="d-flex justify-content-between align-items-center">
     <h4>{{title}}</h4>
-    <div
-      data-bs-toggle="tooltip"
-      data-bs-placement="right"
-      title="{{ _('Retourner à la page principale') }}"
-    >
-      <a
-        role="button"
-        href="{{ url_for('panier_bio.main') }}"
-        class="btn btn-primary"
+    <div class="btn-toolbar">
+      <div
+        data-bs-toggle="tooltip"
+        data-bs-placement="right"
+        title="{{ _('Administration') }}"
       >
-        {{ _("Retour")}}
-      </a>
+        <a
+          role="button"
+          href="{{ url_for('panier_bio.period') }}"
+          class="btn btn-danger me-2"
+        >
+          {{ _("Périodes")}}
+        </a>
+      </div>
+      <div
+        data-bs-toggle="tooltip"
+        data-bs-placement="right"
+        title="{{ _('Retourner à la page principale') }}"
+      >
+        <a
+          role="button"
+          href="{{ url_for('panier_bio.main') }}"
+          class="btn btn-primary"
+        >
+          {{ _("Retour")}}
+        </a>
+      </div>
     </div>
   </div>
 </div>
@@ -29,20 +43,20 @@ super() }}
 <br />
 <h5><b>{{ _("Paramètres :")}}</b></h5>
 <br />
-<form action="" method="post" role="form">
+<form
+  action=""
+  method="post"
+  role="form"
+>
   {{ form_settings.hidden_tag() }}
   <div class="row mb-3">
     <div class="col">
-      <div class="form form-switch">
-        {{ wtf.form_field(form_settings.visibility, value = visibility) }}
-      </div>
+      <div class="form form-switch">{{ wtf.form_field(form_settings.visibility, value = visibility) }}</div>
     </div>
   </div>
   <div class="row mb-3">
     <div class="col-3">
-      <div class="form-floating">
-        {{ wtf.form_field(form_settings.day, value = panier_bio_day) }}
-      </div>
+      <div class="form-floating">{{ wtf.form_field(form_settings.day, value = panier_bio_day) }}</div>
     </div>
   </div>
 
@@ -50,18 +64,24 @@ super() }}
 </form>
 <br />
 <p>
-  {{ _("Les réservations sont fermées automatiquement à 23h deux jours avant le
-  jour du panier bio (Exemple : Si mardi, les réservations seront fermées le
-  dimanche à 23h). Les réservations rouvrent le lendemain matin. ") }}
+  {{ _("Les réservations sont fermées automatiquement à 14h la veille du jour du panier bio (Exemple : Si mardi, les
+  réservations seront fermées le lundi à 14h). Les réservations rouvrent le lendemain matin. ") }}
 </p>
 <br />
 <h5><b>{{ _("Prochain Panier-Bio : ")}} {{ next_day }}</b></h5>
 <br />
 
 <div class="container mb-3">
-  <div class="btn-toolbar justify-content-between" role="toolbar">
+  <div
+    class="btn-toolbar justify-content-between"
+    role="toolbar"
+  >
     <div class="d-flex align-items-center">
-      <div class="btn-group" role="group" name="saison_navbar">
+      <div
+        class="btn-group"
+        role="group"
+        name="saison_navbar"
+      >
         {% for date in date_list %}
         <a
           role="button"
@@ -89,14 +109,24 @@ super() }}
         data-bs-target="#mo-order-add"
         data-bs-toggle="modal"
       >
-        <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+        <svg
+          class="bi flex-shrink-0"
+          width="24"
+          height="24"
+          role="img"
+        >
           {{ macros.bootstrap_icon("plus-circle") }}
         </svg>
       </button>
     </div>
   </div>
   <div>
-    <svg class="bi flex-shrink-0" width="20" height="20" role="img">
+    <svg
+      class="bi flex-shrink-0"
+      width="20"
+      height="20"
+      role="img"
+    >
       {{ macros.bootstrap_icon("person-fill") }}
     </svg>
     {{ _(" : Commande liée à un compte pc-est-magique")}}
@@ -125,12 +155,28 @@ super() }}
               <span>{{ _("Commentaire") }}</span>
             </th>
             <th scope="col">
+              <span>{{ _("Période") }}</span>
+            </th>
+            <th scope="col">
               <span>{{ _("Payé") }}</span>
             </th>
-            <th class="centered" scope="col">
+            <th scope="col">
+              <span>{{ _("Validé par Trésorier") }}</span>
+            </th>
+            <th scope="col">
+              <span>{{ _("Récupéré") }}</span>
+            </th>
+            <th
+              class="centered"
+              scope="col"
+            >
               <div class="centered-content">
                 <span>
-                  <svg class="bi flex-shrink-0" width="22" height="22">
+                  <svg
+                    class="bi flex-shrink-0"
+                    width="22"
+                    height="22"
+                  >
                     {{ macros.bootstrap_icon("wrench") }}
                   </svg>
                 </span>
@@ -144,7 +190,12 @@ super() }}
           <tr>
             <td>
               {{ order.name }} {% if order._pceen_id != None %}
-              <svg class="bi flex-shrink-0" width="20" height="20" role="img">
+              <svg
+                class="bi flex-shrink-0"
+                width="20"
+                height="20"
+                role="img"
+              >
                 {{ macros.bootstrap_icon("person-fill") }}
               </svg>
               {% endif %}
@@ -154,13 +205,69 @@ super() }}
             <td>{{ order.date }}</td>
             <td>{{ order.payment_method }}</td>
             <td>{{ order.comment }}</td>
-
+            <td>{{ order._period_id }}</td>
             <td align="center">
               <a
                 role="button"
-                href="{{ url_for('panier_bio.pay_order', order_id = order.id) }}"
+                href="{{ url_for('panier_bio.validate', id = order.id, type='payment', show = show_date) }}"
               >
                 {% if order.payment_made is false%}
+                <svg
+                  class="bi flex-shrink-0"
+                  width="24"
+                  height="24"
+                  style="color: red"
+                  role="img"
+                >
+                  {{ macros.bootstrap_icon("square") }}
+                </svg>
+                {% else %}
+                <svg
+                  class="bi flex-shrink-0"
+                  width="24"
+                  height="24"
+                  style="color: green"
+                  role="img"
+                >
+                  {{ macros.bootstrap_icon("check-square") }}
+                </svg>
+                {% endif %}
+              </a>
+            </td>
+            <td align="center">
+              <a
+                role="button"
+                href="{{ url_for('panier_bio.validate', id = order.id, type='treasurer', show = show_date) }}"
+              >
+                {% if order.treasurer_validate is false%}
+                <svg
+                  class="bi flex-shrink-0"
+                  width="24"
+                  height="24"
+                  style="color: red"
+                  role="img"
+                >
+                  {{ macros.bootstrap_icon("square") }}
+                </svg>
+                {% else %}
+                <svg
+                  class="bi flex-shrink-0"
+                  width="24"
+                  height="24"
+                  style="color: green"
+                  role="img"
+                >
+                  {{ macros.bootstrap_icon("check-square") }}
+                </svg>
+                {% endif %}
+              </a>
+            </td>
+            <td align="center">
+              <a
+                role="button"
+                href="{{ url_for('panier_bio.validate', id = order.id, type='taken', show = show_date) }}"
+              >
+                {% if order.taken is false%}
                 <svg
                   class="bi flex-shrink-0"
                   width="24"
@@ -201,8 +308,14 @@ super() }}
                   data-order-phone="{{ order.phone_number }}"
                   data-order-payment-method="{{ order.payment_method }}"
                   data-order-payment-made="{{ order.payment_made }}"
+                  data-order-treasurer-validate="{{ order.treasurer_validate }}"
+                  data-order-taken="{{ order.taken }}"
                 >
-                  <svg class="bi flex-shrink-0" width="18" height="18">
+                  <svg
+                    class="bi flex-shrink-0"
+                    width="18"
+                    height="18"
+                  >
                     {{ macros.bootstrap_icon("pen") }}
                   </svg>
                 </button>
@@ -214,6 +327,16 @@ super() }}
         </tbody>
       </table>
     </div>
+  </div>
+  <div style="display: flex">
+    <a
+      class="btn btn-primary"
+      href="{{
+    url_for('panier_bio.generate_excel', date = date_list[show_date]) }}"
+      target="_blank"
+    >
+      {{ _("Exporter excel") }}
+    </a>
   </div>
 </div>
 
@@ -228,7 +351,10 @@ super() }}
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="mo-order-add">
+        <h5
+          class="modal-title"
+          id="mo-order-add"
+        >
           {{_('Ajouter une commande')}}
         </h5>
         <button
@@ -238,61 +364,73 @@ super() }}
           aria-label="{{ _('Fermer') }}"
         ></button>
       </div>
-      <form action="" method="post" role="form">
+      <form
+        action=""
+        method="post"
+        role="form"
+      >
         {{ form.hidden_tag() }}
 
         <div class="modal-body">
           <div class="modal-body">
             <div class="row mb-3">
               <div class="col-6">
-                <div class="form-floating text-muted">
-                  {{ wtf.form_field(form.date) }}
-                </div>
+                <div class="form-floating text-muted">{{ wtf.form_field(form.date) }}</div>
               </div>
             </div>
             <div class="row mb-3">
               <div class="col-4">
-                <div class="form-floating">
-                  {{ wtf.form_field(form.prenom) }}
-                </div>
+                <div class="form-floating">{{ wtf.form_field(form.prenom) }}</div>
               </div>
               <div class="col-4">
                 <div class="form-floating">{{ wtf.form_field(form.nom) }}</div>
               </div>
               <div class="col-4">
-                <div class="form-floating">
-                  {{ wtf.form_field(form.service) }}
-                </div>
+                <div class="form-floating">{{ wtf.form_field(form.service) }}</div>
               </div>
             </div>
             <div class="row mb-3">
               <div class="col-12">
-                <div class="form-floating">
-                  {{ wtf.form_field(form.phone) }}
-                </div>
+                <div class="form-floating">{{ wtf.form_field(form.phone) }}</div>
               </div>
             </div>
             <div class="row mb-3">
               <div class="col-12">
-                <div class="form-floating">
-                  {{ wtf.form_field(form.payment_method) }}
-                </div>
+                <div class="form-floating">{{ wtf.form_field(form.payment_method) }}</div>
               </div>
             </div>
             <div class="row mb-3">
               <div class="col-12">
-                <div class="form-floating">
-                  {{ wtf.form_field(form.comment) }}
-                </div>
+                <div class="form-floating">{{ wtf.form_field(form.comment) }}</div>
               </div>
             </div>
             <div class="row mb-3">
-              <div class="col-6">
+              <div class="col-12">
                 <div
                   class="form form-check"
-                  style="margin-left: 50px; transform: scale(1.5)"
+                  style="margin-left: 85px; transform: scale(1.5)"
                 >
                   {{ wtf.form_field(form.payed) }}
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-12">
+                <div
+                  class="form form-check"
+                  style="margin-left: 85px; transform: scale(1.5)"
+                >
+                  {{ wtf.form_field(form.treasurer_validate) }}
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-12">
+                <div
+                  class="form form-check"
+                  style="margin-left: 85px; transform: scale(1.5)"
+                >
+                  {{ wtf.form_field(form.taken) }}
                 </div>
               </div>
             </div>
@@ -319,9 +457,11 @@ super() }}
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="mo-order-edit">
-          {{ _("Editer commande") }} {{"{order_id}"}} - {{"{order_name}"}} -
-          {{"{order_service}"}}
+        <h5
+          class="modal-title"
+          id="mo-order-edit"
+        >
+          {{ _("Editer commande") }} {{"{order_id}"}} - {{"{order_name}"}} - {{"{order_service}"}}
         </h5>
         <button
           type="button"
@@ -330,7 +470,11 @@ super() }}
           aria-label="{{ _('Fermer') }}"
         ></button>
       </div>
-      <form action="" method="post" role="form">
+      <form
+        action=""
+        method="post"
+        role="form"
+      >
         {{ form.hidden_tag() }}
         <div class="modal-body">
           <div class="row mb-3">
@@ -346,9 +490,7 @@ super() }}
               <div class="form-floating">{{ wtf.form_field(form.nom) }}</div>
             </div>
             <div class="col-4">
-              <div class="form-floating">
-                {{ wtf.form_field(form.service) }}
-              </div>
+              <div class="form-floating">{{ wtf.form_field(form.service) }}</div>
             </div>
           </div>
           <div class="row mb-3">
@@ -358,24 +500,42 @@ super() }}
           </div>
           <div class="row mb-3">
             <div class="col-12">
-              <div class="form-floating">
-                {{ wtf.form_field(form.payment_method) }}
+              <div class="form-floating">{{ wtf.form_field(form.payment_method) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-12">
+              <div class="form-floating">{{ wtf.form_field(form.comment) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-12">
+              <div
+                class="form form-check"
+                style="margin-left: 90px; transform: scale(1.5)"
+              >
+                {{ wtf.form_field(form.payed) }}
               </div>
             </div>
           </div>
           <div class="row mb-3">
             <div class="col-12">
-              <div class="form-floating">
-                {{ wtf.form_field(form.comment) }}
+              <div
+                class="form form-check"
+                style="margin-left: 90px; transform: scale(1.5)"
+              >
+                {{ wtf.form_field(form.treasurer_validate) }}
               </div>
             </div>
           </div>
-          <div class="col-3">
-            <div
-              class="form form-check"
-              style="margin-left: 25px; transform: scale(1.5)"
-            >
-              {{ wtf.form_field(form.payed) }}
+          <div class="row mb-3">
+            <div class="col-12">
+              <div
+                class="form form-check"
+                style="margin-left: 90px; transform: scale(1.5)"
+              >
+                {{ wtf.form_field(form.taken) }}
+              </div>
             </div>
           </div>
         </div>
@@ -387,8 +547,7 @@ super() }}
           >
             {{ _("Annuler") }}
           </button>
-          {{ form.delete(class="btn btn-danger") }} {{ form.edit(class="btn
-          btn-primary") }}
+          {{ form.delete(class="btn btn-danger") }} {{ form.edit(class="btn btn-primary") }}
         </div>
       </form>
     </div>

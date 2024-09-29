@@ -1,15 +1,24 @@
-{# Panier Bio card - used variables: order #} {% extends "cards/base.html" %} {%
-block card_title %} {{ _("Panier Bio") }} {{ macros.badge() }} {% endblock %} {%
-block card_icon %} {{ macros.bootstrap_icon("basket") }} {% endblock %} {% block
-card_table %}
+{# Panier Bio card - used variables: panier_bio_infos #} {% extends "cards/base.html" %} {% block card_title %} {{
+_("Panier Bio") }} {{ macros.badge() }} {% endblock %} {% block card_icon %} {{ macros.bootstrap_icon("basket") }} {%
+endblock %} {% block card_table %}
 <tr>
-  <th scope="row" class="ps-4 text-nowrap">{{ _("Prochain panier bio") }}</th>
-  <td>{{ panier_bio_day }}</td>
+  <th
+    scope="row"
+    class="ps-4 text-nowrap"
+  >
+    {{ _("Prochain jour") }}
+  </th>
+  <td>{{ panier_bio_infos.next_day }}</td>
 </tr>
 <tr>
-  <th scope="row" class="ps-4 text-nowrap">{{ _("Réservé?") }}</th>
+  <th
+    scope="row"
+    class="ps-4 text-nowrap"
+  >
+    {{ _("Réservé?") }}
+  </th>
   <td>
-    {% if panier_bio_reserve %}
+    {% if panier_bio_infos.reserved %}
     <svg
       class="bi flex-shrink-0"
       style="color: green"
@@ -33,13 +42,18 @@ card_table %}
     {% endif %}
   </td>
 </tr>
-{% endblock %} {% block card_footer %} {% if panier_bio_visibility == 1 and
-reserve %}
-<a href="{{ url_for('panier_bio.main') }}" class="btn btn-outline-dark">
+{% endblock %} {% block card_footer %} {% if panier_bio_infos.visibility and not panier_bio_infos.reserved %}
+<a
+  href="{{ url_for('panier_bio.main') }}"
+  class="btn btn-outline-dark"
+>
   {{ _("Réserver") }}
 </a>
 {% else %}
-<a href="{{ url_for('panier_bio.main') }}" class="btn btn-outline-dark">
+<a
+  href="{{ url_for('panier_bio.main') }}"
+  class="btn btn-outline-dark"
+>
   {{ _("Voir l'historique") }}
 </a>
 {% endif %} {% endblock %}

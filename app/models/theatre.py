@@ -25,6 +25,7 @@ class Spectacle(db.Model):
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
     name: Column[str] = column(sa.String(120), nullable=False)
+    year: Column[int] = column(sa.Integer(), nullable=False)
     description: Column[str | None] = column(sa.String(2000), nullable=True)
     ticket_link: Column[str | None] = column(sa.String(120), nullable=True)
     director: Column[str | None] = column(sa.String(64), nullable=True)

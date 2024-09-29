@@ -104,7 +104,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
         theatre,
         club_q,
         bekk,
-        panier_bio
+        panier_bio,
     )
     from app.routes.auth import saml
 

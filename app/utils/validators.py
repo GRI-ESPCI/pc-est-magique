@@ -7,7 +7,7 @@ import flask
 import wtforms
 from flask_babel import lazy_gettext as _l
 
-from app.models import PCeen, Room, Ban, BarItem
+from app.models import PCeen, Room, Ban, BarItem, PeriodPanierBio
 from app.utils.typing import JinjaStr
 
 
@@ -172,3 +172,6 @@ class ValidBarItemID(CustomValidator):
 
     def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
         return field.data.isdigit() and bool(BarItem.query.get(int(field.data)))
+
+
+

@@ -1,0 +1,328 @@
+{% extends "base.html" %} {% import "_form.html" as wtf %}{% block scripts %} {{ super() }}
+<script
+  src="{{url_for('static', filename='js/panier_bio/panier_bio_period.js') }}"
+  defer
+></script>
+
+{% endblock %}{% block app_content %}
+
+<div class="container mb-3">
+  <div class="d-flex justify-content-between align-items-center">
+    <h4>{{title}}</h4>
+    <div class="btn-toolbar">
+      <div
+        data-bs-toggle="tooltip"
+        data-bs-placement="right"
+        title="{{ _('Configuration des périodes') }}"
+      >
+        <a
+          role="button"
+          href="{{ url_for('panier_bio.admin') }}"
+          class="btn btn-danger me-2"
+        >
+          {{ _("Administration")}}
+        </a>
+      </div>
+      <div
+        data-bs-toggle="tooltip"
+        data-bs-placement="right"
+        title="{{ _('Retourner à la page principale') }}"
+      >
+        <a
+          role="button"
+          href="{{ url_for('panier_bio.main') }}"
+          class="btn btn-primary"
+        >
+          {{ _("Retour")}}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<br />
+<p>
+  {{ _("Lorsqu'une période est créée et activée, tous les jours &quot;paniers-bios&quot; valides sont proposés à la
+  réservation. Ne sont pas considéré comme valides les jours fériés et les jours dans &quot;Jours désactivés&quot;. Le
+  format de jours désactivés est &quot;ANNEE1-MOIS1-JOUR1 ANNEE2-MOIS2-JOUR2 ANNEE3-MOIS3-JOUR3&quot;.") }}
+</p>
+<br />
+<h5><b>{{ _("Période en cours : ")}} {{ actual_period }}</b></h5>
+<br />
+
+<div class="container">
+  <div class="btn-toolbar justify-content-between">
+    <h3>{{_("Périodes")}}</h3>
+    <div
+      data-bs-toggle="tooltip"
+      data-bs-placement="right"
+      title="{{ _('Ajouter une période') }}"
+    >
+      <button
+        type="button"
+        class="btn btn-success"
+        data-bs-target="#mo-period-add"
+        data-bs-toggle="modal"
+      >
+        <svg
+          class="bi flex-shrink-0"
+          width="24"
+          height="24"
+          role="img"
+        >
+          {{ macros.bootstrap_icon("plus-circle") }}
+        </svg>
+      </button>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col table-responsive">
+      <table class="table table-striped table-hover table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">
+              <span>{{ _("ID") }}</span>
+            </th>
+            <th scope="col">
+              <span>{{ _("Date de début") }}</span>
+            </th>
+            <th scope="col">
+              <span>{{ _("Date de fin") }}</span>
+            </th>
+            <th scope="col">
+              <span>{{ _("Jours désactivés") }}</span>
+            </th>
+            <th scope="col">
+              <span>{{ _("Activée") }}</span>
+            </th>
+            <th
+              class="centered"
+              scope="col"
+            >
+              <div class="centered-content">
+                <span>
+                  <svg
+                    class="bi flex-shrink-0"
+                    width="22"
+                    height="22"
+                  >
+                    {{ macros.bootstrap_icon("wrench") }}
+                  </svg>
+                </span>
+              </div>
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for period in periods %}
+          <tr>
+            <td>{{ period.id }}</td>
+            <td>{{ period.start_date }}</td>
+            <td>{{ period.end_date }}</td>
+            <td>{{ period.disabled_days }}</td>
+            <td align="center">
+              <a
+                role="button"
+                href="{{ url_for('panier_bio.validate', id=period.id, type='active') }}"
+              >
+                {% if period.active is false%}
+                <svg
+                  class="bi flex-shrink-0"
+                  width="24"
+                  height="24"
+                  style="color: red"
+                  role="img"
+                >
+                  {{ macros.bootstrap_icon("square") }}
+                </svg>
+                {% else %}
+                <svg
+                  class="bi flex-shrink-0"
+                  width="24"
+                  height="24"
+                  style="color: green"
+                  role="img"
+                >
+                  {{ macros.bootstrap_icon("check-square") }}
+                </svg>
+                {% endif %}
+              </a>
+            </td>
+            <td>
+              <div
+                data-bs-toggle="tooltip"
+                title="{{ _('Éditer la période') }}"
+              >
+                <button
+                  class="btn btn-outline-danger p-1 pt-0"
+                  data-bs-target="#mo-period-edit"
+                  data-bs-toggle="modal"
+                  data-period-id="{{ period.id }}"
+                  data-period-start-date="{{ period.start_date }}"
+                  data-period-end-date="{{ period.end_date }}"
+                  data-period-disabled-days="{{ period.disabled_days }}"
+                  data-period-active="{{ period.active }}"
+                >
+                  <svg
+                    class="bi flex-shrink-0"
+                    width="18"
+                    height="18"
+                  >
+                    {{ macros.bootstrap_icon("pen") }}
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Period add modal -->
+<div
+  class="modal fade"
+  id="mo-period-add"
+  tabindex="-1"
+  aria-labelledby="mo-period-add"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5
+          class="modal-title"
+          id="mo-period-add"
+        >
+          {{_('Ajouter une période')}}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Fermer') }}"
+        ></button>
+      </div>
+      <form
+        action=""
+        method="post"
+        role="form"
+      >
+        {{ form.hidden_tag() }}
+
+        <div class="modal-body">
+          <div class="modal-body">
+            <div class="row mb-3">
+              <div class="col-6">
+                <div class="form-floating text-muted">{{ wtf.form_field(form.start_date) }}</div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-6">
+                <div class="form-floating text-muted">{{ wtf.form_field(form.end_date) }}</div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-12">
+                <div class="form-floating">{{ wtf.form_field(form.disabled_days) }}</div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-12">
+                <div
+                  class="form form-check"
+                  style="margin-left: 85px; transform: scale(1.5)"
+                >
+                  {{ wtf.form_field(form.activate) }}
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col">
+                <div class="form-floating">{{ wtf.form_field(form.add) }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- period edit modal -->
+<div
+  class="modal fade"
+  id="mo-period-edit"
+  tabindex="-1"
+  aria-labelledby="mo-period-edit"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5
+          class="modal-title"
+          id="mo-period-edit"
+        >
+          {{ _("Editer période") }} {{"{period_id}"}}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="{{ _('Fermer') }}"
+        ></button>
+      </div>
+      <form
+        action=""
+        method="post"
+        role="form"
+      >
+        {{ form.hidden_tag() }}
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col-6">
+              <div class="form-floating text-muted">{{ wtf.form_field(form.start_date) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-6">
+              <div class="form-floating text-muted">{{ wtf.form_field(form.end_date) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-12">
+              <div class="form-floating">{{ wtf.form_field(form.disabled_days) }}</div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-12">
+              <div
+                class="form form-check"
+                style="margin-left: 85px; transform: scale(1.5)"
+              >
+                {{ wtf.form_field(form.activate) }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            {{ _("Annuler") }}
+          </button>
+          {{ form.delete(class="btn btn-danger") }} {{ form.edit(class="btn btn-primary") }}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

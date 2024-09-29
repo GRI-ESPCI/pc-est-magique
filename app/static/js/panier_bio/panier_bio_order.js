@@ -14,7 +14,7 @@ moOrderAdd.addEventListener("show.bs.modal", function (event) {
   document.getElementsByName("comment")[0].value = null;
 });
 
-// Edit panier bio modal
+// Edit panier bio order modal
 var moOrderEdit = document.getElementById("mo-order-edit");
 var titleOE = moOrderEdit.querySelector(".modal-title");
 
@@ -57,6 +57,18 @@ moOrderEdit.addEventListener("show.bs.modal", function (event) {
     document.getElementsByName("payed")[1].checked = false;
   }
 
+  if (button.dataset["orderTreasurerValidate"] == "True") {
+    document.getElementsByName("treasurer_validate")[1].checked = true;
+  } else {
+    document.getElementsByName("treasurer_validate")[1].checked = false;
+  }
+
+  if (button.dataset["orderTaken"] == "True") {
+    document.getElementsByName("taken")[1].checked = true;
+  } else {
+    document.getElementsByName("taken")[1].checked = false;
+  }
+
   // Set the form field values using Flask-WTF's API
   document.getElementsByName("id")[1].value = orderId;
   document.getElementsByName("date")[1].value = orderDate;
@@ -68,3 +80,4 @@ moOrderEdit.addEventListener("show.bs.modal", function (event) {
   document.getElementsByName("pceen_id")[1].value = orderPceenId;
   document.getElementsByName("comment")[1].value = orderComment;
 });
+
