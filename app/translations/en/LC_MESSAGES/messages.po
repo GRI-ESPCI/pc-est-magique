@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2024-09-29 23:33+0200\n"
+"POT-Creation-Date: 2024-09-29 23:53+0200\n"
 "PO-Revision-Date: 2022-10-29 03:04+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
@@ -3608,226 +3608,6 @@ msgstr "PC est magique and other internal services are still available."
 msgid "Pour toute question ou réclamation, n'hésitez pas à "
 msgstr "For any question or complaint, please feel free to "
 
-#: app/templates/main/changelog.html:13
-msgid ""
-"Ces notes de mise à jour présentent les modifications principales du "
-"point de vue utilisateur. Pour un changelog plus technique, voir"
-msgstr ""
-"These update notes only present major modifications for user. For a more "
-"technic changelog, see"
-
-#: app/templates/main/changelog.html:15
-msgid "sur GitHub"
-msgstr "on GitHub"
-
-#: app/templates/main/changelog.html:23
-msgid ""
-"Ajout du module du Bekk sur pc-est-magique : possibilité de le lire en "
-"ligne, de le télécharger. Outils d'administration pour l'équipe du Bekk."
-msgstr ""
-"Added Bekk (ESPCI Student newspaper) on website with a viewer. "
-"Administrative tools for managing team."
-
-#: app/templates/main/changelog.html:33
-msgid ""
-"Refonte complète de la page Club Q pour une meilleure expérience "
-"utilisateur et administrative."
-msgstr "Redesigned Club Q page for a better user and administrative experience."
-
-#: app/templates/main/changelog.html:43
-msgid ""
-"Ajout de la page de voeux \"Club Q\" pour la réservation des spectacles "
-"du club culture de l'ESPCI."
-msgstr "Added booking page for Club Q ESPCI"
-
-#: app/templates/main/changelog.html:53
-msgid ""
-"Ajout d'une page \"Théâtre\" qui recueille les informations sur la "
-"prochaine saison théâtre à l'ESPCI ainsi que les billeteries."
-msgstr "Added Theater page for ESPCI next theater season."
-
-#: app/templates/main/changelog.html:62
-msgid ""
-"Gestion des photos directement depuis le site (création d'albums, upload,"
-" suppression...)"
-msgstr "Mananing pictures directly on the website"
-
-#: app/templates/main/changelog.html:71
-msgid "Intégration du site du Bar comme module de ce site."
-msgstr "Integrated Bar module on website"
-
-#: app/templates/main/changelog.html:80
-msgid "Mise en place de l'authentification avec le SSO de l'ESPCI."
-msgstr "Added ESPCI SSO authentification"
-
-#: app/templates/main/changelog.html:83
-msgid "Accès effectif aux photos."
-msgstr "Effective pictures access"
-
-#: app/templates/main/changelog.html:92
-msgid "Intégration du site de l'IntraRez dans ce site."
-msgstr "Integrated IntraRez website on this one."
-
-#: app/templates/main/changelog.html:95
-#, fuzzy
-msgid "Ajout du module de photos."
-msgstr "Add photos"
-
-#: app/templates/main/changelog.html:98
-msgid "Nouveau système de rôles et permissions."
-msgstr "New roles and permissions system"
-
-#: app/templates/main/changelog.html:107
-msgid ""
-"Système de coupure d'accès Internet en cas de non-paiement ou autre (en "
-"fait avant c'était du bluff eheh) ;"
-msgstr "Ban system in case of non-payement"
-
-#: app/templates/main/changelog.html:111
-msgid "Correction de divers bugs mineurs."
-msgstr "Corrected minor bugs"
-
-#: app/templates/main/changelog.html:120
-#, fuzzy
-msgid "Mise en service des paiements : "
-msgstr "Commissioning of Internet payments"
-
-#: app/templates/main/changelog.html:122
-#, fuzzy
-msgid "Page générique d'information ;"
-msgstr "More information"
-
-#: app/templates/main/changelog.html:123
-#, fuzzy
-msgid "Page de choix de l'offre et du moyen de paiement ;"
-msgstr "Chose an offer and a payment method."
-
-#: app/templates/main/changelog.html:124
-msgid "Pages de paiement par Lydia / CB, virement bancaire ou espèces ;"
-msgstr "Credit card, Lydia, bank transfer or cash for payement ;"
-
-#: app/templates/main/changelog.html:125
-msgid "Page d'ajout / validation de paiement pour les GRI ;"
-msgstr "Validation / add payement for GRI page"
-
-#: app/templates/main/changelog.html:126
-msgid ""
-"Souscription automatique à l'offre de bienvenue lors de la première "
-"connexion ;"
-msgstr "Automatic subscription to welcome offer on first connexion ;"
-
-#: app/templates/main/changelog.html:127
-msgid "Intégration à la page d'accueil et à la barre de menu."
-msgstr "Integrated at the welcome page and navbar."
-
-#: app/templates/main/changelog.html:131
-msgid "Envoi de mails riches, au format HTML :"
-msgstr "Rich e-mails sending in HTML format:"
-
-#: app/templates/main/changelog.html:133
-#, fuzzy
-msgid "Lors de la création de compte ;"
-msgstr "No rental in progress!"
-
-#: app/templates/main/changelog.html:134
-#, fuzzy
-msgid "En cas d'oubli de mot de passe ;"
-msgstr "Change password"
-
-#: app/templates/main/changelog.html:135
-msgid "Lors de la perte de sa chambre ;"
-msgstr "Loosing chamber"
-
-#: app/templates/main/changelog.html:136
-msgid "À la validation d'un paiement ;"
-msgstr "Payement validation"
-
-#: app/templates/main/changelog.html:137
-msgid "Un mois avant, une semaine avant et le jour d'expiration d'un abonnement."
-msgstr "A month, a week and the day before the membership expiration."
-
-#: app/templates/main/changelog.html:141
-msgid "Ajout de la possibilité de modifier : "
-msgstr "Added modification possibility for: "
-
-#: app/templates/main/changelog.html:143
-msgid "Une information sur son profil ;"
-msgstr "An information on your profile;"
-
-#: app/templates/main/changelog.html:144
-#, fuzzy
-msgid "Son mot de passe ;"
-msgstr "Password:"
-
-#: app/templates/main/changelog.html:145
-msgid "Les dates d'une location ;"
-msgstr "Dates of renting ;"
-
-#: app/templates/main/changelog.html:146
-msgid "Les informations sur un appareil."
-msgstr "Informations on a device."
-
-#: app/templates/main/changelog.html:150
-msgid ""
-"La langue préférée (français ou anglais, selon les paramètres du "
-"navigateur) est enregistrée pour chaque PCéen, et utilisée pour l'envoi "
-"des mails."
-msgstr "Favourite language saved for each PCéen and used for e-mail sending."
-
-#: app/templates/main/changelog.html:154
-msgid "Ajout d'un mode maintenance activable par les GRI."
-msgstr "Added maintenance mode."
-
-#: app/templates/main/changelog.html:157
-msgid "Ajout d'une page GRI pour exécuter un script."
-msgstr "Added GRI script page."
-
-#: app/templates/main/changelog.html:165
-msgid ""
-"L'IntraRez est maintenant utilisable depuis l'extérieur de la Rezidence, "
-"à l'adresse "
-msgstr "IntraRez useable from outside the Rezidence, at "
-
-#: app/templates/main/changelog.html:167
-msgid "(sauf pour la création de compte)."
-msgstr "(excepting account creation)."
-
-#: app/templates/main/changelog.html:170
-msgid ""
-"L'utilisation du formulaire de contact depuis l'extérieur est maintenant "
-"soumise à un captcha."
-msgstr "Use of contact form from the exterior now needs captcha completation."
-
-#: app/templates/main/changelog.html:178
-msgid "Ajout du mécanisme de changement de chambre."
-msgstr "Added room change mecanism."
-
-#: app/templates/main/changelog.html:181
-msgid "Ajout de l'adresse IP attribuée aux appareils dans le profil."
-msgstr "Added IP address to devices in profile."
-
-#: app/templates/main/changelog.html:184
-msgid "Les GRI peuvent maintenant gérer les chambres et les appareils des PCéens."
-msgstr "GRI can now manage rooms and devices."
-
-#: app/templates/main/changelog.html:187
-msgid "Ajout de cette page."
-msgstr "Added this page."
-
-#: app/templates/main/changelog.html:195
-msgid ""
-"Ajout d'options GRI pour la gestion des PCéens et la surveillance du "
-"réseau."
-msgstr "Added settings for GRI to manage PCéens and network monitoring."
-
-#: app/templates/main/changelog.html:203
-msgid "Mise en place d'un portail captif pour simplifier la connexion au réseau."
-msgstr "Added captive portal for simplified network connexion."
-
-#: app/templates/main/changelog.html:209
-msgid "Première version publique."
-msgstr "First public version."
-
 #: app/templates/main/connect_check.html:39
 msgid ""
 "C'est tout bon ! La passerelle va être configurée pour accorder l'accès à"
@@ -3981,7 +3761,9 @@ msgid ""
 "panier bio (Exemple : Si mardi, les\n"
 "  réservations seront fermées le lundi à 14h). Les réservations rouvrent "
 "le lendemain matin. "
-msgstr "Orders are automatically closed from 2pm on the day before the panier bio day."
+msgstr ""
+"Orders are automatically closed from 2pm on the day before the panier bio"
+" day."
 
 #: app/templates/panier_bio/admin.html:71
 msgid "Prochain Panier-Bio : "
@@ -4099,7 +3881,7 @@ msgstr ""
 "  réservation. Ne sont pas considéré comme valides les jours fériés et "
 "les jours dans &quot;Jours désactivés&quot;. Le\n"
 "  format de jours désactivés est &quot;ANNEE1-MOIS1-JOUR1 "
-"ANNEE2-MOIS2-JOUR2 ANNEE3-MOIS3-JOUR3&quot;.""
+"ANNEE2-MOIS2-JOUR2 ANNEE3-MOIS3-JOUR3&quot;.\""
 
 #: app/templates/panier_bio/period.html:50
 msgid "Période en cours : "
@@ -5242,4 +5024,196 @@ msgstr "Invalid item ID."
 #~ "beggining of the piece. If you "
 #~ "have any problem, please fill this "
 #~ "form :"
+
+#~ msgid ""
+#~ "Ces notes de mise à jour "
+#~ "présentent les modifications principales du"
+#~ " point de vue utilisateur. Pour un"
+#~ " changelog plus technique, voir"
+#~ msgstr ""
+#~ "These update notes only present major"
+#~ " modifications for user. For a more"
+#~ " technic changelog, see"
+
+#~ msgid "sur GitHub"
+#~ msgstr "on GitHub"
+
+#~ msgid ""
+#~ "Ajout du module du Bekk sur pc-"
+#~ "est-magique : possibilité de le "
+#~ "lire en ligne, de le télécharger. "
+#~ "Outils d'administration pour l'équipe du "
+#~ "Bekk."
+#~ msgstr ""
+#~ "Added Bekk (ESPCI Student newspaper) on"
+#~ " website with a viewer. Administrative "
+#~ "tools for managing team."
+
+#~ msgid ""
+#~ "Refonte complète de la page Club Q"
+#~ " pour une meilleure expérience utilisateur"
+#~ " et administrative."
+#~ msgstr "Redesigned Club Q page for a better user and administrative experience."
+
+#~ msgid ""
+#~ "Ajout de la page de voeux \"Club"
+#~ " Q\" pour la réservation des "
+#~ "spectacles du club culture de l'ESPCI."
+#~ msgstr "Added booking page for Club Q ESPCI"
+
+#~ msgid ""
+#~ "Ajout d'une page \"Théâtre\" qui "
+#~ "recueille les informations sur la "
+#~ "prochaine saison théâtre à l'ESPCI ainsi"
+#~ " que les billeteries."
+#~ msgstr "Added Theater page for ESPCI next theater season."
+
+#~ msgid ""
+#~ "Gestion des photos directement depuis le"
+#~ " site (création d'albums, upload, "
+#~ "suppression...)"
+#~ msgstr "Mananing pictures directly on the website"
+
+#~ msgid "Intégration du site du Bar comme module de ce site."
+#~ msgstr "Integrated Bar module on website"
+
+#~ msgid "Mise en place de l'authentification avec le SSO de l'ESPCI."
+#~ msgstr "Added ESPCI SSO authentification"
+
+#~ msgid "Accès effectif aux photos."
+#~ msgstr "Effective pictures access"
+
+#~ msgid "Intégration du site de l'IntraRez dans ce site."
+#~ msgstr "Integrated IntraRez website on this one."
+
+#~ msgid "Ajout du module de photos."
+#~ msgstr "Add photos"
+
+#~ msgid "Nouveau système de rôles et permissions."
+#~ msgstr "New roles and permissions system"
+
+#~ msgid ""
+#~ "Système de coupure d'accès Internet en"
+#~ " cas de non-paiement ou autre "
+#~ "(en fait avant c'était du bluff "
+#~ "eheh) ;"
+#~ msgstr "Ban system in case of non-payement"
+
+#~ msgid "Correction de divers bugs mineurs."
+#~ msgstr "Corrected minor bugs"
+
+#~ msgid "Mise en service des paiements : "
+#~ msgstr "Commissioning of Internet payments"
+
+#~ msgid "Page générique d'information ;"
+#~ msgstr "More information"
+
+#~ msgid "Page de choix de l'offre et du moyen de paiement ;"
+#~ msgstr "Chose an offer and a payment method."
+
+#~ msgid "Pages de paiement par Lydia / CB, virement bancaire ou espèces ;"
+#~ msgstr "Credit card, Lydia, bank transfer or cash for payement ;"
+
+#~ msgid "Page d'ajout / validation de paiement pour les GRI ;"
+#~ msgstr "Validation / add payement for GRI page"
+
+#~ msgid ""
+#~ "Souscription automatique à l'offre de "
+#~ "bienvenue lors de la première connexion"
+#~ " ;"
+#~ msgstr "Automatic subscription to welcome offer on first connexion ;"
+
+#~ msgid "Intégration à la page d'accueil et à la barre de menu."
+#~ msgstr "Integrated at the welcome page and navbar."
+
+#~ msgid "Envoi de mails riches, au format HTML :"
+#~ msgstr "Rich e-mails sending in HTML format:"
+
+#~ msgid "Lors de la création de compte ;"
+#~ msgstr "No rental in progress!"
+
+#~ msgid "En cas d'oubli de mot de passe ;"
+#~ msgstr "Change password"
+
+#~ msgid "Lors de la perte de sa chambre ;"
+#~ msgstr "Loosing chamber"
+
+#~ msgid "À la validation d'un paiement ;"
+#~ msgstr "Payement validation"
+
+#~ msgid ""
+#~ "Un mois avant, une semaine avant "
+#~ "et le jour d'expiration d'un abonnement."
+#~ msgstr "A month, a week and the day before the membership expiration."
+
+#~ msgid "Ajout de la possibilité de modifier : "
+#~ msgstr "Added modification possibility for: "
+
+#~ msgid "Une information sur son profil ;"
+#~ msgstr "An information on your profile;"
+
+#~ msgid "Son mot de passe ;"
+#~ msgstr "Password:"
+
+#~ msgid "Les dates d'une location ;"
+#~ msgstr "Dates of renting ;"
+
+#~ msgid "Les informations sur un appareil."
+#~ msgstr "Informations on a device."
+
+#~ msgid ""
+#~ "La langue préférée (français ou anglais,"
+#~ " selon les paramètres du navigateur) "
+#~ "est enregistrée pour chaque PCéen, et"
+#~ " utilisée pour l'envoi des mails."
+#~ msgstr "Favourite language saved for each PCéen and used for e-mail sending."
+
+#~ msgid "Ajout d'un mode maintenance activable par les GRI."
+#~ msgstr "Added maintenance mode."
+
+#~ msgid "Ajout d'une page GRI pour exécuter un script."
+#~ msgstr "Added GRI script page."
+
+#~ msgid ""
+#~ "L'IntraRez est maintenant utilisable depuis"
+#~ " l'extérieur de la Rezidence, à "
+#~ "l'adresse "
+#~ msgstr "IntraRez useable from outside the Rezidence, at "
+
+#~ msgid "(sauf pour la création de compte)."
+#~ msgstr "(excepting account creation)."
+
+#~ msgid ""
+#~ "L'utilisation du formulaire de contact "
+#~ "depuis l'extérieur est maintenant soumise "
+#~ "à un captcha."
+#~ msgstr "Use of contact form from the exterior now needs captcha completation."
+
+#~ msgid "Ajout du mécanisme de changement de chambre."
+#~ msgstr "Added room change mecanism."
+
+#~ msgid "Ajout de l'adresse IP attribuée aux appareils dans le profil."
+#~ msgstr "Added IP address to devices in profile."
+
+#~ msgid ""
+#~ "Les GRI peuvent maintenant gérer les "
+#~ "chambres et les appareils des PCéens."
+#~ msgstr "GRI can now manage rooms and devices."
+
+#~ msgid "Ajout de cette page."
+#~ msgstr "Added this page."
+
+#~ msgid ""
+#~ "Ajout d'options GRI pour la gestion "
+#~ "des PCéens et la surveillance du "
+#~ "réseau."
+#~ msgstr "Added settings for GRI to manage PCéens and network monitoring."
+
+#~ msgid ""
+#~ "Mise en place d'un portail captif "
+#~ "pour simplifier la connexion au réseau."
+#~ msgstr "Added captive portal for simplified network connexion."
+
+#~ msgid "Première version publique."
+#~ msgstr "First public version."
 

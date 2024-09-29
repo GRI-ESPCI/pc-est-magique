@@ -18,6 +18,10 @@ Application Flask tournant sur https://pc-est-magique.fr.
 Seules les fonctionnalités majeures sont listées ici ; voir
 [`CHANGELOG.md`](CHANGELOG.md) pour les détails.
 
+### 2.8
+
+- Ajout du module du Panier Bio sur pc-est-magique : possibilité de commander des panier bios et de suivre son historique. Page d'administration pour le suivi des gérants.
+
 ### 2.7
 
 - Ajout du module du Bekk sur pc-est-magique : possibilité de le lire en ligne, de le télécharger. Outils d'administration pour l'équipe du Bekk.
