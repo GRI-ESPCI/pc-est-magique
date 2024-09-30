@@ -5,6 +5,7 @@
   href='{{url_for("static", filename="css/quill.snow.css") }}'
   rel="stylesheet"
 />
+
 {% endif %} {% endblock %} {% block scripts %} {{ super() }} {% if can_edit %}
 <script
   src='{{url_for("static", filename="js/quill.js") }}'
@@ -14,6 +15,7 @@
   src='{{url_for("static", filename="js/wysiwyg_editor.js") }}'
   defer
 ></script>
+
 {% endif %} {% endblock %} {% block app_content %} {% include 'wysiwyg.html' %}
 
 <div class="row mb-3">
