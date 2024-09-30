@@ -1,15 +1,12 @@
-{% extends "base.html" %} {% block styles %}{{ super() }}
-{% if can_edit %}
+{% extends "base.html" %} {% block styles %}{{ super() }} {% if can_edit %}
 <link
   rel="stylesheet"
   type="text/css"
   href='{{url_for("static", filename="css/quill.snow.css") }}'
   rel="stylesheet"
 />
-{% endif %} {% endblock %} 
 
-{% block scripts %} {{ super() }}
-{% if can_edit %}
+{% endif %} {% endblock %} {% block scripts %} {{ super() }} {% if can_edit %}
 <script
   src='{{url_for("static", filename="js/quill.js") }}'
   defer
@@ -18,54 +15,48 @@
   src='{{url_for("static", filename="js/wysiwyg_editor.js") }}'
   defer
 ></script>
-{% endif %}
 
-{% endblock %}
-
-{% block app_content %}
+{% endif %} {% endblock %} {% block app_content %} {% include 'wysiwyg.html' %}
 
 <div class="row mb-3">
-  <div class="col">
-    <h1>{{ title }}</h1>
-  </div>
-</div>
-
-{% include 'wysiwyg.html' %}
-
-<p align="center">
-  <img src="/theatre_posters/aff_saison.jpg", alt="{{ _("Affiche Saison
-  Théâtrale") }}" width="30%" />
-</p>
-
-{% for spect in spectacles %}
-<hr align="CENTER" />
-<div class="row mb-3">
-  <h2>{{ spect.name }}</h2>
-  <p>
-    <i>
-      {{ _("Une pièce écrite par %(author)s et montée par %(director)s",
-      author=spect.author, director=spect.director) }}
-    </i>
-  </p>
   <p align="center">
-    <img src="/theatre_posters/{{ spect.image_name }}.jpg" , width="30%" />
+    <img src="/theatre_posters/aff_saison.jpg", alt="{{ _("Affiche Saison Théâtrale") }}" width="30%" />
   </p>
 
-  <h5>{{ _("Synopsis")}}</h5>
-  <p>
-    <i> {{ spect.description }} </i>
-  </p>
+  {% for spect in spectacles %}
+  <hr align="CENTER" />
+  <div class="row mb-3">
+    <h2>{{ spect.name }}</h2>
+    <p>
+      <i>
+        {{ _("Une pièce écrite par %(author)s et montée par %(director)s", author=spect.author, director=spect.director)
+        }}
+      </i>
+    </p>
+    <p align="center">
+      <img
+        src="/theatre_posters/{{ spect.image_name }}.jpg"
+        ,
+        width="30%"
+      />
+    </p>
 
-  <h5>{{ _("Représentations :")}}</h5>
-  <ul>
-    {% for rep in spect.representations %}
-    <li>{{moment(rep.date).format('LLLL')}}</li>
-    {% endfor %}
-  </ul>
-  <p>
-    {{ _("Billetterie : ") }} {% if not spect.ticket_link %} {{ _("Lien à
-    venir") }} {% else %}
-    <a href="{{ spect.ticket_link }}">{{ spect.ticket_link }}</a> {% endif %}
-  </p>
+    <h5>{{ _("Synopsis")}}</h5>
+    <p>
+      <i> {{ spect.description }} </i>
+    </p>
+
+    <h5>{{ _("Représentations :")}}</h5>
+    <ul>
+      {% for rep in spect.representations %}
+      <li>{{moment(rep.date).format('LLLL')}}</li>
+      {% endfor %}
+    </ul>
+    <p>
+      {{ _("Billetterie : ") }} {% if not spect.ticket_link %} {{ _("Lien à venir") }} {% else %}
+      <a href="{{ spect.ticket_link }}">{{ spect.ticket_link }}</a> {% endif %}
+    </p>
+    <p>{{ _("Choix des places : ") }} <a href="{{ spect.places }}">{{ spect.places }}</a></p>
+  </div>
 </div>
 {% endfor %} {% endblock %}

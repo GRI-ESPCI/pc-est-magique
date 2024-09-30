@@ -31,6 +31,7 @@ class Spectacle(db.Model):
     director: Column[str | None] = column(sa.String(64), nullable=True)
     author: Column[str | None] = column(sa.String(64), nullable=True)
     image_name: Column[str | None] = column(sa.String(120), nullable=True)
+    places: Column[str | None] = column(sa.String(255), nullable=True)
 
     representations: Relationship[list[Representation]] = one_to_many(
         "Representation.spectacle", order_by="Representation.date"
