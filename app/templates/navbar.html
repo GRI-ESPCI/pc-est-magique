@@ -19,8 +19,13 @@
             </ul>
             <ul class="navbar-nav flex-row flex-wrap justify-content-end">
                 <li class="nav-item">
+                    <a class="btn btn-outline-secondary mx-2 my-1" href="{{ url_for("panier_bio.main") }}">
+                        {{ _("Panier Bio") }}
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="btn btn-outline-secondary mx-2 my-1" href="{{ url_for("theatre.main") }}">
-                        {{ _("Club Théâtre") }}
+                        {{ _("Théâtre") }}
                     </a>
                 </li>
                 {% if not g.logged_in %}

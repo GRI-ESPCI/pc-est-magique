@@ -1,4 +1,5 @@
-{% extends "base.html" %} {% import "_form.html" as wtf %} {% block styles %}{{ super() }}
+{% extends "base.html" %} {% import "_form.html" as wtf %} {% block styles %}{{
+super() }}
 <link
   rel="stylesheet"
   type="text/css"
@@ -20,24 +21,17 @@
   {% for bekk in bekks %}
     url_list.push({{ bekk.pdf_src_with_token |tojson }})
   {% endfor %}
-    var url_list = []
   {% if can_edit %}
     var folder = {{folder |tojson}}
   {% endif %}
 </script>
-<script
-  src="{{url_for('static', filename='js/pdf.js') }}"
-  defer
-></script>
+<script src="{{url_for('static', filename='js/pdf.js') }}" defer></script>
 {% if can_edit %}
 <script
   src="{{url_for('static', filename='js/bekk/bekks.js') }}"
   defer
 ></script>
-<script
-  src='{{url_for("static", filename="js/quill.js") }}'
-  defer
-></script>
+<script src='{{url_for("static", filename="js/quill.js") }}' defer></script>
 <script
   src='{{url_for("static", filename="js/wysiwyg_editor.js") }}'
   defer
@@ -65,12 +59,7 @@
         data-bs-target="#mo-bekk-add"
         data-bs-toggle="modal"
       >
-        <svg
-          class="bi flex-shrink-0"
-          width="24"
-          height="24"
-          role="img"
-        >
+        <svg class="bi flex-shrink-0" width="24" height="24" role="img">
           {{ macros.bootstrap_icon("plus-circle") }}
         </svg>
       </button>
@@ -83,16 +72,9 @@
 
 <!-- Bekk navbar -->
 <div class="container mb-3">
-  <div
-    class="btn-toolbar justify-content-between"
-    role="toolbar"
-  >
+  <div class="btn-toolbar justify-content-between" role="toolbar">
     <div class="d-flex align-items-center">
-      <div
-        class="btn-group"
-        role="group"
-        name="saison_navbar"
-      >
+      <div class="btn-group" role="group" name="saison_navbar">
         <a
           role="button"
           href="{{ url_for('bekk.main', promo=0)}}"
@@ -113,7 +95,9 @@
 </div>
 <div class="row">
   {% for bekk in bekks %}
-  <div class="col-sm-8 col-md-6 col-lg-4 bottom-margin">{% include "cards/bekk.html" %}</div>
+  <div class="col-sm-8 col-md-6 col-lg-4 bottom-margin">
+    {% include "cards/bekk.html" %}
+  </div>
   {% endfor %}
 </div>
 {% if can_edit %}
@@ -130,10 +114,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5
-          class="modal-title"
-          id="mo-bekk-edit"
-        >
+        <h5 class="modal-title" id="mo-bekk-edit">
           {{ _("Editer bekk") }} {{"{bekk_id}"}} - {{"{bekk_name}"}}
         </h5>
         <button
@@ -143,16 +124,14 @@
           aria-label="{{ _('Fermer') }}"
         ></button>
       </div>
-      <form
-        action=""
-        method="post"
-        role="form"
-      >
+      <form action="" method="post" role="form">
         {{ form.hidden_tag() }}
         <div class="modal-body">
           <div class="row mb-3">
             <div class="col">
-              <div class="form-floating">{{ wtf.form_field(form.bekk_name) }}</div>
+              <div class="form-floating">
+                {{ wtf.form_field(form.bekk_name) }}
+              </div>
             </div>
           </div>
           <div class="row mb-3">
@@ -173,7 +152,8 @@
             >
               {{ _("Annuler") }}
             </button>
-            {{ form.delete(class="btn btn-danger") }} {{ form.submit(class="btn btn-primary") }}
+            {{ form.delete(class="btn btn-danger") }} {{ form.submit(class="btn
+            btn-primary") }}
           </div>
         </div>
       </form>
@@ -192,12 +172,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5
-          class="modal-title"
-          id="mo-bekk-add"
-        >
-          {{_('Ajouter un bekk')}}
-        </h5>
+        <h5 class="modal-title" id="mo-bekk-add">{{_('Ajouter un bekk')}}</h5>
         <button
           type="button"
           class="btn-close"
@@ -205,17 +180,14 @@
           aria-label="{{ _('Fermer') }}"
         ></button>
       </div>
-      <form
-        action=""
-        method="post"
-        role="form"
-        enctype="multipart/form-data"
-      >
+      <form action="" method="post" role="form" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <div class="modal-body">
           <div class="row mb-3">
             <div class="col">
-              <div class="form-floating">{{ wtf.form_field(form.bekk_name) }}</div>
+              <div class="form-floating">
+                {{ wtf.form_field(form.bekk_name) }}
+              </div>
             </div>
           </div>
           <div class="row mb-3">
@@ -230,10 +202,14 @@
           </div>
           <div class="row mb-3">
             <div class="col">
-              <div class="form-floating">{{ wtf.form_field(form.pdf_file) }}</div>
+              <div class="form-floating">
+                {{ wtf.form_field(form.pdf_file) }}
+              </div>
             </div>
             {% if form.pdf_file.errors %}
-            <small class="form-text text-danger">{{ form.pdf_file.errors[0] }}</small>
+            <small class="form-text text-danger"
+              >{{ form.pdf_file.errors[0] }}</small
+            >
             {% endif %}
           </div>
           <div class="modal-footer">

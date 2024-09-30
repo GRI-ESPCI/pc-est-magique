@@ -1,4 +1,4 @@
-"""PC est magique - Photos Gallery Forms"""
+"""PC est magique - Bekk Forms"""
 
 import wtforms
 from wtforms.fields import html5

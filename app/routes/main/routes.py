@@ -6,6 +6,7 @@ import datetime
 import hashlib
 import logging
 import os
+import datetime
 
 import flask
 from flask_babel import _
@@ -24,11 +25,14 @@ from app.models import (
     ClubQVoeu,
     ClubQSpectacle,
     Bekk,
+    OrderPanierBio,
+    PeriodPanierBio
 )
 from app.routes.main import bp, forms
 from app.utils import captcha, helpers, typing
 from datetime import date
 from app.routes.club_q.utils import pceen_prix_total
+from app.routes.panier_bio.utils import command_open, what_are_next_days
 
 
 @bp.route("/")
@@ -91,12 +95,38 @@ def index() -> typing.RouteReturn:
                 last_bekk.name, last_bekk.promo, bekks.count(), last_bekk.id
             )
 
+    panier_bio_infos = None
+    
+    panier_bio_day = GlobalSetting.query.filter_by(key="PANIER_BIO_DAY").one().value
+    today = datetime.date.today()
+    all_periods = PeriodPanierBio.query.filter_by(active=True).filter(PeriodPanierBio.end_date>=today).order_by(PeriodPanierBio.start_date.asc()).all()
+    
+    next_days  = what_are_next_days(panier_bio_day, today, all_periods)
+    if len(next_days) > 0:
+        next_day = next_days[0]
+    else:
+        next_day = None
+        
+    all_orders = OrderPanierBio.query.filter_by(_pceen_id=pceen.id).filter(OrderPanierBio.date>=today).order_by(OrderPanierBio.date.asc()).all()
+
+    visibility = GlobalSetting.query.filter_by(key="ACCESS_PANIER_BIO").one().value
+
+    reserved = False
+    for order in all_orders:
+        if order.date == next_day:
+            reserved = True
+
+    panier_bio_infos = namedtuple("PanierBioInfos", ["visibility","next_day", "reserved"])(
+                visibility, next_day, reserved
+            )
+
     return flask.render_template(
         "main/index.html",
         title=_("Accueil"),
         photos_infos=photos_infos,
         bekk_infos=bekk_infos,
         club_q_infos=club_q_infos,
+        panier_bio_infos=panier_bio_infos
     )
 
 

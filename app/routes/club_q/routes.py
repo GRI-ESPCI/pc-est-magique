@@ -149,7 +149,6 @@ def main() -> typing.RouteReturn:
         # Cheking if the minimum number of places is not superior to the number of asked places
         for spect in spectacles:
             if form[f"nb_places_{spect.id}"].data != None:
-                form[f"nb_places_minimum_{spect.id}"].data = 0
                 if form[f"nb_places_minimum_{spect.id}"].data > form[f"nb_places_{spect.id}"].data:
                     flask.flash(
                         _(
@@ -1036,7 +1035,7 @@ def spect_generate_excel(id: int):
     """Sum up of informations concerning the club Q spectacle of the given id"""
     # Get spectacle
     spectacle: ClubQSpectacle | None = ClubQSpectacle.query.filter_by(id=id).one_or_none()
-    if not spectacle or not context.g.pceen.has_permission(PermissionType.all, PermissionScope.club_q):
+    if not spectacle or not context.g.pceen.has_permission(PermissionType.write, PermissionScope.club_q):
         flask.abort(404)
 
     season_id = spectacle._season_id
