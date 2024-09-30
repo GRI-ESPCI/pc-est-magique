@@ -27,7 +27,6 @@ def main() -> typing.RouteReturn:
 
     return flask.render_template(
         "theatre/main.html",
-        title=_("Saison Théâtrale du Club Théâtre 140"),
         spectacles=spectacles,
         can_edit=can_edit,
         folder=folder,

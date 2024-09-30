@@ -149,15 +149,16 @@ def main() -> typing.RouteReturn:
         # Cheking if the minimum number of places is not superior to the number of asked places
         for spect in spectacles:
             if form[f"nb_places_{spect.id}"].data != None:
-                if form[f"nb_places_minimum_{spect.id}"].data > form[f"nb_places_{spect.id}"].data:
-                    flask.flash(
-                        _(
-                            "Un voeu a été défini avec un nombre de places minimum supérieur au nombre de places demandées."
-                        ),
-                        "danger",
-                    )
-                    flag = True  # RAISE THE FLAG!
-                    break
+                if form[f"nb_places_minimum_{spect.id}"].data != None:
+                    if form[f"nb_places_minimum_{spect.id}"].data > form[f"nb_places_{spect.id}"].data:
+                        flask.flash(
+                            _(
+                                "Un voeu a été défini avec un nombre de places minimum supérieur au nombre de places demandées."
+                            ),
+                            "danger",
+                        )
+                        flag = True  # RAISE THE FLAG!
+                        break
 
         priority_list = []
         # Checking if every priority is different
@@ -193,7 +194,7 @@ def main() -> typing.RouteReturn:
 
                     voeu.priorite = form[f"priorite_{spect.id}"].data
                     voeu.places_demandees = form[f"nb_places_{spect.id}"].data
-                    voeu.places_minimum = form[f"nb_places_minimum_{spect.id}"].data or 0
+                    voeu.places_minimum = form[f"nb_places_minimum_{spect.id}"].data if form[f"nb_places_minimum_{spect.id}"].data != None else form[f"nb_places_{spect.id}"].data
                     voeu.places_attribuees = 0
 
                 else:
