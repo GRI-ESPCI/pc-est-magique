@@ -64,7 +64,6 @@ def upgrade():
     # ### end Alembic commands ###
 
 
-"""
     # Create a temporary "_permission_scope" type, convert and drop the "old" type
     tmp_type.create(op.get_bind(), checkfirst=False)
     op.execute("ALTER TABLE permission ALTER COLUMN scope TYPE _permission_scope USING scope::text::_permission_scope")
@@ -73,7 +72,6 @@ def upgrade():
     new_type.create(op.get_bind(), checkfirst=False)
     op.execute("ALTER TABLE permission ALTER COLUMN scope TYPE permission_scope USING scope::text::permission_scope")
     tmp_type.drop(op.get_bind(), checkfirst=False)
-"""
 
 
 def downgrade():
