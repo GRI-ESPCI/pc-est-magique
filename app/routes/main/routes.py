@@ -101,9 +101,12 @@ def index() -> typing.RouteReturn:
     today = datetime.date.today()
     all_periods = PeriodPanierBio.query.filter_by(active=True).filter(PeriodPanierBio.end_date>=today).order_by(PeriodPanierBio.start_date.asc()).all()
     
-    next_days  =what_are_next_days(panier_bio_day, today, all_periods)
-    next_day = next_days[0]
-    
+    next_days  = what_are_next_days(panier_bio_day, today, all_periods)
+    if len(next_days) > 0:
+        next_day = next_days[0]
+    else:
+        next_day = None
+        
     all_orders = OrderPanierBio.query.filter_by(_pceen_id=pceen.id).filter(OrderPanierBio.date>=today).order_by(OrderPanierBio.date.asc()).all()
 
     visibility = GlobalSetting.query.filter_by(key="ACCESS_PANIER_BIO").one().value

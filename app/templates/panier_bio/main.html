@@ -10,10 +10,6 @@
   var folder = {{folder |tojson}}
 </script>
 <script
-  src="{{url_for('static', filename='js/panier_bio/panier_bio_order_user_delete.js') }}"
-  defer
-></script>
-<script
   src='{{url_for("static", filename="js/quill.js") }}'
   defer
 ></script>
@@ -28,6 +24,11 @@
 ></script>
 <script
   src="{{ url_for('static', filename='js/captcha.js') }}"
+  defer
+></script>
+{% else %}
+<script
+  src="{{url_for('static', filename='js/panier_bio/panier_bio_order_user_delete.js') }}"
   defer
 ></script>
 {% endif %} {% endblock %} {% block app_content %}

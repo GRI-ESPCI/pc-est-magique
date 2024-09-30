@@ -127,7 +127,6 @@ def main() -> typing.RouteReturn:
         delete = form["delete"].data
         
         if delete:
-            app.logger.info(form["id"].data)
             order_del = OrderPanierBio.query.filter_by(id=form["id"].data).one()
             if type(order_del._pceen_id) == int: #Only a user can delete a wish
                 if order_del._pceen_id == user.id: #Only a given user can delete his wish
@@ -229,7 +228,10 @@ def admin() -> typing.RouteReturn:
     panier_bio_day = GlobalSetting.query.filter_by(key="PANIER_BIO_DAY").one().value
 
     next_days = what_are_next_days(panier_bio_day, today, all_periods)  # But tell me, what is the next day of Panier Bio ?
-    next_day = next_days[0]
+    if len(next_days) > 0:
+        next_day = next_days[0]
+    else:
+        next_day = None
 
     show_date = flask.request.args.get("show_date") if not None else 0
     if show_date == None:
@@ -353,8 +355,6 @@ def period() -> typing.RouteReturn:
 
     if not can_edit:
         flask.abort(404)
-
-    today = datetime.date.today()
 
     periods = PeriodPanierBio.query.order_by(PeriodPanierBio.start_date.desc()).all()
 
