@@ -43,6 +43,7 @@ def index() -> typing.RouteReturn:
     # if context.has_permission(PermissionType.read, PermissionScope.intrarez) and not context.g.intrarez_setup:
     #    return helpers.safe_redirect(context.g.redemption_endpoint, **context.g.redemption_params)
 
+    pceen = context.g.pceen
     photos_infos = None
     if context.has_permission(PermissionType.read, PermissionScope.photos):
         photos_infos = namedtuple("PhotosInfos", ["nb_collections", "nb_albums", "nb_photos"])(
@@ -53,7 +54,6 @@ def index() -> typing.RouteReturn:
 
     club_q_infos = None
     if context.has_permission(PermissionType.read, PermissionScope.club_q):
-        pceen = context.g.pceen
 
         season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value
         season = ClubQSeason.query.filter_by(id=season_id).first()

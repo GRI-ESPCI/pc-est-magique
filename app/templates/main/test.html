@@ -2,16 +2,16 @@
 
 {% block app_content %}
 
-    <div class="bd-content ps-lg-4">
+{#    <div class="bd-content ps-lg-4">
 <div class="row">
   <pre>g = {{ vars(g) }}</pre>
 </div>
 <div class="row">
   <pre>session = {{ vars(session) }}</pre>
-</div>
+</div>#}
 <div class="row">
   <a href="{{ url_for("login", next="/test") }}">LOGIN</a>
-</div>
+</div>{#
 <div class="row">
 
     <div class="col-md-4">
@@ -68,5 +68,5 @@
 
 </div>
       </div>
-
+#}
 {% endblock %}

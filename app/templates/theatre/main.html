@@ -7,6 +7,9 @@
 />
 
 {% endif %} {% endblock %} {% block scripts %} {{ super() }} {% if can_edit %}
+<script defer>
+  var folder = {{folder |tojson}}
+</script>
 <script
   src='{{url_for("static", filename="js/quill.js") }}'
   defer

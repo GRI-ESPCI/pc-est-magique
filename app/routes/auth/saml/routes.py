@@ -48,6 +48,8 @@ def setup_saml_authentication() -> None:
         idp_response = requests.get(app_config["SAML_IDP_METADATA_URL"], timeout=60)
     except Exception:
         idp_response = None
+    if not idp_response.text.startswith("<?xml"):
+        idp_response = None
     if not idp_response and app_config["SAML_IDP_METADATA_FALLBACK_URL"]:
         idp_response = requests.get(app_config["SAML_IDP_METADATA_FALLBACK_URL"], timeout=60)
     if not idp_response:
@@ -104,8 +106,8 @@ def setup_saml_authentication() -> None:
         config.load(settings)
         config.allow_unknown_attributes = True
         _saml_client = saml2.client.Saml2Client(config=config)
-    except Exception:
-        ("SAML connection unavailable", "danger")
+    except Exception as exc:
+        flask.current_app.logger.exception("SAML connection unavailable %s (%s)", type(exc).__name__, str(exc))
 
 
 @bp.route("/metadata")

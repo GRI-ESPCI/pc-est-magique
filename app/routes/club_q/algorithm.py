@@ -101,10 +101,10 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
                     if voeu.priorite < 6:
                         for pceen in pceens:
                             if voeu.pceen.id == pceen.id:
-                                pceen.discontent = round(pceen.discontent + 1 / 3 * voeu.priorite - 2, 1)
+                                pceen.discontent = round(pceen.discontent + (1 / 3 * voeu.priorite - 2)*round(voeu.places_attribuees**1.5, 1), 1)
                                 voeu.pceen.discontent = pceen.discontent
                                 club_q_algo_logger.info(
-                                    f"Réduction mécontentement de {1/3*voeu.priorite-2 :.2f} . Nouveau mécontentement : {pceen.discontent :.2f}"
+                                    f"Réduction mécontentement de {(1/3*voeu.priorite-2)*round(voeu.places_attribuees**1.5,1) :.2f} . Nouveau mécontentement : {pceen.discontent :.2f}"
                                 )
                     voeux_update.append(voeu)
                     voeux.pop(0)
@@ -125,10 +125,10 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
                     if voeu.priorite < 6:
                         for pceen in pceens:
                             if voeu.pceen.id == pceen.id:
-                                pceen.discontent = round(pceen.discontent + 1 / 6 * voeu.priorite - 1, 1)
+                                pceen.discontent = round(pceen.discontent + (1 / 6 * voeu.priorite - 1)*round(voeu.places_attribuees**1.5, 1), 1)
                                 voeu.pceen.discontent = pceen.discontent
                                 club_q_algo_logger.info(
-                                    f"Réduction mécontentement de {1/6*voeu.priorite-1 :.2f}. Nouveau mécontentement : {pceen.discontent :.2f}"
+                                    f"Réduction mécontentement de {(1/6*voeu.priorite-1)*round(voeu.places_attribuees**1.5,1) :.2f}. Nouveau mécontentement : {pceen.discontent :.2f}"
                                 )
                     voeux_update.append(voeu)
                     voeux.pop(0)

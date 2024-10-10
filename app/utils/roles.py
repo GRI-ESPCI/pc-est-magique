@@ -15,7 +15,7 @@ def grant_student_role(pceen: PCeen) -> None:
     student_role = Role.query.filter_by(name="Élève").one()
     if student_role not in pceen.roles:
         pceen.roles.append(student_role)
-        flask.flash(_("Accès aux modules élèves débloqué !"), "success")
+        #flask.flash(_("Accès aux modules élèves débloqué !"), "success")
 
 
 def grant_promotion_role(pceen: PCeen, promotion: int) -> None:

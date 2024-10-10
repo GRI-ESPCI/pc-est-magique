@@ -45,10 +45,13 @@ class ImageData(exif.Image):
     def timestamp(self) -> datetime.datetime | None:
         """Image timestamp, or ``None`` if not available."""
         if str_timestamp := self._get_from_attrs(*datetime_attrs):
-            if offset := self._get_from_attrs(*offset_attrs):
-                offset_z = offset.replace(":", "")
-                return datetime.datetime.strptime(f"{str_timestamp} {offset_z}", "%Y:%m:%d %H:%M:%S %z")
-            return datetime.datetime.strptime(f"{str_timestamp}", "%Y:%m:%d %H:%M:%S")
+            try:
+                if offset := self._get_from_attrs(*offset_attrs):
+                    offset_z = offset.replace(":", "")
+                    return datetime.datetime.strptime(f"{str_timestamp} {offset_z}", "%Y:%m:%d %H:%M:%S %z")
+                return datetime.datetime.strptime(f"{str_timestamp}", "%Y:%m:%d %H:%M:%S")
+            except ValueError:
+               return None
         return None
 
     @property
