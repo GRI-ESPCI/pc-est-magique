@@ -75,7 +75,7 @@ def validPeriodDates(form, periods):
             pass
         
         else:
-            if form["start_date"] < period.end_date and form["end_date"] > period.start_date:
+            if form["start_date"].data < period.end_date and form["end_date"].data > period.start_date:
                 return(False)
     return(True)
 
