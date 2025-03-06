@@ -151,6 +151,9 @@
           </span>
         </th>
         {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
+        <th>
+            <span>{{ _("Attribution visible") }}</span>
+        </th>
         <th
           scope="col"
           onclick="sort('nbpceens');"
@@ -245,6 +248,34 @@
         <td>{{ saisons[i].fin }}</td>
         <td>{{ saisons[i].fin_inscription }}</td>
         {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
+        <td align="center">
+          <a
+            role="button"
+            href="{{ url_for('club_q.visible', id = saisons[i].id) }}"
+          >
+            {% if saisons[i].attributions_visible is false%}
+            <svg
+              class="bi flex-shrink-0"
+              width="24"
+              height="24"
+              style="color: red"
+              role="img"
+            >
+              {{ macros.bootstrap_icon("square") }}
+            </svg>
+            {% else %}
+            <svg
+              class="bi flex-shrink-0"
+              width="24"
+              height="24"
+              style="color: green"
+              role="img"
+            >
+              {{ macros.bootstrap_icon("check-square") }}
+            </svg>
+            {% endif %}
+          </a>
+        </td>
         <td>{{ saison_nb_pceens[i]}}</td>
         <td>{{ saison_nb_spectacles[i]}}</td>
         <td>{{ saison_nb_voeux[i] }}</td>
@@ -263,6 +294,7 @@
               data-saison-debut="{{ saisons[i].debut }}"
               data-saison-fin="{{ saisons[i].fin }}"
               data-saison-fin-inscription="{{ saisons[i].fin_inscription }}"
+              data-saison-attributions-visible="{{ saisons[i].attributions_visible }}"
             >
               <svg
                 class="bi flex-shrink-0"

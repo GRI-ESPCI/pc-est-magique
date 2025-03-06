@@ -1,8 +1,11 @@
 import logging
 import os
 import random
+import copy
 import flask
 from flask_babel import _
+from app.models import ClubQVoeu
+from app import db
 
 # Set up specific logging for the club q algorithm
 club_q_algo_logger = logging.Logger("club_q_algo")
@@ -64,11 +67,17 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
             pceen.discontent += -10
 
     voeux_update = []
-    voeux_copy = voeux.copy()
+    #voeux_copy = [ClubQVoeu(id=voeu.id, _season_id=voeu._season_id, priorite=voeu.priorite) for voeu in voeux] #Create a copy of the value of the voeux which can be updated, as voeux is only a list of reference, and making a copy of it will change nothing
+    voeux_copy = copy.deepcopy(voeux) #[voeu.__dict__.copy() for voeu in voeux]
+    #app.logger.info(voeux[600])
 
     spectacles_places_attribuees = initialized_attributed_spectacles_places(spectacles, voeux)
 
     random.shuffle(voeux)
+    voeux.sort(key=lambda x: (x.priorite, -x.pceen.discontent))
+    id_save = [voeu.id for voeu in voeux]
+    priority_save = [voeu.priorite for voeu in voeux]
+
 
     while len(voeux) != 0:
         voeux.sort(key=lambda x: (x.priorite, -x.pceen.discontent))
@@ -106,8 +115,10 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
                                 club_q_algo_logger.info(
                                     f"Réduction mécontentement de {(1/3*voeu.priorite-2)*round(voeu.places_attribuees**1.5,1) :.2f} . Nouveau mécontentement : {pceen.discontent :.2f}"
                                 )
+                    restore_priority(voeu, id_save, priority_save)
                     voeux_update.append(voeu)
                     voeux.pop(0)
+
 
                 elif (
                     voeu.spectacle.nb_tickets
@@ -130,8 +141,10 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
                                 club_q_algo_logger.info(
                                     f"Réduction mécontentement de {(1/6*voeu.priorite-1)*round(voeu.places_attribuees**1.5,1) :.2f}. Nouveau mécontentement : {pceen.discontent :.2f}"
                                 )
+                    restore_priority(voeu, id_save, priority_save)
                     voeux_update.append(voeu)
                     voeux.pop(0)
+
 
                 else:
                     club_q_algo_logger.info(
@@ -157,17 +170,25 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
                         club_q_algo_logger.info(
                             f"Plus de voeux pour {voeu.pceen.full_name} après la priorité {voeu.priorite}"
                         )
+                    restore_priority(voeu, id_save, priority_save)
                     voeux.pop(0)
+
                     break
             else:
+                restore_priority(voeu, id_save, priority_save)
                 voeux.pop(0)
+    #app.logger.info(voeux[600])
 
+    """
     # Reattribuate correct proprities
-    for voeu in voeux:
+    for voeu in voeux_update:
         for voeu_init in voeux_copy:
+            
             if voeu.id == voeu_init.id:
-                app.logger.infos("here")
+                app.logger.info(f"Before {voeu.priorite}, {voeu_init.priorite}")
                 voeu.priorite = voeu_init.priorite
+                app.logger.info(f"After {voeu.priorite}, {voeu_init.priorite}")
+    """
 
     # Sum up for logs
     club_q_algo_logger.info("\n")
@@ -242,6 +263,17 @@ def sum_up(voeux, pceens, corruption):
             print(i)
             club_q_algo_logger.info(izadooa[i])
         club_q_algo_logger.info(f"{pceen.full_name} - {sum_places_attribuees_pceen(pceen, voeux)} places attribuées")
+
+
+def restore_priority(voeu, id_save, priority_save):
+    var_check = False
+    for v, id in enumerate(id_save):
+        if voeu.id == id:
+            voeu.priorite = priority_save[v] #Restore initial priority
+            var_check = True
+            break
+    if not var_check:
+        raise ValueError('While handleling this voeu, the original voeu could not be found')
 
 
 efioohze = [

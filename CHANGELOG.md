@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# v2.8.1 (2025-03-06)
+
+### Added
+
+- In Club Q module, an option was added to hide places attribution to people while administration is still working on it
+
+### Fixed
+
+- Corrected shortcut for /theatre_posters/ path
+
+- In Panier Bio module, creation of periods conditions are now functional
+- In Panier Bio module, the button to manually create orders for admin is now functional
+
+- In Club Q module, the excel export button for Spectacles was returning an error
+- In Club Q module, the excel export route for one spectacle was misconfigured and returned all spectacles
+- In Club Q module, the attribution algorithm was modifying whishes priorities in database
+
+
 # v2.8.0 (2024-09-29)
 
 ### Added

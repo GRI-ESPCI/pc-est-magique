@@ -4,6 +4,7 @@ import io
 import flask
 
 from jours_feries_france import JoursFeries
+from flask_babel import _
 
 app = flask.Flask(__name__)
 
@@ -70,15 +71,31 @@ def get_period_id(date, all_periods):
 
 
 def validPeriodDates(form, periods):
+    #Check if dates are coherent between themselves
+    if form["start_date"].data > form["end_date"].data:
+        return(False, _("La date de fin ne peut être antérieure à la date de début"))
+    
+    #Check if periods are superposing between themselves
     for period in periods:
         if period.id == form["id"].data:
             pass
-        
+
         else:
             if form["start_date"].data < period.end_date and form["end_date"].data > period.start_date:
-                return(False)
-    return(True)
+                return(False, "Les dates choisies se superposent à une période existante")
+            
+    return(True, "")
 
+
+def findPeriodId(date, periods):
+    """
+    Check if a given date fits inside a period
+    """
+    for period in periods:
+        if date <= period.end_date and date >= period.start_date:
+            return(period.id)
+    else:
+        return None
 
 def export_excel(date, orders):
     workbook = openpyxl.Workbook()

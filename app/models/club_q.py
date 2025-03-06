@@ -32,6 +32,8 @@ class ClubQSeason(db.Model):
     debut: Column[datetime.date | None] = column(sa.Date(), nullable=True)
     fin: Column[datetime.date | None] = column(sa.Date(), nullable=True)
     fin_inscription: Column[datetime.date | None] = column(sa.Date(), nullable=True)
+    attributions_visible: Column[bool] = column(sa.Boolean(), default=False, nullable=False)
+
     spectacles: Relationship[list[ClubQSpectacle]] = one_to_many(
         "ClubQSpectacle.season", order_by="ClubQSpectacle.date"
     )

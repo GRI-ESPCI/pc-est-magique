@@ -292,27 +292,27 @@ def excel_spectacle(spec, season, voeux_attrib, voeux_nan_attrib):
         sheet.cell(row=7 + i, column=6).number_format = "#,##0.00 €_-"
         tot += apayer
 
-        tab = openpyxl.worksheet.table.Table(displayName="Données", ref=f"A6:F{7 + i}")
+    tab = openpyxl.worksheet.table.Table(displayName="Données", ref=f"A6:F{7 + i}")
 
-        style = openpyxl.worksheet.table.TableStyleInfo(
-            name="TableStyleLight1",
-            showFirstColumn=False,
-            showLastColumn=False,
-            showRowStripes=True,
-            showColumnStripes=False,
-        )
-        tab.tableStyleInfo = style
-        sheet.add_table(tab)
+    style = openpyxl.worksheet.table.TableStyleInfo(
+        name="TableStyleLight1",
+        showFirstColumn=False,
+        showLastColumn=False,
+        showRowStripes=True,
+        showColumnStripes=False,
+    )
+    tab.tableStyleInfo = style
+    sheet.add_table(tab)
 
-        sheet.cell(row=7 + i + 2, column=1).value = "Total"
-        sheet.cell(row=7 + i + 2, column=1).font = openpyxl.styles.Font(bold=True)
+    sheet.cell(row=7 + i + 2, column=1).value = "Total"
+    sheet.cell(row=7 + i + 2, column=1).font = openpyxl.styles.Font(bold=True)
 
-        sheet.cell(row=7 + i + 2, column=5).value = npa
-        sheet.cell(row=7 + i + 2, column=5).font = openpyxl.styles.Font(bold=True)
+    sheet.cell(row=7 + i + 2, column=5).value = npa
+    sheet.cell(row=7 + i + 2, column=5).font = openpyxl.styles.Font(bold=True)
 
-        sheet.cell(row=7 + i + 2, column=6).value = tot
-        sheet.cell(row=7 + i + 2, column=6).font = openpyxl.styles.Font(bold=True)
-        sheet.cell(row=7 + i + 2, column=6).number_format = "#,##0.00 €_-"
+    sheet.cell(row=7 + i + 2, column=6).value = tot
+    sheet.cell(row=7 + i + 2, column=6).font = openpyxl.styles.Font(bold=True)
+    sheet.cell(row=7 + i + 2, column=6).number_format = "#,##0.00 €_-"
 
     sheet.column_dimensions["A"].width = 20
     sheet.column_dimensions["B"].width = 20

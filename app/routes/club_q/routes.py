@@ -5,6 +5,7 @@ import os
 from flask_babel import _
 from sqlalchemy import desc
 
+app = flask.Flask(__name__)
 
 from app import context, db
 from app.models import (
@@ -372,12 +373,12 @@ def spectacles() -> typing.RouteReturn:
     )
 
 
-@bp.route("/spectacles/export_pdfs", methods=["GET", "POST"])
+@bp.route("/spectacles/<int:id>/export_pdfs", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.club_q)
-def spect_export_pdfs():
+def spect_export_pdfs(id: int):
     """Export the PDF spectacle resume for the given id season (or the actual one in the db)"""
 
-    season_id = flask.request.args.get("season_id")
+    season_id = id
     if season_id == None:
         season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
     season = ClubQSeason.query.filter_by(id=season_id).order_by(ClubQSeason.id).one()
@@ -412,12 +413,12 @@ def spect_export_pdfs():
     return response
 
 
-@bp.route("/spectacles/<int:id>/generate_excel", methods=["GET", "POST"])
+@bp.route("/spectacles/<int:id>/generate_excels", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.club_q)
-def spect_export_excels(id: str):
+def spect_export_excels(id: int):
     """Export the excel spectacle resume for the given id season (or the actual one in the db)"""
 
-    season_id = flask.request.args.get("season_id")
+    season_id = id
     if season_id == None:
         season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value  # ID of the season to show
     season = ClubQSeason.query.filter_by(id=season_id).order_by(ClubQSeason.id).one()
@@ -621,6 +622,8 @@ def saisons() -> typing.RouteReturn:
             saison.debut = form_saison["debut"].data
             saison.fin = form_saison["fin"].data
             saison.fin_inscription = form_saison["fin_inscription"].data
+            saison.attributions_visible = form_saison["attributions_visible"].data
+
 
             db.session.add(saison)
             db.session.commit()
@@ -646,6 +649,7 @@ def saisons() -> typing.RouteReturn:
             saison.debut = form_saison["debut"].data
             saison.fin = form_saison["fin"].data
             saison.fin_inscription = form_saison["fin_inscription"].data
+            saison.attributions_visible = form_saison["attributions_visible"].data
 
             db.session.commit()
             flask.flash(_("Saison éditée."))
@@ -734,13 +738,27 @@ def attribution_manager() -> typing.RouteReturn:
             corruption = form_algo_setting["corruption"].data
 
             # Place attribution
-            voeux, pceens = attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption)
 
+            voeux_update, pceens = attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption)
+            #voeux = ClubQVoeu.query.filter_by(_season_id=season_id).order_by(ClubQVoeu.priorite).all()
             if save_results:  # Save algorithm results in database ?
+                """
+                app.logger.info("\n\n\n\n\n\n\n\n\n\n")
+                app.logger.info(voeux)
+                #Rollbacking to previous priorities
+                for voeu_update in voeux_update:
+                    for voeu in voeux:
+                        if voeu.id == voeu_update.id:
+                            app.logger.info(f"Before {voeu.priorite}, {voeu_update.priorite}")
+                            voeu.priorite = voeu_update.priorite
+                            app.logger.info(f"After {voeu.priorite}, {voeu_update.priorite}")
+                """
                 # Commit the changes to the database
                 db.session.commit()
                 flask.flash(_("Algorithme exécuté et résultats sauvegardés."))
             else:
+                # Rollback any changes proposed to the database
+                db.session.rollback()
                 flask.flash(_("Algorithme exécuté."))
 
             try:
@@ -1062,7 +1080,7 @@ def spect_generate_excel(id: int):
 
     # Set the appropriate headers for the response
     response.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    response.headers["Content-Disposition"] = f"attachment; filename=club_q_{spectacle.nom}.xlsx"
+    response.headers["Content-Disposition"] = f"inline; filename=club_q_{spectacle.nom}.xlsx"
 
     # Write the Excel data from the BytesIO buffer to the response
     response.data = excel_spectacle(spectacle, season, voeux_attrib, voeux_nan_attrib).getvalue()
@@ -1252,3 +1270,17 @@ def edit_text():
 
     flask.flash(_("Introduction mise à jour."))
     return flask.redirect(flask.url_for("club_q.main"))
+
+
+
+@bp.route("/saisons/attrib_visible/<int:id>", methods=["GET", "POST"])
+@context.permission_only(PermissionType.write, PermissionScope.club_q)
+def visible(id):
+    """
+    Change the boolean variable to show/hide attributions for all wishes in a Club Q season
+    """
+    season = ClubQSeason.query.get_or_404(id)
+    season.attributions_visible = False if season.attributions_visible else True
+    db.session.commit()
+    
+    return flask.redirect(flask.url_for("club_q.saisons"))
