@@ -794,8 +794,11 @@ def mails() -> typing.RouteReturn:
         .filter(subquery)
     )
 
-    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+    voeux = ClubQVoeu.query.filter_by(_season_id=season_id).filter(ClubQVoeu.places_attribuees > 0)
+    spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date)
+    salles = ClubQSalle.query.order_by(ClubQSalle.nom)
 
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
     form_mail = forms.Mail()
 
     # Get access to Club Q RIB
@@ -808,8 +811,20 @@ def mails() -> typing.RouteReturn:
         date = form_mail["date"].data
         subject = f"Attribution Club Q {saison.nom}"
         for pceen in pceens:
+            
+            voeux_pceen = voeux.filter_by(_pceen_id=pceen.id).all()
+            spectacles_list = []
+            
+            for voeu in voeux_pceen:
+                spectacle = spectacles.filter_by(id=voeu._spectacle_id).one()
+                salle = salles.filter_by(id=spectacle._salle_id).one()
+                spectacles_list.append([f"{spectacle.nom} - {spectacle.date} - {salle.nom} : {voeu.places_attribuees} places attribuée(s), pour {spectacle.unit_price*voeu.places_attribuees} €"])
+
+            if spectacles_list == []:
+                spectacles_list = None
+
             html_body = flask.render_template(
-                "club_q/mails/reservation.html", saison=saison, pceen=pceen, date=date, rib=rib
+                "club_q/mails/reservation.html", saison=saison, pceen=pceen, date=date, rib=rib, spectacles_list=spectacles_list
             )
 
             send_email(

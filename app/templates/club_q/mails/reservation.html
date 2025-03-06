@@ -2,9 +2,26 @@
 
 <div class="row mb-3">
   <div class="col">
-    <h2>{{ _("Réservations places Club Q %(nom)s", nom=saison.nom) }}</h2>
+    <h2>{{ _("Réservation places Club Q %(nom)s", nom=saison.nom) }}</h2>
   </div>
 </div>
+{% if spectacles_list == None %}
+<div class="row">
+  <div class="col">
+    <p>{{ _("Bonjour %(name)s,", name=pceen.prenom) }}</p>
+    <p>
+      {{ _("L'attribution de places pour cette saison du Club Q a été effectuée. Malheureusement, aucun spectacle n'a pu t'être attribué à cette saison et nous nous en excusons.") }}
+    </p>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <p>{{ _("Très bonne journée,") }}</p>
+    <p>{{ _("Le Club Q") }}</p>
+  </div>
+</div>
+
+{% else %}
 <div class="row">
   <div class="col">
     <p>{{ _("Bonjour %(name)s,", name=pceen.prenom) }}</p>
@@ -12,6 +29,15 @@
       {{ _("L'attribution de places pour cette saison du Club Q a été effectuée et tu peux retrouver les places qui
       t'ont été attribuées sur ")}}
       <a href="https://pc-est-magique.fr/club_q/pceens/{{pceen.id}}">{{ _("ta page personnelle") }}</a>.
+    </p>
+    <p>
+      {{ _("Voici les spectacles qu'y t'ont été attribués : ")}}
+      <ul>
+        {% for spect in spectacles_list %}
+        <li>{{spect[0]}}</li>
+        {% endfor %}
+      </ul> 
+
     </p>
   </div>
 </div>
@@ -45,5 +71,5 @@
     <p>{{ _("Le Club Q") }}</p>
   </div>
 </div>
-
+{% endif %}
 {% endblock %}

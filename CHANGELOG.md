@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - In Club Q module, the excel export button for Spectacles was returning an error
 - In Club Q module, the excel export route for one spectacle was misconfigured and returned all spectacles
 - In Club Q module, the attribution algorithm was modifying whishes priorities in database
+- In Club Q module, fixed the sending of e-mails for the attribution
 
 
 # v2.8.0 (2024-09-29)
