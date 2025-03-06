@@ -17,7 +17,7 @@ from app.models import (
 import os
 import datetime
 import wtforms
-from app.routes.panier_bio.utils import command_open, what_are_next_days, export_excel, get_period_id, validPeriodDates
+from app.routes.panier_bio.utils import command_open, what_are_next_days, export_excel, get_period_id, validPeriodDates, findPeriodId
 
 app = flask.Flask(__name__)
 
@@ -298,7 +298,14 @@ def admin() -> typing.RouteReturn:
             order = OrderPanierBio()
             db.session.add(order)
 
+            #Check if a compatible period can be found
+            period_id = findPeriodId(form["date"].data, all_periods)
+            if period_id == None:
+                flask.flash(_("No compatible period founded for choosen date."))
+                pass
+
             order.name = form["prenom"].data + " " + form["nom"].data
+            order._period_id = period_id
             order.service = form["service"].data
             order.phone_number = form["phone"].data
             order.payment_made = form["payed"].data
@@ -368,8 +375,9 @@ def period() -> typing.RouteReturn:
         edit = form["edit"].data
 
         #Check if starting and ending dates of periods adding/modification does not overlap with existing orders bio period
-        if not(validPeriodDates(form, periods)):
-            flask.flash(_("Les dates de la période chevauchent sur une période existante."), "danger")
+        valid, msg = validPeriodDates(form, periods)
+        if add and not valid:
+            flask.flash(msg, "danger")
 
         else:
             if add:
