@@ -808,9 +808,23 @@ def mails() -> typing.RouteReturn:
     rib = f"{src_rib}?{token_args}"
 
     if form_mail.validate_on_submit() and can_edit:
-        date = form_mail["date"].data
+
+        #Informations from the Mail form
+        date_payement = form_mail["date_payement"].data
+        date_SAV = form_mail["date_SAV"].data
+        link_SAV = form_mail["link_SAV"].data
+
+        #If there is a problem, send email from the x-th email
+        threshold = form_mail["threshold"].data
+        x = 0
+        
         subject = f"Attribution Club Q {saison.nom}"
         for pceen in pceens:
+          
+            #Sending email according to the x-th one
+            if threshold != 0 and x < threshold:
+                x+=1
+                continue
             
             voeux_pceen = voeux.filter_by(_pceen_id=pceen.id).all()
             spectacles_list = []
@@ -824,7 +838,7 @@ def mails() -> typing.RouteReturn:
                 spectacles_list = None
 
             html_body = flask.render_template(
-                "club_q/mails/reservation.html", saison=saison, pceen=pceen, date=date, rib=rib, spectacles_list=spectacles_list
+                "club_q/mails/reservation.html", saison=saison, pceen=pceen, date_payement=date_payement, date_SAV=date_SAV, link_SAV=link_SAV, rib=rib, spectacles_list=spectacles_list
             )
 
             send_email(
@@ -899,6 +913,7 @@ def pceen_id(id: int):
 
     spectacles = ClubQSpectacle.query.filter_by(_season_id=season_id).order_by(ClubQSpectacle.date).all()
     voeux = ClubQVoeu.query.filter_by(_season_id=season_id).filter_by(_pceen_id=pceen.id).order_by(ClubQVoeu.priorite)
+    saison = ClubQSeason.query.filter_by(id=season_id).one()
 
     pceens = (
         PCeen.query.join(PCeen.roles)
@@ -908,6 +923,10 @@ def pceen_id(id: int):
 
     saisons = ClubQSeason.query.order_by(desc(ClubQSeason.debut)).all()
 
+    show_attribution = 0
+    if saison.attributions_visible or context.g.pceen.has_permission(PermissionType.write, PermissionScope.club_q):
+        show_attribution = 1
+    
     user = context.g.pceen
     if user == pceen:
         view = "pceen_reservations"
@@ -949,6 +968,7 @@ def pceen_id(id: int):
         form_add_voeu=form_add_voeu,
         form_edit_voeu=form_edit_voeu,
         nb_voeux=voeux.count(),
+        show_attribution=show_attribution
     )
 
 

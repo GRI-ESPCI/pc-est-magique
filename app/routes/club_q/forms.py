@@ -108,9 +108,11 @@ class Mail(FlaskForm):
         _l("Adresse e-mail de réponse"),
         validators=[DataRequired(), Length(max=120), Email()],
     )
-    date = html5.DateField("Date de payement", validators=[DataRequired()])
+    date_payement = html5.DateField("Date de payement", validators=[DataRequired()])
+    date_SAV = html5.DateField("Date limite SAV", validators=[DataRequired()])
+    link_SAV = html5.URLField("Lien du SAV", validators=[DataRequired()])
     threshold = wtforms.IntegerField(
-        "Envoyer à partir du x-ème email (à utiliser en cas de bug)", validators=[Optional()]
+        "Envoyer à partir du x-ème email (à utiliser en cas de bug)", default=0, validators=[Optional()]
     )
     submit_mail = wtforms.SubmitField(_l("Envoyer les e-mails"))
 
