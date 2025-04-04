@@ -31,7 +31,7 @@
       <a href="https://pc-est-magique.fr/club_q/pceens/{{pceen.id}}">{{ _("ta page personnelle") }}</a>.
     </p>
     <p>
-      {{ _("Voici les spectacles qu'y t'ont été attribués : ")}}
+      {{ _("Voici les spectacles qui t'ont été attribués : ")}}
       <ul>
         {% for spect in spectacles_list %}
         <li>{{spect[0]}}</li>
@@ -44,18 +44,23 @@
 <div class="row">
   <div class="col">
     <p>
-      {{ _("Concernant le paiement, merci de le faire avant le %(date_here)s pour faciliter le travail du trésorier du
-      Club Q. Deux moyens de paiement sont possibles :", date_here=date) }}
+      {{ _("Le SAV est ouvert jusqu'au %(date_sav_here)s <a href=%(link_SAV_here)s>au lien suivant</a>.", date_sav_here=date_SAV, link_SAV_here=link_SAV) }}
+    </p>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <p>
+      {{ _("Concernant le paiement, merci de le faire avant le %(date_p_here)s pour faciliter le travail du trésorier du
+      Club Q. Deux moyens de paiement sont possibles :", date_p_here=date_payement) }}
     </p>
     <ul class="mb-4">
       <li>
-        {{ _("Par chèque à l’ordre du « BDE Physique Chimie Paris Club Q » (une enveloppe dédiée est accrochée au mur du
-        foyer). Au dos mets-y <b>Prénom-Nom-Promo-Saison/spectacles</b>.") }}
+        {{ _("Par chèque à l’ordre du « BDE Physique Chimie Paris Club Q » (une enveloppe dédiée est accrochée sur la porte du local BDE au foyer). Au dos mets-y <b>Prénom-Nom-Promo-Saison/spectacles</b>.") }}
       </li>
       <li>
         {{ _("Par virement bancaire, avec les mêmes informations que les chèques (Prénom Nom Promo Saison). La référence
-        du virement est super importante sinon on s’y retrouve plus ! C’est le BDE qui se récolte la compta des
-        virements, alors on préfère les chèques.") }}
+        du virement est super importante sinon on ne pourra pas t'attribuer le virement.") }}
       </li>
     </ul>
     <img

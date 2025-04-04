@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2025-03-06 17:20+0100\n"
+"POT-Creation-Date: 2025-04-04 16:15+0200\n"
 "PO-Revision-Date: 2022-10-29 03:04+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
@@ -440,7 +440,7 @@ msgstr "Date"
 
 #: app/routes/bekk/forms.py:20 app/routes/club_q/forms.py:46
 #: app/routes/club_q/forms.py:67 app/routes/club_q/forms.py:80
-#: app/routes/club_q/forms.py:95 app/routes/club_q/forms.py:124
+#: app/routes/club_q/forms.py:95 app/routes/club_q/forms.py:126
 #: app/templates/gris/roles.html:203
 msgid "Ajouter"
 msgstr "Add"
@@ -464,7 +464,7 @@ msgstr "Edit"
 msgid "Supprimer"
 msgstr "Delete"
 
-#: app/routes/bekk/routes.py:48 app/routes/club_q/routes.py:1186
+#: app/routes/bekk/routes.py:48 app/routes/club_q/routes.py:1206
 msgid "Aucun fichier choisi."
 msgstr "No choosen file"
 
@@ -487,7 +487,7 @@ msgstr "Edited Bekk."
 msgid "Page du Bekk ESPCI"
 msgstr "ESPCI Bekk newspaper"
 
-#: app/routes/bekk/routes.py:158 app/routes/club_q/routes.py:1286
+#: app/routes/bekk/routes.py:158 app/routes/club_q/routes.py:1306
 #: app/routes/panier_bio/routes.py:460 app/routes/theatre/routes.py:46
 #, fuzzy
 msgid "Introduction mise à jour."
@@ -545,15 +545,15 @@ msgstr "Discontent"
 msgid "Adresse e-mail de réponse"
 msgstr "Reply-to email address"
 
-#: app/routes/club_q/forms.py:115
+#: app/routes/club_q/forms.py:117
 #, fuzzy
 msgid "Envoyer les e-mails"
 msgstr "Send e-mails"
 
-#: app/routes/club_q/forms.py:122 app/routes/club_q/routes.py:1172
+#: app/routes/club_q/forms.py:124 app/routes/club_q/routes.py:1192
 #, fuzzy
 msgid "Saison"
-msgstr "Seasons"
+msgstr "Season"
 
 #: app/routes/club_q/routes.py:100
 #, fuzzy
@@ -627,7 +627,7 @@ msgstr "Deleted season."
 msgid "Saison éditée."
 msgstr "Edited season."
 
-#: app/routes/club_q/routes.py:724 app/routes/club_q/routes.py:879
+#: app/routes/club_q/routes.py:724 app/routes/club_q/routes.py:893
 #: app/routes/panier_bio/routes.py:289
 #, fuzzy
 msgid "Mis à jour."
@@ -641,34 +641,34 @@ msgstr "Executed algorithm and saved results."
 msgid "Algorithme exécuté."
 msgstr "Executed algorithm."
 
-#: app/routes/club_q/routes.py:853 app/routes/panier_bio/routes.py:253
+#: app/routes/club_q/routes.py:867 app/routes/panier_bio/routes.py:253
 msgid "Visibilité de la page de réservation"
 msgstr "Show booking page"
 
-#: app/routes/club_q/routes.py:861 app/templates/cards/club_q_accueil.html:9
+#: app/routes/club_q/routes.py:875 app/templates/cards/club_q_accueil.html:9
 #, fuzzy
 msgid "Saison actuelle"
 msgstr "Current season"
 
-#: app/routes/club_q/routes.py:938
+#: app/routes/club_q/routes.py:957
 #, fuzzy
 msgid "Récapitulatif - "
 msgstr "Summary"
 
-#: app/routes/club_q/routes.py:1191
+#: app/routes/club_q/routes.py:1211
 msgid "Il y a déjà une plaquette associée à cette saison."
 msgstr "There is already a brochure for this season."
 
-#: app/routes/club_q/routes.py:1206
+#: app/routes/club_q/routes.py:1226
 #, fuzzy
 msgid "Plaquette ajoutée."
 msgstr "Added brochure."
 
-#: app/routes/club_q/routes.py:1215
+#: app/routes/club_q/routes.py:1235
 msgid "Plaquettes Club Q"
 msgstr "Club Q Brochures"
 
-#: app/routes/club_q/routes.py:1273
+#: app/routes/club_q/routes.py:1293
 #, fuzzy
 msgid "Plaquette supprimée."
 msgstr "Deleted brochure."
@@ -1690,7 +1690,7 @@ msgstr "Mail address:"
 #: app/templates/auth/mails/account_registered.html:45
 #: app/templates/auth/mails/reset_password.html:42
 #: app/templates/club_q/mails/reservation.html:19
-#: app/templates/club_q/mails/reservation.html:70
+#: app/templates/club_q/mails/reservation.html:75
 #: app/templates/gris/mails/role_switch.html:65
 #: app/templates/payments/mails/internet_cut.html:80
 #: app/templates/payments/mails/new_subscription.html:50
@@ -2606,7 +2606,7 @@ msgstr "No. of wanted seats"
 msgid "Éditer le mécontement"
 msgstr "Edit discontent"
 
-#: app/templates/club_q/id/pceen.html:322
+#: app/templates/club_q/id/pceen.html:326
 #: app/templates/club_q/id/salle.html:335
 #: app/templates/club_q/id/spectacle.html:277
 #: app/templates/club_q/pceens.html:233
@@ -2620,10 +2620,10 @@ msgstr "Total:"
 msgid "Nb de PCéens : "
 msgstr "No. of PCéens: "
 
-#: app/templates/club_q/id/pceen.html:324
-#: app/templates/club_q/id/pceen.html:326
-#: app/templates/club_q/id/pceen.html:329
+#: app/templates/club_q/id/pceen.html:328
 #: app/templates/club_q/id/pceen.html:330
+#: app/templates/club_q/id/pceen.html:337
+#: app/templates/club_q/id/pceen.html:338
 #: app/templates/club_q/id/salle.html:337
 #: app/templates/club_q/id/salle.html:338
 #: app/templates/club_q/id/salle.html:339
@@ -2788,7 +2788,7 @@ msgstr "Allocated"
 msgid "Prix total"
 msgstr "Total price"
 
-#: app/templates/club_q/id/pceen.html:292
+#: app/templates/club_q/id/pceen.html:296
 #: app/templates/club_q/id/spectacle.html:248
 #: app/templates/club_q/voeux.html:235
 msgid "Éditer le voeu"
@@ -2841,7 +2841,12 @@ msgstr "Pl."
 msgid "Rest."
 msgstr "Rem."
 
-#: app/templates/club_q/id/pceen.html:323
+#: app/templates/club_q/id/pceen.html:285
+#: app/templates/club_q/id/pceen.html:334
+msgid "En attente"
+msgstr "Coming soon"
+
+#: app/templates/club_q/id/pceen.html:327
 msgid "Nb de voeux : "
 msgstr "Nb of whishes: "
 
@@ -2931,7 +2936,7 @@ msgstr ""
 "whish could be accomplished and we are sorry about that."
 
 #: app/templates/club_q/mails/reservation.html:20
-#: app/templates/club_q/mails/reservation.html:71
+#: app/templates/club_q/mails/reservation.html:76
 msgid "Le Club Q"
 msgstr "Club Q"
 
@@ -2949,41 +2954,52 @@ msgid "ta page personnelle"
 msgstr "your personal page"
 
 #: app/templates/club_q/mails/reservation.html:34
-msgid "Voici les spectacles qu'y t'ont été attribués : "
+#, fuzzy
+msgid "Voici les spectacles qui t'ont été attribués : "
 msgstr "This is the list of the spectacles where you got a place: "
 
 #: app/templates/club_q/mails/reservation.html:47
 #, python-format
 msgid ""
-"Concernant le paiement, merci de le faire avant le %(date_here)s pour "
+"Le SAV est ouvert jusqu'au %(date_sav_here)s <a href=%(link_SAV_here)s>au"
+" lien suivant</a>."
+msgstr ""
+"SAV is open until %(date_sav_here)s <a href=%(link_SAV_here)s>with the "
+"following link</a>"
+
+#: app/templates/club_q/mails/reservation.html:54
+#, fuzzy, python-format
+msgid ""
+"Concernant le paiement, merci de le faire avant le %(date_p_here)s pour "
 "faciliter le travail du trésorier du\n"
 "      Club Q. Deux moyens de paiement sont possibles :"
 msgstr ""
-"The payment should be made before the %(date_here)s. Two means of payment"
-" are possible:"
+"The payment should be made before the %(date_p_here)s. Two means of "
+"payment are possible:"
 
-#: app/templates/club_q/mails/reservation.html:52
+#: app/templates/club_q/mails/reservation.html:59
+#, fuzzy
 msgid ""
 "Par chèque à l’ordre du « BDE Physique Chimie Paris Club Q » (une "
-"enveloppe dédiée est accrochée au mur du\n"
-"        foyer). Au dos mets-y <b>Prénom-Nom-Promo-Saison/spectacles</b>."
+"enveloppe dédiée est accrochée sur la porte du local BDE au foyer). Au "
+"dos mets-y <b>Prénom-Nom-Promo-Saison/spectacles</b>."
 msgstr ""
 "By cheque with the order 'BDE Physique Chimie Paris Club Q'. You can "
 "deposit it in an enveloppe in the student building. On the back you "
 "should put <b>First name-Name-Promo-Season/spectacles</b>."
 
-#: app/templates/club_q/mails/reservation.html:56
+#: app/templates/club_q/mails/reservation.html:62
+#, fuzzy
 msgid ""
 "Par virement bancaire, avec les mêmes informations que les chèques "
 "(Prénom Nom Promo Saison). La référence\n"
-"        du virement est super importante sinon on s’y retrouve plus ! "
-"C’est le BDE qui se récolte la compta des\n"
-"        virements, alors on préfère les chèques."
+"        du virement est super importante sinon on ne pourra pas "
+"t'attribuer le virement."
 msgstr ""
-"By bank transfer, with the same informations as the cheque. If any of its"
-" two means is not possible, please contact the Club Q treasurer."
+"By bank transfer, with the same informations as the cheque. If any of "
+"this two means is not possible, please contact the Club Q treasurer."
 
-#: app/templates/club_q/mails/reservation.html:63
+#: app/templates/club_q/mails/reservation.html:68
 msgid "RIB Club Q"
 msgstr "RIB Club Q"
 
@@ -3839,7 +3855,9 @@ msgstr "At the payement validation ;"
 
 #: app/templates/main/changelog.html:147
 msgid "Un mois avant, une semaine avant et le jour d'expiration d'un abonnement."
-msgstr "A month before, a week before and on the day of the subscription expiration."
+msgstr ""
+"A month before, a week before and on the day of the subscription "
+"expiration."
 
 #: app/templates/main/changelog.html:151
 msgid "Ajout de la possibilité de modifier : "
@@ -3867,7 +3885,9 @@ msgid ""
 "La langue préférée (français ou anglais, selon les paramètres du "
 "navigateur) est enregistrée pour chaque PCéen, et utilisée pour l'envoi "
 "des mails."
-msgstr "Favorite language (depending on navigator) is registered and used for sending emails."
+msgstr ""
+"Favorite language (depending on navigator) is registered and used for "
+"sending emails."
 
 #: app/templates/main/changelog.html:164
 msgid "Ajout d'un mode maintenance activable par les GRI."
@@ -3881,7 +3901,9 @@ msgstr "Added GRI page to execute a script."
 msgid ""
 "L'IntraRez est maintenant utilisable depuis l'extérieur de la Rezidence, "
 "à l'adresse "
-msgstr "The IntraRez is now accessible from the exterior of the Rezidence, by the adress "
+msgstr ""
+"The IntraRez is now accessible from the exterior of the Rezidence, by the"
+" adress "
 
 #: app/templates/main/changelog.html:177
 msgid "(sauf pour la création de compte)."

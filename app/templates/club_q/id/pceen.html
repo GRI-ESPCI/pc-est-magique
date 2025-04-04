@@ -279,7 +279,11 @@
           <td>{{ voeu.priorite }}</td>
           <td>{{ voeu.places_demandees }}</td>
           <td>{{ voeu.places_minimum }}</td>
+          {% if show_attribution %}
           <td>{{ voeu.places_attribuees }}</td>
+          {% else %}
+          <td>{{ _("En attente") }}</td>
+          {% endif %}
           {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
           <td>{{ voeu.spectacle.nb_tickets}}</td>
           <td>{{ voeu.spectacle.nb_tickets - voeu.spectacle.sum_places_attribuees}}</td>
@@ -324,7 +328,11 @@
           <td><b>{{ _("-") }}</b></td>
           <td><b>{{ total_places_demandees }}</b></td>
           <td><b>{{ _("-") }}</b></td>
+          {% if show_attribution %}
           <td><b>{{ total_places_attribuees }}</b></td>
+          {% else %}
+          <td><b>{{ _("En attente") }}</b></td>
+          {% endif %}
           {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
           <td><b>{{ _("-") }}</b></td>
           <td><b>{{ _("-") }}</b></td>
