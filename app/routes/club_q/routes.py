@@ -820,7 +820,7 @@ def mails() -> typing.RouteReturn:
         
         subject = f"Attribution Club Q {saison.nom}"
         for pceen in pceens:
-
+          
             #Sending email according to the x-th one
             if threshold != 0 and x < threshold:
                 x+=1
