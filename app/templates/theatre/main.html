@@ -23,10 +23,12 @@
 
 <div class="row mb-3">
   <p align="center">
-    <img src="/theatre_posters/aff_saison.jpg", alt="{{ _("Affiche Saison Théâtrale") }}" width="30%" />
+    <img src="/theatre_posters/aff_saison.jpg", alt="{{ _('Affiche Saison Théâtrale') }}" width="30%" />
   </p>
+</div>
 
-  {% for spect in spectacles %}
+{% for spect in spectacles %}
+<div class="row-mb-3">
   <hr align="CENTER" />
   <div class="row mb-3">
     <h2>{{ spect.name }}</h2>
@@ -37,11 +39,7 @@
       </i>
     </p>
     <p align="center">
-      <img
-        src="/theatre_posters/{{ spect.image_name }}.jpg"
-        ,
-        width="30%"
-      />
+      <img src="/theatre_posters/{{ spect.image_name }}.jpg" width="30%" />
     </p>
 
     <h5>{{ _("Synopsis")}}</h5>
