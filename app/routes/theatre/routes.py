@@ -2,18 +2,32 @@
 
 import flask, os
 from flask_babel import _
+from flask_migrate import current
 
 from app import context, db
-from app.models import PermissionScope, PermissionType, Spectacle
+from app.models import (
+    PermissionScope,
+    PermissionType,
+    Spectacle,
+    Saison
+)
 from app.routes.theatre import bp
 from app.utils import typing
 
 
 @bp.route("")
 @bp.route("/")
-def main() -> typing.RouteReturn:
+@bp.route("/<saison_id>")
+def main(saison_id="") -> typing.RouteReturn:
     """PC est magique profile page."""
-    spectacles = Spectacle.query.order_by(Spectacle.id).all()
+    saisons = Saison.query.order_by(Saison.start_date.desc()).all()
+
+    if saison_id == "":
+        current_saison = saisons[0]
+    else:
+        current_saison = Saison.query.get(saison_id)
+        if current_saison == None:
+            flask.abort(404)
 
     can_edit = context.has_permission(PermissionType.write, PermissionScope.theatre)
 
@@ -28,10 +42,11 @@ def main() -> typing.RouteReturn:
     return flask.render_template(
         "theatre/main.html",
         title=_("Saison Théâtrale du Club Théâtre"),
-        spectacles=spectacles,
         can_edit=can_edit,
         folder=folder,
         html_file=html_file,
+        saisons=saisons,
+        current_saison=current_saison
     )
 
 

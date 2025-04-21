@@ -86,6 +86,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.jinja_env.globals["copyright"] = in_app_copyright
     app.jinja_env.globals["babel"] = flask_babel
     app.jinja_env.globals["Settings"] = global_settings.Settings
+    app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 
     # Register blueprints
     # ! Keep imports here to avoid circular import issues !
