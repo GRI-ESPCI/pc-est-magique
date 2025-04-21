@@ -26,7 +26,7 @@ class Saison(db.Model):
     name: Column[str] = column(sa.String(120), nullable=False)
     description: Column[str | None] = column(sa.String(2000), nullable=True)
     image_name: Column[str | None] = column(sa.String(120), nullable=True)
-    start_date: Column[date] = column(sa.Date(), nullable=False)
+    start_date: Column[datetime.date] = column(sa.Date(), nullable=False)
 
     spectacles: Relationship[list[Representation]] = one_to_many(
         "Spectacle.saison"

@@ -21,29 +21,38 @@
 
 {% endif %} {% endblock %} {% block app_content %}
 
-<div class="btn-group" role="group">
-  {% for s in saisons %}
-    {% if loop.index == 6 %}{% break %}{% endif %}
-    {% if s.id == current_saison.id %}
-    <a href="{{ url_for('theatre.main', saison_id=s.id)}}" class="btn btn-danger" role="button">{{s.name}}</a>
-    {% else %}
-    <a href="{{ url_for('theatre.main', saison_id=s.id)}}" class="btn btn-outline-danger" role="button">{{s.name}}</a>
+<div class="btn-toolbar justify-content-between">
+  <div class="btn-group" role="group">
+    {% for s in saisons %}
+      {% if loop.index == 6 %}{% break %}{% endif %}
+      {% if s.id == current_saison.id %}
+      <a href="{{ url_for('theatre.main', saison_id=s.id)}}" class="btn btn-danger" role="button">{{s.name}}</a>
+      {% else %}
+      <a href="{{ url_for('theatre.main', saison_id=s.id)}}" class="btn btn-outline-danger" role="button">{{s.name}}</a>
+      {% endif %}
+    {% endfor %}
+    {% if saisons|length >= 6 %}
+      <button class="btn btn-danger dropdown-toggle" type="button" id="oldSeasonsBtn" data-bs-toggle="dropdown" aria-expanded="false">
+        {{ _("Anciennes saisons") }}
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="oldSeasonsBtn">
     {% endif %}
-  {% endfor %}
-  {% if saisons|length >= 6 %}
-    <button class="btn btn-danger dropdown-toggle" type="button" id="oldSeasonsBtn" data-bs-toggle="dropdown" aria-expanded="false">
-      {{ _("Anciennes saisons") }}
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="oldSeasonsBtn">
-  {% endif %}
-  {% for s in saisons %}
-    {% if loop.index >= 6 %}
-      <li><a href="{{ url_for('theatre.main', saison_id=s.id)}}" class="dropdown-item">{{s.name}}</a></li>
+    {% for s in saisons %}
+      {% if loop.index >= 6 %}
+        <li><a href="{{ url_for('theatre.main', saison_id=s.id)}}" class="dropdown-item">{{s.name}}</a></li>
+      {% endif %}
+    {% endfor%}
+    {% if saisons|length >= 6 %}
+      </ul>
     {% endif %}
-  {% endfor%}
-  {% if saisons|length >= 6 %}
-    </ul>
-  {% endif %}
+  </div>
+  <div data-bs-toggle="tooltip" data-bs-placement="right" title="{{ _('Administration') }}">
+    <a href="{{ url_for('theatre.admin') }}" class="btn btn-danger" role="button">
+      <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+            {{ macros.bootstrap_icon("gear-fill") }}
+      </svg>
+    </a>
+  </div>
 </div>
 
 <p></p>

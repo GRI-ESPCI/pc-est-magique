@@ -1,8 +1,10 @@
 """PC est magique - Theater Pages Routes"""
 
-import flask, os
+import os
+
+import flask
+from flask import url_for
 from flask_babel import _
-from flask_migrate import current
 
 from app import context, db
 from app.models import (
@@ -11,6 +13,7 @@ from app.models import (
     Spectacle,
     Saison
 )
+from app.routes.theatre.forms import EditSaison
 from app.routes.theatre import bp
 from app.utils import typing
 
@@ -60,3 +63,54 @@ def edit_text():
 
     flask.flash(_("Introduction mise à jour."))
     return flask.redirect(flask.url_for("theatre.main"))
+
+@bp.route("/admin")
+@context.permission_only(PermissionType.write, PermissionScope.theatre)
+def admin():
+
+    saisons = Saison.query.order_by(Saison.start_date.desc()).all()
+
+    return flask.render_template(
+        "theatre/admin.html",
+        saisons=saisons
+    )
+
+@bp.route("/admin/saison/<id>")
+@context.permission_only(PermissionType.write, PermissionScope.theatre)
+def admin_saison(id: int):
+
+    saison = Saison.query.get(id)
+    if saison is None:
+        flask.abort(404)
+
+    return flask.render_template(
+        "theatre/admin_saison.html",
+        saison=saison
+    )
+
+@bp.route("/admin/saison/edit/<id>", methods=["GET", "POST"])
+@context.permission_only(PermissionType.write, PermissionScope.theatre)
+def admin_saison_edit(id: int):
+
+    saison = Saison.query.get(id)
+    if saison is None:
+        flask.abort(404)
+
+    form = EditSaison(obj=saison)
+
+    if form.validate_on_submit():
+        saison.name = form.name.data
+        saison.description = form.description.data
+        saison.start_date = form.start_date.data
+
+        db.session.commit()
+
+        return flask.redirect(
+            url_for("theatre.admin_saison", id=saison.id)
+        )
+
+    return flask.render_template(
+        "theatre/admin_saison_edit.html",
+        saison=saison,
+        form=form
+    )

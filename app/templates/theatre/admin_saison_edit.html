@@ -1,0 +1,38 @@
+{% extends "base.html" %} {% block styles %}{{ super() }}{% endblock %}
+
+{% block app_content %}
+
+<div class="row mb-3">
+    <h1>{{ _("Théâtre - Administration") }}</h1>
+</div>
+
+<hr>
+
+<div class="row mb-3">
+    <h2>{{ _("Édition de") }} {{ saison.name }}</h2>
+</div>
+
+<div class="row mb-3">
+    <form method="POST" action="{{ url_for('theatre.admin_saison_edit', id=saison.id) }}">
+        {{ form.csrf_token }}
+
+        <div class="mb-3">
+            {{ form.name.label(class="form-label")}} 
+            {{ form.name(class="form-control") }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.description.label(class="form-label")}} 
+            {{ form.description(class="form-control", rows=5) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.start_date.label(class="form-label")}} 
+            {{ form.start_date(class="form-control", type="date") }}
+        </div>
+
+        <input type="submit" class="btn btn-primary" value="{{ _('Valider') }}">
+    </form>
+</div>
+
+{% endblock %}
