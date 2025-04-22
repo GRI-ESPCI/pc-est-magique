@@ -88,6 +88,30 @@ def admin_saison(id: int):
         saison=saison
     )
 
+@bp.route("/admin/saison/new", methods=["GET", "POST"])
+@context.permission_only(PermissionType.write, PermissionScope.theatre)
+def admin_saison_new():
+
+    form = EditSaison()
+
+    if form.validate_on_submit():
+        saison = Saison()
+        saison.name = form.name.data
+        saison.description = form.description.data
+        saison.start_date = form.start_date.data
+
+        db.session.add(saison)
+        db.session.commit()
+
+        return flask.redirect(
+            url_for("theatre.admin_saison", id=saison.id)
+        )
+
+    return flask.render_template(
+        "theatre/admin_saison_new.html",
+        form=form
+    )
+
 @bp.route("/admin/saison/edit/<id>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin_saison_edit(id: int):
