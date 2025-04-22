@@ -1,0 +1,82 @@
+{% extends "base.html" %} {% block styles %}{{ super() }}{% endblock %}
+
+{% block app_content %}
+
+<div class="row mb-3">
+    <h1>{{ _("Théâtre - Administration") }}</h1>
+</div>
+
+<div class="row mb-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('theatre.admin') }}">{{ _("Page admin") }}</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('theatre.admin_saison', id=spectacle.saison.id) }}">{{ spectacle.saison.name}}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {{ spectacle.name }}
+            </li>
+        </ol>
+    </nav>
+</div>
+
+<hr>
+
+<div class="row mb-3">
+    <div class="btn-toolbar justify-content-between">
+        <h2>{{ spectacle.name }}</h2>
+        <div data-bs-toggle="tooltip" data-bs-placement="right" title="{{ _('Modifier') }}">
+            <a href="" class="btn btn-primary" role="button">
+                <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                    {{ macros.bootstrap_icon("pen") }}
+                </svg>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <p><i>{{ _("Une pièce écrite par %(author)s et montée par %(director)s", author=spectacle.author,
+            director=spectacle.director) }}.</i></p>
+</div>
+
+<div class="row mb-3">
+    <div class="center">
+        <img src="/theatre/{{ spectacle.image_name }}" alt="{{ _('Affiche de la pièce') }} {{ spectacle.name }}"
+            style="max-height: 30em;">
+    </div>
+</div>
+
+<div class="row mb-3">
+    <h3>{{ _("Synopsis") }}</h3>
+    {% if spectacle.description is none %}
+    <p>{{ _("Pas de description.") }}</p>
+    {% else %}
+    <p>{{ spectacle.description }}</p>
+    {% endif %}
+</div>
+
+<div class="row mb-3">
+    <p>{{ _("Billeterie :") }} <a href="" {{ spectacle.billeterie }}></a></p>
+</div>
+
+<div class="row mb-3">
+    <p>{{ _("Réservation des places :") }} <a href="" {{ spectacle.places }}></a></p>
+</div>
+
+<div class="row mb-3">
+    <h3>{{ _("Listes des représentations") }}</h3>
+    {% if spectacle.representations|length %}
+    <ul>
+        {% for r in spectacle.representations %}
+            <li>{{ spectacle.date.strformat("%A %d %m %Y") }}</li>
+        {% endfor%}
+    </ul>
+    {% else %}
+    <p>{{ _("Pas de représentations prévues pour le moment.") }}</p>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -138,3 +138,15 @@ def admin_saison_edit(id: int):
         saison=saison,
         form=form
     )
+
+@bp.route("/admin/spectacle/<id>")
+@context.permission_only(PermissionType.write, PermissionScope.theatre)
+def admin_spectacle(id: int):
+    spectacle = Spectacle.query.get(id)
+    if spectacle is None:
+        flask.abort(404)
+    
+    return flask.render_template(
+        "theatre/admin_spectacle.html",
+        spectacle=spectacle
+    )
