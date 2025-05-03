@@ -55,7 +55,7 @@
     <div class="btn-toolbar justify-content-between">
         <h2>{{ spectacle.name }}</h2>
         <div data-bs-toggle="tooltip" data-bs-placement="right" title="{{ _('Modifier') }}">
-            <a href="" class="btn btn-primary" role="button">
+            <a href="{{ url_for('theatre.admin_spectacle_edit', id=spectacle.id) }}" class="btn btn-primary" role="button">
                 <svg class="bi flex-shrink-0" width="24" height="24" role="img">
                     {{ macros.bootstrap_icon("pen") }}
                 </svg>
@@ -114,11 +114,11 @@
 </div>
 
 <div class="row mb-3">
-    <p>{{ _("Billeterie :") }} <a href="" {{ spectacle.billeterie }}></a></p>
+    <p>{{ _("Billeterie :") }} <a href="{{ spectacle.ticket_link }}" >{{ spectacle.ticket_link }}</a></p>
 </div>
 
 <div class="row mb-3">
-    <p>{{ _("Réservation des places :") }} <a href="" {{ spectacle.places }}></a></p>
+    <p>{{ _("Réservation des places :") }} <a href="{{ spectacle.places }}">{{ spectacle.places }}</a></p>
 </div>
 
 <div class="row mb-3">
