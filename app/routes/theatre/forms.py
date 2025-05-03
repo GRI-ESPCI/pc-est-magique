@@ -2,6 +2,7 @@
 
 import wtforms
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed, FileRequired
 from flask_babel import lazy_gettext as _l
 from wtforms.validators import DataRequired, Length
 
@@ -27,5 +28,15 @@ class EditSaison(FlaskForm):
         _l("Date de début"),
         validators=[
             DataRequired()
+        ]
+    )
+
+class SendPicture(FlaskForm):
+    """WTForm to send pictures"""
+
+    picture = wtforms.FileField(
+        _l("Photo à téléverser"),
+        validators=[
+            FileRequired()
         ]
     )

@@ -1,9 +1,12 @@
 """PC est magique - Theater Pages Routes"""
 
 import os
+import mimetypes
+import pathlib
 
+from babel.util import missing
 import flask
-from flask import url_for
+from flask import url_for, request, current_app
 from flask_babel import _
 
 from app import context, db
@@ -13,7 +16,7 @@ from app.models import (
     Spectacle,
     Saison
 )
-from app.routes.theatre.forms import EditSaison
+from app.routes.theatre.forms import EditSaison, SendPicture
 from app.routes.theatre import bp
 from app.utils import typing
 
@@ -83,9 +86,12 @@ def admin_saison(id: int):
     if saison is None:
         flask.abort(404)
 
+    picture_form = SendPicture()
+
     return flask.render_template(
         "theatre/admin_saison.html",
-        saison=saison
+        saison=saison,
+        picture_form=picture_form
     )
 
 @bp.route("/admin/saison/new", methods=["GET", "POST"])
@@ -150,3 +156,68 @@ def admin_spectacle(id: int):
         "theatre/admin_spectacle.html",
         spectacle=spectacle
     )
+
+@bp.route("/admin/picture_upload/<type>/<id>", methods=["POST"])
+@context.permission_only(PermissionType.write, PermissionScope.theatre)
+def picture_upload(type: str, id: int):
+    """
+    Handle picture uploading for season and spectacle posters.
+
+    Path structure:
+
+    - `saison_<id>/saison_<id>.<jpg|png>` for season poster
+    - `saison_<id>/spectacle_<id>.<jpg|png>` for spectacle poster
+    """
+
+    next_url = request.args.get('next_url')
+    form = SendPicture()
+
+    if form.validate_on_submit():
+
+        ext = form.picture.data.filename.split(".")[-1]
+
+        if type == "saison":
+            saison = Saison.query.get(id)
+            if saison is None:
+                flask.abort(404)
+            old_filename = f"saison_{saison.id}.{saison.image_extension}"
+            filename = f"saison_{saison.id}.{ext}"
+            path = f"saison_{saison.id}/"
+
+            # Remove old picture
+            pathlib.Path(os.path.join(
+                current_app.config['THEATRE_BASE_PATH'],
+                path,
+                old_filename
+            )).unlink(missing_ok=True)
+
+            # Create folder
+            pathlib.Path(os.path.join(
+                current_app.config['THEATRE_BASE_PATH'],
+                path
+            )).mkdir(parents=True, exist_ok=True)
+
+            # Save new picture
+            form.picture.data.save(
+                os.path.join(
+                    current_app.config['THEATRE_BASE_PATH'],
+                    path,
+                    filename
+                )
+            )
+
+            saison.image_extension = ext
+            db.session.commit()
+
+        elif type == "spectacle":
+            pass
+        else:
+            flask.flash(_("Type de téléversement non valide."))
+            return flask.redirect(next_url)
+            
+        flask.flash(_("Image téléversée."), category="success")
+    else:
+        flask.flash(_("Erreur lors du téléversement de l'image."), category="error")
+
+
+    return flask.redirect(next_url)
