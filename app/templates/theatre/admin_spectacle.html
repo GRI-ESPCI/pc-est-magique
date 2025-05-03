@@ -1,4 +1,31 @@
-{% extends "base.html" %} {% block styles %}{{ super() }}{% endblock %}
+{% extends "base.html" %}
+
+{% block styles %}
+
+{{ super() }}
+
+<style>
+    .btn-hover-container {
+        position: relative;
+    }
+    .btn-hover {
+        transition: .5s ease;
+        opacity: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+    .btn-hover-container:hover img {
+        opacity: 0.3;
+    }
+    .btn-hover-container:hover .btn-hover {
+        opacity: 1;
+    }
+</style>
+
+{% endblock %}
 
 {% block app_content %}
 
@@ -43,9 +70,37 @@
 </div>
 
 <div class="row mb-3">
-    <div class="center">
-        <img src="/theatre/{{ spectacle.image_name }}" alt="{{ _('Affiche de la pièce') }} {{ spectacle.name }}"
+    <div class="text-center btn-hover-container">
+        <img src="/theatre_posters/saison_{{ spectacle.saison.id }}/spectacle_{{ spectacle.id }}.{{ spectacle.image_extension }}" alt="{{ _('Affiche de la pièce') }} {{ spectacle.name }}"
             style="max-height: 30em;">
+        <div class="btn-hover">
+        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#poster-modal">
+            <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                {{ macros.bootstrap_icon("pen") }}
+            </svg>
+        </button>
+    </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" id="poster-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('theatre.picture_upload', type='spectacle', id=spectacle.id, next_url=url_for('theatre.admin_spectacle', id=spectacle.id)) }}" method="post" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5>{{ _("Modification du poster du spectacle") }}</h5>
+                </div>
+                <div class="modal-body">
+                    {{ picture_form.csrf_token }}
+                    {{ picture_form.picture.label(class="form-label") }}
+                    {{ picture_form.picture(class="form-control", accept="image/png, image/jpeg") }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Annuler") }}</button>
+                    <input type="submit" class="btn btn-primary" value="{{ _('Sauvegarder') }}">
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

@@ -148,13 +148,17 @@ def admin_saison_edit(id: int):
 @bp.route("/admin/spectacle/<id>")
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin_spectacle(id: int):
+
+    picture_form = SendPicture()
+
     spectacle = Spectacle.query.get(id)
     if spectacle is None:
         flask.abort(404)
     
     return flask.render_template(
         "theatre/admin_spectacle.html",
-        spectacle=spectacle
+        spectacle=spectacle,
+        picture_form=picture_form
     )
 
 @bp.route("/admin/picture_upload/<type>/<id>", methods=["POST"])
@@ -210,7 +214,38 @@ def picture_upload(type: str, id: int):
             db.session.commit()
 
         elif type == "spectacle":
-            pass
+            spectacle = Spectacle.query.get(id)
+            if spectacle is None:
+                flask.abort(404) 
+            old_filename = f"spectacle_{spectacle.id}.{spectacle.image_extension}"
+            filename = f"spectacle_{spectacle.id}.{ext}"
+            path = f"saison_{spectacle.saison.id}/"
+
+            # Remove old picture
+            pathlib.Path(os.path.join(
+                current_app.config['THEATRE_BASE_PATH'],
+                path,
+                old_filename
+            )).unlink(missing_ok=True)
+
+            # Create folder
+            pathlib.Path(os.path.join(
+                current_app.config['THEATRE_BASE_PATH'],
+                path
+            )).mkdir(parents=True, exist_ok=True)
+
+            # Save new picture
+            form.picture.data.save(
+                os.path.join(
+                    current_app.config['THEATRE_BASE_PATH'],
+                    path,
+                    filename
+                )
+            )
+
+            spectacle.image_extension = ext
+            db.session.commit()
+            
         else:
             flask.flash(_("Type de téléversement non valide."))
             return flask.redirect(next_url)
