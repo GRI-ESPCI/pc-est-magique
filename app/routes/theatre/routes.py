@@ -20,6 +20,15 @@ from app.routes.theatre.forms import EditSaison, EditSpectacle, SendPicture
 from app.routes.theatre import bp
 from app.utils import typing
 
+"""
+TODO:
+    - HTML editor for spectacle and saison
+    - Creation of new  spectacle
+    - Add representation to spectacle and edit
+    - (Maybe) Custom reservation
+    - Update frontend for user
+"""
+
 
 @bp.route("")
 @bp.route("/")
