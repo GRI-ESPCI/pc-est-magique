@@ -23,7 +23,6 @@ from app.utils import typing
 """
 TODO:
     - HTML editor for spectacle and saison
-    - Creation of new  spectacle
     - Add representation to spectacle and edit
     - (Maybe) Custom reservation
     - Update frontend for user
@@ -199,6 +198,43 @@ def admin_spectacle_edit(id: int):
         "theatre/admin_spectacle_edit.html",
         spectacle=spectacle,
         form=form
+    )
+
+@bp.route("/admin/spectacle/new/<saison_id>", methods=["GET", "POST"])
+@context.permission_only(PermissionType.write, PermissionScope.theatre)
+def admin_spectacle_new(saison_id: int):
+
+    form = EditSpectacle()
+    saison = Saison.query.get(saison_id)
+    if saison is None:
+        flask.abort(404)
+
+    if form.validate_on_submit():
+        spectacle = Spectacle()
+        spectacle.name = form.name.data
+        spectacle.description = form.description.data
+        spectacle.director = form.director.data
+        spectacle.author = form.author.data
+        spectacle.ticket_link = form.ticket_link.data
+        spectacle.places = form.places.data
+        spectacle.saison = saison
+
+        # Legacy compatibility
+        spectacle.year = 0
+
+        print(spectacle.id)
+
+        db.session.add(spectacle)
+        db.session.commit()
+
+        return flask.redirect(
+            url_for("theatre.admin_spectacle", id=spectacle.id)
+        )
+
+    return flask.render_template(
+        "theatre/admin_spectacle_new.html",
+        form=form,
+        saison=saison
     )
 
 @bp.route("/admin/picture_upload/<type>/<id>", methods=["POST"])
