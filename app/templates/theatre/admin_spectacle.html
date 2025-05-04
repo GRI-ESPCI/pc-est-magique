@@ -129,7 +129,7 @@
     {% if spectacle.representations|length %}
     <ul>
         {% for r in spectacle.representations %}
-            <li>{{ r.date.strftime("%A %d %m %Y") }}
+            <li>{{ moment(r.date).format('dddd LL') }}
                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rep-del-modal-{{ r.id }}">
                     <svg class="bi flex-shrink-0" width="18" height="18">
                         {{ macros.bootstrap_icon("x-lg") }}

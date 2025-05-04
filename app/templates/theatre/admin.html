@@ -42,7 +42,7 @@
                     <tr>
                         <td scope="row">{{ s.id }}</td>
                         <td>{{ s.name }}</td>
-                        <td>{{ s.start_date }}</td>
+                        <td>{{ moment(s.start_date).format('dddd LL') }}</td>
                         <td>
                             <a href="{{ url_for('theatre.admin_saison', id=s.id) }}" class="btn btn-success">
                                 <svg class="bi flex-shrink-0" width="18" height="18">

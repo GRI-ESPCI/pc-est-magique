@@ -61,7 +61,7 @@
     </div>
 </div>
 <div class="row mb-3">
-    <p class="fst-italic">{{ _("La saison commence le") }} {{ saison.start_date.strftime("%A %d %B %Y") }}.</p>
+    <p class="fst-italic">{{ _("La saison commence le") }} {{ moment(saison.start_date).format("dddd LL") }}.</p>
 </div>
 
 {# Season poster with modal for edition #}
