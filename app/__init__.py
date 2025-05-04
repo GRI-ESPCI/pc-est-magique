@@ -93,8 +93,10 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 
     # Jinja filters
-    def markdown_filter(text: str) -> Markup:
-        return Markup(markdown.markdown(text))
+    def markdown_filter(text: str|None) -> Markup:
+        if text is not None:
+            return Markup(markdown.markdown(text))
+        return Markup("")
     app.jinja_env.filters["markdown"] = markdown_filter
 
     # Register blueprints
