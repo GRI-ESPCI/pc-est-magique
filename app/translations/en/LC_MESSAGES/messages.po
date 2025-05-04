@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2025-04-04 16:15+0200\n"
+"POT-Creation-Date: 2025-05-04 21:11+0200\n"
 "PO-Revision-Date: 2022-10-29 03:04+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
@@ -110,7 +110,8 @@ msgstr "Sign in"
 #: app/templates/cards/device.html:87 app/templates/cards/device_modal.html:15
 #: app/templates/cards/offer.html:14 app/templates/club_q/pceens.html:43
 #: app/templates/club_q/saisons.html:68 app/templates/gris/pceens.html:79
-#: app/templates/panier_bio/admin.html:140
+#: app/templates/panier_bio/admin.html:140 app/templates/theatre/admin.html:33
+#: app/templates/theatre/admin_saison.html:120
 msgid "Nom"
 msgstr "Name"
 
@@ -152,6 +153,11 @@ msgstr "New password (validation)"
 
 #: app/routes/auth/forms.py:60 app/routes/bar/forms.py:29
 #: app/routes/bar/forms.py:45
+#: app/templates/theatre/admin_representation_new.html:43
+#: app/templates/theatre/admin_saison_edit.html:50
+#: app/templates/theatre/admin_saison_new.html:47
+#: app/templates/theatre/admin_spectacle_edit.html:68
+#: app/templates/theatre/admin_spectacle_new.html:65
 msgid "Valider"
 msgstr "Validate"
 
@@ -288,7 +294,8 @@ msgstr "Download"
 msgid "Supprimer l'image actuelle"
 msgstr "Delete current image"
 
-#: app/routes/bar/forms.py:70
+#: app/routes/bar/forms.py:70 app/templates/theatre/admin_saison.html:97
+#: app/templates/theatre/admin_spectacle.html:100
 msgid "Sauvegarder"
 msgstr "Save"
 
@@ -453,6 +460,8 @@ msgstr "Add"
 #: app/templates/bar/user.html:299 app/templates/photos/album.html:212
 #: app/templates/photos/collection.html:180 app/templates/photos/main.html:57
 #: app/templates/rooms/register.html:106
+#: app/templates/theatre/admin_saison.html:54
+#: app/templates/theatre/admin_spectacle.html:57
 msgid "Modifier"
 msgstr "Edit"
 
@@ -460,7 +469,9 @@ msgstr "Edit"
 #: app/routes/club_q/forms.py:69 app/routes/club_q/forms.py:82
 #: app/routes/club_q/forms.py:97 app/routes/panier_bio/forms.py:52
 #: app/routes/panier_bio/forms.py:67 app/templates/cards/club_q.html:36
-#: app/templates/photos/album.html:226
+#: app/templates/photos/album.html:226 app/templates/theatre/admin.html:76
+#: app/templates/theatre/admin_saison.html:169
+#: app/templates/theatre/admin_spectacle.html:150
 msgid "Supprimer"
 msgstr "Delete"
 
@@ -488,7 +499,7 @@ msgid "Page du Bekk ESPCI"
 msgstr "ESPCI Bekk newspaper"
 
 #: app/routes/bekk/routes.py:158 app/routes/club_q/routes.py:1306
-#: app/routes/panier_bio/routes.py:460 app/routes/theatre/routes.py:46
+#: app/routes/panier_bio/routes.py:460 app/routes/theatre/routes.py:74
 #, fuzzy
 msgid "Introduction mise à jour."
 msgstr "Changelog"
@@ -707,10 +718,9 @@ msgstr "Location"
 msgid "Spectacle ajouté."
 msgstr "Added spectacle."
 
-#: app/routes/club_q/utils.py:660
-#, fuzzy
+#: app/routes/club_q/utils.py:660 app/routes/theatre/routes.py:267
 msgid "Spectacle supprimé."
-msgstr "Deleted spectacle"
+msgstr "Deleted spectacle."
 
 #: app/routes/club_q/utils.py:680
 msgid "Spectacle édité."
@@ -1031,8 +1041,9 @@ msgstr "By ordering, I undertake to pay and to collect the basket."
 msgid "Commander"
 msgstr "Ordering"
 
-#: app/routes/panier_bio/forms.py:59 app/templates/panier_bio/period.html:87
-#: app/templates/payments/main.html:197
+#: app/routes/panier_bio/forms.py:59 app/routes/theatre/forms.py:34
+#: app/templates/panier_bio/period.html:87 app/templates/payments/main.html:197
+#: app/templates/theatre/admin.html:34
 msgid "Date de début"
 msgstr "Start date"
 
@@ -1402,10 +1413,68 @@ msgstr "Modify rental"
 msgid "Changer de chambre"
 msgstr "Change room"
 
-#: app/routes/theatre/routes.py:30
+#: app/routes/theatre/forms.py:18
+msgid "Nom de la saison"
+msgstr "Name of the season"
+
+#: app/routes/theatre/forms.py:26 app/routes/theatre/forms.py:52
+#: app/templates/cards/offer.html:18 app/templates/club_q/salles.html:105
+#: app/templates/theatre/admin_saison.html:122
+msgid "Description"
+msgstr "Description"
+
+#: app/routes/theatre/forms.py:44
+msgid "Nom du spectacle"
+msgstr "Name of the show"
+
+#: app/routes/theatre/forms.py:60
+msgid "Metteur ou metteuse en scène"
+msgstr "Director"
+
+#: app/routes/theatre/forms.py:67
+msgid "Auteur ou autrice de la pièce"
+msgstr "Author of the play"
+
+#: app/routes/theatre/forms.py:74
+msgid "Lien vers la billeterie"
+msgstr "Link to ticket booking"
+
+#: app/routes/theatre/forms.py:80
+msgid "Lien vers la résérvation des places"
+msgstr "Link to seats booking"
+
+#: app/routes/theatre/forms.py:90
+msgid "Date de la représentation"
+msgstr "Date of the representation"
+
+#: app/routes/theatre/forms.py:101
+msgid "Photo à téléverser"
+msgstr "Picture to upload"
+
+#: app/routes/theatre/routes.py:57
 #, fuzzy
 msgid "Saison Théâtrale du Club Théâtre"
 msgstr "ESPCI Theatre Season 2023"
+
+#: app/routes/theatre/routes.py:165
+msgid "Saison supprimée avec succès."
+msgstr "Season successfully deleted."
+
+#: app/routes/theatre/routes.py:311
+msgid "Réprésentation annulée."
+msgstr "Representation canceled."
+
+#: app/routes/theatre/routes.py:402
+msgid "Type de téléversement non valide."
+msgstr "Type of uploading non valid."
+
+#: app/routes/theatre/routes.py:405
+msgid "Image téléversée."
+msgstr "Image uplaoded."
+
+#: app/routes/theatre/routes.py:407
+msgid "Erreur lors du téléversement de l'image."
+msgstr "Error while uploading the image."
 
 #: app/templates/doas.html:3
 #, python-format
@@ -1690,7 +1759,7 @@ msgstr "Mail address:"
 #: app/templates/auth/mails/account_registered.html:45
 #: app/templates/auth/mails/reset_password.html:42
 #: app/templates/club_q/mails/reservation.html:19
-#: app/templates/club_q/mails/reservation.html:75
+#: app/templates/club_q/mails/reservation.html:74
 #: app/templates/gris/mails/role_switch.html:65
 #: app/templates/payments/mails/internet_cut.html:80
 #: app/templates/payments/mails/new_subscription.html:50
@@ -1800,7 +1869,11 @@ msgstr "New item || Edit _name_"
 #: app/templates/club_q/salles.html:408 app/templates/devices/modify.html:79
 #: app/templates/panier_bio/admin.html:548
 #: app/templates/panier_bio/main.html:272
-#: app/templates/panier_bio/period.html:319
+#: app/templates/panier_bio/period.html:319 app/templates/theatre/admin.html:75
+#: app/templates/theatre/admin_saison.html:96
+#: app/templates/theatre/admin_saison.html:168
+#: app/templates/theatre/admin_spectacle.html:99
+#: app/templates/theatre/admin_spectacle.html:149
 msgid "Annuler"
 msgstr "Cancel"
 
@@ -2268,10 +2341,6 @@ msgstr "Device"
 msgid "Offre"
 msgstr "Offer"
 
-#: app/templates/cards/offer.html:18 app/templates/club_q/salles.html:105
-msgid "Description"
-msgstr "Description"
-
 #: app/templates/cards/offer.html:31
 msgid "Changer d'offre"
 msgstr "Change offer"
@@ -2650,6 +2719,7 @@ msgid "Saisons : "
 msgstr "Seasons: "
 
 #: app/templates/club_q/saisons.html:20 app/templates/club_q/saisons.html:405
+#: app/templates/theatre/admin.html:25
 #, fuzzy
 msgid "Ajouter une saison"
 msgstr "Add a season"
@@ -2857,6 +2927,7 @@ msgstr "Address: "
 
 #: app/templates/club_q/id/salle.html:45
 #: app/templates/club_q/modals/modals_spectacles.html:112
+#: app/templates/theatre/admin_saison.html:112
 #, fuzzy
 msgid "Ajouter un spectacle"
 msgstr "Add spectacle"
@@ -2936,7 +3007,7 @@ msgstr ""
 "whish could be accomplished and we are sorry about that."
 
 #: app/templates/club_q/mails/reservation.html:20
-#: app/templates/club_q/mails/reservation.html:76
+#: app/templates/club_q/mails/reservation.html:75
 msgid "Le Club Q"
 msgstr "Club Q"
 
@@ -2958,7 +3029,7 @@ msgstr "your personal page"
 msgid "Voici les spectacles qui t'ont été attribués : "
 msgstr "This is the list of the spectacles where you got a place: "
 
-#: app/templates/club_q/mails/reservation.html:47
+#: app/templates/club_q/mails/reservation.html:46
 #, python-format
 msgid ""
 "Le SAV est ouvert jusqu'au %(date_sav_here)s <a href=%(link_SAV_here)s>au"
@@ -2967,7 +3038,7 @@ msgstr ""
 "SAV is open until %(date_sav_here)s <a href=%(link_SAV_here)s>with the "
 "following link</a>"
 
-#: app/templates/club_q/mails/reservation.html:54
+#: app/templates/club_q/mails/reservation.html:53
 #, fuzzy, python-format
 msgid ""
 "Concernant le paiement, merci de le faire avant le %(date_p_here)s pour "
@@ -2977,7 +3048,7 @@ msgstr ""
 "The payment should be made before the %(date_p_here)s. Two means of "
 "payment are possible:"
 
-#: app/templates/club_q/mails/reservation.html:59
+#: app/templates/club_q/mails/reservation.html:58
 #, fuzzy
 msgid ""
 "Par chèque à l’ordre du « BDE Physique Chimie Paris Club Q » (une "
@@ -2988,7 +3059,7 @@ msgstr ""
 "deposit it in an enveloppe in the student building. On the back you "
 "should put <b>First name-Name-Promo-Season/spectacles</b>."
 
-#: app/templates/club_q/mails/reservation.html:62
+#: app/templates/club_q/mails/reservation.html:61
 #, fuzzy
 msgid ""
 "Par virement bancaire, avec les mêmes informations que les chèques "
@@ -2999,7 +3070,7 @@ msgstr ""
 "By bank transfer, with the same informations as the cheque. If any of "
 "this two means is not possible, please contact the Club Q treasurer."
 
-#: app/templates/club_q/mails/reservation.html:68
+#: app/templates/club_q/mails/reservation.html:67
 msgid "RIB Club Q"
 msgstr "RIB Club Q"
 
@@ -5040,38 +5111,128 @@ msgstr ""
 msgid "Quelqu'un vient de voler ma chambre (%(room)s) !"
 msgstr "Someone just stole my room (%(room)s)!"
 
-#: app/templates/theatre/main.html:26
-#, fuzzy
-msgid "Affiche Saison Théâtrale"
-msgstr "Theatre Season Poster"
+#: app/templates/theatre/admin.html:6
+#: app/templates/theatre/admin_representation_new.html:6
+#: app/templates/theatre/admin_saison.html:33
+#: app/templates/theatre/admin_saison_edit.html:6
+#: app/templates/theatre/admin_saison_new.html:6
+#: app/templates/theatre/admin_spectacle.html:33
+#: app/templates/theatre/admin_spectacle_edit.html:6
+#: app/templates/theatre/admin_spectacle_new.html:6
+msgid "Théâtre - Administration"
+msgstr "Theatre - Administration"
 
-#: app/templates/theatre/main.html:35
+#: app/templates/theatre/admin.html:13
+#: app/templates/theatre/admin_representation_new.html:13
+#: app/templates/theatre/admin_saison.html:40
+#: app/templates/theatre/admin_saison_edit.html:13
+#: app/templates/theatre/admin_saison_new.html:13
+#: app/templates/theatre/admin_spectacle.html:40
+#: app/templates/theatre/admin_spectacle_edit.html:13
+#: app/templates/theatre/admin_spectacle_new.html:13
+msgid "Page admin"
+msgstr "Admin page"
+
+#: app/templates/theatre/admin.html:22
+msgid "Liste des saisons théâtrales"
+msgstr "Liste of theatre seasons"
+
+#: app/templates/theatre/admin.html:32
+#: app/templates/theatre/admin_saison.html:119
+msgid "Id"
+msgstr ""
+
+#: app/templates/theatre/admin.html:71
+#: app/templates/theatre/admin_saison.html:164
+msgid "Es-tu sûr de vouloir supprimer ce spectacle ?"
+msgstr "Are you sure you want to delete this show?"
+
+#: app/templates/theatre/admin_representation_new.html:22
+#: app/templates/theatre/admin_representation_new.html:31
+msgid "Création d'une nouvelle représentation"
+msgstr "Creating a new representation"
+
+#: app/templates/theatre/admin_saison.html:64
+msgid "La saison commence le"
+msgstr "The season begins on the"
+
+#: app/templates/theatre/admin_saison.html:71
+msgid "Affiche"
+msgstr "Poster"
+
+#: app/templates/theatre/admin_saison.html:88
+msgid "Modification du poster de la saison"
+msgstr "Modification of the season poster"
+
+#: app/templates/theatre/admin_saison.html:106
+#: app/templates/theatre/admin_spectacle.html:110
+msgid "Pas de description."
+msgstr "No description."
+
+#: app/templates/theatre/admin_saison.html:121
+msgid "Metteur en scène"
+msgstr "Director"
+
+#: app/templates/theatre/admin_saison_edit.html:19
+#: app/templates/theatre/admin_spectacle_edit.html:22
+msgid "Édition"
+msgstr "Edit"
+
+#: app/templates/theatre/admin_saison_edit.html:28
+#: app/templates/theatre/admin_spectacle_edit.html:31
+msgid "Édition de"
+msgstr "Edit of"
+
+#: app/templates/theatre/admin_saison_new.html:16
+#: app/templates/theatre/admin_saison_new.html:25
+msgid "Création d'une nouvelle saison"
+msgstr "Creating a new season"
+
+#: app/templates/theatre/admin_spectacle.html:68
 #, python-format
 msgid "Une pièce écrite par %(author)s et montée par %(director)s"
 msgstr "A play written by %(author)s and set upped by %(director)s"
 
-#: app/templates/theatre/main.html:47
+#: app/templates/theatre/admin_spectacle.html:74
+msgid "Affiche de la pièce"
+msgstr "Poster of the play"
+
+#: app/templates/theatre/admin_spectacle.html:91
+msgid "Modification du poster du spectacle"
+msgstr "Edit the poster of the show"
+
+#: app/templates/theatre/admin_spectacle.html:108
 msgid "Synopsis"
 msgstr "Synopsis"
 
-#: app/templates/theatre/main.html:52
-msgid "Représentations :"
-msgstr "Representations : "
+#: app/templates/theatre/admin_spectacle.html:117
+msgid "Billeterie :"
+msgstr "Ticket booking:"
 
-#: app/templates/theatre/main.html:59
-#, fuzzy
-msgid "Billetterie : "
-msgstr "Ticket link : "
+#: app/templates/theatre/admin_spectacle.html:121
+msgid "Réservation des places :"
+msgstr "Seat booking:"
 
-#: app/templates/theatre/main.html:59
-#, fuzzy
-msgid "Lien à venir"
-msgstr "Coming soon"
+#: app/templates/theatre/admin_spectacle.html:125
+msgid "Listes des représentations"
+msgstr "List of representations "
 
-#: app/templates/theatre/main.html:62
-#, fuzzy
-msgid "Choix des places : "
-msgstr "No. of wanted seats"
+#: app/templates/theatre/admin_spectacle.html:127
+msgid "Ajouter une représentation"
+msgstr "Add a representation"
+
+#: app/templates/theatre/admin_spectacle.html:145
+msgid "Es-tu sûr de vouloir supprimer cette représentation ?"
+msgstr "Are you sure you want to delete this representation?"
+
+#: app/templates/theatre/admin_spectacle.html:158
+msgid "Pas de représentations prévues pour le moment."
+msgstr "No representation planned yet."
+
+#: app/templates/theatre/admin_spectacle_new.html:19
+#: app/templates/theatre/admin_spectacle_new.html:28
+msgid "Création d'un nouveau spectacle"
+msgstr "Creation of a new show"
 
 #: app/utils/lydia.py:82
 msgid "Offre Internet à la Rez :"
@@ -5557,4 +5718,10 @@ msgstr "Invalid item ID."
 
 #~ msgid "Accès aux modules élèves débloqué !"
 #~ msgstr "Students modules access granted!"
+
+#~ msgid "Lien à venir"
+#~ msgstr "Link coming soon"
+
+#~ msgid "Choix des places : "
+#~ msgstr "Choice of seats:"
 

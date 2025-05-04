@@ -20,6 +20,20 @@ from app.utils.columns import (
 Model = typing.cast(type[type], db.Model)  # type checking hack
 
 
+class Saison(db.Model):
+    """Store data about one season of theatre club"""
+    id: Column[int] = column(sa.Integer(), primary_key=True)
+    name: Column[str] = column(sa.String(120), nullable=False)
+    description: Column[str | None] = column(sa.String(2000), nullable=True)
+    image_extension: Column[str | None] = column(sa.String(120), nullable=True)
+    start_date: Column[datetime.date] = column(sa.Date(), nullable=False)
+
+    spectacles: Relationship[list[Representation]] = one_to_many(
+        "Spectacle.saison",
+        cascade="all, delete-orphan"
+    )
+
+
 class Spectacle(db.Model):
     """All information about ESPCI theatre spectacle information."""
 
@@ -30,11 +44,16 @@ class Spectacle(db.Model):
     ticket_link: Column[str | None] = column(sa.String(120), nullable=True)
     director: Column[str | None] = column(sa.String(64), nullable=True)
     author: Column[str | None] = column(sa.String(64), nullable=True)
-    image_name: Column[str | None] = column(sa.String(120), nullable=True)
+    image_extension: Column[str | None] = column(sa.String(120), nullable=True)
     places: Column[str | None] = column(sa.String(255), nullable=True)
 
+    _saison_id: Column[int] = column(sa.ForeignKey("saison.id"), nullable=False)
+    saison: Relationship[Saison] = many_to_one("Saison.spectacles")
+
     representations: Relationship[list[Representation]] = one_to_many(
-        "Representation.spectacle", order_by="Representation.date"
+        "Representation.spectacle",
+        order_by="Representation.date",
+        cascade="all, delete-orphan"
     )
 
 
@@ -45,7 +64,9 @@ class Representation(db.Model):
     date: Column[datetime.datetime] = column(sa.DateTime(), nullable=False)
 
     _spectacle_id: Column[int] = column(sa.ForeignKey("spectacle.id"), nullable=False)
-    spectacle: Relationship[Spectacle] = many_to_one("Spectacle.representations")
+    spectacle: Relationship[Spectacle] = many_to_one(
+        "Spectacle.representations"
+    )
 
 
 from app import models

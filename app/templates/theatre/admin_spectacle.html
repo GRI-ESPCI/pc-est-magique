@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block styles %}
+
+{{ super() }}
+
+<style>
+    .btn-hover-container {
+        position: relative;
+    }
+    .btn-hover {
+        transition: .5s ease;
+        opacity: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+    .btn-hover-container:hover img {
+        opacity: 0.3;
+    }
+    .btn-hover-container:hover .btn-hover {
+        opacity: 1;
+    }
+</style>
+
+{% endblock %}
+
+{% block app_content %}
+
+<div class="row mb-3">
+    <h1>{{ _("Théâtre - Administration") }}</h1>
+</div>
+
+<div class="row mb-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('theatre.admin') }}">{{ _("Page admin") }}</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('theatre.admin_saison', id=spectacle.saison.id) }}">{{ spectacle.saison.name}}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {{ spectacle.name }}
+            </li>
+        </ol>
+    </nav>
+</div>
+
+<hr>
+
+<div class="row mb-3">
+    <div class="btn-toolbar justify-content-between">
+        <h2>{{ spectacle.name }}</h2>
+        <div data-bs-toggle="tooltip" data-bs-placement="right" title="{{ _('Modifier') }}">
+            <a href="{{ url_for('theatre.admin_spectacle_edit', id=spectacle.id) }}" class="btn btn-primary" role="button">
+                <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                    {{ macros.bootstrap_icon("pen") }}
+                </svg>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <p><i>{{ _("Une pièce écrite par %(author)s et montée par %(director)s", author=spectacle.author,
+            director=spectacle.director) }}.</i></p>
+</div>
+
+<div class="row mb-3">
+    <div class="text-center btn-hover-container">
+        <img src="/theatre_posters/saison_{{ spectacle.saison.id }}/spectacle_{{ spectacle.id }}.{{ spectacle.image_extension }}" alt="{{ _('Affiche de la pièce') }} {{ spectacle.name }}"
+            style="max-height: 30em;">
+        <div class="btn-hover">
+        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#poster-modal">
+            <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+                {{ macros.bootstrap_icon("pen") }}
+            </svg>
+        </button>
+    </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" id="poster-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('theatre.picture_upload', type='spectacle', id=spectacle.id, next_url=url_for('theatre.admin_spectacle', id=spectacle.id)) }}" method="post" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5>{{ _("Modification du poster du spectacle") }}</h5>
+                </div>
+                <div class="modal-body">
+                    {{ picture_form.csrf_token }}
+                    {{ picture_form.picture.label(class="form-label") }}
+                    {{ picture_form.picture(class="form-control", accept="image/png, image/jpeg") }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Annuler") }}</button>
+                    <input type="submit" class="btn btn-primary" value="{{ _('Sauvegarder') }}">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <h3>{{ _("Synopsis") }}</h3>
+    {% if spectacle.description is none %}
+    <p>{{ _("Pas de description.") }}</p>
+    {% else %}
+    <p>{{ spectacle.description|markdown }}</p>
+    {% endif %}
+</div>
+
+<div class="row mb-3">
+    <p>{{ _("Billeterie :") }} <a href="{{ spectacle.ticket_link }}" >{{ spectacle.ticket_link }}</a></p>
+</div>
+
+<div class="row mb-3">
+    <p>{{ _("Réservation des places :") }} <a href="{{ spectacle.places }}">{{ spectacle.places }}</a></p>
+</div>
+
+<div class="row mb-3">
+    <h3>{{ _("Listes des représentations") }}</h3>
+
+    <p><a href="{{ url_for('theatre.admin_representation_new', spectacle_id=spectacle.id) }}" class="btn btn-success">{{ _("Ajouter une représentation") }}</a></p>
+
+    {% if spectacle.representations|length %}
+    <ul>
+        {% for r in spectacle.representations %}
+            <li>{{ moment(r.date).format('dddd LL') }} {{'%02dh%02d' % (r.date.hour, r.date.minute) }}
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rep-del-modal-{{ r.id }}">
+                    <svg class="bi flex-shrink-0" width="18" height="18">
+                        {{ macros.bootstrap_icon("x-lg") }}
+                    </svg>
+                </button>
+            </li>
+
+            {# Modal to confirm representation deletion #}
+            <div class="modal fade" id="rep-del-modal-{{ r.id }}" tabindex="-1" aria-labelledby="rep-del-modal-label-{{ r.id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="rep-del-modal-label-{{ r.id }}">{{ _("Es-tu sûr de vouloir supprimer cette représentation ?") }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Annuler") }}</button>
+                        <a href="{{ url_for('theatre.admin_representation_delete', rep_id=r.id) }}" class="btn btn-danger">{{ _("Supprimer") }}</a>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor%}
+    </ul>
+    {% else %}
+    <p>{{ _("Pas de représentations prévues pour le moment.") }}</p>
+    {% endif %}
+</div>
+
+{% endblock %}

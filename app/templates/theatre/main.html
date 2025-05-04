@@ -1,32 +1,56 @@
-{% extends "base.html" %} {% block styles %}{{ super() }} {% if can_edit %}
-<link
-  rel="stylesheet"
-  type="text/css"
-  href='{{url_for("static", filename="css/quill.snow.css") }}'
-  rel="stylesheet"
-/>
+{% extends "base.html" %} 
 
-{% endif %} {% endblock %} {% block scripts %} {{ super() }} {% if can_edit %}
-<script defer>
-  var folder = {{folder |tojson}}
-</script>
-<script
-  src='{{url_for("static", filename="js/quill.js") }}'
-  defer
-></script>
-<script
-  src='{{url_for("static", filename="js/wysiwyg_editor.js") }}'
-  defer
-></script>
+{% block app_content %}
 
-{% endif %} {% endblock %} {% block app_content %} {% include 'wysiwyg.html' %}
+<div class="btn-toolbar justify-content-between mb-3">
+  <div class="btn-group" role="group">
+    {% for s in saisons %}
+      {% if loop.index == 6 %}{% break %}{% endif %}
+      {% if s.id == current_saison.id %}
+      <a href="{{ url_for('theatre.main', saison_id=s.id)}}" class="btn btn-danger" role="button">{{s.name}}</a>
+      {% else %}
+      <a href="{{ url_for('theatre.main', saison_id=s.id)}}" class="btn btn-outline-danger" role="button">{{s.name}}</a>
+      {% endif %}
+    {% endfor %}
+    {% if saisons|length >= 6 %}
+      <button class="btn btn-danger dropdown-toggle" type="button" id="oldSeasonsBtn" data-bs-toggle="dropdown" aria-expanded="false">
+        {{ _("Anciennes saisons") }}
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="oldSeasonsBtn">
+    {% endif %}
+    {% for s in saisons %}
+      {% if loop.index >= 6 %}
+        <li><a href="{{ url_for('theatre.main', saison_id=s.id)}}" class="dropdown-item">{{s.name}}</a></li>
+      {% endif %}
+    {% endfor%}
+    {% if saisons|length >= 6 %}
+      </ul>
+    {% endif %}
+  </div>
+  <div data-bs-toggle="tooltip" data-bs-placement="right" title="{{ _('Administration') }}">
+    <a href="{{ url_for('theatre.admin') }}" class="btn btn-danger" role="button">
+      <svg class="bi flex-shrink-0" width="24" height="24" role="img">
+            {{ macros.bootstrap_icon("gear-fill") }}
+      </svg>
+    </a>
+  </div>
+</div>
 
 <div class="row mb-3">
-  <p align="center">
-    <img src="/theatre_posters/aff_saison.jpg", alt="{{ _("Affiche Saison Théâtrale") }}" width="30%" />
-  </p>
+  <h1>{{ current_saison.name }}</h1>
+  <p>{{ current_saison.description|markdown }}</p>
+</div>
 
-  {% for spect in spectacles %}
+<div class="row mb-3">
+  <p class="text-center">
+    <img src="/theatre_posters/saison_{{ current_saison.id }}/saison_{{ current_saison.id }}.{{ current_saison.image_extension }}"
+         alt="{{ _('Affiche ') + current_saison.name }}"
+         style="max-height: 30em;" >
+  </p>
+</div>
+
+{% for spect in current_saison.spectacles %}
+<div class="row mb-3">
   <hr align="CENTER" />
   <div class="row mb-3">
     <h2>{{ spect.name }}</h2>
@@ -37,22 +61,20 @@
       </i>
     </p>
     <p align="center">
-      <img
-        src="/theatre_posters/{{ spect.image_name }}.jpg"
-        ,
-        width="30%"
-      />
+      <img src="/theatre_posters/saison_{{ spect.saison.id }}/spectacle_{{ spect.id }}.{{ spect.image_extension }}"
+           alt="{{ _('Affiche du spectacle ') + spect.name }}"
+           style="max-height: 30em;">
     </p>
 
     <h5>{{ _("Synopsis")}}</h5>
     <p>
-      <i> {{ spect.description }} </i>
+      <i> {{ spect.description|markdown }} </i>
     </p>
 
     <h5>{{ _("Représentations :")}}</h5>
     <ul>
       {% for rep in spect.representations %}
-      <li>{{moment(rep.date).format('LLLL')}}</li>
+        <li>{{ moment(rep.date).format('dddd LL') }} {{'%02dh%02d' % (rep.date.hour, rep.date.minute) }}</li>
       {% endfor %}
     </ul>
     <p>

@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "es2015",
+        "module": "es2015",
+        "outDir": "./app/static/dist/",
+        "strict": true,
+        "moduleResolution": "node"
+    },
+    "include": [
+        "./app/static/ts/**/*"
+    ]
+}

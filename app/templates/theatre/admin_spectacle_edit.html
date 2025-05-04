@@ -1,0 +1,74 @@
+{% extends "base.html" %} {% block styles %}{{ super() }}{% endblock %}
+
+{% block app_content %}
+
+<div class="row mb-3">
+    <h1>{{ _("Théâtre - Administration") }}</h1>
+</div>
+
+<div class="row mb-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('theatre.admin') }}">{{ _("Page admin") }}</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('theatre.admin_saison', id=spectacle.saison.id) }}">{{ spectacle.saison.name }}</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('theatre.admin_spectacle', id=spectacle.id) }}">{{ spectacle.name }}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {{ _("Édition") }}
+            </li>
+        </ol>
+    </nav>
+</div>
+
+<hr>
+
+<div class="row mb-3">
+    <h2>{{ _("Édition de") }} {{ spectacle.name }}</h2>
+</div>
+
+<div class="row mb-3">
+    <form method="POST" action="{{ url_for('theatre.admin_spectacle_edit', id=spectacle.id) }}">
+        {{ form.csrf_token }}
+
+        <div class="mb-3">
+            {{ form.name.label(class="form-label")}} 
+            {{ form.name(class="form-control") }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.description.label(class="form-label")}} 
+            {{ form.description(class="form-control", rows=5) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.director.label(class="form-label")}} 
+            {{ form.director(class="form-control") }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.author.label(class="form-label")}} 
+            {{ form.author(class="form-control") }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.ticket_link.label(class="form-label")}} 
+            {{ form.ticket_link(class="form-control", type="url") }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.places.label(class="form-label")}} 
+            {{ form.places(class="form-control", type="url") }}
+        </div>
+
+        <input type="submit" class="btn btn-primary" value="{{ _('Valider') }}">
+    </form>
+</div>
+
+<script type="module" src="{{ url_for('static', filename='dist/md-editor.bundle.js') }}"></script>
+
+{% endblock %}

@@ -208,6 +208,12 @@ https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deploymen
   flask sass compile
   ```
 
+- Compiler les fichiers typescript :
+
+  ```
+  npx rollup -c
+  ```
+
 L'application peut alors normalement être lancée avec `flask run`.
 
 On a alors une version de développement installée : `flask run` n'est pas
@@ -308,6 +314,7 @@ sudo supervisorctl stop pc-est-magique
 flask db upgrade
 flask translate compile
 flask sass compile
+npx rollup -c
 sudo supervisorctl start pc-est-magique
 ```
 

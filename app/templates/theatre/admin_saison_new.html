@@ -1,0 +1,53 @@
+{% extends "base.html" %} {% block styles %}{{ super() }}{% endblock %}
+
+{% block app_content %}
+
+<div class="row mb-3">
+    <h1>{{ _("Théâtre - Administration") }}</h1>
+</div>
+
+<div class="row mb-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('theatre.admin') }}">{{ _("Page admin") }}</a>
+            </li>
+            <li class="breadcrumb-item" aria-current="page">
+                {{ _("Création d'une nouvelle saison") }}
+            </li>
+        </ol>
+    </nav>
+</div>
+
+<hr>
+
+<div class="row mb-3">
+    <h2>{{ _("Création d'une nouvelle saison") }}</h2>
+</div>
+
+<div class="row mb-3">
+    <form method="POST" action="{{ url_for('theatre.admin_saison_new') }}">
+        {{ form.csrf_token }}
+
+        <div class="mb-3">
+            {{ form.name.label(class="form-label")}} 
+            {{ form.name(class="form-control") }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.description.label(class="form-label")}} 
+            {{ form.description(class="form-control", rows=5) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.start_date.label(class="form-label")}} 
+            {{ form.start_date(class="form-control", type="date") }}
+        </div>
+
+        <input type="submit" class="btn btn-primary" value="{{ _('Valider') }}">
+    </form>
+</div>
+
+<script type="module" src="{{ url_for('static', filename='dist/md-editor.bundle.js') }}"></script>
+
+{% endblock %}
