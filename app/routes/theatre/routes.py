@@ -24,9 +24,7 @@ from app.utils import typing
 """
 TODO:
     - HTML editor for spectacle and saison
-    - Add representation to spectacle and edit
     - (Maybe) Custom reservation
-    - Update frontend for user
 """
 
 
