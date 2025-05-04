@@ -78,6 +78,16 @@ class EditSpectacle(FlaskForm):
         ]
     )
 
+class EditRepresentation(FlaskForm):
+    """WTform used to edit a theatre spectacle"""
+
+    date = wtforms.DateField(
+        _l("Date de la représentation"),
+        validators=[
+            DataRequired()
+        ]
+    )
+
 class SendPicture(FlaskForm):
     """WTForm to send pictures"""
 

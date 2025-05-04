@@ -16,7 +16,8 @@ from app.models import (
     Spectacle,
     Saison
 )
-from app.routes.theatre.forms import EditSaison, EditSpectacle, SendPicture
+from app.models.theatre import Representation
+from app.routes.theatre.forms import EditRepresentation, EditSaison, EditSpectacle, SendPicture
 from app.routes.theatre import bp
 from app.utils import typing
 
@@ -235,6 +236,50 @@ def admin_spectacle_new(saison_id: int):
         "theatre/admin_spectacle_new.html",
         form=form,
         saison=saison
+    )
+
+@bp.route("/admin/representation/new/<spectacle_id>", methods=["GET", "POST"])
+@context.permission_only(PermissionType.write, scope=PermissionScope.theatre)
+def admin_representation_new(spectacle_id: int):
+
+    form = EditRepresentation()
+    spectacle = Spectacle.query.get(spectacle_id)
+    if spectacle is None:
+        return flask.abort(404)
+
+    if form.validate_on_submit():
+        rep = Representation()
+        rep.date = form.date.data
+        rep.spectacle = spectacle
+
+        db.session.add(rep)
+        db.session.commit()
+
+        return flask.redirect(
+            url_for("theatre.admin_spectacle", id=spectacle.id)
+        )
+
+    return flask.render_template(
+        "theatre/admin_representation_new.html",
+        spectacle=spectacle,
+        form=form
+    )
+
+@bp.route("/admin/representation/delete/<rep_id>")
+@context.permission_only(PermissionType.write, scope=PermissionScope.theatre)
+def admin_representation_delete(rep_id: int):
+    rep = Representation.query.get(rep_id)
+    if rep is None:
+        flask.abort(404)
+
+    s_id = rep.spectacle.id
+
+    db.session.delete(rep)
+    db.session.commit()
+
+    flask.flash(_("Réprésentation annulée."), category="success")
+    return flask.redirect(
+        url_for("theatre.admin_spectacle", id=s_id)
     )
 
 @bp.route("/admin/picture_upload/<type>/<id>", methods=["POST"])

@@ -1,0 +1,47 @@
+{% extends "base.html" %} {% block styles %}{{ super() }}{% endblock %}
+
+{% block app_content %}
+
+<div class="row mb-3">
+    <h1>{{ _("Théâtre - Administration") }}</h1>
+</div>
+
+<div class="row mb-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('theatre.admin') }}">{{ _("Page admin") }}</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('theatre.admin_saison', id=spectacle.saison.id) }}">{{ spectacle.saison.name }}</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('theatre.admin_spectacle', id=spectacle.id) }}">{{ spectacle.name }}</a>
+            </li>
+            <li class="breadcrumb-item" aria-current="page">
+                {{ _("Création d'une nouvelle représentation") }}
+            </li>
+        </ol>
+    </nav>
+</div>
+
+<hr>
+
+<div class="row mb-3">
+    <h2>{{ _("Création d'une nouvelle représentation") }}</h2>
+</div>
+
+<div class="row mb-3">
+    <form method="POST" action="{{ url_for('theatre.admin_representation_new', spectacle_id=spectacle.id) }}">
+        {{ form.csrf_token }}
+
+        <div class="mb-3">
+            {{ form.date.label(class="form-label")}} 
+            {{ form.date(class="form-control", type="date") }}
+        </div>
+
+        <input type="submit" class="btn btn-primary" value="{{ _('Valider') }}">
+    </form>
+</div>
+
+{% endblock %}
