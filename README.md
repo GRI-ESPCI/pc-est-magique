@@ -333,7 +333,7 @@ https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deploymen
 
 #### Modèles
 
-Le système de permission se base sur les modèles `Role` et `qPermission` défini dans
+Le système de permission se base sur les modèles `Role` et `Permission` défini dans
 [`app/models/gris.py`](app/models/gris.py) :
 
 - Chaque `Permission` est définie par
