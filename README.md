@@ -211,7 +211,7 @@ https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deploymen
 - Compiler les fichiers typescript :
 
   ```
-  npx tsc
+  npx rollup -c
   ```
 
 L'application peut alors normalement être lancée avec `flask run`.
@@ -314,7 +314,7 @@ sudo supervisorctl stop pc-est-magique
 flask db upgrade
 flask translate compile
 flask sass compile
-npx tsc
+npx rollup -c
 sudo supervisorctl start pc-est-magique
 ```
 

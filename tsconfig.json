@@ -1,8 +1,10 @@
 {
     "compilerOptions": {
-        "target": "ES6",
-        "module": "CommonJS",
-        "outDir": "./app/static/dist/ts"
+        "target": "es2015",
+        "module": "es2015",
+        "outDir": "./app/static/dist/",
+        "strict": true,
+        "moduleResolution": "node"
     },
     "include": [
         "./app/static/ts/**/*"

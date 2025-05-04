@@ -4,7 +4,9 @@
   "description": "PC est magique Flask Web App",
   "main": "n/a",
   "scripts": {
-    "test": "n/a"
+    "test": "n/a",
+    "build": "rollup -c",
+    "watch": "rollup -c --watch"
   },
   "repository": {
     "type": "git",
@@ -17,9 +19,18 @@
   },
   "homepage": "https://pc-est-magique.fr",
   "dependencies": {
+    "@codemirror/lang-markdown": "^6.3.2",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.36.7",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.2",
     "@types/node": "^22.15.3",
     "bower": "^1.8.12",
+    "codemirror": "^6.0.1",
+    "rollup": "^4.40.1",
     "sass": "^1.42.1",
+    "tslib": "^2.8.1",
     "typescript": "^5.8.3"
   }
 }
