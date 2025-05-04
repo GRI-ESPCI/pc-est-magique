@@ -55,7 +55,7 @@ from app.utils import helpers, loggers, typing
 
 # Load extensions
 db = flask_sqlalchemy.SQLAlchemy()
-migrate = flask_migrate.Migrate()
+migrate = flask_migrate.Migrate(compare_type=True)
 login = flask_login.LoginManager()
 mail = flask_mail.Mail()
 moment = flask_moment.Moment()

@@ -24,9 +24,6 @@ class EditSaison(FlaskForm):
 
     description = wtforms.TextAreaField(
         _l("Description"),
-        validators=[
-            Length(max=2000)
-        ],
         widget=MarkdownWidget()
     )
 
@@ -50,9 +47,6 @@ class EditSpectacle(FlaskForm):
 
     description = wtforms.TextAreaField(
         _l("Description"),
-        validators=[
-            Length(max=2000)
-        ],
         widget=MarkdownWidget()
     )
 
