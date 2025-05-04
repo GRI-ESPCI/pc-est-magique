@@ -208,6 +208,12 @@ https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deploymen
   flask sass compile
   ```
 
+- Compiler les fichiers typescript :
+
+  ```
+  npx tsc
+  ```
+
 L'application peut alors normalement être lancée avec `flask run`.
 
 On a alors une version de développement installée : `flask run` n'est pas
@@ -308,6 +314,7 @@ sudo supervisorctl stop pc-est-magique
 flask db upgrade
 flask translate compile
 flask sass compile
+npx tsc
 sudo supervisorctl start pc-est-magique
 ```
 
@@ -326,7 +333,7 @@ https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xvii-deploymen
 
 #### Modèles
 
-Le système de permission se base sur les modèles `Role` et `Permission` défini dans
+Le système de permission se base sur les modèles `Role` et `qPermission` défini dans
 [`app/models/gris.py`](app/models/gris.py) :
 
 - Chaque `Permission` est définie par
