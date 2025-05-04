@@ -74,7 +74,7 @@
     <h5>{{ _("Représentations :")}}</h5>
     <ul>
       {% for rep in spect.representations %}
-        <li>{{ moment(rep.date).format('dddd LL') }}</li>
+        <li>{{ moment(rep.date).format('dddd LL') }} {{'%02dh%02d' % (rep.date.hour, rep.date.minute) }}</li>
       {% endfor %}
     </ul>
     <p>

@@ -86,11 +86,12 @@ class EditSpectacle(FlaskForm):
 class EditRepresentation(FlaskForm):
     """WTform used to edit a theatre spectacle"""
 
-    date = wtforms.DateField(
+    date = wtforms.DateTimeField(
         _l("Date de la représentation"),
         validators=[
             DataRequired()
-        ]
+        ],
+        format='%Y-%m-%dT%H:%M'
     )
 
 class SendPicture(FlaskForm):
