@@ -105,7 +105,7 @@
     {% if saison.description is none %}
         <p>{{ _("Pas de description.") }}</p>
     {% else %}
-        <p>{{ saison.description }}</p>
+        <p>{{ saison.description|markdown }}</p>
     {% endif %}
 </div>
 
@@ -120,9 +120,9 @@
                     <th scope="col">{{ _("Nom") }}</th>
                     <th scope="col">{{ _("Metteur en scène") }}</th>
                     <th scope="col">{{ _("Description") }}</th>
-                    <th scop="col"></th>
-                    <th scop="col"></th>
-                    <th scop="col"></th>
+                    <th scop="col" style="width: 20px;"></th>
+                    <th scop="col" style="width: 20px;"></th>
+                    <th scop="col" style="width: 20px;"></th>
                 </tr>
             </thead>
             <tbody>

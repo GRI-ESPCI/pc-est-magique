@@ -5,8 +5,11 @@ from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileRequired
 
+from markupsafe import Markup
 import wtforms
 from wtforms.validators import DataRequired, Length
+
+from app.utils.forms import MarkdownWidget
 
 class EditSaison(FlaskForm):
     """WTform used to edit a theatre season"""
@@ -23,7 +26,8 @@ class EditSaison(FlaskForm):
         _l("Description"),
         validators=[
             Length(max=2000)
-        ]
+        ],
+        widget=MarkdownWidget()
     )
 
     start_date = wtforms.DateField(
@@ -48,7 +52,8 @@ class EditSpectacle(FlaskForm):
         _l("Description"),
         validators=[
             Length(max=2000)
-        ]
+        ],
+        widget=MarkdownWidget()
     )
 
     director = wtforms.StringField(

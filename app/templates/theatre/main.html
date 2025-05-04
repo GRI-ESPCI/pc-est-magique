@@ -38,7 +38,7 @@
 
 <div class="row mb-3">
   <h1>{{ current_saison.name }}</h1>
-  <p>{{ current_saison.description }}</p>
+  <p>{{ current_saison.description|markdown }}</p>
 </div>
 
 <div class="row mb-3">
@@ -68,13 +68,13 @@
 
     <h5>{{ _("Synopsis")}}</h5>
     <p>
-      <i> {{ spect.description }} </i>
+      <i> {{ spect.description|markdown }} </i>
     </p>
 
     <h5>{{ _("Représentations :")}}</h5>
     <ul>
       {% for rep in spect.representations %}
-      <li>{{moment(rep.date).format('LLLL')}}</li>
+        <li>{{ moment(rep.date).format('dddd LL') }}</li>
       {% endfor %}
     </ul>
     <p>

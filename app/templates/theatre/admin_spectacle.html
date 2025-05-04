@@ -109,7 +109,7 @@
     {% if spectacle.description is none %}
     <p>{{ _("Pas de description.") }}</p>
     {% else %}
-    <p>{{ spectacle.description }}</p>
+    <p>{{ spectacle.description|markdown }}</p>
     {% endif %}
 </div>
 
@@ -139,18 +139,18 @@
 
             {# Modal to confirm representation deletion #}
             <div class="modal fade" id="rep-del-modal-{{ r.id }}" tabindex="-1" aria-labelledby="rep-del-modal-label-{{ r.id }}" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="rep-del-modal-label-{{ r.id }}">{{ _("Es-tu sûr de vouloir supprimer cette représentation ?") }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="rep-del-modal-label-{{ r.id }}">{{ _("Es-tu sûr de vouloir supprimer cette représentation ?") }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Annuler") }}</button>
+                        <a href="{{ url_for('theatre.admin_representation_delete', rep_id=r.id) }}" class="btn btn-danger">{{ _("Supprimer") }}</a>
+                    </div>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Annuler") }}</button>
-                    <a href="{{ url_for('theatre.admin_representation_delete', rep_id=r.id) }}" class="btn btn-danger">{{ _("Supprimer") }}</a>
-                </div>
-                </div>
-            </div>
             </div>
         {% endfor%}
     </ul>

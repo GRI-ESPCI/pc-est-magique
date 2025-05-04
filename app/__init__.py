@@ -12,6 +12,8 @@ __all__ = ["create_app"]
 
 import json
 
+from markupsafe import Markup
+
 with open("package.json", "r") as fp:
     __version__ = json.load(fp).get("version", "Undefined")
 
@@ -23,6 +25,8 @@ import flask_mail
 import flask_moment
 import flask_babel
 from werkzeug import urls as wku
+
+import markdown
 
 from config import Config
 from app import enums
@@ -87,6 +91,11 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.jinja_env.globals["babel"] = flask_babel
     app.jinja_env.globals["Settings"] = global_settings.Settings
     app.jinja_env.add_extension('jinja2.ext.loopcontrols')
+
+    # Jinja filters
+    def markdown_filter(text: str) -> Markup:
+        return Markup(markdown.markdown(text))
+    app.jinja_env.filters["markdown"] = markdown_filter
 
     # Register blueprints
     # ! Keep imports here to avoid circular import issues !
