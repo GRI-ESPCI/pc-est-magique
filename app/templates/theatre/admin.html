@@ -32,8 +32,9 @@
                     <th scope="col">{{ _("Id") }}</th>
                     <th scope="col">{{ _("Nom") }}</th>
                     <th scope="col">{{ _("Date de début") }}</th>
-                    <th scope="col">{{ _("Description") }}</th>
-                    <th scop="col"></th>
+                    <th scop="col" width="20px"></th>
+                    <th scop="col" width="20px"></th>
+                    <th scop="col" width="20px"></th>
                 </tr>
             </thead>
             <tbody>
@@ -42,17 +43,41 @@
                         <td scope="row">{{ s.id }}</td>
                         <td>{{ s.name }}</td>
                         <td>{{ s.start_date }}</td>
-                        {% if s.description is none %}
-                            <td></td>
-                        {% else %}
-                            <td>{{ s.description|truncate(20) }}</td>
-                        {% endif %}
                         <td>
-                            <a href="{{ url_for('theatre.admin_saison', id=s.id) }}" class="btn btn-primary">
+                            <a href="{{ url_for('theatre.admin_saison', id=s.id) }}" class="btn btn-success">
+                                <svg class="bi flex-shrink-0" width="18" height="18">
+                                    {{ macros.bootstrap_icon("eye") }}
+                                </svg>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('theatre.admin_saison_edit', id=s.id) }}" class="btn btn-primary">
                                 <svg class="bi flex-shrink-0" width="18" height="18">
                                     {{ macros.bootstrap_icon("pen") }}
                                 </svg>
                             </a>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#saison-del-modal-{{ s.id }}">
+                                <svg class="bi flex-shrink-0" width="18" height="18">
+                                    {{ macros.bootstrap_icon("x-lg") }}
+                                </svg>
+                            </button>
+                            {# Modal to confirm saison deletion #}
+                            <div class="modal fade" id="saison-del-modal-{{ s.id }}" tabindex="-1" aria-labelledby="saison-del-modal-label-{{ s.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="saison-del-modal-label-{{ s.id }}">{{ _("Es-tu sûr de vouloir supprimer ce spectacle ?") }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Annuler") }}</button>
+                                        <a href="{{ url_for('theatre.admin_saison_delete', id=s.id) }}" class="btn btn-danger">{{ _("Supprimer") }}</a>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 {% endfor %}

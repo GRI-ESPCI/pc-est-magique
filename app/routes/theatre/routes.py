@@ -154,6 +154,22 @@ def admin_saison_edit(id: int):
         form=form
     )
 
+@bp.route("/admin/saison/delete/<id>")
+@context.permission_only(PermissionType.write, PermissionScope.theatre)
+def admin_saison_delete(id: int):
+    saison =Saison.query.get(id)
+    if saison is None:
+        flask.abort(404)
+
+    db.session.delete(saison)
+    db.session.commit()
+
+    flask.flash(_("Saison supprimée avec succès."), category="success")
+    return flask.redirect(
+        url_for("theatre.admin")
+    )
+
+
 @bp.route("/admin/spectacle/<id>")
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin_spectacle(id: int):
@@ -236,6 +252,23 @@ def admin_spectacle_new(saison_id: int):
         "theatre/admin_spectacle_new.html",
         form=form,
         saison=saison
+    )
+
+@bp.route("/admin/spectacle/delete/<spectacle_id>")
+@context.permission_only(PermissionType.write, PermissionScope.theatre)
+def admin_spectacle_delete(spectacle_id: int):
+    
+    spectacle = Spectacle.query.get(spectacle_id)
+    if spectacle is None:
+        flask.abort(404)
+    saison_id = spectacle.saison.id
+
+    db.session.delete(spectacle)
+    db.session.commit()
+
+    flask.flash(_("Spectacle supprimé."), category="success")
+    return flask.redirect(
+        url_for("theatre.admin_saison", id=saison_id)
     )
 
 @bp.route("/admin/representation/new/<spectacle_id>", methods=["GET", "POST"])

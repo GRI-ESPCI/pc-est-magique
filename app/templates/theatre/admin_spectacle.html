@@ -129,7 +129,13 @@
     {% if spectacle.representations|length %}
     <ul>
         {% for r in spectacle.representations %}
-            <li>{{ r.date.strftime("%A %d %m %Y") }} <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rep-del-modal-{{ r.id }}">x</button></li>
+            <li>{{ r.date.strftime("%A %d %m %Y") }}
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rep-del-modal-{{ r.id }}">
+                    <svg class="bi flex-shrink-0" width="18" height="18">
+                        {{ macros.bootstrap_icon("x-lg") }}
+                    </svg>
+                </button>
+            </li>
 
             {# Modal to confirm representation deletion #}
             <div class="modal fade" id="rep-del-modal-{{ r.id }}" tabindex="-1" aria-labelledby="rep-del-modal-label-{{ r.id }}" aria-hidden="true">

@@ -29,7 +29,8 @@ class Saison(db.Model):
     start_date: Column[datetime.date] = column(sa.Date(), nullable=False)
 
     spectacles: Relationship[list[Representation]] = one_to_many(
-        "Spectacle.saison"
+        "Spectacle.saison",
+        cascade="all, delete-orphan"
     )
 
 
@@ -50,7 +51,9 @@ class Spectacle(db.Model):
     saison: Relationship[Saison] = many_to_one("Saison.spectacles")
 
     representations: Relationship[list[Representation]] = one_to_many(
-        "Representation.spectacle", order_by="Representation.date"
+        "Representation.spectacle",
+        order_by="Representation.date",
+        cascade="all, delete-orphan"
     )
 
 
@@ -61,7 +64,9 @@ class Representation(db.Model):
     date: Column[datetime.datetime] = column(sa.DateTime(), nullable=False)
 
     _spectacle_id: Column[int] = column(sa.ForeignKey("spectacle.id"), nullable=False)
-    spectacle: Relationship[Spectacle] = many_to_one("Spectacle.representations")
+    spectacle: Relationship[Spectacle] = many_to_one(
+        "Spectacle.representations"
+    )
 
 
 from app import models
