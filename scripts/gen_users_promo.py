@@ -13,6 +13,7 @@ Il faut modifier le script pour changer le numéro de la promo.
 
 08/2023 Louis (aka Le Chauve Capé) 139
 """
+import sys
 import csv
 import string
 import random
@@ -23,7 +24,7 @@ try:
     from app.routes.auth import email
     from app.routes.auth.utils import new_username
     from app.utils import helpers, loggers
-    from app.utils.roles import grant_rezident_role
+    from app.utils.roles import grant_rezident_role, grant_student_role, grant_promotion_role
 
 except ImportError:
     sys.stderr.write(
@@ -41,13 +42,15 @@ def main():
     with open("new_promo.csv", "r", newline="") as file:
         reader = csv.reader(file, delimiter=",")
         for row in reader:
-            user = PCeen(username=new_username(row[2], row[1]), nom=row[1], prenom=row[2], promo=143, email=row[3])
+            promo=145
+            user = PCeen(username=new_username(row[2], row[1]), nom=row[1], prenom=row[2], promo=promo, email=row[3])
 
             # Generate random password
             letters = string.ascii_lowercase
             user.set_password("".join(random.choice(letters) for i in range(32)))
 
             grant_student_role(user)
+            grant_promotion_role(user, promo)
             db.session.add(user)
             db.session.commit()
             helpers.log_action(
