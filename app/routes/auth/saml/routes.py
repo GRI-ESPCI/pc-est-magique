@@ -176,6 +176,7 @@ def acs() -> typing.RouteReturn:
         pceen = PCeen.query.filter_by(nom=nom, prenom=prenom, promo=promo).first()
         if pceen:
             pceen_matched = pceen
+            helpers.log_action(f"SSO ESPCI : Un compte sans SSO lié ({pceen.full_name} {pceen.promo}) a été trouvé et va être lié à l'email {extracted_email}.")
 
     if pceen_matched:
         if not pceen_matched.espci_sso_enabled:
