@@ -10,12 +10,14 @@ import saml2.config
 import saml2.entity
 import saml2.metadata
 
+from app import db
 from app.models import PCeen
 from app.routes.auth import email
 from app.routes.auth.saml import bp
 from app.routes.auth.saml.utils import (
     reconciliate_account,
     create_new_account,
+    process_attributes,
     PROMOTIONS_SERVICES,
     SAMLAttributes,
 )
@@ -159,16 +161,36 @@ def acs() -> typing.RouteReturn:
         return helpers.ensure_safe_redirect("auth.auth_needed", next=None)
 
     # Authentication OK, process attributes
+    prenom, nom, extracted_email, promo = process_attributes(attributes)
+    
+    # 1. First Pass: check by exact espci_email
+    pceen_matched = None
     for mail in attributes["mail"]:
-        if pceen := PCeen.query.filter_by(email=mail).first():
-            if not pceen.espci_sso_enabled:
-                reconciliate_account(pceen, attributes)
+        pceen = PCeen.query.filter_by(espci_email=mail).first()
+        if pceen:
+            pceen_matched = pceen
+            break
+            
+    # 2. Second Pass: If not found by espci_email, check by Name + Promo
+    if not pceen_matched and promo is not None:
+        pceen = PCeen.query.filter_by(nom=nom, prenom=prenom, promo=promo).first()
+        if pceen:
+            pceen_matched = pceen
 
-            flask_login.login_user(pceen, remember=False)
-            flask.flash(_("Connecté !"), "success")
-            return helpers.redirect_to_next()
+    if pceen_matched:
+        if not pceen_matched.espci_sso_enabled:
+            reconciliate_account(pceen_matched, attributes)
+        
+        # Ensure we backfill espci_email if it's missing (e.g. for existing accounts matched by name)
+        if not pceen_matched.espci_email:
+             pceen_matched.espci_email = extracted_email
+             db.session.commit()
 
-    # No known address, check if allowed to access
+        flask_login.login_user(pceen_matched, remember=False)
+        flask.flash(_("Connecté !"), "success")
+        return helpers.redirect_to_next()
+
+    # 3. Third Pass: No known address or name, check if allowed to access / create
     if any(service in ACCEPTED_SERVICES for service in attributes["authorizedService"]):
         pceen = create_new_account(attributes)
         email.send_account_registered_email(pceen)

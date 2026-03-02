@@ -33,6 +33,12 @@
     </td>
 </tr>
 <tr>
+    <th scope="row" class="ps-4">{{ _("Email ESPCI") }}</th>
+    <td class="text-break">
+        <a href="mailto:{{ pceen.email }}" class="text-dark">{{ pceen.espci_email }}</a>
+    </td>
+</tr>
+<tr>
     <th scope="row" class="ps-4">{{ _("Rôles") }}</th>
     <td>{{ pceen.roles | join(", ") }}</td>
 </tr>

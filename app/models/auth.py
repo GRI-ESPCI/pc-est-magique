@@ -58,6 +58,7 @@ class PCeen(flask_login.UserMixin, Model):
     locale: Column[str | None] = column(sa.String(8), nullable=True)
     is_gri: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
     sub_state: Column[SubState] = column(Enum(SubState), nullable=True)
+    espci_email: Column[str] = column(sa.String(120), unique=True, nullable=True)
 
     # Login info
     activated: Column[bool] = column(sa.Boolean(), nullable=False, default=True)
