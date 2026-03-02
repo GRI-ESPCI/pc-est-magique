@@ -18,7 +18,9 @@ depends_on = None
 
 def upgrade():
     op.execute("CREATE EXTENSION IF NOT EXISTS unaccent;")
+    op.add_column("pceen", sa.Column("espci_email", sa.String(length=120), nullable=True))
 
 
 def downgrade():
+    op.drop_column("pceen", "espci_email")
     op.execute("DROP EXTENSION IF EXISTS unaccent;")
