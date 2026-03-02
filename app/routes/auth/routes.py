@@ -42,10 +42,10 @@ def register_rezident() -> typing.RouteReturn:
         promo = form.promo.data
 
         if nom and prenom and promo is not None:
-            existing_pceen = PCeen.query.filter_by(nom=nom, prenom=prenom, promo=promo).first()
+            existing_pceen = PCeen.find_by_fuzzy_name(nom, prenom, promo)
             if existing_pceen:
                 flask.session["link_rezident_role"] = True
-                helpers.log_action(f"Un utilisateur déjà existant a demandé à devenir Rezident ! ({pceen.full_name} {pceen.promo})")
+                helpers.log_action(f"Un utilisateur déjà existant a demandé à devenir Rezident ! ({existing_pceen.full_name} {existing_pceen.promo})")
                 flask.flash(_("Un compte avec ces informations existe déjà. Veuillez vous connecter pour finaliser la création du compte Rezident."), "info")
                 return flask.redirect(flask.url_for("auth.login"))
 

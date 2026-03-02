@@ -173,7 +173,7 @@ def acs() -> typing.RouteReturn:
             
     # 2. Second Pass: If not found by espci_email, check by Name + Promo
     if not pceen_matched and promo is not None:
-        pceen = PCeen.query.filter_by(nom=nom, prenom=prenom, promo=promo).first()
+        pceen = PCeen.find_by_fuzzy_name(nom, prenom, promo)
         if pceen:
             pceen_matched = pceen
             helpers.log_action(f"SSO ESPCI : Un compte sans SSO lié ({pceen.full_name} {pceen.promo}) a été trouvé et va être lié à l'email {extracted_email}.")

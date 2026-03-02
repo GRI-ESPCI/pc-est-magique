@@ -12,6 +12,7 @@ from flask_babel import _
 import flask_login
 import sqlalchemy as sa
 from sqlalchemy.ext.hybrid import hybrid_property
+from unidecode import unidecode
 from sqlalchemy.orm import Query
 from werkzeug import security as wzs
 
@@ -184,6 +185,30 @@ class PCeen(flask_login.UserMixin, Model):
         if not public_role:
             return False
         return cls._has_permission(public_role.permissions, type, scope, elem)
+
+    @classmethod
+    def find_by_fuzzy_name(cls, nom: str, prenom: str, promo: int | None) -> PCeen | None:
+        """Find a PCeen by a fuzzy name (unaccented + lowercased) and promo.
+        
+        Args:
+            nom: The user's last name.
+            prenom: The user's first name.
+            promo: The user's promotion number.
+            
+        Returns:
+            The matching PCeen, if one exists.
+        """
+        if not nom or not prenom or promo is None:
+            return None
+            
+        nom_clean = unidecode(nom.lower())
+        prenom_clean = unidecode(prenom.lower())
+        
+        return cls.query.filter(
+            sa.func.unaccent(sa.func.lower(cls.nom)) == nom_clean,
+            sa.func.unaccent(sa.func.lower(cls.prenom)) == prenom_clean,
+            cls.promo == promo
+        ).first()
 
     @property
     def first_seen(self) -> datetime.datetime:
