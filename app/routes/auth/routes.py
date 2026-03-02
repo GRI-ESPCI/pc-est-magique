@@ -37,8 +37,11 @@ def register_rezident() -> typing.RouteReturn:
     form = forms.RegistrationForm()
 
     if form.is_submitted():
-        nom = form.nom.data.title() if form.nom.data else ""
-        prenom = form.prenom.data.title() if form.prenom.data else ""
+        if not form.nom.data or not form.prenom.data:
+            raise ValueError(_("Veuillez renseigner votre nom et prénom pour l'inscription."))
+            
+        nom = form.nom.data.title()
+        prenom = form.prenom.data.title()
         promo = form.promo.data
 
         if nom and prenom and promo is not None:

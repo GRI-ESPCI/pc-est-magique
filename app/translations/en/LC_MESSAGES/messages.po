@@ -5701,6 +5701,10 @@ msgstr "Invalid item ID."
 #~ "à un captcha."
 #~ msgstr "Use of contact form from the exterior now needs captcha completation."
 
+#: app/routes/auth/routes.py:41
+msgid "Veuillez renseigner votre nom et prénom pour l'inscription."
+msgstr "Please provide your first and last name to register."
+
 #~ msgid "Ajout du mécanisme de changement de chambre."
 #~ msgstr "Added room change mecanism."
 
