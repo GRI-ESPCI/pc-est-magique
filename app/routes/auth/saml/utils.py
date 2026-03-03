@@ -61,10 +61,14 @@ def reconciliate_account(pceen: PCeen, attributes: SAMLAttributes) -> None:
         pceen: The PCéen matching the authenticated user.
         attributes: SAML attributes of the authenticated user.
     """
-    prenom, nom, _email, promo = process_attributes(attributes)
+    prenom, nom, email, promo = process_attributes(attributes)
     pceen.prenom = prenom
     pceen.nom = nom
     pceen.promo = promo
+    
+    if not pceen.espci_email:
+        pceen.espci_email = email
+        
     flask.flash(
         _(
             "Compte mis à jour depuis les infos ESPCI (prénom : %(prenom)s, nom : %(nom)s, promotion : %(promo)s)",
@@ -101,6 +105,7 @@ def create_new_account(attributes: SAMLAttributes) -> PCeen:
         prenom=prenom,
         promo=promo,
         email=email,
+        espci_email=email,
         espci_sso_enabled=True,
     )
     if promo:

@@ -73,10 +73,22 @@ msgstr "This photo is now the album's thumbnail."
 msgid "Photo définitivement supprimée."
 msgstr "Photo deleted definitively."
 
-#: app/routes/auth/email.py:17 app/routes/auth/routes.py:53
+#: app/routes/auth/email.py:17 app/routes/auth/routes.py:48
+msgid "Un compte avec ces informations existe déjà. Veuillez vous connecter pour finaliser la création du compte Rezident."
+msgstr "Account already exists. Please sign in to finalize the creation of the Rezident account."
+
+#: app/routes/auth/email.py:17 app/routes/auth/routes.py:70
 #: app/routes/auth/saml/routes.py:176
 msgid "Compte créé avec succès !"
 msgstr "Account successfully created!"
+
+#: app/routes/auth/email.py:17 app/routes/auth/routes.py:105
+msgid "Ce compte possède déjà le rôle Rezident."
+msgstr "This accound already has the Rezident role assigned."
+
+#: app/routes/auth/email.py:17 app/routes/auth/routes.py:109
+msgid "Le rôle Rezident vous a été ajouté."
+msgstr "You have been given the Rezident role."
 
 #: app/routes/auth/email.py:38 app/templates/auth/mails/reset_password.html:7
 msgid "Réinitialisation du mot de passe"
@@ -2057,6 +2069,10 @@ msgstr "Observer"
 #: app/templates/bar/user.html:138 app/templates/cards/account.html:30
 msgid "Email"
 msgstr "Mail"
+
+#: app/templates/bar/user.html:138 app/templates/cards/account.html:36
+msgid "Email ESPCI"
+msgstr "ESPCI Mail"
 
 #: app/templates/bar/user.html:147
 msgid "Externe"
@@ -5684,6 +5700,10 @@ msgstr "Invalid item ID."
 #~ "depuis l'extérieur est maintenant soumise "
 #~ "à un captcha."
 #~ msgstr "Use of contact form from the exterior now needs captcha completation."
+
+#: app/routes/auth/routes.py:41
+msgid "Veuillez renseigner votre nom et prénom pour l'inscription."
+msgstr "Please provide your first and last name to register."
 
 #~ msgid "Ajout du mécanisme de changement de chambre."
 #~ msgstr "Added room change mecanism."

@@ -6,7 +6,7 @@ from flask_babel import _
 
 from app import context, db
 from app.routes.auth import bp, forms, email
-from app.models import PCeen
+from app.models import PCeen, Role
 from app.routes.auth.utils import new_username
 from app.utils import helpers, typing
 from app.utils.roles import grant_rezident_role
@@ -35,12 +35,33 @@ def register_rezident() -> typing.RouteReturn:
         return helpers.redirect_to_next()
 
     form = forms.RegistrationForm()
+
+    if form.is_submitted():
+        if not form.nom.data or not form.prenom.data:
+            raise ValueError(_("Veuillez renseigner votre nom et prénom pour l'inscription."))
+            
+        nom = form.nom.data.title()
+        prenom = form.prenom.data.title()
+        promo = form.promo.data
+
+        if nom and prenom and promo is not None:
+            existing_pceen = PCeen.find_by_fuzzy_name(nom, prenom, promo)
+            if existing_pceen:
+                flask.session["link_rezident_role"] = True
+                helpers.log_action(f"Un utilisateur déjà existant a demandé à devenir Rezident ! ({existing_pceen.full_name} {existing_pceen.promo})")
+                flask.flash(_("Un compte avec ces informations existe déjà. Veuillez vous connecter pour finaliser la création du compte Rezident."), "info")
+                return flask.redirect(flask.url_for("auth.login"))
+
     if form.validate_on_submit():
+        nom = form.nom.data.title()
+        prenom = form.prenom.data.title()
+        promo = form.promo.data
+
         pceen = PCeen(
-            username=new_username(form.prenom.data, form.nom.data),
-            nom=form.nom.data.title(),
-            prenom=form.prenom.data.title(),
-            promo=form.promo.data,
+            username=new_username(prenom, nom),
+            nom=nom,
+            prenom=prenom,
+            promo=promo,
             email=form.email.data,
         )
         pceen.set_password(form.password.data)
@@ -81,7 +102,18 @@ def login() -> typing.RouteReturn:
             if not pceen.activated:
                 pceen.activated = True
                 db.session.commit()
-            flask.flash(_("Connecté !"), "success")
+            
+            if flask.session.pop("link_rezident_role", None):
+                rezident_role = Role.query.filter_by(name="Rezident").one()
+                if rezident_role in pceen.roles:
+                    flask.flash(_("Ce compte possède déjà le rôle Rezident."), "danger")
+                else:
+                    grant_rezident_role(pceen)
+                    db.session.commit()
+                    flask.flash(_("Le rôle Rezident vous a été ajouté."), "success")
+            else:
+                flask.flash(_("Connecté !"), "success")
+                
             return helpers.redirect_to_next()
 
     return flask.render_template("auth/login.html", title=_("Connexion"), form=form)
