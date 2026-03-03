@@ -201,12 +201,12 @@ class PCeen(flask_login.UserMixin, Model):
         if not nom or not prenom or promo is None:
             return None
             
-        nom_clean = unidecode(nom.lower()).replace("--", "-")
-        prenom_clean = unidecode(prenom.lower()).replace("--", "-")
+        nom_clean = unidecode(nom.lower()).replace("--", " ").replace("-", " ")
+        prenom_clean = unidecode(prenom.lower()).replace("--", " ").replace("-", " ")
         
         return cls.query.filter(
-            sa.func.replace(sa.func.unaccent(sa.func.lower(cls.nom)), "--", "-") == nom_clean,
-            sa.func.replace(sa.func.unaccent(sa.func.lower(cls.prenom)), "--", "-") == prenom_clean,
+            sa.func.replace(sa.func.replace(sa.func.unaccent(sa.func.lower(cls.nom)), "--", " "), "-", " ") == nom_clean,
+            sa.func.replace(sa.func.replace(sa.func.unaccent(sa.func.lower(cls.prenom)), "--", " "), "-", " ") == prenom_clean,
             cls.promo == promo
         ).first()
 
