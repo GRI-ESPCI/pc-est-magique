@@ -1,4 +1,5 @@
--- Script générique pour migrer toutes les informations d'un compte PEM vers un autre compte. Il transfère toutes les informations, l'historique des transactions, balance bar...
+-- Script générique pour migrer toutes les informations d'un compte PEM vers un autre compte. 
+-- Il transfère toutes les informations, l'historique des transactions, balance bar...
 DO $$
 DECLARE
     old_id_here INT := 1874;     -- ID du compte à supprimer
@@ -36,14 +37,19 @@ WHERE old_data._pceen_id = old_id_here
   AND target_data._pceen_id = target_id_here
   AND target_data.date = old_data.date;
 
-
 UPDATE bar_daily_data
 SET _pceen_id = target_id_here
 WHERE _pceen_id = old_id_here;
 
--- Migration de la balance
+-- Migration de la balance et des informations de profil
 UPDATE pceen AS target
-SET bar_balance = COALESCE(target.bar_balance, 0) + COALESCE(old.bar_balance, 0)
+SET 
+    bar_balance = COALESCE(target.bar_balance, 0) + COALESCE(old.bar_balance, 0),
+    sub_state = COALESCE(target.sub_state, old.sub_state),
+    discontent = COALESCE(target.discontent, old.discontent),
+    espci_email = COALESCE(target.espci_email, old.espci_email),
+    bar_nickname = COALESCE(target.bar_nickname, old.bar_nickname),
+    bar_deposit = COALESCE(target.bar_deposit, false) OR COALESCE(old.bar_deposit, false)
 FROM pceen AS old
 WHERE target.id = target_id_here 
   AND old.id = old_id_here;
@@ -51,7 +57,6 @@ WHERE target.id = target_id_here
 UPDATE pceen
 SET bar_balance = 0
 WHERE id = old_id_here;
-
 
 -- Tout le reste
 UPDATE bar_transaction SET _client_id = target_id_here WHERE _client_id = old_id_here;
