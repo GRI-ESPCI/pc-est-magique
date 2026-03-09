@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime
+import re
 import time
 import typing
 
@@ -201,12 +202,12 @@ class PCeen(flask_login.UserMixin, Model):
         if not nom or not prenom or promo is None:
             return None
             
-        nom_clean = unidecode(nom.lower()).replace("--", " ").replace("-", " ")
-        prenom_clean = unidecode(prenom.lower()).replace("--", " ").replace("-", " ")
+        nom_clean = re.sub(r'\W+', ' ', unidecode(nom)).strip()
+        prenom_clean = re.sub(r'\W+', ' ', unidecode(prenom)).strip()
         
         return cls.query.filter(
-            sa.func.replace(sa.func.replace(sa.func.unaccent(sa.func.lower(cls.nom)), "--", " "), "-", " ") == nom_clean,
-            sa.func.replace(sa.func.replace(sa.func.unaccent(sa.func.lower(cls.prenom)), "--", " "), "-", " ") == prenom_clean,
+            sa.func.trim(sa.func.regexp_replace(sa.func.unaccent(cls.nom), r'\W+', ' ', 'g')).ilike(nom_clean),
+            sa.func.trim(sa.func.regexp_replace(sa.func.unaccent(cls.prenom), r'\W+', ' ', 'g')).ilike(prenom_clean),
             cls.promo == promo
         ).first()
 
