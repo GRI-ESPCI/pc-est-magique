@@ -32,12 +32,21 @@
         <a href="mailto:{{ pceen.email }}" class="text-dark">{{ pceen.email }}</a>
     </td>
 </tr>
+{% if pceen.espci_email != None %}
 <tr>
     <th scope="row" class="ps-4">{{ _("Email ESPCI") }}</th>
     <td class="text-break">
         <a href="mailto:{{ pceen.email }}" class="text-dark">{{ pceen.espci_email }}</a>
     </td>
+</tr>   
+{% else  %}
+<tr>
+    <th scope="row" class="ps-4">{{ _("Email ESPCI") }}</th>
+    <td class="text-break">
+        <p> Pas de compte ESPCI associé</p>
+    </td>
 </tr>
+{% endif %}
 <tr>
     <th scope="row" class="ps-4">{{ _("Rôles") }}</th>
     <td>{{ pceen.roles | join(", ") }}</td>

@@ -15,7 +15,7 @@
         <h3 class="card-title text-{{ theme }} my-1">
             <span>{{ _("Profil Bar :") }}</span>
             <span class="fw-bold">{{ pceen.prenom }}
-            {% if current_user_is_barman and pceen.bar_nickname %}
+            {% if pceen.bar_nickname and (current_user_is_barman or personal_page) %}
                 &laquo;&nbsp;{{ pceen.bar_nickname }}&nbsp;&raquo;
             {% endif %}
             {{ pceen.nom }}</span>
