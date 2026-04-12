@@ -49,8 +49,8 @@ class Room(Model):
     base_ip: Column[str] = column(sa.String(4))
     ips_allocated: Column[int] = column(sa.Integer(), nullable=False, default=0)
 
-    rentals: Relationship[list[Rental]] = one_to_many("Rental.room")
-    allocations: Relationship[list[models.Allocation]] = one_to_many("Allocation.room")
+    rentals = one_to_many("Rental.room", uselist=True)
+    allocations = one_to_many("Allocation.room", uselist=True)
 
     def __repr__(self) -> str:
         """Returns repr(self)."""

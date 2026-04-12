@@ -33,6 +33,7 @@ from app.utils import captcha, helpers, typing
 from datetime import date
 from app.routes.club_q.utils import pceen_prix_total
 from app.routes.panier_bio.utils import command_open, what_are_next_days
+from app import db
 
 
 @bp.route("/")
@@ -190,7 +191,7 @@ def connect_check() -> typing.RouteReturn:
 def banned() -> typing.RouteReturn:
     """Page shown when the Rezident is banned."""
     try:
-        ban = Ban.query.get(context.g._ban)
+        ban = db.session.get(Ban, context.g._ban)
     except AttributeError:
         return helpers.redirect_to_next()
     return flask.render_template("main/banned.html", ban=ban, title=_("Accès à Internet restreint"))
@@ -322,3 +323,26 @@ def custom_files(folder: str, filename: str) -> typing.RouteReturn:
         path = flask.current_app.config["BEKK_BASE_PATH"]
     filepath = os.path.join(path, filename)
     return flask.send_file(filepath)
+
+
+@bp.route("/set_theme/<theme>")
+def set_theme(theme: str) -> typing.RouteReturn:
+    """Set the interface theme."""
+    valid_themes = ["material", "frost", "classic"]
+    if theme not in valid_themes:
+        theme = "material"
+    
+    resp = flask.make_response(helpers.redirect_to_next())
+    resp.set_cookie("theme", theme, max_age=60*60*24*365)
+    return resp
+
+@bp.route("/set_mode/<mode>")
+def set_mode(mode: str) -> typing.RouteReturn:
+    """Set the interface custom mode (light/dark/auto)."""
+    valid_modes = ["light", "dark", "auto"]
+    if mode not in valid_modes:
+        mode = "auto"
+    
+    resp = flask.make_response(helpers.redirect_to_next())
+    resp.set_cookie("mode", mode, max_age=60*60*24*365)
+    return resp

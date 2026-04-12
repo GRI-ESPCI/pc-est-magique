@@ -8,7 +8,7 @@ import importlib
 import flask
 from flask_babel import lazy_gettext as _l
 import werkzeug
-from werkzeug import urls as wku
+from urllib.parse import urlparse
 
 from app import PCEstMagiqueApp
 from app.utils import typing
@@ -110,7 +110,7 @@ def redirect_to_next(**params: str | bool | None) -> typing.RouteReturn:
     except werkzeug.routing.BuildError:  # type: ignore
         next_page = None
 
-    if not next_page or wku.url_parse(next_page).netloc != "":
+    if not next_page or urlparse(next_page).netloc != "":
         # Do not redirect to absolute links (possible attack)
         next_endpoint = "main.index"
 

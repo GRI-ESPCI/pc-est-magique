@@ -1,7 +1,6 @@
 """PC est magique - Profile-related Forms"""
 
 import wtforms
-from wtforms.fields import html5
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
 from flask import Flask
@@ -60,9 +59,9 @@ class EditSaison(FlaskForm):
     id = wtforms.HiddenField("")
     nom = wtforms.StringField("Nom de la saison", validators=[DataRequired()])
     promo = wtforms.IntegerField("Promo organisatrice", validators=[DataRequired()])
-    debut = html5.DateField("Date de début de la saison", validators=[Optional()])
-    fin = html5.DateField("Date de fin de la saison", validators=[Optional()])
-    fin_inscription = html5.DateField("Date de fin d'inscription", validators=[Optional()])
+    debut = wtforms.DateField("Date de début de la saison", validators=[Optional()])
+    fin = wtforms.DateField("Date de fin de la saison", validators=[Optional()])
+    fin_inscription = wtforms.DateField("Date de fin d'inscription", validators=[Optional()])
     attributions_visible = wtforms.IntegerField("Attributions visibles", validators=[Optional()])
     add = wtforms.SubmitField(_l("Ajouter"))
     modify = wtforms.SubmitField(_l("Modifier"))
@@ -88,8 +87,8 @@ class EditSpectacle(FlaskForm):
     description = wtforms.TextAreaField("Description", validators=[Optional(), Length(max=2500)])
     categorie = wtforms.StringField("Catégorie", validators=[Optional()])
     image = wtforms.FileField(_l(""), validators=[FileAllowed(["jpg"], "JPG uniquement!")])
-    date = html5.DateField("Date", validators=[InputRequired()])
-    time = html5.TimeField("Heure", validators=[InputRequired()])
+    date = wtforms.DateField("Date", validators=[InputRequired()])
+    time = wtforms.TimeField("Heure", validators=[InputRequired()])
     nb_tickets = wtforms.IntegerField("Nombre de places", validators=[DataRequired()])
     price = wtforms.DecimalField("Prix par place (€)", places=2, validators=[DataRequired()])
     add = wtforms.SubmitField(_l("Ajouter"))
@@ -104,13 +103,13 @@ class EditDiscontent(FlaskForm):
 
 
 class Mail(FlaskForm):
-    reply_to = html5.EmailField(
+    reply_to = wtforms.EmailField(
         _l("Adresse e-mail de réponse"),
         validators=[DataRequired(), Length(max=120), Email()],
     )
-    date_payement = html5.DateField("Date de payement", validators=[DataRequired()])
-    date_SAV = html5.DateField("Date limite SAV", validators=[DataRequired()])
-    link_SAV = html5.URLField("Lien du SAV", validators=[DataRequired()])
+    date_payement = wtforms.DateField("Date de payement", validators=[DataRequired()])
+    date_SAV = wtforms.DateField("Date limite SAV", validators=[DataRequired()])
+    link_SAV = wtforms.URLField("Lien du SAV", validators=[DataRequired()])
     threshold = wtforms.IntegerField(
         "Envoyer à partir du x-ème email (à utiliser en cas de bug)", default=0, validators=[Optional()]
     )

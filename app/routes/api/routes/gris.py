@@ -39,10 +39,10 @@ def add_remove_role(action: str, pceen_id: str, role_id: str) -> tuple[str | dic
     # Check request refer to existing objects
     if action not in ("add", "remove"):
         return f"Invalid action '{action}'", 400
-    pceen = PCeen.query.get(pceen_id)
+    pceen = db.session.get(PCeen, pceen_id)
     if not pceen:
         return f"Invalid pceen_id #{pceen_id}", 404
-    role = Role.query.get(role_id)
+    role = db.session.get(Role, role_id)
     if not role:
         return f"Invalid role {role_id}", 404
     # Check request is acceptable
@@ -97,7 +97,7 @@ def add_perm(role_id: str, perm_id: str, type_name: str, scope_name: str, ref_id
         If the permission was successfully added, an empty dict with a 204.
     """
     # Check request refer to existing objects
-    role: Role = Role.query.get(role_id)
+    role: Role = db.session.get(Role, role_id)
     if not role:
         return f"Invalid role '{role_id}'", 404
     # Check rights
@@ -105,7 +105,7 @@ def add_perm(role_id: str, perm_id: str, type_name: str, scope_name: str, ref_id
         return "Unauthorized (you nasty cheater)", 403
     # Check request refer to existing objects
     if perm_id:
-        perm: Permission = Permission.query.get(perm_id)
+        perm: Permission = db.session.get(Permission, perm_id)
         if not perm:
             return f"Invalid perm '{perm_id}'", 404
     else:
@@ -164,10 +164,10 @@ def remove_perm(role_id: str, perm_id: str) -> tuple[str | dict, int]:
         If the permission was successfully removed, an empty dict with a 204.
     """
     # Check request refer to existing objects
-    role: Role = Role.query.get(role_id)
+    role: Role = db.session.get(Role, role_id)
     if not role:
         return f"Invalid role '{role_id}'", 404
-    perm: Permission = Permission.query.get(perm_id)
+    perm: Permission = db.session.get(Permission, perm_id)
     if not perm:
         return f"Invalid perm '{perm_id}'", 404
     # Check request is acceptable

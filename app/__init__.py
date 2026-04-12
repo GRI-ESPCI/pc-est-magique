@@ -6,7 +6,7 @@ See github.com/GRI-ESPCI/pc-est-magique for informations.
 __title__ = "pc-est-magique"
 __author__ = "Loïc Simon, Samuel Diebolt, Louis Grandvaux, Alec Cochard & other GRIs"
 __license__ = "MIT"
-__copyright__ = "2021-2023 GRIs – ESPCI Paris - PSL"
+__copyright__ = "2021-2026 GRIs – ESPCI Paris - PSL"
 __all__ = ["create_app"]
 
 
@@ -24,7 +24,7 @@ import flask_login
 import flask_mail
 import flask_moment
 import flask_babel
-from werkzeug import urls as wku
+from urllib.parse import urlparse
 
 import markdown
 
@@ -32,7 +32,7 @@ from config import Config
 from app import enums
 
 
-in_app_copyright = "2021-2023 GRI ESPCI"
+in_app_copyright = "2021-2026 GRI ESPCI"
 
 
 # Define Flask subclass
@@ -55,6 +55,7 @@ from app.utils import helpers, loggers, typing
 
 # Load extensions
 db = flask_sqlalchemy.SQLAlchemy()
+db.Model.__allow_unmapped__ = True  # Legacy Column[] annotations (SQLAlchemy 2.0 compat)
 migrate = flask_migrate.Migrate(compare_type=True)
 login = flask_login.LoginManager()
 mail = flask_mail.Mail()
@@ -79,7 +80,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     login.init_app(app)
     mail.init_app(app)
     moment.init_app(app)
-    babel.init_app(app)
+    babel.init_app(app, locale_selector=_get_locale)
 
     # Set up Jinja
     app.jinja_env.trim_blocks = True
@@ -145,8 +146,9 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     # ! Keep import here to avoid circular import issues !
     from app import email
 
-    app.before_first_request(email.init_premailer)
-    app.before_first_request(email.init_textifier)
+    with app.app_context():
+        email.init_premailer()
+        email.init_textifier()
 
     # Set up captive portal
     @app.before_request
@@ -159,7 +161,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
         if flask.request.endpoint:
             # No infinite redirections loop
             return None
-        if wku.url_parse(flask.request.url).netloc not in netlocs:
+        if urlparse(flask.request.url).netloc not in netlocs:
             # Requested URL not in netlocs: redirect
             return context.capture()
         # Valid URL
@@ -206,18 +208,22 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
 # ! Keep at the bottom to avoid circular import issues !
 from app import models
 from app.utils import global_settings
+from app import db
 
 
 # Set up locale
-@babel.localeselector
+
 def _get_locale() -> str | None:
     """Get the application language preferred by the remote user."""
     locale = flask.request.accept_languages.best_match(flask.current_app.config["LANGUAGES"])
-    if flask.g.logged_in and locale != flask.g.logged_in_user.locale:
-        # Do not use flask.g.pceen here, it would override user locale
-        # by the locale of a GRI using doas
-        flask.g.logged_in_user.locale = locale
-        db.session.commit()
+    try:
+        if flask.g.logged_in and locale != flask.g.logged_in_user.locale:
+            # Do not use flask.g.pceen here, it would override user locale
+            # by the locale of a GRI using doas
+            flask.g.logged_in_user.locale = locale
+            db.session.commit()
+    except AttributeError:
+        pass  # g.logged_in not yet set (called before context setup)
 
     return locale
 
@@ -235,4 +241,4 @@ def _load_user(id: str) -> models.PCeen | None:
     """
     if not id.isdigit():
         return None
-    return models.PCeen.query.get(int(id))
+    return models.db.session.get(models.PCeen, int(id))

@@ -9,7 +9,7 @@
                 <h1>{{ title }}</h1>
             </div>
             <div class="col my-auto me-auto">
-                <a class="btn btn-outline-secondary"
+                <a class="btn btn-outline-secondary rounded-pill btn-sm"
                    href="{{ url_for("payments.pay") }}">
                     {{ _("Changer") }}
                 </a>
@@ -24,28 +24,28 @@
             <div class="col">
                 <p>{{ _("Bonjour ami GRI, avant d'ajouter le paiement merci "
                         "de vérifier ces paramètres :") }}</p>
-                <ul>
-                    <li>
+                <ul class="list-group list-group-flush mb-3 bg-transparent">
+                    <li class="list-group-item bg-transparent px-0 border-light border-opacity-10">
                         {{ _("Payeur :") }}
-                        <span class="fw-bold font-monospace ps-1">
+                        <span class="fw-bold text-primary ps-1">
                             {{ g.pceen.full_name }}
                         </span>
                     </li>
-                    <li>
+                    <li class="list-group-item bg-transparent px-0 border-light border-opacity-10">
                         {{ _("Montant :") }}
-                        <span class="fw-bold font-monospace ps-1">
+                        <span class="fw-bold text-primary ps-1">
                             {{ babel.format_currency(offer.price, "EUR") }}
                         </span>
                     </li>
-                    <li>
+                    <li class="list-group-item bg-transparent px-0 border-light border-opacity-10">
                         {{ _("Offre :") }}
-                        <span class="fw-bold font-monospace ps-1">
+                        <span class="fw-bold text-primary ps-1">
                             {{ _("Voir sur la droite (ou en-dessous)") }}
                         </span>
                     </li>
-                    <li>
+                    <li class="list-group-item bg-transparent px-0 border-0">
                         {{ _("GRI effectuant l'opération :") }}
-                        <span class="fw-bold font-monospace ps-1">
+                        <span class="fw-bold text-primary ps-1">
                             {{ current_user.full_name }}
                         </span>
                     </li>
@@ -63,7 +63,7 @@
 </div>
 <div class="row mt-4">
     <div class="col text-center">
-        <a class="btn btn-secondary ms-2"
+        <a class="btn btn-primary btn-pill btn-lg shadow-sm ms-2"
            href="{{ url_for("payments.add_payment", offer=offer.slug,
                              doas=request.args.get("doas")) }}">
             {{ _("Valider le paiement") }}

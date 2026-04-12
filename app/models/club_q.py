@@ -34,11 +34,11 @@ class ClubQSeason(db.Model):
     fin_inscription: Column[datetime.date | None] = column(sa.Date(), nullable=True)
     attributions_visible: Column[bool] = column(sa.Boolean(), default=False, nullable=False)
 
-    spectacles: Relationship[list[ClubQSpectacle]] = one_to_many(
-        "ClubQSpectacle.season", order_by="ClubQSpectacle.date"
+    spectacles = one_to_many(
+        "ClubQSpectacle.season", order_by="ClubQSpectacle.date", uselist=True
     )
-    voeu: Relationship[list[ClubQVoeu]] = one_to_many("ClubQVoeu.season", order_by="ClubQVoeu.id")
-    brochure: Relationship[list[ClubQBrochure]] = one_to_many("ClubQBrochure.season", order_by="ClubQBrochure.id")
+    voeu = one_to_many("ClubQVoeu.season", order_by="ClubQVoeu.id", uselist=True)
+    brochure = one_to_many("ClubQBrochure.season", order_by="ClubQBrochure.id", uselist=True)
 
     @property
     def sum_places_demandees(self) -> int:
@@ -62,7 +62,7 @@ class ClubQSalle(db.Model):
     adresse: Column[str | None] = column(sa.String(64), nullable=True)
     latitude: Column[float] = column(sa.Float(), default=0, nullable=False)
     longitude: Column[float] = column(sa.Float(), default=0, nullable=False)
-    spectacles: Relationship[list[ClubQSpectacle]] = one_to_many("ClubQSpectacle.salle", order_by="ClubQSpectacle.date")
+    spectacles = one_to_many("ClubQSpectacle.salle", order_by="ClubQSpectacle.date", uselist=True)
 
 
 class ClubQSpectacle(db.Model):
@@ -78,7 +78,7 @@ class ClubQSpectacle(db.Model):
     nb_tickets: Column[int] = column(sa.Integer(), nullable=False)
     unit_price: Column[float] = column(sa.Float(), nullable=False)
 
-    voeu: Relationship[list[ClubQVoeu]] = one_to_many("ClubQVoeu.spectacle", order_by="ClubQVoeu.id", lazy="dynamic")
+    voeu = one_to_many("ClubQVoeu.spectacle", order_by="ClubQVoeu.id", uselist=True)
 
     _season_id: Column[int] = column(sa.ForeignKey("club_q_season.id"), nullable=False)
     season: Relationship[ClubQSeason] = many_to_one("ClubQSeason.spectacles")
@@ -89,12 +89,12 @@ class ClubQSpectacle(db.Model):
     @property
     def sum_places_demandees(self) -> int:
         """The number of tickets asked for a spectacle"""
-        return sum(v.places_demandees for v in self.voeu.filter_by(_season_id=self._season_id))
+        return sum(v.places_demandees for v in self.voeu if v._season_id == self._season_id)
 
     @property
     def sum_places_attribuees(self) -> int:
         """The number of tickets asked for a spectacle"""
-        return sum(v.places_attribuees for v in self.voeu.filter_by(_season_id=self._season_id))
+        return sum(v.places_attribuees for v in self.voeu if v._season_id == self._season_id)
 
     @property
     def src(self) -> int:

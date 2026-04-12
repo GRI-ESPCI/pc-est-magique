@@ -16,6 +16,151 @@
 
 {% with date_descr = _("aujourd’hui") if is_today else _("le ") + babel.format_date(date, "short") %}
 
+{% if g.theme != 'classic' %}
+<!-- MODERN THEMES (FROST / MATERIAL) -->
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3 mt-1">
+    <div class="col">
+        <div class="card hover-lift h-100 border-0 shadow-sm overflow-hidden">
+            <div class="card-body p-4 text-nowrap">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="p-3 rounded-4 me-3 d-flex align-items-center justify-content-center" style="background-color: rgba(13, 110, 253, 0.12);">
+                        <svg class="bi text-primary" width="28" height="28" fill="currentColor" role="img">
+                            {{ macros.bootstrap_icon("people-fill") }}
+                        </svg>
+                    </div>
+                    <div>
+                        <h6 class="text-muted small mb-0 uppercase tracking-wider fw-bold text-uppercase">{{ _("Clients") }}</h6>
+                        <h3 class="mb-0 fw-bold">{{ nb_daily_clients }} / {{ nb_daily_clients_alcohol }}</h3>
+                    </div>
+                </div>
+                <p class="text-muted small mb-0">{{ macros.s(nb_daily_clients, "Client", False) }} / {{ macros.s(nb_daily_clients_alcohol, "Client", False) }} {{ date_descr }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col">
+        <div class="card hover-lift h-100 border-0 shadow-sm overflow-hidden">
+            <div class="card-body p-4 text-nowrap">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="p-3 rounded-4 me-3 d-flex align-items-center justify-content-center" style="background-color: rgba(220, 53, 69, 0.12);">
+                        <svg class="bi text-danger" width="28" height="28" fill="currentColor" role="img">
+                            {{ macros.bootstrap_icon("cup-fill") }}
+                        </svg>
+                    </div>
+                    <div>
+                        <h6 class="text-muted small mb-0 uppercase tracking-wider fw-bold text-uppercase">{{ _("Alcool vendu") }}</h6>
+                        <h3 class="mb-0 fw-bold">{{ babel.format_decimal(alcohol_qty) }}&nbsp;g</h3>
+                    </div>
+                </div>
+                <p class="text-muted small mb-0">{{ _("Vendu") }} {{ date_descr }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card hover-lift h-100 border-0 shadow-sm overflow-hidden">
+            <div class="card-body p-4 text-nowrap">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="p-3 rounded-4 me-3 d-flex align-items-center justify-content-center" style="background-color: rgba(25, 135, 84, 0.12);">
+                        <svg class="bi text-success" width="28" height="28" fill="currentColor" role="img">
+                            {{ macros.bootstrap_icon("cash-stack") }}
+                        </svg>
+                    </div>
+                    <div>
+                        <h6 class="text-muted small mb-0 uppercase tracking-wider fw-bold text-uppercase">{{ _("Recette") }}</h6>
+                        <h3 class="mb-0 fw-bold">{{ babel.format_currency(daily_revenue or 0, "EUR") }}</h3>
+                    </div>
+                </div>
+                <p class="text-muted small mb-0">{{ _("Total") }} {{ date_descr }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card hover-lift h-100 border-0 shadow-sm overflow-hidden">
+            <div class="card-body p-4 text-nowrap">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="p-3 rounded-4 me-3 d-flex align-items-center justify-content-center" style="background-color: rgba(13, 202, 240, 0.12);">
+                        <svg class="bi text-info" width="28" height="28" fill="currentColor" role="img">
+                            {{ macros.bootstrap_icon("bank2") }}
+                        </svg>
+                    </div>
+                    <div>
+                        <h6 class="text-muted small mb-0 uppercase tracking-wider fw-bold text-uppercase">{{ _("Moula clients") }}</h6>
+                        <h3 class="mb-0 fw-bold">{{ babel.format_currency(total_balances_sum or 0, "EUR") }}</h3>
+                    </div>
+                </div>
+                <p class="text-muted small mb-0">{{ _("Somme totale des soldes") }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card hover-lift h-100 border-0 shadow-sm overflow-hidden">
+            <div class="card-body p-4 text-nowrap">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="p-3 rounded-4 me-3 d-flex align-items-center justify-content-center" style="background-color: rgba(255, 193, 7, 0.12);">
+                        <svg class="bi text-warning" width="28" height="28" fill="currentColor" role="img">
+                            {{ macros.bootstrap_icon("star-fill") }}
+                        </svg>
+                    </div>
+                    <div>
+                        <h6 class="text-muted small mb-0 uppercase tracking-wider fw-bold text-uppercase">{{ _("Top client") }}</h6>
+                        <h3 class="mb-0 fw-bold">{{ best_customer_name }}</h3>
+                    </div>
+                </div>
+                <p class="text-muted small mb-0">{{ _("Meilleur client du mois") }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <form action="" method="get">
+                    <h6 class="text-muted small mb-3 uppercase tracking-wider fw-bold text-uppercase">{{ _("Changer de date") }}</h6>
+                    <div class="d-flex gap-2">
+                        <input class="form-control form-control-sm border-0 bg-body-tertiary text-body px-3" type="date" id="date" name="date" value="{{ date.isoformat() }}">
+                        <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold rounded-pill">{{ _("Go") }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-3 mb-5">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-body p-4">
+                <h5 class="card-title fw-bold mb-4 text-body d-flex align-items-center gap-2">
+                    <svg class="bi text-primary" width="20" height="20" fill="currentColor">{{ macros.bootstrap_icon("graph-up") }}</svg>
+                    {{ _("Recettes mensuelles") }}
+                </h5>
+                <div style="height: 350px; position: relative;">
+                    <canvas id="revenues-chart" aria-label="revenues-chart" role="img"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 mt-4">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-body p-4">
+                <h5 class="card-title fw-bold mb-4 text-body d-flex align-items-center gap-2">
+                    <svg class="bi text-primary" width="20" height="20" fill="currentColor">{{ macros.bootstrap_icon("activity") }}</svg>
+                    {{ _("Transactions par jour") }}
+                </h5>
+                <div style="height: 350px; position: relative;">
+                    <canvas id="transactions-chart" aria-label="transactions-chart" role="img"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- CLASSIC THEME (ORIGINAL) -->
 <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 mt-3">
     <div class="col mb-3">
         <div class="card shadow bg-info">
@@ -113,7 +258,6 @@
                     </svg>
                 </div>
                 <div class="col my-auto d-flex">
-                    <!-- <label class="form-label my-auto" for="date">{{ _("Date&nbsp;:") }}</label> -->
                     <input class="form-control me-2" type="date" id="date" name="date" value="{{ date.isoformat() }}">
                     <button type="submit" class="btn btn-info">{{ _("Go") }}</button>
                 </div>
@@ -123,8 +267,6 @@
         </div>
     </div>
 </div>
-
-{% endwith %}
 
 <div class="card border-info mb-3">
     <div class="card-body">
@@ -137,5 +279,8 @@
         <canvas id="transactions-chart" width="600" height="400" aria-label="transactions-chart" role="img"></canvas>
     </div>
 </div>
+{% endif %}
+
+{% endwith %}
 
 {% endblock %}

@@ -1,32 +1,30 @@
 {% if can_edit %}
 <button
-  class="btn btn-outline-primary"
+  class="btn btn-outline-primary d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2 my-2"
   id="edit-text"
-  style="margin-top: 5px; margin-bottom: 5px"
 >
-  <svg
-    class="bi flex-shrink-0"
-    width="18"
-    height="18"
-  >
-    {{ macros.bootstrap_icon("pen") }}
+  <svg class="bi flex-shrink-0" width="18" height="18">
+    {{ macros.bootstrap_icon("pencil-square") }}
   </svg>
+  <span>{{ _("Modifier") }}</span>
 </button>
-<div
-  id="wysiwyg_editor"
-  class="col"
->
+
+<div id="wysiwyg_editor" class="mb-4">
   <div id="editor">{{html_file | safe}}</div>
-  <button
-    type="submit"
-    class="btn btn-primary"
-    style="margin-top: 5px; margin-bottom: 5px"
-    id="save-text"
-  >
-    {{ ("Sauvegarder") }}
-  </button>
+  <div class="d-flex justify-content-start mt-3">
+    <button
+      type="submit"
+      class="btn btn-primary d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2"
+      id="save-text"
+    >
+      <svg class="bi flex-shrink-0" width="18" height="18">
+        {{ macros.bootstrap_icon("check2-circle") }}
+      </svg>
+      <span>{{ _("Sauvegarder") }}</span>
+    </button>
+  </div>
 </div>
-<br />
 {% endif %}
 
-<div id="intro_text">{{html_file | safe}}</div>
+<div id="intro_text" class="mb-4">{{html_file | safe}}</div>
+

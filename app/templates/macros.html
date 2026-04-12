@@ -40,9 +40,10 @@
             "danger":   (_("Attention :"),      "exclamation-triangle-fill"),
         }.get(category, ("",                    ""))
     %}
-    <div class="toast{{ ' show-toast' if message else '' }}" role="alert" aria-live="assertive" aria-atomic="true"
+    <div class="toast {{ 'glass-toast' if g.theme != 'classic' else '' }}{{ ' show-toast' if message else '' }}" role="alert" aria-live="assertive" aria-atomic="true"
          {{ extra_div_args }}>
-        <div class="toast-header text-white bg-{{ category }}">
+        {% if g.theme == 'classic' %}
+        <div class="toast-header text-white bg-{{ category }} bg-gradient">
             <svg class="bi flex-shrink-0 me-2" width="24" height="24"
                  role="img" aria-label="{{ alert_label }}">
                 {{ bootstrap_icon(alert_icon) }}
@@ -57,6 +58,22 @@
         <div class="toast-body">
             {{ message }}
         </div>
+        {% else %}
+        <div class="toast-body d-flex align-items-center p-3">
+            <div class="toast-icon d-flex align-items-center justify-content-center me-3 text-{{ category }} flex-shrink-0" style="width: 48px; height: 48px;">
+                <svg class="bi" width="40" height="40" fill="currentColor" role="img" aria-label="{{ alert_label }}">
+                    {{ bootstrap_icon(alert_icon) }}
+                </svg>
+            </div>
+            <div class="flex-grow-1">
+                <strong class="d-block {{ 'text-warning' if category == 'warning' else 'text-' ~ category }} mb-1">{{ alert_label }}</strong>
+                <span class="toast-message-text">{{ message }}</span>
+            </div>
+            <button type="button" class="btn-close ms-2 m-auto align-self-start" data-bs-dismiss="toast"
+                    aria-label="{{ _("Fermer") }}">
+            </button>
+        </div>
+        {% endif %}
     </div>
     {% endwith %}
 {% endmacro %}

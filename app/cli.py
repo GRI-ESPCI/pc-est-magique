@@ -95,6 +95,4 @@ def register(app: PCEstMagiqueApp) -> None:
                 print(f"{script_name.ljust(max_script_name_len)}    {descr}")
             return
 
-        for func in app.before_first_request_funcs:
-            func()
         run_script(name)

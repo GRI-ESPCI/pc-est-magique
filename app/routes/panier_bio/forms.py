@@ -1,7 +1,6 @@
 """PC est magique - Panier Bio Forms"""
 
 import wtforms
-from wtforms.fields import html5
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
 from datetime import date
@@ -22,7 +21,6 @@ class MultiCheckboxField(wtforms.SelectMultipleField):
     option_widget = wtforms.widgets.CheckboxInput()
 
 
-
 class PanierBio(FlaskForm):
     """WTForm used to manage Panier Bio."""
 
@@ -33,8 +31,8 @@ class PanierBio(FlaskForm):
     service = wtforms.StringField(_l("Promo, labo..."), validators=[DataRequired(), Length(max=20)])
     payment_method = wtforms.SelectField(_l("Méthode de payement"), validators=[DataRequired()], choices=["Espèces lors du retrait", "Par virement"])
     dates = MultiCheckboxField(_l("Date du Panier Bio"), validators=[Optional()])
-    date = html5.DateField(_l("Date du Panier Bio"), validators=[Optional()])
-    phone = html5.TelField(_l("Numéro de téléphone (Optionnel)"), validators=[Optional()])
+    date = wtforms.DateField(_l("Date du Panier Bio"), validators=[Optional()])
+    phone = wtforms.TelField(_l("Numéro de téléphone (Optionnel)"), validators=[Optional()])
     comment = wtforms.TextAreaField(_l("Commentaire"), validators=[Optional(), Length(max=500)])
     payed = wtforms.BooleanField(_l("Payée ?"), validators=[Optional()], default=False)
     treasurer_validate = wtforms.BooleanField(
@@ -56,8 +54,8 @@ class Period(FlaskForm):
     """WTForm used to manage Panier Bio."""
 
     id = wtforms.HiddenField("")
-    start_date = html5.DateField(_l("Date de début"), validators=[DataRequired()])
-    end_date = html5.DateField(_l("Date de fin"), validators=[DataRequired()])
+    start_date = wtforms.DateField(_l("Date de début"), validators=[DataRequired()])
+    end_date = wtforms.DateField(_l("Date de fin"), validators=[DataRequired()])
     disabled_days = wtforms.TextAreaField(_l("Jours sans panier bio"), validators=[Optional(), Length(max=500)])
     activate = wtforms.BooleanField(_l("Activée ?"), validators=[Optional()], default=False)
 

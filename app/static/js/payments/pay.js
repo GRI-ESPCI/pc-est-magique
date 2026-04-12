@@ -32,11 +32,11 @@ function chose_offer(offer) {
     for (i = 0; i < offer_buttons.length; i++) {
         offer_buttons[i].style.setProperty("transition", "all 0.2s");
         if (offer_buttons[i] == button) {
-            offer_buttons[i].classList.replace("btn-outline-secondary",
+            offer_buttons[i].classList.replace("btn-outline-primary",
                                                "btn-success");
         } else {
             offer_buttons[i].classList.replace("btn-success",
-                                               "btn-outline-secondary");
+                                               "btn-outline-primary");
         }
     }
     // Display methods section
@@ -73,11 +73,11 @@ function chose_method(method) {
     for (i = 0; i < method_buttons.length; i++) {
         method_buttons[i].style.setProperty("transition", "all 0.2s");
         if (method_buttons[i] == button) {
-            method_buttons[i].classList.replace("btn-outline-secondary",
+            method_buttons[i].classList.replace("btn-outline-primary",
                                                 "btn-success");
         } else {
             method_buttons[i].classList.replace("btn-success",
-                                                "btn-outline-secondary");
+                                                "btn-outline-primary");
         }
     }
     // Prepare pay button

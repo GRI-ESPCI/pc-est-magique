@@ -13,7 +13,8 @@ import subprocess
 import time
 
 from dotenv import load_dotenv
-import pyinotify
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 
 logging.basicConfig(level=logging.DEBUG, style="{", format="{asctime} {levelname}:{name}:{message}")
@@ -25,29 +26,43 @@ if not file or not os.path.isfile(file):
 last_event = time.time()
 
 
-def restart_dhpc_server(_event) -> None:
-    # Fonction appelée à chaque modification détectée
-    global last_event
-    now = time.time()
-    if now - last_event < 1:
-        # Ignorer les doubles appels (trop rapprochés)
-        return
-    last_event = now
-    logging.info("File modification detected, restarting DHCP server...")
-    try:
-        retcode = subprocess.call(["systemctl", "restart", "isc-dhcp-server"])
-        if retcode < 0:
-            logging.error(f"ERROR - Restart terminated by signal {-retcode}")
-        elif retcode == 0:
-            logging.info("DHCP server restarted!")
-        else:
-            logging.error(f"ERROR - Restart order returned {retcode}")
-    except OSError as exc:
-        logging.error(f"ERROR - Restart order execution failed: {exc}")
+class DHCPFileHandler(FileSystemEventHandler):
+    """Handler that restarts the DHCP server when the watched file is modified."""
+
+    def on_modified(self, event):
+        global last_event
+        # Only react to the specific file, not directory events
+        if event.is_directory or os.path.abspath(event.src_path) != os.path.abspath(file):
+            return
+        now = time.time()
+        if now - last_event < 1:
+            # Ignorer les doubles appels (trop rapprochés)
+            return
+        last_event = now
+        logging.info("File modification detected, restarting DHCP server...")
+        try:
+            retcode = subprocess.call(["systemctl", "restart", "isc-dhcp-server"])
+            if retcode < 0:
+                logging.error(f"ERROR - Restart terminated by signal {-retcode}")
+            elif retcode == 0:
+                logging.info("DHCP server restarted!")
+            else:
+                logging.error(f"ERROR - Restart order returned {retcode}")
+        except OSError as exc:
+            logging.error(f"ERROR - Restart order execution failed: {exc}")
 
 
-wm = pyinotify.WatchManager()
-wm.add_watch(file, pyinotify.IN_MODIFY, restart_dhpc_server)
+event_handler = DHCPFileHandler()
+observer = Observer()
+observer.schedule(event_handler, os.path.dirname(file) or ".", recursive=False)
+observer.start()
 logging.info(f"Started watching {file}...")
-pyinotify.Notifier(wm).loop()
-logging.info(f"Sopped watching {file}.")
+
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    observer.stop()
+
+observer.join()
+logging.info(f"Stopped watching {file}.")

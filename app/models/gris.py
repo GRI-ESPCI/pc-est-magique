@@ -45,8 +45,8 @@ class Role(Model):
     index: Column[int] = column(sa.Integer(), nullable=False, default=1000)
     color: Column[str] = column(sa.String(6), nullable=True)
 
-    pceens: Relationship[list[models.PCeen]] = many_to_many("PCeen.roles", secondary=_PCeen_Role_AT)
-    permissions: Relationship[list[Permission]] = many_to_many("Permission.roles", secondary=_Role_Permission_AT)
+    pceens = many_to_many("PCeen.roles", secondary=_PCeen_Role_AT, uselist=True)
+    permissions = many_to_many("Permission.roles", secondary=_Role_Permission_AT, uselist=True)
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -82,7 +82,7 @@ class Permission(Model):
     scope: Column[PermissionScope] = column(my_enum(PermissionScope), nullable=False)
     ref_id: Column[int] = column(sa.Integer(), nullable=True)
 
-    roles: Relationship[list[Role]] = many_to_many("Role.permissions", secondary=_Role_Permission_AT)
+    roles = many_to_many("Role.permissions", secondary=_Role_Permission_AT, uselist=True)
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -171,7 +171,8 @@ class Ban(Model):
     @property
     def is_active(self) -> bool:
         """Whether the ban is currently active."""
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
+        
         return (self.start <= now) and ((not self.end) or now < self.end)
 
 

@@ -1,10 +1,25 @@
-<nav class="navbar navbar-expand-md navbar-light mb-4 py-0 border-bottom border-2 border-secondary
-            bg-{{ "danger" if hasattr(g, "_ban") or (hasattr(g, "pceen") and g.pceen.is_banned) else "primary" }}">
-    <div class="container-fluid ps-0">
-        <a class="navbar-brand p-0" href="{{ url_for("main.index") }}">
-            <img src="{{ url_for("static", filename="img/gri_80x80.png") }}" class="d-inline-block m-0" alt="GRI"
-                 width="80" height="80" />
-            <span class="align-text-top">/&nbsp;<strong>PC est magique</strong></span>
+<nav class="navbar navbar-expand-md 
+{% if g.theme == 'classic' %}
+    navbar-light mb-4 py-0 shadow bg-gradient bg-{{ 'danger' if hasattr(g, '_ban') or (hasattr(g, 'pceen') and g.pceen.is_banned) else 'primary' }}
+{% elif g.theme == 'frost' %}
+    {% if hasattr(g, '_ban') or (hasattr(g, 'pceen') and g.pceen.is_banned) %}
+        navbar-dark mb-4 py-0 shadow-sm bg-danger sticky-top
+    {% else %}
+        navbar-light mb-4 py-0 shadow-sm glass-navbar sticky-top
+    {% endif %}
+{% else %}
+    {% if hasattr(g, '_ban') or (hasattr(g, 'pceen') and g.pceen.is_banned) %}
+        navbar-dark mb-4 py-2 shadow-none bg-danger sticky-top
+    {% else %}
+        navbar-light py-2 sticky-top
+    {% endif %}
+{% endif %}
+">
+    <div class="container">
+        <a class="navbar-brand p-0 d-flex align-items-center" href="{{ url_for("main.index") }}">
+            <img src="{{ url_for("static", filename="img/gri_80x80.png") }}" class="d-inline-block m-0 rounded-4 shadow-sm" alt="GRI"
+                 width="48" height="48" style="object-fit: cover;" />
+            <span class="ms-3 fs-4 fw-bold tracking-tight">PC est magique</span>
             {% if config.get("BRANCH") %}
             <span class="badge rounded-pill bg-warning text-dark ms-2">{{ config["BRANCH"] }}</span>
             {% endif %}
@@ -19,55 +34,58 @@
             </ul>
             <ul class="navbar-nav flex-row flex-wrap justify-content-end">
                 <li class="nav-item">
-                    <a class="btn btn-outline-secondary mx-2 my-1" href="{{ url_for("panier_bio.main") }}">
+                    {% set is_active = request.endpoint and request.endpoint.startswith('panier_bio.') %}
+                    <a class="{{ 'btn btn-outline-secondary mx-2 my-1' if g.theme == 'classic' else 'nav-link px-3 fw-medium' }} {{ 'active border-bottom border-2 border-primary' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("panier_bio.main") }}">
                         {{ _("Panier Bio") }}
                     </a>
                 </li>
+                
                 <li class="nav-item">
-                    <a class="btn btn-outline-secondary mx-2 my-1" href="{{ url_for("theatre.main") }}">
+                    {% set is_active = request.endpoint and request.endpoint.startswith('theatre.') %}
+                    <a class="{{ 'btn btn-outline-secondary mx-2 my-1' if g.theme == 'classic' else 'nav-link px-3 fw-medium' }} {{ 'active border-bottom border-2 border-primary' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("theatre.main") }}">
                         {{ _("Théâtre") }}
                     </a>
                 </li>
                 {% if not g.logged_in %}
                 <li class="nav-item">
-                    <a class="btn btn-outline-secondary mx-2 my-1" href="{{ url_for("auth.login") }}">
+                    <a class="{{ 'btn btn-outline-secondary mx-2 my-1' if g.theme == 'classic' else 'nav-link px-3 fw-medium' }}" href="{{ url_for("auth.login") }}">
                         {{ _("Connexion") }}
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="btn btn-outline-secondary mx-2 my-1" href="{{ url_for("auth.register") }}">
+                    <a class="{{ 'btn btn-outline-secondary mx-2 my-1' if g.theme == 'classic' else 'nav-link px-3 fw-medium' }}" href="{{ url_for("auth.register") }}">
                         {{ _("Créer un compte") }}
                     </a>
                 </li>
                 {% else %}      {# Utilisateur connecté #}
                 {% if has_permission(PermissionType.read, PermissionScope.intrarez) %}
                 <li class="nav-item">
-                    <a class="btn btn-outline-secondary mx-2 my-1 position-relative"
-                       href="{{ url_for("payments.main") }}">
+                     {% set is_active = request.endpoint and (request.endpoint.startswith('payments.') or request.endpoint.startswith('devices.') or request.endpoint.startswith('rooms.')) %}
+                    <a class="{{ 'btn btn-outline-secondary mx-2 my-1' if g.theme == 'classic' else 'nav-link px-3 fw-medium' }} {{ 'active border-bottom border-2 border-primary' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("payments.main") }}">
                         {{ _("Internet") }}
                     </a>
                 </li>
                 {% endif %}
                 {% if has_permission(PermissionType.read, PermissionScope.bekk) %}
                 <li class="nav-item">
-                    <a class="btn btn-outline-secondary mx-2 my-1 position-relative"
-                       href="{{ url_for("bekk.main") }}">
+                     {% set is_active = request.endpoint and request.endpoint.startswith('bekk.') %}
+                    <a class="{{ 'btn btn-outline-secondary mx-2 my-1' if g.theme == 'classic' else 'nav-link px-3 fw-medium' }} {{ 'active border-bottom border-2 border-primary' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("bekk.main") }}">
                         {{ _("Bekk") }}
                     </a>
                 </li>
                 {% endif %}
                 {% if has_permission(PermissionType.read, PermissionScope.club_q) %}
                 <li class="nav-item">
-                    <a class="btn btn-outline-secondary mx-2 my-1 position-relative"
-                       href="{{ url_for("club_q.main") }}">
+                     {% set is_active = request.endpoint and request.endpoint.startswith('club_q.') %}
+                    <a class="{{ 'btn btn-outline-secondary mx-2 my-1' if g.theme == 'classic' else 'nav-link px-3 fw-medium' }} {{ 'active border-bottom border-2 border-primary' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("club_q.main") }}">
                         {{ _("Club Q") }}
                     </a>
                 </li>
                 {% endif %}
                 {% if has_permission(PermissionType.read, PermissionScope.photos) %}
                 <li class="nav-item">
-                    <a class="btn btn-outline-secondary mx-2 my-1 position-relative"
-                       href="{{ url_for("photos.main") }}">
+                     {% set is_active = request.endpoint and request.endpoint.startswith('photos.') %}
+                    <a class="{{ 'btn btn-outline-secondary mx-2 my-1' if g.theme == 'classic' else 'nav-link px-3 fw-medium' }} {{ 'active border-bottom border-2 border-primary' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("photos.main") }}">
                         {{ _("Photos") }}
                     </a>
                 </li>
@@ -75,18 +93,20 @@
                 {% if has_permission(PermissionType.read, PermissionScope.bar)
                    or has_permission(PermissionType.read, PermissionScope.bar_stats) %}
                 <li class="nav-item">
-                    <a class="btn btn-outline-secondary mx-2 my-1 position-relative" href="{{ url_for("bar.main") }}">
+                     {% set is_active = request.endpoint and request.endpoint.startswith('bar.') %}
+                    <a class="{{ 'btn btn-outline-secondary mx-2 my-1' if g.theme == 'classic' else 'nav-link px-3 fw-medium' }} {{ 'active border-bottom border-2 border-primary' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("bar.main") }}">
                         {{ _("Bar") }}
                     </a>
                 </li>
                 {% endif %}
                 <li class="nav-item">
-                    <a class="btn btn-outline-secondary mx-2 my-1" href="{{ url_for("profile.main") }}">
+                     {% set is_active = request.endpoint and request.endpoint.startswith('profile.') %}
+                    <a class="{{ 'btn btn-outline-secondary mx-2 my-1' if g.theme == 'classic' else 'nav-link px-3 fw-medium' }} {{ 'active border-bottom border-2 border-primary' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("profile.main") }}">
                         {{ _("Profil") }}
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="btn btn-outline-secondary mx-2 my-1" href="{{ url_for("auth.logout") }}">
+                    <a class="{{ 'btn btn-outline-secondary mx-2 my-1' if g.theme == 'classic' else 'nav-link px-3 fw-medium' }}" href="{{ url_for("auth.logout") }}">
                         {{ _("Déconnexion") }}
                     </a>
                 </li>

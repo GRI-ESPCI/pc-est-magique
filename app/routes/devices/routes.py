@@ -55,7 +55,7 @@ def modify(device_id: str | None = None) -> typing.RouteReturn:
     if device_id is None:
         device = context.g.pceen.current_device
     elif device_id.isdigit():
-        device = Device.query.get(device_id)
+        device = db.session.get(Device, device_id)
 
     if not device:
         flask.flash(_("Appareil inconnu !"), "danger")

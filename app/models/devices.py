@@ -32,7 +32,7 @@ class Device(Model):
     registered: Column[datetime.datetime] = column(sa.DateTime(), nullable=False)
     last_seen: Column[datetime.datetime | None] = column(sa.DateTime(), nullable=True)
 
-    allocations: Relationship[list[Allocation]] = one_to_many("Allocation.device")
+    allocations = one_to_many("Allocation.device")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -49,7 +49,7 @@ class Device(Model):
 
     def update_last_seen(self) -> None:
         """Change :attr:`.Device.last_seen` timestamp to now."""
-        self.last_seen = datetime.datetime.utcnow()
+        self.last_seen = datetime.datetime.now(datetime.UTC)
         db.session.commit()
 
     def allocate_ip_for(self, room: models.Room) -> str:

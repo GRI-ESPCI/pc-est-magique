@@ -29,7 +29,7 @@
     {% with price = babel.format_currency(offer.price, "EUR") %}
     <div class="col">
 
-        <div class="card o-card bg-pc5 border-pc4 border-2 h-100 mx-auto"
+        <div class="card o-card {{ 'bg-pc5 border-pc4 border-2' if g.theme == 'classic' else 'bg-body-tertiary border-0 shadow-sm rounded-4 hover-lift' }} h-100 mx-auto"
              id="card_offer_{{ offer.slug }}" name="offer_card">
             <div class="card-body d-flex align-items-center">
                 <h3 class="card-title me-auto my-0">{{ offer.name }}</h3>
@@ -51,7 +51,7 @@
                 </div>
             </div>
             <div class="card-body text-center">
-                <button class="btn btn-outline-secondary mb-2"
+                <button class="btn btn-outline-primary rounded-pill mb-2"
                         onclick="chose_offer('{{ offer.slug }}');"
                         id="offer_button_{{ offer.slug }}" name="offer_button"
                         data-price="{{ price }}">
@@ -74,7 +74,7 @@
     {% if g.doas %}
     <div class="col">
 
-        <div class="card o-card bg-pc5 border-pc4 border-2 h-100 mx-auto"
+        <div class="card o-card {{ 'bg-pc5 border-pc4 border-2' if g.theme == 'classic' else 'bg-body-tertiary border-0 shadow-sm rounded-4 hover-lift' }} h-100 mx-auto"
              id="card_method_magic" name="method_card">
             <div class="card-body d-flex align-items-center">
                 <h3 class="card-title me-auto my-0 font-monospace">
@@ -88,7 +88,7 @@
                 {{ _("Je suis un GRI je fais que ce que je veux, non ?") }}
             </div>
             <div class="card-body text-center">
-                <button class="btn btn-outline-secondary mb-2"
+                <button class="btn btn-outline-primary rounded-pill mb-2"
                         onclick="chose_method('magic');"
                         id="method_button_magic" name="method_button"
                         data-phrase="{{ _("Ajouter un paiement de _price_") }}"
@@ -102,7 +102,7 @@
     {% else %}
     <div class="col">
 
-        <div class="card o-card bg-pc5 border-pc4 border-2 h-100 mx-auto"
+        <div class="card o-card {{ 'bg-pc5 border-pc4 border-2' if g.theme == 'classic' else 'bg-body-tertiary border-0 shadow-sm rounded-4 hover-lift' }} h-100 mx-auto"
              id="card_method_lydia" name="method_card">
             <div class="card-body d-flex align-items-center">
                 <h3 class="card-title me-auto my-0">{{ _("Lydia / CB") }}</h3>
@@ -125,7 +125,7 @@
                      "quelques clics et sans créer de compte.") }}
             </div>
             <div class="card-body text-center">
-                <button class="btn btn-outline-secondary mb-2"
+                <button class="btn btn-outline-primary rounded-pill mb-2"
                         onclick="chose_method('lydia');"
                         id="method_button_lydia" name="method_button"
                         data-phrase="{{ _("Payer _price_ avec Lydia") }}">
@@ -137,7 +137,7 @@
     </div>
     <div class="col">
 
-        <div class="card o-card bg-pc5 border-pc4 border-2 h-100 mx-auto"
+        <div class="card o-card {{ 'bg-pc5 border-pc4 border-2' if g.theme == 'classic' else 'bg-body-tertiary border-0 shadow-sm rounded-4 hover-lift' }} h-100 mx-auto"
              id="card_method_transfer" name="method_card">
             <div class="card-body d-flex align-items-center">
                 <h3 class="card-title me-auto my-0">{{ _("Virement" )}}</h3>
@@ -152,7 +152,7 @@
                 "avant validation de la transaction.") }}
             </div>
             <div class="card-body text-center mt-auto">
-                <button class="btn btn-outline-secondary mb-2"
+                <button class="btn btn-outline-primary rounded-pill mb-2"
                         onclick="chose_method('transfer');"
                         id="method_button_transfer" name="method_button"
                         data-phrase="{{ _("Payer _price_ par virement") }}">
@@ -164,7 +164,7 @@
     </div>
     <div class="col">
 
-        <div class="card o-card bg-pc5 border-pc4 border-2 h-100 mx-auto"
+        <div class="card o-card {{ 'bg-pc5 border-pc4 border-2' if g.theme == 'classic' else 'bg-body-tertiary border-0 shadow-sm rounded-4 hover-lift' }} h-100 mx-auto"
              id="card_method_cash" name="method_card">
             <div class="card-body d-flex align-items-center">
                 <h3 class="card-title me-auto my-0">{{ _("Espèces") }}</h3>
@@ -179,7 +179,7 @@
                 "paiement.") }}
             </div>
             <div class="card-body text-center">
-                <button class="btn btn-outline-secondary mb-2"
+                <button class="btn btn-outline-primary rounded-pill mb-2"
                         onclick="chose_method('cash');"
                         id="method_button_cash" name="method_button"
                         data-phrase="{{ _("Payer _price_ en main propre") }}">
@@ -201,7 +201,7 @@
     <div class="col text-center">
         <a href="{{ url_for("payments.pay_", method="_method_",
                             offer="_offer_") }}"
-           class="btn btn-primary" id="pay_button">[TBD]</a>
+           class="btn btn-primary btn-pill btn-lg shadow-sm" id="pay_button">[TBD]</a>
         <!-- Link and button text inserted by static/js/payments/pay.js -->
     </div>
 </div>

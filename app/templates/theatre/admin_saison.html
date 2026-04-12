@@ -49,15 +49,15 @@
 <hr>
 
 <div class="row mb-3">
-    <div class="btn-toolbar justify-content-between">
-        <h2>{{ saison.name }}</h2>
-            <div data-bs-toggle="tooltip" data-bs-placement="right" title="{{ _('Modifier') }}">
-            <a href="{{ url_for('theatre.admin_saison_edit', id=saison.id) }}" class="btn btn-primary" role="button">
-            <svg class="bi flex-shrink-0" width="24" height="24" role="img">
-                    {{ macros.bootstrap_icon("pen") }}
-            </svg>
-            </a>
-        </div>
+    <div class="btn-toolbar justify-content-between align-items-center">
+        <h2 class="mb-0">{{ saison.name }}</h2>
+        <a href="{{ url_for('theatre.admin_saison_edit', id=saison.id) }}"
+           class="btn btn-primary d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2" role="button">
+          <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+            {{ macros.bootstrap_icon("pencil") }}
+          </svg>
+          <span>{{ _("Modifier") }}</span>
+        </a>
     </div>
 </div>
 <div class="row mb-3">
@@ -71,30 +71,32 @@
         <img src="/theatre_posters/saison_{{ saison.id }}/saison_{{ saison.id }}.{{ saison.image_extension }}" alt="{{ _('Affiche') }} {{ saison.name }}"
              style="max-height: 30em;">
             <div class="btn-hover">
-            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#poster-modal">
-                <svg class="bi flex-shrink-0" width="24" height="24" role="img">
-                    {{ macros.bootstrap_icon("pen") }}
+            <button class="btn btn-primary d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2" type="button" data-bs-toggle="modal" data-bs-target="#poster-modal">
+                <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+                    {{ macros.bootstrap_icon("pencil") }}
                 </svg>
+                <span>{{ _("Modifier l'affiche") }}</span>
             </button>
         </div>
     </div>
 </div>
 
 <div class="modal" tabindex="-1" id="poster-modal">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
             <form action="{{ url_for('theatre.picture_upload', type='saison', id=saison.id, next_url=url_for('theatre.admin_saison', id=saison.id)) }}" method="post" enctype="multipart/form-data">
-                <div class="modal-header">
-                    <h5>{{ _("Modification du poster de la saison") }}</h5>
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="fw-bold px-2 pt-2">{{ _("Modification du poster de la saison") }}</h5>
+                    <button type="button" class="btn-close me-2 mt-2" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body px-4">
                     {{ picture_form.csrf_token }}
                     {{ picture_form.picture.label(class="form-label") }}
                     {{ picture_form.picture(class="form-control", accept="image/png, image/jpeg") }}
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Annuler") }}</button>
-                    <input type="submit" class="btn btn-primary" value="{{ _('Sauvegarder') }}">
+                <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">{{ _("Annuler") }}</button>
+                    <input type="submit" class="btn btn-primary rounded-pill px-4 fw-bold" value="{{ _('Sauvegarder') }}">
                 </div>
             </form>
         </div>
@@ -109,74 +111,88 @@
     {% endif %}
 </div>
 
-<a href="{{ url_for('theatre.admin_spectacle_new', saison_id=saison.id) }}" class="btn btn-success">{{ _("Ajouter un spectacle") }}</a>
+<div class="container mb-3">
+  <div class="btn-toolbar justify-content-between align-items-center">
+    <h3 class="mb-0">{{ _("Spectacles") }}</h3>
+    <a href="{{ url_for('theatre.admin_spectacle_new', saison_id=saison.id) }}"
+       class="btn btn-success d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2">
+      <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+        {{ macros.bootstrap_icon("plus-lg") }}
+      </svg>
+      <span>{{ _("Ajouter un spectacle") }}</span>
+    </a>
+  </div>
+</div>
 
-<div class="row mb-3">
-    <div class="col table-responsive">
-        <table class="table table-striped table-hover-table-bordered">
-            <thead>
-                <tr>
-                    <th scope="col">{{ _("Id") }}</th>
-                    <th scope="col">{{ _("Nom") }}</th>
-                    <th scope="col">{{ _("Metteur en scène") }}</th>
-                    <th scope="col">{{ _("Description") }}</th>
-                    <th scop="col" style="width: 20px;"></th>
-                    <th scop="col" style="width: 20px;"></th>
-                    <th scop="col" style="width: 20px;"></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for s in saison.spectacles %}
-                    <tr>
-                        <td scope="row">{{ s.id }}</td>
-                        <td>{{ s.name }}</td>
-                        <td>{{ s.director }}</td>
-                        {% if s.description is none %}
-                            <td></td>
-                        {% else %}
-                            <td>{{ s.description|truncate(200) }}</td>
-                        {% endif %}
-                        <td>
-                            <a href="{{ url_for('theatre.admin_spectacle', id=s.id) }}" class="btn btn-success">
-                                <svg class="bi flex-shrink-0" width="18" height="18">
-                                    {{ macros.bootstrap_icon("eye") }}
-                                </svg>
-                            </a>
-                        </td>
-                        <td>
-                            <a href="{{ url_for('theatre.admin_spectacle_edit', id=s.id) }}" class="btn btn-primary">
-                                <svg class="bi flex-shrink-0" width="18" height="18">
-                                    {{ macros.bootstrap_icon("pen") }}
-                                </svg>
-                            </a>
-                        </td>
-                        <td>
-                            <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#spec-del-modal-{{ s.id }}">
-                                <svg class="bi flex-shrink-0" width="18" height="18">
-                                    {{ macros.bootstrap_icon("x-lg") }}
-                                </svg>
-                            </button>
-                            {# Modal to confirm spectacle deletion #}
-                            <div class="modal fade" id="spec-del-modal-{{ s.id }}" tabindex="-1" aria-labelledby="spec-del-modal-label-{{ s.id }}" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="spec-del-modal-label-{{ s.id }}">{{ _("Es-tu sûr de vouloir supprimer ce spectacle ?") }}</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Annuler") }}</button>
-                                        <a href="{{ url_for('theatre.admin_spectacle_delete', spectacle_id=s.id) }}" class="btn btn-danger">{{ _("Supprimer") }}</a>
-                                    </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+<div class="table-responsive bg-body-tertiary rounded-4 shadow-sm border mb-4">
+  <table class="table table-hover table-borderless align-middle mb-0">
+    <thead class="border-bottom">
+      <tr>
+        <th class="ps-3">{{ _("Id") }}</th>
+        <th>{{ _("Nom") }}</th>
+        <th>{{ _("Metteur en scène") }}</th>
+        <th>{{ _("Description") }}</th>
+        <th class="text-end pe-3">{{ _("Actions") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in saison.spectacles %}
+      <tr>
+        <td class="ps-3 text-muted">{{ s.id }}</td>
+        <td class="fw-medium">{{ s.name }}</td>
+        <td>{{ s.director }}</td>
+        <td>{% if s.description is none %}{% else %}{{ s.description|truncate(200) }}{% endif %}</td>
+        <td class="text-end pe-3">
+          <div class="d-flex gap-1 justify-content-end" role="group">
+            <a href="{{ url_for('theatre.admin_spectacle', id=s.id) }}"
+               class="btn btn-icon-zoom text-success p-2 shadow-none"
+               data-bs-toggle="tooltip" title="{{ _('Voir le spectacle') }}">
+              <svg class="bi flex-shrink-0" width="18" height="18">
+                {{ macros.bootstrap_icon("eye") }}
+              </svg>
+            </a>
+            <a href="{{ url_for('theatre.admin_spectacle_edit', id=s.id) }}"
+               class="btn btn-icon-zoom text-warning p-2 shadow-none"
+               data-bs-toggle="tooltip" title="{{ _('Modifier le spectacle') }}">
+              <svg class="bi flex-shrink-0" width="18" height="18">
+                {{ macros.bootstrap_icon("pencil") }}
+              </svg>
+            </a>
+            <button type="button"
+                    class="btn btn-icon-zoom text-danger p-2 shadow-none"
+                    data-bs-toggle="modal" data-bs-target="#spec-del-modal-{{ s.id }}"
+                    title="{{ _('Supprimer le spectacle') }}">
+              <svg class="bi flex-shrink-0" width="18" height="18">
+                {{ macros.bootstrap_icon("trash") }}
+              </svg>
+            </button>
+          </div>
+
+          <div class="modal fade" id="spec-del-modal-{{ s.id }}" tabindex="-1"
+               aria-labelledby="spec-del-modal-label-{{ s.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                  <h5 class="modal-title fw-bold px-2 pt-2" id="spec-del-modal-label-{{ s.id }}">
+                    {{ _("Supprimer le spectacle ?") }}
+                  </h5>
+                  <button type="button" class="btn-close me-2 mt-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4 px-4 text-body opacity-75">
+                  {{ _("Es-tu sûr de vouloir supprimer ce spectacle ? Cette action est irréversible.") }}
+                </div>
+                <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                  <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">{{ _("Annuler") }}</button>
+                  <a href="{{ url_for('theatre.admin_spectacle_delete', spectacle_id=s.id) }}" class="btn btn-danger rounded-pill px-4 fw-bold">{{ _("Supprimer") }}</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 
 {% endblock %}

@@ -13,9 +13,16 @@ from app.routes.payments.utils import add_subscription
 from app.utils import helpers, lydia, typing
 
 
-@bp.before_app_first_request
-def create_first_offer() -> None:
+_payments_initialized = False
+
+
+@bp.before_app_request
+def _lazy_create_first_offer() -> None:
     """Create subscription welcome order if not already present."""
+    global _payments_initialized
+    if _payments_initialized:
+        return
+    _payments_initialized = True
     if not Offer.query.first():
         offer = Offer.create_first_offer()
         db.session.add(offer)
@@ -68,7 +75,7 @@ def pay_(method: str, offer: str | None = None) -> typing.RouteReturn:
         "magic": _("Ajouter un paiement"),
     }
     if method in methods:
-        offer = Offer.query.get(offer)
+        offer = db.session.get(Offer, offer)
         if offer and offer.visible and offer.active:
             if method == "magic" and not context.g.doas:
                 flask.abort(403)
@@ -107,7 +114,7 @@ def add_payment(offer: str = None) -> typing.RouteReturn:
         flask.flash(_("Vous avez déjà un abonnement en cours !"), "warning")
         return helpers.redirect_to_next()
 
-    offer = Offer.query.get(offer)
+    offer = db.session.get(Offer, offer)
     if not (offer and offer.visible and offer.active):
         flask.flash("Offre incorrecte", "danger")
         return helpers.redirect_to_next()
@@ -168,7 +175,7 @@ def lydia_callback_confirm() -> typing.RouteReturn:
         return "order_ref invalid", 400
 
     # Retrieve payment
-    payment = Payment.query.get(int(order_ref))
+    payment = db.session.get(Payment, int(order_ref))
     if not payment:
         return f"Payment not existing: {order_ref}", 404
     if payment.status != PaymentStatus.waiting:
@@ -221,7 +228,7 @@ def lydia_callback_cancel() -> typing.RouteReturn:
         return "order_ref invalid", 400
 
     # Retrieve payment
-    payment = Payment.query.get(int(order_ref))
+    payment = db.session.get(Payment, int(order_ref))
     if not payment:
         return f"Payment not existing: {order_ref}", 404
     if payment.status != PaymentStatus.waiting:
@@ -278,7 +285,7 @@ def lydia_validate(payment_id: int) -> typing.RouteReturn:
         return helpers.ensure_safe_redirect("payments.pay", next=None)
 
     # Retrieve payment
-    payment = Payment.query.get(int(payment_id))
+    payment = db.session.get(Payment, int(payment_id))
     if not payment:
         flask.flash(_("Numéro de paiement invalide"), "warning")
         return helpers.ensure_safe_redirect("payments.pay", next=None)

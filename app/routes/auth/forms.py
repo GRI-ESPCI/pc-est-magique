@@ -1,7 +1,6 @@
 """PC est magique - Authentication Forms"""
 
 import wtforms
-from wtforms.fields import html5
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
 
@@ -29,8 +28,8 @@ class RegistrationForm(FlaskForm):
 
     nom = wtforms.StringField(_l("Nom"), validators=[DataRequired(), Length(max=64)])
     prenom = wtforms.StringField(_l("Prénom"), validators=[DataRequired(), Length(max=64)])
-    promo = html5.IntegerField(_l("Promotion"), validators=[Optional()])
-    email = html5.EmailField(
+    promo = wtforms.IntegerField(_l("Promotion"), validators=[Optional()])
+    email = wtforms.EmailField(
         _l("Adresse e-mail"),
         validators=[DataRequired(), Length(max=120), Email(), NewEmail()],
     )
@@ -45,7 +44,7 @@ class RegistrationForm(FlaskForm):
 class ResetPasswordRequestForm(FlaskForm):
     """WTForm used to request a user password request."""
 
-    email = html5.EmailField(_l("Adresse e-mail"), validators=[DataRequired(), Email()])
+    email = wtforms.EmailField(_l("Adresse e-mail"), validators=[DataRequired(), Email()])
     submit = wtforms.SubmitField(_l("Envoyer le mail de réinitialisation"))
 
 

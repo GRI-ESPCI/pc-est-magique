@@ -46,7 +46,7 @@
             </div>
         </form>
         <div class="row mt-5 mb-3">
-            <div class="col p-3 mx-4 bg-warning rounded-3 position-relative">
+            <div class="col p-3 mx-4 bg-warning text-dark rounded-3 position-relative">
                 <div class="position-absolute mt-1">
                     <svg class="bi flex-shrink-0" width="28" height="28">
                         {{ macros.bootstrap_icon("exclamation-triangle") }}
@@ -57,7 +57,7 @@
                         {{ _("Il est possible que le paiement ne soit pas "
                              "validé automatiquement. Dans le doute, merci de "
                              "cliquer sur") }}
-                        <span class="text-muted">
+                        <span class="fw-bold">
                             {{ _("Retour sur le site marchand") }}
                         </span>
                         {{ _("en bas de la page une fois le paiement validé, "
@@ -67,13 +67,13 @@
                         {{ _("Si votre paiement n'est toujours pas validé, "
                              "essayez de") }}
                         <a href="{{ url_for("payments.lydia_success") }}"
-                           class="text-secondary">
+                           class="text-dark fw-bold text-decoration-underline">
                             {{ _("cliquer ici") -}}
                         </a>
                         {{ _("pour résoudre la situation, ou" )}}
                         <a href="{{ url_for("main.contact",
-                                title=_("Lydia est méchant avec moi")) }}"
-                           class="text-secondary">
+                                 title=_("Lydia est méchant avec moi")) }}"
+                           class="text-dark fw-bold text-decoration-underline">
                             {{ _("contactez-nous") -}}
                         </a>.
                     </p>

@@ -37,24 +37,16 @@
   <div class="btn-toolbar justify-content-between">
     <h4>{{title}}</h4>
     {% if can_edit %}
-    <div
-      data-bs-toggle="tooltip"
-      data-bs-placement="right"
-      title="{{ _('Administration') }}"
-    >
+    <div>
       <a
         role="button"
         href="{{ url_for('panier_bio.admin') }}"
-        class="btn btn-danger"
+        class="btn btn-danger d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2"
       >
-        <svg
-          class="bi flex-shrink-0"
-          width="24"
-          height="24"
-          role="img"
-        >
+        <svg class="bi flex-shrink-0" width="18" height="18" role="img">
           {{ macros.bootstrap_icon("gear-fill") }}
         </svg>
+        <span>{{ _("Administration") }}</span>
       </a>
     </div>
     {% endif %}
@@ -63,36 +55,42 @@
 
 {% include 'wysiwyg.html' %} {% if visibility == 0 %} {{ _("La réservation pour le panier bio n'est pas possible pour le
 moment.")}} {% else %}
-<br />
-<h5><b>Prochain Panier-Bio : {{ next_day }}</b></h5>
-<br />
 {% if next_day != None and next_day == next_order.date %}
-<svg
-  class="bi flex-shrink-0"
-  style="color: green"
-  width="64"
-  height="64"
-  role="img"
->
-  {{ macros.bootstrap_icon("check-lg") }}
-</svg>
-
-<p>
-  {{ _("Vous avez commandé un Panier Bio pour le ")}} <b>{{next_day.strftime("%A %d %B %Y")}}</b> {{" en payant par "}}
-  <b>{{next_order.payment_method}}</b>.
-</p>
-{% endif %}
-<div class="col-lg-4">
-  {% if form_visibility %}
-  <p>{{ _("Vous pouvez commander les paniers bios pour ces prochains jours :")}}</p>
-  <div class="card align-items-center bg-pc5 border-pc4">
-    <div
-      class="container mb-3"
-      style="margin-top: 15px"
-    >
-      <h5><b>{{_("Formulaire de commande")}}</b></h5>
+<div class="card card-accent-success border-0 shadow-sm rounded-4 bg-body-tertiary mb-5 overflow-hidden">
+    <div class="card-body p-4 d-flex align-items-center">
+        <div class="text-success me-4">
+            <svg class="bi" width="48" height="48" fill="currentColor">
+                {{ macros.bootstrap_icon("check-circle-fill") }}
+            </svg>
+        </div>
+        <div>
+            <h5 class="fw-bold mb-1 text-success">{{ _("Commande confirmée !") }}</h5>
+            <p class="mb-0 text-body">
+                {{ _("Vous avez réservé votre Panier Bio pour le ")}} <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 fw-bold">{{ babel.format_date(next_day, "full") }}</span>
+                {{" (Paiement : "}} <strong class="text-reset opacity-75">{{ next_order.payment_method }}</strong>)
+            </p>
+        </div>
     </div>
-    <div style="margin-left: 15px; margin-right: 15px">
+</div>
+{% elif next_day != None %}
+<div class="alert alert-warning border-0 shadow-sm rounded-4 p-4 mb-5 d-flex align-items-center">
+    <div class="me-3 fs-3">🥕</div>
+    <div>
+        <h5 class="fw-bold mb-0">{{ _("Prochain Panier-Bio : %(date)s", date=babel.format_date(next_day, "full")) }}</h5>
+    </div>
+</div>
+{% endif %}
+<div class="col-lg-5 mx-auto">
+  {% if form_visibility %}
+  <div class="card border-0 shadow-sm rounded-4 bg-body-tertiary overflow-hidden mb-4">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-4 text-primary d-flex align-items-center">
+        <svg class="bi me-2" width="24" height="24" fill="currentColor">
+            {{ macros.bootstrap_icon("cart-fill") }}
+        </svg>
+        {{_("Formulaire de commande")}}
+      </h5>
+
       <form
         action=""
         method="post"
@@ -102,8 +100,8 @@ moment.")}} {% else %}
         <div class="row mb-3">
           <div class="col-9">
             <div
-              class="multiple_checkbox"
-              style="font-size: 120%"
+              class="multiple_checkbox list-unstyled"
+              style="font-size: 110%"
             >
               {{ form.dates }}
             </div>
@@ -149,64 +147,54 @@ moment.")}} {% else %}
               data-callback="enable_submit"
               data-expired-callback="disable_submit"
             ></div>
-            <div>{% endif %} {{ form.add(class="btn btn-primary") }}</div>
+            <div>{% endif %} {{ form.add(class="btn btn-primary rounded-pill px-4 fw-bold") }}</div>
           </div>
         </div>
       </form>
-    </div>
   </div>
   {% else %}
-  <p><i>{{ _("Vous avez commandé des paniers bios pour tous les jours réservables pour le moment.")}}</i></p>
+  <div class="alert alert-info rounded-4 border-0 shadow-sm p-4 d-flex align-items-center" role="alert">
+    <svg class="bi me-3 flex-shrink-0" width="24" height="24" fill="currentColor">
+        {{ macros.bootstrap_icon("check-circle-fill") }}
+    </svg>
+    <div>
+        {{ _("Vous avez commandé des paniers bios pour tous les jours réservables pour le moment.")}}
+    </div>
+  </div>
   {% endif %}
 </div>
 
 {% if connected %}
 <div><br /></div>
-<div class="container">
-  <h3>{{_("Historique des commandes")}}</h3>
-  <div class="row mb-3">
-    <div class="col table-responsive">
-      <table class="table table-striped table-hover table-bordered">
-        <thead>
+<div class="container pb-5">
+  <h4 class="fw-bold mb-4 text-{{ theme }}">{{_("Historique des commandes")}}</h4>
+  <div class="row">
+    <div class="col px-0"><div class="table-responsive rounded-4 shadow-sm bg-body-tertiary mb-4">
+      <table class="table table-hover table-borderless align-middle mb-0">
+        <thead class="small text-uppercase">
           <tr>
-            <th scope="col">
-              <span>{{ _("Date") }}</span>
-            </th>
-            <th scope="col">
-              <span>{{ _("Payement") }}</span>
-            </th>
-            <th
-              class="centered"
-              scope="col"
-            >
-              <div class="centered-content">
-                <span>
-                  <svg
-                    class="bi flex-shrink-0"
-                    width="22"
-                    height="22"
-                  >
-                    {{ macros.bootstrap_icon("wrench") }}
-                  </svg>
-                </span>
-              </div>
-            </th>
+            <th class="ps-4 py-3">{{ _("Date") }}</th>
+            <th class="py-3">{{ _("Payement") }}</th>
+            <th class="pe-4 py-3 text-end">{{ _("Actions") }}</th>
           </tr>
         </thead>
 
         <tbody>
           {% for i, order in enumerate(all_orders) %}
           <tr>
-            <td>{{ order.date.strftime("%A %d %B %Y") }}</td>
-            <td>{{ order.payment_method }}</td>
+            <td class="ps-4 fw-medium">{{ babel.format_date(order.date, "full") }}</td>
             <td>
+                <span class="badge text-bg-secondary bg-opacity-25 text-dark rounded-pill px-3 fw-normal" style="border: 1px solid rgba(0,0,0,0.1)">{{ order.payment_method }}</span>
+            </td>
+            <td class="pe-4 text-end">
               {% if can_delete_orders[i] %}
               <div
                 data-bs-toggle="tooltip"
                 title="{{ _('Supprimer la commande') }}"
+                class="d-inline-block"
               >
                 <button
-                  class="btn btn-outline-danger p-1 pt-0"
+                  class="btn btn-icon-zoom text-danger p-2"
                   data-bs-target="#mo-order-delete"
                   data-bs-toggle="modal"
                   data-order-id="{{ order.id }}"
@@ -214,11 +202,11 @@ moment.")}} {% else %}
                   data-form-visibility="{{form_visibility}}"
                 >
                   <svg
-                    class="bi flex-shrink-0"
-                    width="18"
-                    height="18"
+                    class="bi"
+                    width="20"
+                    height="20"
                   >
-                    {{ macros.bootstrap_icon("x-lg") }}
+                    {{ macros.bootstrap_icon("trash-fill") }}
                   </svg>
                 </button>
               </div>
@@ -228,50 +216,26 @@ moment.")}} {% else %}
           {% endfor %}
         </tbody>
       </table>
-    </div>
   </div>
 </div>
 {% endif %} {% endif %}
 
 <!-- Order delete modal -->
-<div
-  class="modal fade"
-  id="mo-order-delete"
-  tabindex="-1"
-  aria-labelledby="mo-order-delete"
-  aria-hidden="true"
->
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5
-          class="modal-title"
-          id="mo-order-delete"
-        >
-          {{ _("Supprimer commande") }} {{"{order_date}"}}
-        </h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="{{ _('Fermer') }}"
-        ></button>
+<div class="modal fade" id="mo-order-delete" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold px-2 pt-2">{{ _("Annuler la commande") }}</h5>
+        <button type="button" class="btn-close me-2 mt-2" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form
-        action=""
-        method="post"
-        role="form"
-      >
+      <form action="" method="post" role="form">
         {{ form.hidden_tag() }}
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            {{ _("Annuler") }}
-          </button>
-          {{ form.delete(class="btn btn-danger") }}
+        <div class="modal-body py-4 px-4 text-body opacity-75">
+          {{ _("Êtes-vous sûr de vouloir annuler votre commande de Panier Bio ? Cette action est irréversible.") }}
+        </div>
+        <div class="modal-footer border-0 pt-0 pb-4 px-4">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">{{ _("Garder la commande") }}</button>
+          {{ form.delete(class="btn btn-danger rounded-pill px-4 fw-bold") }}
         </div>
       </form>
     </div>
@@ -279,3 +243,4 @@ moment.")}} {% else %}
 </div>
 
 {% endblock %}
+

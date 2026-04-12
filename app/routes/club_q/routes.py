@@ -1314,7 +1314,7 @@ def visible(id):
     """
     Change the boolean variable to show/hide attributions for all wishes in a Club Q season
     """
-    season = ClubQSeason.query.get_or_404(id)
+    season = db.get_or_404(ClubQSeason, id)
     season.attributions_visible = False if season.attributions_visible else True
     db.session.commit()
     

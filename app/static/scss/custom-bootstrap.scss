@@ -7,6 +7,11 @@ $secondary: #152f4e; // PC1 (bleu foncé)
 $danger: #e40046; // PC3 (framboise)
 // $info:      #d5c0a9;        // PC5 (panais)
 
+$font-family-sans-serif: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$enable-shadows: true;
+$border-radius: 0.5rem;
+$body-bg: #f4f7f6;
+
 // Add PC colors
 $custom-colors: (
   "pc1": #152f4e,

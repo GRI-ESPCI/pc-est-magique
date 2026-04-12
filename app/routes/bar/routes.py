@@ -30,8 +30,16 @@ from app.utils import helpers, roles
 from app.utils.global_settings import Settings
 
 
-@bp.before_app_first_request
-def retrieve_bar_settings():
+_bar_initialized = False
+
+
+@bp.before_app_request
+def _lazy_retrieve_bar_settings() -> None:
+    """Load bar settings cache on first request."""
+    global _bar_initialized
+    if _bar_initialized:
+        return
+    _bar_initialized = True
     # Call getter for all settings to load cache
     Settings.max_daily_alcoholic_drinks_per_user
     Settings.quick_access_item
@@ -45,7 +53,7 @@ def stats():
     is_today = False
     if not date:
         is_today = True
-        timestamp = datetime.datetime.utcnow()
+        timestamp = datetime.datetime.now(datetime.UTC)
         date = timestamp.date()
         if timestamp.hour < 4:  # 4h UTC = 5-6h Paris
             date -= datetime.timedelta(days=1)
@@ -106,7 +114,7 @@ def stats():
     best_customer_name = "Sylvain Gilat"
     if customers_consumption_this_month:
         best_customer_id, _sum = max(customers_consumption_this_month, key=lambda tup: tup[1])
-        best_customer_name = PCeen.query.get(best_customer_id).full_name
+        best_customer_name = db.session.get(PCeen, best_customer_id).full_name
 
     return flask.render_template(
         "bar/stats.html",
@@ -156,7 +164,11 @@ def search():
             if sort == "promo"
             else (PCeen.full_name.desc() if way == "desc" else PCeen.full_name.asc())
         )
-        .paginate(page, flask.current_app.config["BAR_USERS_PER_PAGE"], True)
+        .paginate(
+            page=page, 
+            per_page=flask.current_app.config["BAR_USERS_PER_PAGE"], 
+            error_out=True
+        )
     )
 
     if paginator.total == 1:
@@ -236,7 +248,12 @@ def _user(pceen: PCeen, form: EditBarUserForm | None = None, page: int | None = 
     # Get pceen transactions
     if page == None:
         page = flask.request.args.get("page", 1, type=int)
-    transactions_paginator = pceen.bar_transactions_made.order_by(BarTransaction.date.desc()).paginate(page, 5, True)
+    transactions_paginator = (
+        db.session.query(BarTransaction)
+        .filter(BarTransaction._client_id == pceen.id)
+        .order_by(BarTransaction.date.desc())
+        .paginate(page=page, per_page=5, error_out=True)
+    )
 
     # Get inventory
     item_descriptions = dict(get_items_descriptions(pceen))
@@ -274,7 +291,11 @@ def transactions():
     # Sort transactions alphabetically
     paginator = BarTransaction.query.order_by(
         BarTransaction.date.desc() if way == "desc" else BarTransaction.date.asc()
-    ).paginate(page, flask.current_app.config["BAR_ITEMS_PER_PAGE"], True)
+    ).paginate(
+        page=page, 
+        per_page=flask.current_app.config["BAR_ITEMS_PER_PAGE"], 
+        error_out=True
+    )
 
     return flask.render_template(
         "bar/transactions.html", title=_("Transactions – Bar"), paginator=paginator, sort=sort, way=way
@@ -293,7 +314,7 @@ def items():
             alcohol_mass = form.alcohol_mass.data or 0
             if form.id.data:
                 # Edit existing item
-                item: BarItem = BarItem.query.get(form.id.data)
+                item: BarItem = db.session.get(BarItem, form.id.data)
                 item.name = form.name.data
                 item.is_quantifiable = form.is_quantifiable.data
                 item.quantity = quantity
@@ -336,7 +357,11 @@ def items():
                 else sqlalchemy.func.lower(BarItem.name).asc()
             )
         )
-        .paginate(page, flask.current_app.config["BAR_ITEMS_PER_PAGE"], True)
+        .paginate(
+            page=page, 
+            per_page=flask.current_app.config["BAR_ITEMS_PER_PAGE"], 
+            error_out=True
+        )
     )
 
     return flask.render_template(

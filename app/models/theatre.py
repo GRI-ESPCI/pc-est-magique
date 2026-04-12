@@ -28,9 +28,10 @@ class Saison(db.Model):
     image_extension: Column[str | None] = column(sa.String(120), nullable=True)
     start_date: Column[datetime.date] = column(sa.Date(), nullable=False)
 
-    spectacles: Relationship[list[Representation]] = one_to_many(
+    spectacles = one_to_many(
         "Spectacle.saison",
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
+        uselist=True
     )
 
 
@@ -50,10 +51,11 @@ class Spectacle(db.Model):
     _saison_id: Column[int] = column(sa.ForeignKey("saison.id"), nullable=False)
     saison: Relationship[Saison] = many_to_one("Saison.spectacles")
 
-    representations: Relationship[list[Representation]] = one_to_many(
+    representations = one_to_many(
         "Representation.spectacle",
         order_by="Representation.date",
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
+        uselist=True
     )
 
 

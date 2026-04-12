@@ -17,6 +17,7 @@ from app.models import (
 import os
 import datetime
 import wtforms
+from flask_babel import format_date
 from app.routes.panier_bio.utils import command_open, what_are_next_days, export_excel, get_period_id, validPeriodDates, findPeriodId
 
 app = flask.Flask(__name__)
@@ -103,7 +104,7 @@ def main() -> typing.RouteReturn:
                 next_order = None
                 all_orders = None
 
-            form.dates.choices = [(day.strftime("%A %d %B %Y"), day.strftime("%A %d %B %Y")) for day in next_days]
+            form.dates.choices = [(day.isoformat(), format_date(day, format="full")) for day in next_days]
     
     form_visibility = 0 if not visibility else form_visibility
 
@@ -153,11 +154,20 @@ def main() -> typing.RouteReturn:
             flag = True
         if connected:
             for order in all_orders:
-                for date in form["dates"].data:
-                    if datetime.datetime.strptime(date,"%A %d %B %Y").date() == order.date:
+                for date_str in form["dates"].data:
+                    try:
+                        parsed_date = datetime.date.fromisoformat(date_str)
+                    except ValueError:
+                        # Fallback for old format if necessary, though new submissions will be ISO
+                        try:
+                            parsed_date = datetime.datetime.strptime(date_str, "%A %d %B %Y").date()
+                        except ValueError:
+                            continue
+                            
+                    if parsed_date == order.date:
                         flask.flash(
-                        _("Vous avez déjà commandé un panier bio pour le %s" % date),
-                        "danger",
+                            _("Vous avez déjà commandé un panier bio pour le %s" % format_date(parsed_date, "full")),
+                            "danger",
                         )
                         flag = True       
      
@@ -169,20 +179,23 @@ def main() -> typing.RouteReturn:
                     flask.flash(_("Vous devez vous engagez à payer et venir chercher le panier"), "danger")
                 else:
                     #order = [OrderPanierBio() for i in range(len(form["dates"].data))]
-                    for date in form["dates"].data:
+                    for date_str in form["dates"].data:
                         order = OrderPanierBio()
                         db.session.add(order)
                         order.name = form["prenom"].data + " " + form["nom"].data
                         order.service = form["service"].data
-                        order.date = date
+                        try:
+                            order.date = datetime.date.fromisoformat(date_str)
+                        except ValueError:
+                            order.date = datetime.datetime.strptime(date_str, "%A %d %B %Y").date()
                         order._pceen_id = user.id if connected else None
                         order.phone_number = form["phone"].data
                         order.payment_method = form["payment_method"].data
                         order.comment = form["comment"].data
-                        order._period_id = get_period_id(date, all_periods)
+                        order._period_id = get_period_id(order.date, all_periods)
 
                     db.session.commit()
-                    flask.flash(_("Votre panier a été commandé avec succès !"))
+                    flask.flash(_("Votre panier a été commandé avec succès !"), "success")
                     return flask.redirect(flask.url_for("panier_bio.main"))
             
         
@@ -286,7 +299,7 @@ def admin() -> typing.RouteReturn:
             GlobalSetting.query.filter_by(key="PANIER_BIO_DAY").one().value = form_settings["day"].data
 
             db.session.commit()
-            flask.flash(_("Mis à jour."))
+            flask.flash(_("Mis à jour."), "success")
             return flask.redirect(flask.url_for("panier_bio.admin", show_date=show_date))
 
     if form.is_submitted() and can_edit:
@@ -295,27 +308,28 @@ def admin() -> typing.RouteReturn:
         edit = form["edit"].data
 
         if add:
-            order = OrderPanierBio()
-            db.session.add(order)
+            if not form["date"].data:
+                flask.flash(_("Veuillez choisir une date."), "danger")
+            else:
+                #Check if a compatible period can be found
+                period_id = findPeriodId(form["date"].data, all_periods)
+                if period_id == None:
+                    flask.flash(_("Aucune période compatible trouvée pour la date choisie."), "danger")
+                else:
+                    order = OrderPanierBio()
+                    db.session.add(order)
+                    order.name = form["prenom"].data + " " + form["nom"].data
+                    order._period_id = period_id
+                    order.service = form["service"].data
+                    order.phone_number = form["phone"].data
+                    order.payment_made = form["payed"].data
+                    order.payment_method = form["payment_method"].data
+                    order.date = form["date"].data
+                    order.comment = form["comment"].data
 
-            #Check if a compatible period can be found
-            period_id = findPeriodId(form["date"].data, all_periods)
-            if period_id == None:
-                flask.flash(_("No compatible period founded for choosen date."))
-                pass
-
-            order.name = form["prenom"].data + " " + form["nom"].data
-            order._period_id = period_id
-            order.service = form["service"].data
-            order.phone_number = form["phone"].data
-            order.payment_made = form["payed"].data
-            order.payment_method = form["payment_method"].data
-            order.date = form["date"].data
-            order.comment = form["comment"].data
-
-            db.session.commit()
-            flask.flash(_("Commande effectuée."))
-            return flask.redirect(flask.url_for("panier_bio.admin", show_date=show_date))
+                    db.session.commit()
+                    flask.flash(_("Commande effectuée."), "success")
+                    return flask.redirect(flask.url_for("panier_bio.admin", show_date=show_date))
 
         elif edit or delete:
             order = OrderPanierBio.query.filter_by(id=form["id"].data).one()
@@ -324,7 +338,7 @@ def admin() -> typing.RouteReturn:
                 db.session.delete(order)
                 db.session.commit()
 
-                flask.flash(_("Commande supprimée."))
+                flask.flash(_("Commande supprimée."), "danger")
                 return flask.redirect(flask.url_for("panier_bio.admin", show_date=show_date))
 
             elif edit:
@@ -336,7 +350,7 @@ def admin() -> typing.RouteReturn:
                 order.comment = form["comment"].data
 
                 db.session.commit()
-                flask.flash(_("Commande éditée."))
+                flask.flash(_("Commande éditée."), "success")
                 return flask.redirect(flask.url_for("panier_bio.admin", show_date=show_date))
 
     return flask.render_template(
@@ -390,7 +404,7 @@ def period() -> typing.RouteReturn:
                 period.disabled_days = form["disabled_days"].data
 
                 db.session.commit()
-                flask.flash(_("Periode ajoutée."))
+                flask.flash(_("Periode ajoutée."), "success")
                 return flask.redirect(flask.url_for("panier_bio.period"))
 
             elif edit or delete:
@@ -400,7 +414,7 @@ def period() -> typing.RouteReturn:
                     db.session.delete(period)
                     db.session.commit()
 
-                    flask.flash(_("Période supprimée."))
+                    flask.flash(_("Période supprimée."), "danger")
                     return flask.redirect(flask.url_for("panier_bio.period"))
 
                 elif edit:
@@ -410,7 +424,7 @@ def period() -> typing.RouteReturn:
                     period.disabled_days = form["disabled_days"].data
 
                     db.session.commit()
-                    flask.flash(_("Période éditée."))
+                    flask.flash(_("Période éditée."), "success")
                     return flask.redirect(flask.url_for("panier_bio.period"))
 
     return flask.render_template(
@@ -432,13 +446,13 @@ def validate(id, type):
         show = int(show)
 
     if type == "active":
-        period = PeriodPanierBio.query.get_or_404(id)
+        period = db.get_or_404(PeriodPanierBio, id)
         period.active = False if period.active else True
         db.session.commit()
         return flask.redirect(flask.url_for("panier_bio.period"))
     
     else:
-        order = OrderPanierBio.query.get_or_404(id)
+        order = db.get_or_404(OrderPanierBio, id)
         if type == "payment":
             order.payment_made = False if order.payment_made else True
         elif type == "treasurer":
@@ -457,7 +471,7 @@ def edit_text():
     with open(path, "w") as file:
         file.write(content)
 
-    flask.flash(_("Introduction mise à jour."))
+    flask.flash(_("Introduction mise à jour."), "success")
     return flask.redirect(flask.url_for("panier_bio.main"))
 
 

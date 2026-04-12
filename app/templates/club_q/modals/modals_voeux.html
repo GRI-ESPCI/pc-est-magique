@@ -59,15 +59,15 @@
               <div class="form-floating">{{ wtf.form_field(form_add_voeu.places_attribuees_add, value=0) }}</div>
             </div>
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer border-0 pt-0 pb-2 px-4">
             <button
               type="button"
-              class="btn btn-secondary"
+              class="btn btn-outline-secondary rounded-pill px-4"
               data-bs-dismiss="modal"
             >
               {{ _("Annuler") }}
             </button>
-            {{ form_add_voeu.submit_add(class="btn btn-primary") }}
+            {{ form_add_voeu.submit_add(class="btn btn-primary rounded-pill px-4 fw-bold") }}
           </div>
         </div>
       </form>
@@ -126,16 +126,15 @@
               <div class="form-floating">{{ wtf.form_field(form_edit_voeu.places_attribuees_edit) }}</div>
             </div>
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer border-0 pt-0 pb-2 px-4">
             <button
               type="button"
-              class="btn btn-secondary"
+              class="btn btn-outline-secondary rounded-pill px-4"
               data-bs-dismiss="modal"
             >
               {{ _("Annuler") }}
             </button>
-            {{ form_edit_voeu.delete_edit(class="btn btn-danger") }} {{ form_edit_voeu.submit_edit(class="btn
-            btn-primary") }}
+            {{ form_edit_voeu.delete_edit(class="btn btn-danger rounded-pill px-4 fw-bold") }} {{ form_edit_voeu.submit_edit(class="btn btn-primary rounded-pill px-4 fw-bold") }}
           </div>
         </div>
       </form>

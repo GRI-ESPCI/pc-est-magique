@@ -1,5 +1,5 @@
 {# Club Q card - used variables: club_q_infos #} {% extends "cards/base.html" %} {% block card_title %} {{ _("Club Q")
-}} {{ macros.badge() }} {% endblock %} {% block card_icon %} {{ macros.bootstrap_icon("music-note-beamed") }} {%
+}} {% endblock %} {% block card_icon %} {{ macros.bootstrap_icon("music-note-beamed") }} {%
 endblock %} {% block card_table %}
 <tr>
   <th
@@ -39,14 +39,14 @@ endblock %} {% block card_table %}
 {% endblock %} {% block card_footer %} {% if club_q_infos.visibility == 1 %}
 <a
   href="{{ url_for('club_q.main') }}"
-  class="btn btn-outline-dark"
+  class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}"
 >
   {{ _("Réserver") }}
 </a>
 {% endif %}
 <a
   href="{{ url_for('club_q.pceen_id', id=club_q_infos.pceen.id) }}"
-  class="btn btn-outline-dark"
+  class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}"
 >
   {{ _("Détails") }}
 </a>

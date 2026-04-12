@@ -38,7 +38,7 @@ def main(saison_id="") -> typing.RouteReturn:
     if saison_id == "":
         current_saison = saisons[0]
     else:
-        current_saison = Saison.query.get(saison_id)
+        current_saison = db.session.get(Saison, saison_id)
         if current_saison == None:
             flask.abort(404)
 
@@ -89,7 +89,7 @@ def admin():
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin_saison(id: int):
 
-    saison = Saison.query.get(id)
+    saison = db.session.get(Saison, id)
     if saison is None:
         flask.abort(404)
 
@@ -129,7 +129,7 @@ def admin_saison_new():
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin_saison_edit(id: int):
 
-    saison = Saison.query.get(id)
+    saison = db.session.get(Saison, id)
     if saison is None:
         flask.abort(404)
 
@@ -155,7 +155,7 @@ def admin_saison_edit(id: int):
 @bp.route("/admin/saison/delete/<id>")
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin_saison_delete(id: int):
-    saison =Saison.query.get(id)
+    saison =db.session.get(Saison, id)
     if saison is None:
         flask.abort(404)
 
@@ -174,7 +174,7 @@ def admin_spectacle(id: int):
 
     picture_form = SendPicture()
 
-    spectacle = Spectacle.query.get(id)
+    spectacle = db.session.get(Spectacle, id)
     if spectacle is None:
         flask.abort(404)
     
@@ -188,7 +188,7 @@ def admin_spectacle(id: int):
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin_spectacle_edit(id: int):
 
-    spectacle = Spectacle.query.get(id)
+    spectacle = db.session.get(Spectacle, id)
     if spectacle is None:
         flask.abort(404)
 
@@ -220,7 +220,7 @@ def admin_spectacle_edit(id: int):
 def admin_spectacle_new(saison_id: int):
 
     form = EditSpectacle()
-    saison = Saison.query.get(saison_id)
+    saison = db.session.get(Saison, saison_id)
     if saison is None:
         flask.abort(404)
 
@@ -256,7 +256,7 @@ def admin_spectacle_new(saison_id: int):
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin_spectacle_delete(spectacle_id: int):
     
-    spectacle = Spectacle.query.get(spectacle_id)
+    spectacle = db.session.get(Spectacle, spectacle_id)
     if spectacle is None:
         flask.abort(404)
     saison_id = spectacle.saison.id
@@ -274,7 +274,7 @@ def admin_spectacle_delete(spectacle_id: int):
 def admin_representation_new(spectacle_id: int):
 
     form = EditRepresentation()
-    spectacle = Spectacle.query.get(spectacle_id)
+    spectacle = db.session.get(Spectacle, spectacle_id)
     if spectacle is None:
         return flask.abort(404)
 
@@ -299,7 +299,7 @@ def admin_representation_new(spectacle_id: int):
 @bp.route("/admin/representation/delete/<rep_id>")
 @context.permission_only(PermissionType.write, scope=PermissionScope.theatre)
 def admin_representation_delete(rep_id: int):
-    rep = Representation.query.get(rep_id)
+    rep = db.session.get(Representation, rep_id)
     if rep is None:
         flask.abort(404)
 
@@ -333,7 +333,7 @@ def picture_upload(type: str, id: int):
         ext = form.picture.data.filename.split(".")[-1]
 
         if type == "saison":
-            saison = Saison.query.get(id)
+            saison = db.session.get(Saison, id)
             if saison is None:
                 flask.abort(404)
             old_filename = f"saison_{saison.id}.{saison.image_extension}"
@@ -366,7 +366,7 @@ def picture_upload(type: str, id: int):
             db.session.commit()
 
         elif type == "spectacle":
-            spectacle = Spectacle.query.get(id)
+            spectacle = db.session.get(Spectacle, id)
             if spectacle is None:
                 flask.abort(404) 
             old_filename = f"spectacle_{spectacle.id}.{spectacle.image_extension}"

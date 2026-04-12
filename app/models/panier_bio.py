@@ -56,4 +56,4 @@ class PeriodPanierBio(db.Model):
     disabled_days: Column[str] = column(sa.String(500), nullable=True)
     active: Column[bool] = column(sa.Boolean(), nullable=False)
 
-    order: Relationship[Query[models.OrderPanierBio]] = one_to_many("OrderPanierBio.period", lazy="dynamic")
+    order = one_to_many("OrderPanierBio.period", uselist=True)

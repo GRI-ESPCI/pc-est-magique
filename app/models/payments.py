@@ -84,7 +84,7 @@ class Payment(Model):
     _gri_id: Column[int | None] = column(sa.ForeignKey("pceen.id"), nullable=True)
     gri: Relationship[models.PCeen] = many_to_one("PCeen.payments_created", foreign_keys=_gri_id)
 
-    subscriptions: Relationship[list[Subscription]] = one_to_many("Subscription.payment")
+    subscriptions = one_to_many("Subscription.payment", uselist=True)
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -105,7 +105,7 @@ class Offer(Model):
     visible: Column[bool] = column(sa.Boolean(), nullable=False, default=True)
     active: Column[bool] = column(sa.Boolean(), nullable=False, default=True)
 
-    subscriptions: Relationship[list[Subscription]] = one_to_many("Subscription.offer")
+    subscriptions = one_to_many("Subscription.offer", uselist=True)
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -160,7 +160,7 @@ class Offer(Model):
     @classmethod
     def first_offer(cls) -> Offer:
         """Query method: get the welcome offer (1 free month)."""
-        offer = cls.query.get("_first")
+        offer = db.session.get(cls, "_first")
         if not offer:
             raise RuntimeError("First offer not created!")
         return offer

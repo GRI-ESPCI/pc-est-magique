@@ -43,7 +43,7 @@
 <div class="accordion" id="acco-room">
 <div class="accordion-item">
     <h3 class="accordion-header" id="acco-room-h">
-        <button class="accordion-button collapsed bg-pc5 text-dark"
+        <button class="accordion-button collapsed {{ 'bg-pc5 text-dark' if g.theme == 'classic' else ('bg-transparent' if g.theme == 'frost' else '') }}"
                 type="button" data-bs-toggle="collapse"
                 data-bs-target="#coll-room-h" aria-expanded="true"
                 aria-controls="coll-room-h">
@@ -54,7 +54,7 @@
     <div id="coll-room-h" class="accordion-collapse collapse"
             aria-labelledby="acco-room-h"
             data-bs-parent="#acco-room">
-    <div class="accordion-body bg-pc5 p-0">
+    <div class="accordion-body p-0 {{ 'bg-pc5' if g.theme == 'classic' else ('bg-transparent' if g.theme == 'frost' else '') }}">
         {% if pceen.old_rentals %}
         <table class="table table-striped table-borderless mb-0">
         <tbody>
@@ -83,16 +83,16 @@
 
 {% block card_footer_class %}{{ super() }} px-auto{% endblock %}
 {% block card_footer %}
-<a class="btn btn-outline-dark me-3 mb-2 position-relative"
-   href="{{ url_for("rooms.modify", doas=doas,
-                    next=request.url_rule.endpoint) }}">
-    {{ _("Modifier les dates") }}
-    {{ macros.badge("NEW") }}
-</a>
-<a class="btn btn-outline-dark me-3 position-relative"
-   href="{{ url_for("rooms.terminate", doas=doas,
-                    next=request.url_rule.endpoint) }}">
-    {{ _("Changer de chambre") }}
-    {{ macros.badge("NEW") }}
-</a>
+<div class="d-flex flex-wrap gap-3">
+    <a class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }} position-relative"
+       href="{{ url_for("rooms.modify", doas=doas,
+                        next=request.url_rule.endpoint) }}">
+        {{ _("Modifier les dates") }}
+    </a>
+    <a class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }} position-relative"
+       href="{{ url_for("rooms.terminate", doas=doas,
+                        next=request.url_rule.endpoint) }}">
+        {{ _("Changer de chambre") }}
+    </a>
+</div>
 {% endblock %}

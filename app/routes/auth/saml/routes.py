@@ -39,8 +39,20 @@ REQUESTED_ATTRIBUTES: list[str] = [
 ACCEPTED_SERVICES: list[str] = list(PROMOTIONS_SERVICES)
 
 
-@bp.before_app_first_request
-def setup_saml_authentication() -> None:
+_saml_initialized = False
+
+
+@bp.before_app_request
+def _lazy_setup_saml() -> None:
+    """Lazy-init SAML client on the first real request (url_for needs full app)."""
+    global _saml_initialized
+    if _saml_initialized:
+        return
+    _saml_initialized = True
+    _do_setup_saml_authentication()
+
+
+def _do_setup_saml_authentication() -> None:
     """Prepare objects needed to provide ESPCI SAML authentication."""
     global _idp_metadata, _saml_client
     app_config = flask.current_app.config
@@ -50,12 +62,16 @@ def setup_saml_authentication() -> None:
         idp_response = requests.get(app_config["SAML_IDP_METADATA_URL"], timeout=60)
     except Exception:
         idp_response = None
-    if not idp_response.text.startswith("<?xml"):
+    if idp_response is not None and not idp_response.text.startswith("<?xml"):
         idp_response = None
     if not idp_response and app_config["SAML_IDP_METADATA_FALLBACK_URL"]:
-        idp_response = requests.get(app_config["SAML_IDP_METADATA_FALLBACK_URL"], timeout=60)
+        try:
+            idp_response = requests.get(app_config["SAML_IDP_METADATA_FALLBACK_URL"], timeout=60)
+        except Exception:
+            idp_response = None
     if not idp_response:
-        raise RuntimeError(f"Could not retrieve IdP metadata ({idp_response.status_code}): {idp_response.text}")
+        flask.current_app.logger.error("Could not retrieve IdP metadata")
+        return
     _idp_metadata = idp_response.text
 
     # Create and configure SAML client

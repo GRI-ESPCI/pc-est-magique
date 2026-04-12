@@ -33,7 +33,7 @@ class BarItem(db.Model):
     favorite_index: Column[int] = column(sa.Integer(), nullable=False, default=0)
     archived: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
 
-    transactions: Relationship[Query[models.BarTransaction]] = one_to_many("BarTransaction.item", lazy="dynamic")
+    transactions = one_to_many("BarTransaction.item", uselist=True)
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -117,7 +117,7 @@ class BarTransaction(db.Model):
             raise ValueError(f"Transaction {self} is already reverted!")
         # BarTransaction is now reverted: it won't ever be 'unreverted'
         self.is_reverted = True
-        self.revert_date = datetime.datetime.utcnow()
+        self.revert_date = datetime.datetime.now(datetime.UTC)
         self.reverter = reverter
         self._update_linked_objects(revert=True)
 
