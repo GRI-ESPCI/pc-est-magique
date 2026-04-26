@@ -801,11 +801,6 @@ def mails() -> typing.RouteReturn:
     can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
     form_mail = forms.Mail()
 
-    # Get access to Club Q RIB
-    src_rib = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "RIB_Club_Q.jpg")
-    ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]
-    token_args = get_nginx_access_token(src_rib, ip)
-    rib = f"{src_rib}?{token_args}"
 
     if form_mail.validate_on_submit() and can_edit:
 
@@ -838,7 +833,7 @@ def mails() -> typing.RouteReturn:
                 spectacles_list = None
 
             html_body = flask.render_template(
-                "club_q/mails/reservation.html", saison=saison, pceen=pceen, date_payement=date_payement, date_SAV=date_SAV, link_SAV=link_SAV, rib=rib, spectacles_list=spectacles_list
+                "club_q/mails/reservation.html", saison=saison, pceen=pceen, date_payement=date_payement, date_SAV=date_SAV, link_SAV=link_SAV, spectacles_list=spectacles_list
             )
 
             send_email(
