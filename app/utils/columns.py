@@ -93,7 +93,6 @@ def one_to_many(table_dot_back_populates: str, **kwargs) -> "Relationship":  # [
             of form ``Table.column` (**many elements** of ``Table`` are
             linked to **one element** in this table).
     """
-    kwargs["uselist"] = True
     return _relationship(table_dot_back_populates, **kwargs)
 
 
@@ -117,7 +116,6 @@ def many_to_many(table_dot_back_populates: str, secondary: type | str, **kwargs)
             linked to **many elements** in this table).
         secondary: The associative table used to join tables.
     """
-    kwargs["uselist"] = True
     return _relationship(
         table_dot_back_populates,
         secondary=secondary if isinstance(secondary, str) else secondary.__table__,

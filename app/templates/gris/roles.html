@@ -83,7 +83,7 @@
             data-name="{{ role.name }}"
             data-index="{{ role.index }}"
             data-perms="{{ len(role.permissions) }}"
-            data-users="{{ len(role.pceens) }}"
+            data-users="{{ role.pceens_count }}"
         >
             <td>{{ role.id }}</td>
             <td>
@@ -125,7 +125,7 @@
                 </span>
 
             </td>
-            <td>{{ len(role.pceens) }}</td>
+            <td>{{ role.pceens_count }}</td>
         </tr>
         {% endfor %}
     </tbody></table>

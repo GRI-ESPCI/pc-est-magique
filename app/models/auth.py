@@ -15,7 +15,7 @@ import flask_login
 import sqlalchemy as sa
 from sqlalchemy.ext.hybrid import hybrid_property
 from unidecode import unidecode
-from sqlalchemy.orm import Query
+from sqlalchemy.orm import Query, Mapped, WriteOnlyMapped
 from werkzeug import security as wzs
 
 from app import db
@@ -78,43 +78,39 @@ class PCeen(flask_login.UserMixin, Model):
     # Club Q info
     discontent: Column[float] = column(sa.Numeric(precision=2, asdecimal=False), nullable=True)
 
-    photos = one_to_many("Photo.author", uselist=True)
-    roles = many_to_many(
+    photos: Mapped[list["models.Photo"]] = one_to_many("Photo.author")
+    roles: Mapped[list["models.Role"]] = many_to_many(
         "Role.pceens",
         secondary="_pceen_role_at",
         order_by="Role.index",
-        uselist=True,
     )
-    bans = one_to_many("Ban.pceen", uselist=True)
-    devices = one_to_many("Device.pceen", uselist=True)
-    rentals = one_to_many("Rental.pceen", uselist=True)
-    subscriptions = one_to_many("Subscription.pceen", uselist=True)
-    payments = one_to_many("Payment.pceen", foreign_keys="Payment._pceen_id", uselist=True)
-    payments_created = one_to_many("Payment.gri", foreign_keys="Payment._gri_id", uselist=True)
+    bans: Mapped[list["models.Ban"]] = one_to_many("Ban.pceen")
+    devices: Mapped[list["models.Device"]] = one_to_many("Device.pceen")
+    rentals: Mapped[list["models.Rental"]] = one_to_many("Rental.pceen")
+    subscriptions: Mapped[list["models.Subscription"]] = one_to_many("Subscription.pceen")
+    payments: Mapped[list["models.Payment"]] = one_to_many("Payment.pceen", foreign_keys="Payment._pceen_id")
+    payments_created: Mapped[list["models.Payment"]] = one_to_many("Payment.gri", foreign_keys="Payment._gri_id")
 
-    bar_transactions_made = one_to_many(
+    bar_transactions_made: WriteOnlyMapped["models.BarTransaction"] = one_to_many(
         "BarTransaction.client",
         foreign_keys="BarTransaction._client_id",
-        lazy="select",
-        uselist=True,
+        lazy="write_only",
     )
-    bar_transactions_cashed = one_to_many(
+    bar_transactions_cashed: WriteOnlyMapped["models.BarTransaction"] = one_to_many(
         "BarTransaction.barman",
         foreign_keys="BarTransaction._barman_id",
-        lazy="select",
-        uselist=True,
+        lazy="write_only",
     )
-    bar_transactions_reverted = one_to_many(
+    bar_transactions_reverted: WriteOnlyMapped["models.BarTransaction"] = one_to_many(
         "BarTransaction.reverter",
         foreign_keys="BarTransaction._reverter_id",
-        lazy="select",
-        uselist=True,
+        lazy="write_only",
     )
-    bar_daily_data = one_to_many("BarDailyData.pceen", uselist=True)
+    bar_daily_data: Mapped[list["models.BarDailyData"]] = one_to_many("BarDailyData.pceen")
 
-    clubq_voeux = one_to_many("ClubQVoeu.pceen", uselist=True)
+    clubq_voeux: Mapped[list["models.ClubQVoeu"]] = one_to_many("ClubQVoeu.pceen")
 
-    order_panier_bio = one_to_many("OrderPanierBio.pceen", uselist=True)
+    order_panier_bio: Mapped[list["models.OrderPanierBio"]] = one_to_many("OrderPanierBio.pceen")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -129,32 +125,21 @@ class PCeen(flask_login.UserMixin, Model):
         """The pceens's first + last names."""
         return self.prenom + " " + self.nom
 
-    def _get_list(self, attr_name: str) -> list:
-        """Helper to make SQLAlchemy relationships into a list."""
-        val = getattr(self, attr_name)
-        if not val:
-            return []
-        if not isinstance(val, (list, set, tuple)):
-            return [val]
-        return val
-
     @property
-    def all_roles(self) -> list:
+    def all_roles(self) -> list["models.Role"]:
         """Gets roles from templates"""
-        return self._get_list("roles")
+        return self.roles
 
     @property
-    def all_devices(self) -> list:
+    def all_devices(self) -> list["models.Device"]:
         """Gets devices from templates."""
-        return self._get_list("devices")
+        return self.devices
 
     @property
-    def permissions(self) -> set[models.Permission]:
+    def permissions(self) -> set["models.Permission"]:
         """The set of all permissions this PCeen has."""
-        roles_list = self._get_list("roles")
-
         all_perms = set()
-        for role in roles_list:
+        for role in self.roles:
             perms = role.permissions
             if not perms:
                 continue
@@ -257,15 +242,14 @@ class PCeen(flask_login.UserMixin, Model):
     @property
     def first_seen(self) -> datetime.datetime:
         """The first time the pceen registered a device, or now."""
-        devices = self._get_list("devices")
-        if not devices:
+        if not self.devices:
             return datetime.datetime.now(datetime.UTC)
-        return min(device.registered for device in devices)
+        return min(device.registered for device in self.devices)
 
     @property
     def current_device(self) -> models.Device | None:
         """The PCeen's last seen device, or ``None``."""
-        devices = self._get_list("devices")
+        devices = self.devices
         if not devices:
             return None
         return max(devices, key=lambda device: device.last_seen_time)
@@ -286,7 +270,7 @@ class PCeen(flask_login.UserMixin, Model):
         *If the PCeen's "current_device" is not the device currently making the request
         (connection from outside/GRIs list), it is included in this list.
         """
-        devices = self._get_list("devices")
+        devices = self.devices
         if not devices:
             return []
         all_devices = sorted(devices, key=lambda device: device.last_seen_time, reverse=True)
@@ -300,13 +284,13 @@ class PCeen(flask_login.UserMixin, Model):
     @property
     def current_rental(self) -> models.Rental | None:
         """The PCeen's current rental, or ``None``."""
-        rentals = self._get_list("rentals")
+        rentals = self.rentals
         return next((rent for rent in rentals if rent.is_current), None)
 
     @property
     def old_rentals(self) -> list[models.Rental]:
         """The PCeen's non-current rentals."""
-        rentals = self._get_list("rentals")
+        rentals = self.rentals
         return [rental for rental in rentals if not rental.is_current]
 
     @property
@@ -325,7 +309,7 @@ class PCeen(flask_login.UserMixin, Model):
         """:class:`Subscription`: The PCeen's current subscription, or ``None``.
 
         Sorted from most recent to last recent subscription."""
-        subscriptions = self._get_list("subscriptions")
+        subscriptions = self.subscriptions
         if not subscriptions:
             return None
         return max(subscriptions, key=lambda sub: sub.start)
@@ -333,7 +317,7 @@ class PCeen(flask_login.UserMixin, Model):
     @property
     def old_subscriptions(self) -> list[models.Subscription] | None:
         """:class:`list[Subscription]`: The PCeen's non-current subscriptions."""
-        subscriptions = self._get_list("subscriptions")
+        subscriptions = self.subscriptions
         if not subscriptions:
             return None
         return sorted(
@@ -370,7 +354,7 @@ class PCeen(flask_login.UserMixin, Model):
         The subscription starts the day the PCeen registered its first
         device (usually today), and ends today.
         """
-        if not self._get_list("devices"):
+        if not self.devices:
             return
         offer = models.Offer.first_offer()
         start = self.first_seen.date()
@@ -392,7 +376,7 @@ class PCeen(flask_login.UserMixin, Model):
     @property
     def current_ban(self) -> models.Ban | None:
         """The PCeen's current ban, or ``None``."""
-        bans = self._get_list("bans")
+        bans = self.bans
         return next((ban for ban in bans if ban.is_active), None)
 
     @property

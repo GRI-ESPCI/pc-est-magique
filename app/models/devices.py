@@ -6,6 +6,7 @@ import datetime
 import typing
 
 import sqlalchemy as sa
+from sqlalchemy.orm import Mapped
 
 from app import db
 from app.utils.columns import (
@@ -13,7 +14,6 @@ from app.utils.columns import (
     one_to_many,
     many_to_one,
     Column,
-    Relationship,
 )
 
 
@@ -25,14 +25,14 @@ class Device(Model):
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
     _pceen_id: Column[int] = column(sa.ForeignKey("pceen.id"), nullable=False)
-    pceen: Relationship[models.PCeen] = many_to_one("PCeen.devices")
+    pceen: Mapped[models.PCeen] = many_to_one("PCeen.devices")
     mac_address: Column[str] = column(sa.String(17), nullable=False, unique=True)
     name: Column[str | None] = column(sa.String(64), nullable=True)
     type: Column[str | None] = column(sa.String(64), nullable=True)
     registered: Column[datetime.datetime] = column(sa.DateTime(), nullable=False)
     last_seen: Column[datetime.datetime | None] = column(sa.DateTime(), nullable=True)
 
-    allocations = one_to_many("Allocation.device")
+    allocations: Mapped[list["models.Allocation"]] = one_to_many("Allocation.device")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -98,9 +98,9 @@ class Allocation(Model):
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
     _device_id: Column[int] = column(sa.ForeignKey("device.id"), nullable=False)
-    device: Relationship[Device] = many_to_one("Device.allocations")
+    device: Mapped[Device] = many_to_one("Device.allocations")
     _room_num: Column[int] = column(sa.ForeignKey("room.num"), nullable=False)
-    room: Relationship[models.Room] = many_to_one("Room.allocations")
+    room: Mapped[models.Room] = many_to_one("Room.allocations")
     ip: Column[str] = column(sa.String(16), nullable=False)
 
     def __repr__(self) -> str:

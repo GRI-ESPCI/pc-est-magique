@@ -9,6 +9,7 @@ import typing
 import flask
 import flask_babel
 import sqlalchemy as sa
+from sqlalchemy.orm import Mapped
 
 from app import db
 from app.enums import PermissionType, PermissionScope
@@ -17,7 +18,6 @@ from app.utils.columns import (
     one_to_many,
     many_to_one,
     Column,
-    Relationship,
 )
 from app.utils.nginx import get_nginx_access_token
 
@@ -30,12 +30,12 @@ class Photo(Model):
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
     _album_id: Column[int] = column(sa.ForeignKey("album.id"), nullable=False)
-    album: Relationship[Album] = many_to_one("Album.photos")
+    album: Mapped[Album] = many_to_one("Album.photos")
     file_name: Column[str] = column(sa.String(120), nullable=False)
     width: Column[int] = column(sa.Integer(), nullable=False)
     height: Column[int] = column(sa.Integer(), nullable=False)
     _author_id: Column[int | None] = column(sa.ForeignKey("pceen.id"), nullable=True)
-    author: Relationship[models.PCeen | None] = many_to_one("PCeen.photos")
+    author: Mapped[models.PCeen | None] = many_to_one("PCeen.photos")
     author_str: Column[str | None] = column(sa.String(64), nullable=True)
     timestamp: Column[datetime.datetime | None] = column(sa.DateTime(), nullable=True)
     lat: Column[float | None] = column(sa.Float(), nullable=True)
@@ -104,7 +104,7 @@ class Album(Model):
     id: Column[int] = column(sa.Integer(), primary_key=True)
     visible: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
     _collection_id: Column[int] = column(sa.ForeignKey("collection.id"), nullable=False)
-    collection: Relationship[Collection] = many_to_one("Collection.albums")
+    collection: Mapped[Collection] = many_to_one("Collection.albums")
     dir_name: Column[str] = column(sa.String(120), nullable=False)
     name: Column[str] = column(sa.String(120), nullable=False)
     description: Column[str] = column(sa.String(280), nullable=True)
@@ -113,7 +113,7 @@ class Album(Model):
     featured: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
     nb_photos: Column[int] = column(sa.Integer, nullable=False, default=0)
 
-    photos = one_to_many("Photo.album", cascade="all, delete-orphan", uselist=True)
+    photos: Mapped[list["models.Photo"]] = one_to_many("Photo.album", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -178,7 +178,7 @@ class Collection(Model):
     start: Column[datetime.date] = column(sa.Date(), nullable=True)
     end: Column[datetime.date] = column(sa.Date(), nullable=True)
 
-    albums = one_to_many("Album.collection", cascade="all, delete-orphan", uselist=True)
+    albums: Mapped[list["models.Album"]] = one_to_many("Album.collection", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""

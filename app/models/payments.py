@@ -8,6 +8,7 @@ import typing
 from dateutil import relativedelta
 import flask_babel
 import sqlalchemy as sa
+from sqlalchemy.orm import Mapped, WriteOnlyMapped
 
 from app import db
 from app.enums import PaymentStatus
@@ -30,11 +31,11 @@ class Subscription(Model):
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
     _pceen_id: Column[int] = column(sa.ForeignKey("pceen.id"), nullable=False)
-    pceen: Relationship[models.PCeen] = many_to_one("PCeen.subscriptions")
+    pceen: Mapped[models.PCeen] = many_to_one("PCeen.subscriptions")
     _offer_slug: Column[str] = column(sa.ForeignKey("offer.slug"), nullable=False)
-    offer: Relationship[Offer] = many_to_one("Offer.subscriptions")
+    offer: Mapped[Offer] = many_to_one("Offer.subscriptions")
     _payment_id: Column[int | None] = column(sa.ForeignKey("payment.id"), nullable=True)
-    payment: Relationship[Payment | None] = many_to_one("Payment.subscriptions")
+    payment: Mapped[Payment | None] = many_to_one("Payment.subscriptions")
     start: Column[datetime.date] = column(sa.Date(), nullable=False)
     end: Column[datetime.date] = column(sa.Date(), nullable=False)
 
@@ -74,7 +75,7 @@ class Payment(Model):
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
     _pceen_id: Column[int] = column(sa.ForeignKey("pceen.id"), nullable=False)
-    pceen: Relationship[models.PCeen] = many_to_one("PCeen.payments", foreign_keys=_pceen_id)
+    pceen: Mapped[models.PCeen] = many_to_one("PCeen.payments", foreign_keys=_pceen_id)
     amount: Column[float] = column(sa.Numeric(6, 2, asdecimal=False), nullable=False)
     created: Column[datetime.date] = column(sa.DateTime(), nullable=False)
     payed: Column[datetime.date] = column(sa.DateTime(), nullable=True)
@@ -82,10 +83,10 @@ class Payment(Model):
     lydia_uuid: Column[str | None] = column(sa.String(32), nullable=True)
     lydia_transaction_id: Column[str | None] = column(sa.String(32), nullable=True)
     _gri_id: Column[int | None] = column(sa.ForeignKey("pceen.id"), nullable=True)
-    gri: Relationship[models.PCeen] = many_to_one("PCeen.payments_created", foreign_keys=_gri_id)
+    gri: Mapped[models.PCeen] = many_to_one("PCeen.payments_created", foreign_keys=_gri_id)
 
-    subscriptions = one_to_many("Subscription.payment", uselist=True)
-
+    subscriptions: Mapped[list["models.Subscription"]] = one_to_many("Subscription.payment")
+    
     def __repr__(self) -> str:
         """Returns repr(self)."""
         return f"<Payment #{self.id} of €{self.amount} by {self.pceen}>"
@@ -105,7 +106,7 @@ class Offer(Model):
     visible: Column[bool] = column(sa.Boolean(), nullable=False, default=True)
     active: Column[bool] = column(sa.Boolean(), nullable=False, default=True)
 
-    subscriptions = one_to_many("Subscription.offer", uselist=True)
+    subscriptions: WriteOnlyMapped["models.Subscription"] = one_to_many("Subscription.offer", lazy="write_only")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
