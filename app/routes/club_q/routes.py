@@ -895,7 +895,7 @@ def options() -> typing.RouteReturn:
     return flask.render_template("club_q/options.html", view="options", form_setting=form_setting, user=context.g.pceen)
 
 
-@bp.route("/pceens/<id>", methods=["GET", "POST"])
+@bp.route("/pceens/<int:id>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
 def pceen_id(id: int):
     """Sum up of informations about users regarding Club Q"""
@@ -972,7 +972,7 @@ def pceen_id(id: int):
     )
 
 
-@bp.route("/pceens/<id>/generate_pdf", methods=["GET"])
+@bp.route("/pceens/<int:id>/generate_pdf", methods=["GET"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
 def user_generate_pdf(id: int):
     """Receipt generation for Club Q as a PDF for the user"""

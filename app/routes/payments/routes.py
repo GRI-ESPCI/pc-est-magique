@@ -59,10 +59,10 @@ def pay() -> typing.RouteReturn:
 
 @bp.route("/pay/<method>", methods=["GET", "POST"])
 @bp.route("/pay/<method>/", methods=["GET", "POST"])
-@bp.route("/pay/<method>/<offer>", methods=["GET", "POST"])
+@bp.route("/pay/<method>/<int:offer>", methods=["GET", "POST"])
 @context.intrarez_setup_only
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
-def pay_(method: str, offer: str | None = None) -> typing.RouteReturn:
+def pay_(method: str, offer: int | None = None) -> typing.RouteReturn:
     """Payment page."""
     if context.g.pceen.sub_state == SubState.subscribed:
         flask.flash(_("Vous avez déjà un abonnement en cours !"), "warning")
@@ -101,10 +101,10 @@ def pay_(method: str, offer: str | None = None) -> typing.RouteReturn:
     return helpers.ensure_safe_redirect("payments.pay", next=None)
 
 
-@bp.route("/add_payment/<offer>")
+@bp.route("/add_payment/<int:offer>")
 @context.intrarez_setup_only
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
-def add_payment(offer: str = None) -> typing.RouteReturn:
+def add_payment(offer: int | None = None) -> typing.RouteReturn:
     """Add an arbitrary payment by a GRI."""
     if not context.g.doas:
         flask.abort(403)
@@ -275,17 +275,13 @@ def lydia_fail() -> typing.RouteReturn:
     return helpers.ensure_safe_redirect("payments.pay", next=None)
 
 
-@bp.route("/lydia/validate/<payment_id>")
+@bp.route("/lydia/validate/<int:payment_id>")
 @context.intrarez_setup_only
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def lydia_validate(payment_id: int) -> typing.RouteReturn:
     """Route to register a payment done but not validated (callback error)."""
-    if not payment_id.isdigit():
-        flask.flash(_("Numéro de paiement invalide"), "warning")
-        return helpers.ensure_safe_redirect("payments.pay", next=None)
-
     # Retrieve payment
-    payment = db.session.get(Payment, int(payment_id))
+    payment = db.session.get(Payment, payment_id)
     if not payment:
         flask.flash(_("Numéro de paiement invalide"), "warning")
         return helpers.ensure_safe_redirect("payments.pay", next=None)

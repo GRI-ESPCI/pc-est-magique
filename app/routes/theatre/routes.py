@@ -30,12 +30,12 @@ TODO:
 
 @bp.route("")
 @bp.route("/")
-@bp.route("/<saison_id>")
-def main(saison_id="") -> typing.RouteReturn:
+@bp.route("/<int:saison_id>")
+def main(saison_id: int | None = None) -> typing.RouteReturn:
     """PC est magique profile page."""
     saisons = Saison.query.order_by(Saison.start_date.desc()).all()
 
-    if saison_id == "":
+    if saison_id is None:
         current_saison = saisons[0]
     else:
         current_saison = db.session.get(Saison, saison_id)
@@ -85,7 +85,7 @@ def admin():
         saisons=saisons
     )
 
-@bp.route("/admin/saison/<id>")
+@bp.route("/admin/saison/<int:id>")
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin_saison(id: int):
 
@@ -125,7 +125,7 @@ def admin_saison_new():
         form=form
     )
 
-@bp.route("/admin/saison/edit/<id>", methods=["GET", "POST"])
+@bp.route("/admin/saison/edit/<int:id>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin_saison_edit(id: int):
 
@@ -152,7 +152,7 @@ def admin_saison_edit(id: int):
         form=form
     )
 
-@bp.route("/admin/saison/delete/<id>")
+@bp.route("/admin/saison/delete/<int:id>")
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin_saison_delete(id: int):
     saison =db.session.get(Saison, id)
@@ -168,7 +168,7 @@ def admin_saison_delete(id: int):
     )
 
 
-@bp.route("/admin/spectacle/<id>")
+@bp.route("/admin/spectacle/<int:id>")
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin_spectacle(id: int):
 
@@ -184,7 +184,7 @@ def admin_spectacle(id: int):
         picture_form=picture_form
     )
 
-@bp.route("/admin/spectacle/edit/<id>", methods=["GET", "POST"])
+@bp.route("/admin/spectacle/edit/<int:id>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin_spectacle_edit(id: int):
 
@@ -215,7 +215,7 @@ def admin_spectacle_edit(id: int):
         form=form
     )
 
-@bp.route("/admin/spectacle/new/<saison_id>", methods=["GET", "POST"])
+@bp.route("/admin/spectacle/new/<int:saison_id>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin_spectacle_new(saison_id: int):
 
@@ -252,7 +252,7 @@ def admin_spectacle_new(saison_id: int):
         saison=saison
     )
 
-@bp.route("/admin/spectacle/delete/<spectacle_id>")
+@bp.route("/admin/spectacle/delete/<int:spectacle_id>")
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin_spectacle_delete(spectacle_id: int):
     
@@ -269,7 +269,7 @@ def admin_spectacle_delete(spectacle_id: int):
         url_for("theatre.admin_saison", id=saison_id)
     )
 
-@bp.route("/admin/representation/new/<spectacle_id>", methods=["GET", "POST"])
+@bp.route("/admin/representation/new/<int:spectacle_id>", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, scope=PermissionScope.theatre)
 def admin_representation_new(spectacle_id: int):
 
@@ -296,7 +296,7 @@ def admin_representation_new(spectacle_id: int):
         form=form
     )
 
-@bp.route("/admin/representation/delete/<rep_id>")
+@bp.route("/admin/representation/delete/<int:rep_id>")
 @context.permission_only(PermissionType.write, scope=PermissionScope.theatre)
 def admin_representation_delete(rep_id: int):
     rep = db.session.get(Representation, rep_id)
@@ -313,7 +313,7 @@ def admin_representation_delete(rep_id: int):
         url_for("theatre.admin_spectacle", id=s_id)
     )
 
-@bp.route("/admin/picture_upload/<type>/<id>", methods=["POST"])
+@bp.route("/admin/picture_upload/<type>/<int:id>", methods=["POST"])
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def picture_upload(type: str, id: int):
     """
