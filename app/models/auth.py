@@ -365,7 +365,7 @@ class PCeen(flask_login.UserMixin, Model):
             return SubState.subscribed
 
     def add_first_subscription(self) -> None:
-         """Add subscription to first offer (free month).
+        """Add subscription to first offer (free month).
 
         The subscription starts the day the PCeen registered its first
         device (usually today), and ends today.
@@ -439,7 +439,7 @@ class PCeen(flask_login.UserMixin, Model):
         return wzs.check_password_hash(self._password_hash or "", password)
 
     def get_reset_password_token(self, expires_in: int = 600) -> str:
-         """Forge a JWT reset password token for the pceen.
+        """Forge a JWT reset password token for the pceen.
 
         Relies on :func:`jwt.encode`.
 
@@ -457,7 +457,7 @@ class PCeen(flask_login.UserMixin, Model):
 
     @classmethod
     def verify_reset_password_token(cls, token: str) -> PCeen | None:
-         """Verify a pceen password reset token (class method).
+        """Verify a pceen password reset token (class method).
 
         Relies on :func:`jwt.decode`.
 
