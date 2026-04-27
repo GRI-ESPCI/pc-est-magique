@@ -18,6 +18,12 @@ Application Flask tournant sur https://pc-est-magique.fr.
 Seules les fonctionnalités majeures sont listées ici ; voir
 [`CHANGELOG.md`](CHANGELOG.md) pour les détails.
 
+### 2.10
+
+- Nouveaux thèmes "M3" et "Frost" avec variantes clair/sombre.
+- Localisation des dates de réservation du panier bio.
+
+
 ### 2.9
 
 - Refonte du système de comptes pour empêcher la création de plus d'un compte par personne. 
@@ -108,7 +114,7 @@ Seules les fonctionnalités majeures sont listées ici ; voir
 
 ## Exigences
 
-- Python >= 3.10 ;
+- Python >= 3.14 ;
 - Autres packages Linux : `postgresql postfix git npm xmlsec1`, plus pour le
   déploiement : `supervisor nginx` ;
 - Package npm : `bower sass`
