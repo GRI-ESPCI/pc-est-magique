@@ -1087,7 +1087,7 @@ msgid "Vous avez déjà commandé un panier bio pour le %s"
 msgstr "You already ordered a panier bio for the %s"
 
 #: app/routes/panier_bio/routes.py:169
-msgid "Vous devez vous engagez à payer et venir chercher le panier"
+msgid "Vous devez vous engager à payer et venir chercher le panier"
 msgstr "You must engage yourself to pay and to collect the basket"
 
 #: app/routes/panier_bio/routes.py:185

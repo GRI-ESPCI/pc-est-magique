@@ -139,8 +139,48 @@ html[data-theme="dark"] :is(.theme-material, .theme-frost) :is(.img-thumbnail, .
 }
 
 /* --- Toast notifications --- */
-.glass-toast { background-color: rgba(255, 255, 255, 0.8) !important; backdrop-filter: blur(12px) !important; border: 1px solid rgba(255, 255, 255, 0.3); }
-html[data-theme="dark"] :is(.theme-material, .theme-frost) .glass-toast { background-color: rgba(15, 20, 30, 0.85) !important; border-color: rgba(255, 255, 255, 0.15); color: #f8fafc; }
+.toast-container, .toast {
+    position: fixed !important;  /* Les toasts suivent l'écran pendant le scroll */
+    top: 125px !important;       
+    right: 1.5rem !important;  
+    z-index: 1000 !important; 
+    pointer-events: none;
+}
+
+.toast {
+    pointer-events: auto;        /* Permet de cliquer sur la croix du toast */
+}
+
+/* Material Light */
+.glass-toast { 
+    background-color: #ffffff !important; /* Opaque total */
+    backdrop-filter: none !important; 
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Frost Light */
+.theme-frost .glass-toast { 
+    background-color: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(12px) !important; 
+}
+
+/* Dark Mode Material */
+html[data-theme="dark"] .theme-material .glass-toast { 
+    background-color: #1e2028 !important; /* Gris anthracite solide */
+    backdrop-filter: none !important; 
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Dark Mode Frost */
+html[data-theme="dark"] .theme-frost .glass-toast { 
+    background-color: rgba(15, 20, 30, 0.85) !important; 
+    backdrop-filter: blur(12px) !important; 
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Ajustements globaux Dark */
+html[data-theme="dark"] :is(.theme-material, .theme-frost) .glass-toast { color: #f8fafc; }
 html[data-theme="dark"] :is(.theme-material, .theme-frost) .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
 
 /* --- Modals --- */

@@ -186,7 +186,7 @@ def main() -> typing.RouteReturn:
             
             if add:
                 if not form["consent"].data:
-                    flask.flash(_("Vous devez vous engagez à payer et venir chercher le panier"), "danger")
+                    flask.flash(_("Vous devez vous engager à payer et venir chercher le panier"), "danger")
                 else:
                     #order = [OrderPanierBio() for i in range(len(form["dates"].data))]
                     for date_str in form["dates"].data:
