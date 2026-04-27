@@ -1,4 +1,4 @@
-<footer class="bd-footer pt-3 mt-5 bg-light">
+<footer class="bd-footer pt-3 mt-5">
     <div class="container py-3">
         <div class="row gx-4">
             <div class="col-auto">
@@ -34,6 +34,27 @@
                 <a class="link-secondary" href="{{ url_for("main.legal") }}">
                     {{ _("Mentions légales") }}
                 </a>
+            </div>
+            <div class="col-6 col-lg-auto mb-2 me-lg-4 d-flex align-items-center dropup">
+                <a class="link-secondary dropdown-toggle text-decoration-none" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-palette me-1"></i> {{ _("Thème M3") if g.theme == 'material' else (_("Thème Frost") if g.theme == 'frost' else _("Thème Classique")) }}
+                </a>
+                <ul class="dropdown-menu shadow-sm border-0">
+                    <li><a class="dropdown-item {{ 'active' if g.theme == 'material' else '' }}" href="{{ url_for('main.set_theme', theme='material') }}">{{ _("Thème M3") }}</a></li>
+                    <li><a class="dropdown-item {{ 'active' if g.theme == 'frost' else '' }}" href="{{ url_for('main.set_theme', theme='frost') }}">{{ _("Thème Frost") }}</a></li>
+                    <li><a class="dropdown-item {{ 'active' if g.theme == 'classic' else '' }}" href="{{ url_for('main.set_theme', theme='classic') }}">{{ _("Thème Classique") }}</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-lg-auto mb-2 me-lg-4 d-flex align-items-center dropup">
+                <a class="link-secondary dropdown-toggle text-decoration-none" href="#" id="modeDropdownBtn" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas {{ 'fa-sun' if g.mode == 'light' else ('fa-moon' if g.mode == 'dark' else 'fa-desktop') }} me-1"></i> 
+                    {{ _("Clair") if g.mode == 'light' else (_("Sombre") if g.mode == 'dark' else _("Auto")) }}
+                </a>
+                <ul class="dropdown-menu shadow-sm border-0">
+                    <li><a class="dropdown-item" href="#" onclick="setModeAJAX('light', event)"><i class="fas fa-sun me-2 w-15px"></i>{{ _("Clair") }}</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="setModeAJAX('dark', event)"><i class="fas fa-moon me-2 w-15px"></i>{{ _("Sombre") }}</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="setModeAJAX('auto', event)"><i class="fas fa-desktop me-2 w-15px"></i>{{ _("Auto") }}</a></li>
+                </ul>
             </div>
         </div>
     </div>

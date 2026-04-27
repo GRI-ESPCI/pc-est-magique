@@ -14,6 +14,7 @@ import flask_login
 from app.models import Model, Device, PCeen, PermissionType, PermissionScope
 from app.utils import helpers, typing
 from app.utils.roles import grant_rezident_role
+from app import db
 
 if TYPE_CHECKING:
 
@@ -80,6 +81,8 @@ def create_request_context() -> typing.RouteReturn | None:
     g.intrarez_setup = True
     g.redemption_endpoint = None
     g.redemption_params = {}
+    g.theme = flask.request.cookies.get("theme", "material")
+    g.mode = flask.request.cookies.get("mode", "auto")
 
     # Get user
     current_user = typing.cast(flask_login.AnonymousUserMixin | PCeen, flask_login.current_user)
@@ -94,7 +97,7 @@ def create_request_context() -> typing.RouteReturn | None:
 
     # Check doas
     doas_id = flask.request.args.get("doas", "")
-    doas = PCeen.query.get(doas_id) if doas_id.isdigit() else None
+    doas = db.session.get(PCeen, doas_id) if doas_id.isdigit() else None
     if doas:
         if g.is_gri:
             g.pceen = doas

@@ -6,11 +6,11 @@ import datetime
 import typing
 
 import sqlalchemy as sa
-from sqlalchemy.orm import Query
+from sqlalchemy.orm import Query, Mapped, WriteOnlyMapped
 
 from app import db
 from app.enums import BarTransactionType
-from app.utils.columns import column, many_to_one, one_to_many, Column, Relationship
+from app.utils.columns import column, many_to_one, one_to_many, Column
 
 
 Model = typing.cast(type[type], db.Model)  # type checking hack
@@ -33,7 +33,7 @@ class BarItem(db.Model):
     favorite_index: Column[int] = column(sa.Integer(), nullable=False, default=0)
     archived: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
 
-    transactions: Relationship[Query[models.BarTransaction]] = one_to_many("BarTransaction.item", lazy="dynamic")
+    transactions: WriteOnlyMapped["models.BarTransaction"] = one_to_many("BarTransaction.item", lazy="write_only")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -48,16 +48,16 @@ class BarTransaction(db.Model):
     id: Column[int] = column(sa.Integer(), primary_key=True)
 
     _client_id: Column[int] = column(sa.ForeignKey("pceen.id"), nullable=False)
-    client: Relationship[models.PCeen] = many_to_one("PCeen.bar_transactions_made", foreign_keys=[_client_id])
+    client: Mapped[models.PCeen] = many_to_one("PCeen.bar_transactions_made", foreign_keys=[_client_id])
 
     _barman_id: Column[str] = column(sa.ForeignKey("pceen.id"), nullable=False)
-    barman: Relationship[models.PCeen] = many_to_one("PCeen.bar_transactions_cashed", foreign_keys=[_barman_id])
+    barman: Mapped[models.PCeen] = many_to_one("PCeen.bar_transactions_cashed", foreign_keys=[_barman_id])
 
     date: Column[datetime.datetime] = column(sa.DateTime(), default=datetime.datetime.utcnow, nullable=False)
     type: Column[BarTransactionType] = column(sa.Enum(BarTransactionType), nullable=False)
 
     _item_id: Column[int] = column(sa.ForeignKey("bar_item.id"), nullable=True)
-    item: Relationship[BarItem] = many_to_one("BarItem.transactions")
+    item: Mapped[BarItem] = many_to_one("BarItem.transactions")
 
     balance_change: Column[float] = column(sa.Numeric(6, 2, asdecimal=False), nullable=False)
 
@@ -65,7 +65,7 @@ class BarTransaction(db.Model):
     is_reverted: Column[bool] = column(sa.Boolean(), default=False)
     revert_date: Column[datetime.datetime] = column(sa.DateTime(), nullable=True)
     _reverter_id: Column[str] = column(sa.ForeignKey("pceen.id"), nullable=True)
-    reverter: Relationship[models.PCeen] = many_to_one("PCeen.bar_transactions_reverted", foreign_keys=[_reverter_id])
+    reverter: Mapped[models.PCeen] = many_to_one("PCeen.bar_transactions_reverted", foreign_keys=[_reverter_id])
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -117,7 +117,7 @@ class BarTransaction(db.Model):
             raise ValueError(f"Transaction {self} is already reverted!")
         # BarTransaction is now reverted: it won't ever be 'unreverted'
         self.is_reverted = True
-        self.revert_date = datetime.datetime.utcnow()
+        self.revert_date = datetime.datetime.now(datetime.UTC)
         self.reverter = reverter
         self._update_linked_objects(revert=True)
 
@@ -130,7 +130,7 @@ class BarDailyData(db.Model):
     id: Column[int] = column(sa.Integer(), primary_key=True)
 
     _pceen_id: Column[int] = column(sa.ForeignKey("pceen.id"), nullable=False)
-    pceen: Relationship[models.PCeen] = many_to_one("PCeen.bar_daily_data")
+    pceen: Mapped[models.PCeen] = many_to_one("PCeen.bar_daily_data")
 
     date: Column[datetime.date] = column(sa.Date(), nullable=False)
 

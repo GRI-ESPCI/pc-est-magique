@@ -1,11 +1,11 @@
 {# Card template - to be extended by other files here #}
 
-<div class="card p-card bg-pc5 border-pc4 border-2 h-100">
+<div class="card p-card h-100 {{ 'bg-pc5 border-pc4 border-2' if g.theme == 'classic' else 'hover-lift border-0 shadow-sm rounded-4 bg-body-tertiary' }}">
   {% block card_head %}
   <div class="card-body d-flex align-items-center mb-2">
     <h3 class="card-title me-auto my-0">{% block card_title %}{% endblock %}</h3>
     <svg
-      class="bi flex-shrink-0"
+      class="bi flex-shrink-0 {{ '' if g.theme == 'classic' else 'text-primary' }}"
       width="36"
       height="36"
       role="img"
@@ -15,7 +15,7 @@
   </div>
   {% endblock %} {% block card_body %}
   <div class="h-100">
-    <table class="table table-pctable table-striped table-borderless">
+    <table class="table {{ 'table-pctable table-striped' if g.theme == 'classic' else '' }} table-borderless">
       <tbody>
         {% block card_table %}{% endblock %}
       </tbody>

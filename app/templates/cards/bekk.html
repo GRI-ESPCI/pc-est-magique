@@ -32,7 +32,7 @@
 {% endblock %} {% block card_footer_class %}{{ super() }} px-auto{% endblock %} {% block card_footer %}
 <a
   href="{{ url_for('bekk.reader', id=bekk.id) }}"
-  class="btn btn-outline-dark"
+  class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}"
 >
   {{ _("Lire le Bekk") }}
 </a>
@@ -41,7 +41,7 @@
   role="button"
   href="{{bekk.pdf_src_with_token}}"
   download="{{bekk.id}}.pdf"
-  class="btn btn-outline-dark"
+  class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}"
 >
   {{ _("Télécharger (PDF)") }}
 </a>

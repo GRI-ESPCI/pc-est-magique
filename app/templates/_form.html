@@ -99,7 +99,7 @@ the necessary fix for required=False attributes, but will also not set the requi
         {%- if form_type == "inline" %}
             {# <div class="nonexisting"> #}
               {% if field.type == 'FileField' %}
-                {{field(**kwargs)|safe}}
+                {{field(class=kwargs.pop("class", "") + " form-control", **kwargs)|safe}}
               {% else %}
                 {{field(class=kwargs.pop("class", "") + " form-control", **kwargs)|safe}}
               {% endif %}
@@ -110,7 +110,7 @@ the necessary fix for required=False attributes, but will also not set the requi
             {% elif form_type == "horizontal" %}
               <div class=" col-{{horizontal_columns[0]}}-{{horizontal_columns[2]}}">
                 {% if field.type == 'FileField' %}
-                  {{field(**kwargs)|safe}}
+                  {{field(class=kwargs.pop("class", "") + " form-control", **kwargs)|safe}}
                 {% else %}
                   {{field(class=kwargs.pop("class", "") + " form-control", **kwargs)|safe}}
                 {% endif %}
@@ -134,7 +134,7 @@ the necessary fix for required=False attributes, but will also not set the requi
             {%- else -%}
 
               {% if field.type == 'FileField' %}
-                {{field(**kwargs)|safe}}
+                {{field(class=kwargs.pop("class", "") + " form-control", **kwargs)|safe}}
               {% else %}
                 {%- if field.errors %}
                   {{field(class=kwargs.pop("class", "") + " form-control is-invalid", placeholder=field.label.text, **kwargs)|safe}}

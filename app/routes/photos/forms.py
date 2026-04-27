@@ -1,7 +1,6 @@
 """PC est magique - Photos Gallery Forms"""
 
 import wtforms
-from wtforms.fields import html5
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
 
@@ -16,13 +15,13 @@ class EditPhotoForm(FlaskForm):
     photo_name = wtforms.StringField(_l("Nom du fichier"), validators=[DataRequired()])
     caption = wtforms.StringField(_l("Légende (optionnel)"), validators=[Optional(), Length(max=280)])
     author_str = wtforms.StringField(_l("Auteur (optionnel)"), validators=[Optional(), Length(max=64)])
-    date = html5.DateField(_l("Date (optionnel)"), validators=[Optional()])
-    time = html5.TimeField(_l("Heure (optionnel)"), format="%H:%M:%S", validators=[Optional()])
-    lat = html5.DecimalField(
+    date = wtforms.DateField(_l("Date (optionnel)"), validators=[Optional()])
+    time = wtforms.TimeField(_l("Heure (optionnel)"), format="%H:%M:%S", validators=[Optional()])
+    lat = wtforms.DecimalField(
         _l("Latitude (optionnel)"),
         validators=[Optional(), NumberRange(min=-90, max=90)],
     )
-    lng = html5.DecimalField(
+    lng = wtforms.DecimalField(
         _l("Longitude (optionnel)"),
         validators=[Optional(), NumberRange(min=-180, max=180)],
     )
@@ -34,8 +33,8 @@ class EditAlbumForm(FlaskForm):
 
     name = wtforms.StringField(_l("Nom de l'album"), validators=[DataRequired(), Length(max=120)])
     description = wtforms.StringField(_l("Description (optionnel)"), validators=[Optional(), Length(max=280)])
-    start = html5.DateField(_l("Date de début (optionnel)"), validators=[Optional()])
-    end = html5.DateField(_l("Date de fin (optionnel)"), validators=[Optional()])
+    start = wtforms.DateField(_l("Date de début (optionnel)"), validators=[Optional()])
+    end = wtforms.DateField(_l("Date de fin (optionnel)"), validators=[Optional()])
     visible = wtforms.BooleanField(_l("Album visible"))
     submit = wtforms.SubmitField(_l("Modifier l'album"))
 
@@ -52,7 +51,7 @@ class CreateAlbumForm(FlaskForm):
 
     def validate_album_name(self, field: wtforms.Field) -> None:
         dir_name = get_dir_name(field.data)
-        if self.collection.albums.filter_by(dir_name=dir_name).count():
+        if any(a.dir_name == dir_name for a in self.collection.albums):
             raise wtforms.ValidationError(_l("Un album avec un nom similaire existe déjà dans cette collection !"))
 
 
@@ -61,7 +60,7 @@ class EditCollectionForm(FlaskForm):
 
     name = wtforms.StringField(_l("Nom de la collection"), validators=[DataRequired(), Length(max=120)])
     description = wtforms.StringField(_l("Description (optionnel)"), validators=[Optional(), Length(max=280)])
-    start = html5.DateField(_l("Date de début (optionnel)"), validators=[Optional()])
-    end = html5.DateField(_l("Date de fin (optionnel)"), validators=[Optional()])
+    start = wtforms.DateField(_l("Date de début (optionnel)"), validators=[Optional()])
+    end = wtforms.DateField(_l("Date de fin (optionnel)"), validators=[Optional()])
     visible = wtforms.BooleanField(_l("Collection visible"))
     submit = wtforms.SubmitField(_l("Modifier la collection"))

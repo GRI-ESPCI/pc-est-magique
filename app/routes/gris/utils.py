@@ -39,10 +39,10 @@ def add_remove_role(action: str, pceen_id: str, role_id: str) -> tuple[str | dic
     # Check request refer to existing objects
     if action not in ("add", "remove"):
         return f"Invalid action '{action}'", 400
-    pceen = PCeen.query.get(pceen_id)
+    pceen = db.session.get(PCeen, pceen_id)
     if not pceen:
         return f"Invalid pceen_id #{pceen_id}", 404
-    role = Role.query.get(role_id)
+    role = db.session.get(Role, role_id)
     if not role:
         return f"Invalid role {role_id}", 404
     # Check request is acceptable
@@ -97,7 +97,7 @@ def add_perm(role_id: str, perm_id: str, type_name: str, scope_name: str, ref_id
         If the permission was successfully added, an empty dict with a 204.
     """
     # Check request refer to existing objects
-    role: Role = Role.query.get(role_id)
+    role: Role = db.session.get(Role, role_id)
     if not role:
         return f"Invalid role '{role_id}'", 404
     # Check rights
@@ -105,7 +105,7 @@ def add_perm(role_id: str, perm_id: str, type_name: str, scope_name: str, ref_id
         return "Unauthorized (you nasty cheater)", 403
     # Check request refer to existing objects
     if perm_id:
-        perm: Permission = Permission.query.get(perm_id)
+        perm: Permission = db.session.get(Permission, perm_id)
         if not perm:
             return f"Invalid perm '{perm_id}'", 404
     else:
@@ -164,10 +164,10 @@ def remove_perm(role_id: str, perm_id: str) -> tuple[str | dict, int]:
         If the permission was successfully removed, an empty dict with a 204.
     """
     # Check request refer to existing objects
-    role: Role = Role.query.get(role_id)
+    role: Role = db.session.get(Role, role_id)
     if not role:
         return f"Invalid role '{role_id}'", 404
-    perm: Permission = Permission.query.get(perm_id)
+    perm: Permission = db.session.get(Permission, perm_id)
     if not perm:
         return f"Invalid perm '{perm_id}'", 404
     # Check request is acceptable
@@ -272,10 +272,10 @@ def add_edit_ban(
 ) -> None:
     """Process a ban add/update request, or return an error."""
     if ban_id:
-        ban = Ban.query.get(int(ban_id))
+        ban = db.session.get(Ban, int(ban_id))
         if unban:
             # Terminate existing ban
-            ban.end = datetime.datetime.utcnow()
+            ban.end = datetime.datetime.now(datetime.UTC)
             helpers.log_action(f"Terminated {ban!r}")
             flask.flash(_("Le ban a été terminé."), "success")
         else:
@@ -288,11 +288,11 @@ def add_edit_ban(
     else:
         # New ban
         app.logger.info(pceen, infinite, message)
-        pceen = PCeen.query.get(int(pceen))
+        pceen = db.session.get(PCeen, int(pceen))
         if pceen.is_banned:
             flask.flash(_("Ce PCéén est déjà banni !"), "danger")
         else:
-            start = datetime.datetime.utcnow()
+            start = datetime.datetime.now(datetime.UTC)
             end = compute_ban_end(start, infinite, hours, days, months)
             ban = Ban(
                 pceen=pceen,

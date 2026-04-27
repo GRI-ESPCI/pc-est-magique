@@ -1,7 +1,6 @@
 """PC est magique - Profile-related Forms"""
 
 import wtforms
-from wtforms.fields import html5
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
 
@@ -14,7 +13,7 @@ class AccountModificationForm(FlaskForm):
     nom = wtforms.StringField(_l("Nom"), validators=[DataRequired(), Length(max=64)])
     prenom = wtforms.StringField(_l("Prénom"), validators=[DataRequired(), Length(max=64)])
     promo = wtforms.IntegerField(_l("Promotion"), validators=[DataRequired()])
-    email = html5.EmailField(
+    email = wtforms.EmailField(
         _l("Adresse e-mail"),
         validators=[DataRequired(), Length(max=120), Email(), NewEmail()],
     )

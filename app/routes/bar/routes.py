@@ -8,6 +8,7 @@ from typing import NamedTuple
 import flask
 from flask_babel import _, format_date
 import sqlalchemy
+from sqlalchemy import func
 from unidecode import unidecode
 import werkzeug.datastructures
 
@@ -30,8 +31,16 @@ from app.utils import helpers, roles
 from app.utils.global_settings import Settings
 
 
-@bp.before_app_first_request
-def retrieve_bar_settings():
+_bar_initialized = False
+
+
+@bp.before_app_request
+def _lazy_retrieve_bar_settings() -> None:
+    """Load bar settings cache on first request."""
+    global _bar_initialized
+    if _bar_initialized:
+        return
+    _bar_initialized = True
     # Call getter for all settings to load cache
     Settings.max_daily_alcoholic_drinks_per_user
     Settings.quick_access_item
@@ -45,14 +54,14 @@ def stats():
     is_today = False
     if not date:
         is_today = True
-        timestamp = datetime.datetime.utcnow()
+        timestamp = datetime.datetime.now(datetime.UTC)
         date = timestamp.date()
         if timestamp.hour < 4:  # 4h UTC = 5-6h Paris
             date -= datetime.timedelta(days=1)
 
     # Daily clients
-    daily_data: list[BarDailyData] = BarDailyData.query.filter(
-        BarDailyData.date == date, BarDailyData.total_spent != 0
+    daily_data: list[BarDailyData] = db.session.scalars(
+        db.select(BarDailyData).filter(BarDailyData.date == date, BarDailyData.total_spent != 0)
     ).all()
     nb_daily_clients_alcohol = sum(1 if data.alcohol_bought_count != 0 else 0 for data in daily_data)
 
@@ -66,47 +75,51 @@ def stats():
 
     # Compute number of clients this month
     clients_this_month = [
-        BarDailyData.query.filter(
-            BarDailyData.date == date.replace(day=day), BarDailyData.items_bought_count > 0
-        ).count()
+        db.session.scalar(
+            db.select(func.count()).select_from(BarDailyData).filter(
+                BarDailyData.date == date.replace(day=day), BarDailyData.items_bought_count > 0
+            )
+        )
         for day in days_range
         if day <= date.day
     ]
 
     clients_alcohol_this_month = [
-        BarDailyData.query.filter(
-            BarDailyData.date == date.replace(day=day), BarDailyData.alcohol_bought_count > 0
-        ).count()
+        db.session.scalar(
+            db.select(func.count()).select_from(BarDailyData).filter(
+                BarDailyData.date == date.replace(day=day), BarDailyData.alcohol_bought_count > 0
+            )
+        )
         for day in days_range
         if day <= date.day
     ]
 
     revenues_this_month = [
-        db.session.query(sqlalchemy.func.sum(BarDailyData.total_spent))
-        .filter(BarDailyData.date == date.replace(day=day))
-        .scalar()
+        db.session.scalar(
+            db.select(func.sum(BarDailyData.total_spent))
+            .filter(BarDailyData.date == date.replace(day=day))
+        )
         for day in days_range
         if day <= date.day
     ]
 
     # Client total moula
-    (total_balances_sum,) = db.session.query(sqlalchemy.func.sum(PCeen.bar_balance)).first()
+    total_balances_sum = db.session.scalar(db.select(func.sum(PCeen.bar_balance)))
 
     # Best customer
-    customers_consumption_this_month = (
-        db.session.query(BarDailyData._pceen_id, sqlalchemy.func.sum(BarDailyData.total_spent))
+    customers_consumption_this_month = db.session.execute(
+        db.select(BarDailyData._pceen_id, func.sum(BarDailyData.total_spent))
         .filter(
             sqlalchemy.extract("year", BarDailyData.date) == date.year,
             sqlalchemy.extract("month", BarDailyData.date) == date.month,
         )
         .group_by(BarDailyData._pceen_id)
-        .all()
-    )
+    ).all()
 
     best_customer_name = "Sylvain Gilat"
     if customers_consumption_this_month:
         best_customer_id, _sum = max(customers_consumption_this_month, key=lambda tup: tup[1])
-        best_customer_name = PCeen.query.get(best_customer_id).full_name
+        best_customer_name = db.session.get(PCeen, best_customer_id).full_name
 
     return flask.render_template(
         "bar/stats.html",
@@ -139,12 +152,12 @@ def search():
     if not query:
         return helpers.ensure_safe_redirect("bar.me")
 
-    pceen = PCeen.query.filter_by(username=query).one_or_none()
+    pceen = db.session.scalars(db.select(PCeen).filter_by(username=query)).one_or_none()
     if pceen and pceen.has_permission(PermissionType.read, PermissionScope.bar):
         return helpers.ensure_safe_redirect("bar.user", username=pceen.username)
 
-    paginator = (
-        PCeen.query.join(PCeen.roles)
+    stmt = (
+        db.select(PCeen).join(PCeen.roles)
         .join(Role.permissions)
         .filter(
             Permission.type == PermissionType.read,
@@ -156,8 +169,8 @@ def search():
             if sort == "promo"
             else (PCeen.full_name.desc() if way == "desc" else PCeen.full_name.asc())
         )
-        .paginate(page, flask.current_app.config["BAR_USERS_PER_PAGE"], True)
     )
+    paginator = db.paginate(stmt, page=page, per_page=flask.current_app.config["BAR_USERS_PER_PAGE"], error_out=True)
 
     if paginator.total == 1:
         return helpers.ensure_safe_redirect("bar.user", username=paginator.items[0].username)
@@ -197,7 +210,7 @@ def me():
 @context.permission_only(PermissionType.write, PermissionScope.bar)
 def user(username: str, page: int | None = None):
     # Get user
-    pceen: PCeen | None = PCeen.query.filter_by(username=username).one_or_none()
+    pceen: PCeen | None = db.session.scalars(db.select(PCeen).filter_by(username=username)).one_or_none()
     if not pceen or not pceen.has_permission(PermissionType.read, PermissionScope.bar):
         flask.abort(404)
 
@@ -236,7 +249,12 @@ def _user(pceen: PCeen, form: EditBarUserForm | None = None, page: int | None = 
     # Get pceen transactions
     if page == None:
         page = flask.request.args.get("page", 1, type=int)
-    transactions_paginator = pceen.bar_transactions_made.order_by(BarTransaction.date.desc()).paginate(page, 5, True)
+    stmt = (
+        db.select(BarTransaction)
+        .filter(BarTransaction._client_id == pceen.id)
+        .order_by(BarTransaction.date.desc())
+    )
+    transactions_paginator = db.paginate(stmt, page=page, per_page=5, error_out=True)
 
     # Get inventory
     item_descriptions = dict(get_items_descriptions(pceen))
@@ -272,9 +290,10 @@ def transactions():
     way = flask.request.args.get("way", "desc", type=str)
 
     # Sort transactions alphabetically
-    paginator = BarTransaction.query.order_by(
+    stmt = db.select(BarTransaction).order_by(
         BarTransaction.date.desc() if way == "desc" else BarTransaction.date.asc()
-    ).paginate(page, flask.current_app.config["BAR_ITEMS_PER_PAGE"], True)
+    )
+    paginator = db.paginate(stmt, page=page, per_page=flask.current_app.config["BAR_ITEMS_PER_PAGE"], error_out=True)
 
     return flask.render_template(
         "bar/transactions.html", title=_("Transactions – Bar"), paginator=paginator, sort=sort, way=way
@@ -293,7 +312,7 @@ def items():
             alcohol_mass = form.alcohol_mass.data or 0
             if form.id.data:
                 # Edit existing item
-                item: BarItem = BarItem.query.get(form.id.data)
+                item: BarItem = db.session.get(BarItem, form.id.data)
                 item.name = form.name.data
                 item.is_quantifiable = form.is_quantifiable.data
                 item.quantity = quantity
@@ -325,8 +344,8 @@ def items():
     way = flask.request.args.get("way", "asc", type=str)
 
     # Sort items alphabetically
-    paginator = (
-        BarItem.query.filter(~BarItem.archived)
+    stmt = (
+        db.select(BarItem).filter(~BarItem.archived)
         .order_by(
             (BarItem.quantity.desc() if way == "desc" else BarItem.quantity.asc())
             if sort == "quantity"
@@ -336,8 +355,8 @@ def items():
                 else sqlalchemy.func.lower(BarItem.name).asc()
             )
         )
-        .paginate(page, flask.current_app.config["BAR_ITEMS_PER_PAGE"], True)
     )
+    paginator = db.paginate(stmt, page=page, per_page=flask.current_app.config["BAR_ITEMS_PER_PAGE"], error_out=True)
 
     return flask.render_template(
         "bar/items.html",
@@ -403,7 +422,7 @@ def export():
 @context.permission_only(PermissionType.write, PermissionScope.bar)
 def settings():
     """Render the global settings page."""
-    max_daily_alcoholic_drink_per_user = GlobalSetting.query.filter_by(key="MAX_DAILY_ALCOHOLIC_DRINKS_PER_USER").one()
+    max_daily_alcoholic_drink_per_user = db.session.scalars(db.select(GlobalSetting).filter_by(key="MAX_DAILY_ALCOHOLIC_DRINKS_PER_USER")).one()
     form = GlobalSettingsForm()
     if form.validate_on_submit():
         Settings.max_daily_alcoholic_drinks_per_user = form.max_daily_alcoholic_drinks_per_user.data

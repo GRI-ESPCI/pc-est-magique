@@ -18,7 +18,7 @@ def main() -> typing.RouteReturn:
     # Filter collections to display based on permissions
     collections = [
         collection
-        for collection in Collection.query.order_by(Collection.start.desc()).all()
+        for collection in db.session.scalars(db.select(Collection).order_by(Collection.start.desc())).all()
         if context.has_permission(collection.view_permission_type, PermissionScope.collection, elem=collection)
     ]
     return flask.render_template("photos/main.html", collections=collections, title=_("Photos"))
@@ -28,27 +28,28 @@ def main() -> typing.RouteReturn:
 @context.permission_only(PermissionType.read, PermissionScope.photos)
 def collection(collection_dir: str) -> typing.RouteReturn:
     """Photos collection page (list of albums)."""
-    collection = Collection.query.filter_by(dir_name=collection_dir).first()
+    collection = db.session.scalars(db.select(Collection).filter_by(dir_name=collection_dir)).first()
     if not collection:
         flask.abort(404)
 
     # Restrict access and filter albums to display based on permissions
     if write_permission := context.has_permission(PermissionType.write, PermissionScope.collection, elem=collection):
         # Write permission: show all albums
-        albums = collection.albums.all()
+        albums = sorted(collection.albums, key=lambda a: a.id)
     elif context.has_permission(PermissionType.read, PermissionScope.collection, elem=collection):
         # Read permission: show visible albums + hidden albums for which
         # we have a specific write permission
-        albums = collection.albums.filter_by(visible=True).all() + [
-            album
-            for album in collection.albums.filter_by(visible=False).all()
-            if context.has_permission(PermissionType.write, PermissionScope.album, elem=album)
+        visible = [a for a in collection.albums if a.visible]
+        hidden_with_perm = [
+            a for a in collection.albums
+            if not a.visible and context.has_permission(PermissionType.write, PermissionScope.album, elem=a)
         ]
+        albums = sorted(visible + hidden_with_perm, key=lambda a: a.id)
     else:
         # No permission on collection: check if albums-specific permissions
         albums = [
             album
-            for album in collection.albums.all()
+            for album in sorted(collection.albums, key=lambda a: a.id)
             if context.has_permission(album.view_permission_type, PermissionScope.album, elem=album)
         ]
     if not albums and not write_permission:
@@ -69,7 +70,7 @@ def collection(collection_dir: str) -> typing.RouteReturn:
         collection.visible = edit_form.visible.data
         collection.start = edit_form.start.data
         collection.end = edit_form.end.data
-        if collection.visible and not collection.albums.filter_by(visible=True).count():
+        if collection.visible and not any(a.visible for a in collection.albums):
             collection.visible = False
             flask.flash(
                 _("Une collection ne peut pas être rendue visible si elle ne contient aucun album visible !"), "warning"
@@ -112,10 +113,10 @@ def collection(collection_dir: str) -> typing.RouteReturn:
 @context.permission_only(PermissionType.read, PermissionScope.photos)
 def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
     """Photos album page (list of photos)."""
-    collection = Collection.query.filter_by(dir_name=collection_dir).first()
+    collection = db.session.scalars(db.select(Collection).filter_by(dir_name=collection_dir)).first()
     if not collection:
         flask.abort(404)
-    album = collection.albums.filter_by(dir_name=album_dir).first()
+    album = next((a for a in collection.albums if a.dir_name == album_dir), None)
     if not album:
         flask.abort(404)
 
@@ -138,7 +139,7 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
         album.visible = album_form.visible.data
         album.start = album_form.start.data
         album.end = album_form.end.data
-        if album.visible and not album.photos.count():
+        if album.visible and not album.photos:
             album.visible = False
             flask.flash(_("Un album ne peut pas être rendu visible si il ne contient aucune photo !"), "warning")
         else:
@@ -147,7 +148,7 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
 
     photo_form = forms.EditPhotoForm()
 
-    photos = album.photos.order_by(Photo.timestamp.asc(), Photo.file_name.asc()).all()
+    photos = sorted(album.photos, key=lambda p: (p.timestamp is None, p.timestamp, p.file_name or ""))
     token_args = album.get_access_token(ip)
     return flask.render_template(
         "photos/album.html",
@@ -180,10 +181,10 @@ def photo(collection_dir: str, album_dir: str, photo_file: str) -> typing.RouteR
               Flask is considered invalid by Nginx. This *should* however
               never happen.
     """
-    collection = Collection.query.filter_by(dir_name=collection_dir).first()
+    collection = db.session.scalars(db.select(Collection).filter_by(dir_name=collection_dir)).first()
     if not collection:
         flask.abort(404)
-    album = collection.albums.filter_by(dir_name=album_dir).first()
+    album = next((a for a in collection.albums if a.dir_name == album_dir), None)
     if not album:
         flask.abort(404)
 

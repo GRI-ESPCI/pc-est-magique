@@ -7,6 +7,7 @@ import typing
 
 from dateutil import relativedelta
 import sqlalchemy as sa
+from sqlalchemy.orm import Mapped, WriteOnlyMapped
 
 from app import db
 from app.enums import PermissionType, PermissionScope
@@ -45,8 +46,14 @@ class Role(Model):
     index: Column[int] = column(sa.Integer(), nullable=False, default=1000)
     color: Column[str] = column(sa.String(6), nullable=True)
 
-    pceens: Relationship[list[models.PCeen]] = many_to_many("PCeen.roles", secondary=_PCeen_Role_AT)
-    permissions: Relationship[list[Permission]] = many_to_many("Permission.roles", secondary=_Role_Permission_AT)
+    pceens: WriteOnlyMapped["models.PCeen"] = many_to_many("PCeen.roles", secondary=_PCeen_Role_AT, lazy="write_only")
+    permissions: Mapped[list["models.Permission"]] = many_to_many("Permission.roles", secondary=_Role_Permission_AT)
+
+    @property
+    def pceens_count(self) -> int:
+        """The number of PCeens in this role."""
+        stmt = sa.select(sa.func.count()).select_from(self.pceens.select().subquery())
+        return db.session.scalar(stmt) or 0
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -82,8 +89,8 @@ class Permission(Model):
     scope: Column[PermissionScope] = column(my_enum(PermissionScope), nullable=False)
     ref_id: Column[int] = column(sa.Integer(), nullable=True)
 
-    roles: Relationship[list[Role]] = many_to_many("Role.permissions", secondary=_Role_Permission_AT)
-
+    roles: Mapped[list["models.Role"]] = many_to_many("Role.permissions", secondary=_Role_Permission_AT)
+    
     def __repr__(self) -> str:
         """Returns repr(self)."""
         try:
@@ -150,7 +157,7 @@ class Ban(Model):
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
     _pceen_id: Column[int] = column(sa.ForeignKey("pceen.id"), nullable=False)
-    pceen: Relationship[models.PCeen] = many_to_one("PCeen.bans")
+    pceen: Mapped[models.PCeen] = many_to_one("PCeen.bans")
     start: Column[datetime.datetime] = column(sa.DateTime(), nullable=False)
     end: Column[datetime.datetime | None] = column(sa.DateTime(), nullable=True)
     reason: Column[str] = column(sa.String(32), nullable=False)
@@ -171,7 +178,8 @@ class Ban(Model):
     @property
     def is_active(self) -> bool:
         """Whether the ban is currently active."""
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
+        
         return (self.start <= now) and ((not self.end) or now < self.end)
 
 

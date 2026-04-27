@@ -5,6 +5,7 @@ import traceback
 import flask
 from flask_babel import _
 from werkzeug.exceptions import HTTPException
+from markupsafe import escape, Markup
 
 from app import context, db
 from app.routes.errors import bp
@@ -91,9 +92,9 @@ def other_error(error: Exception) -> typing.RouteReturn:
             is_gri = False
         if is_gri:
             # GRI: show traceback
-            tb_str = str(flask.escape(traceback.format_exc()))
-            tb = flask.Markup(tb_str.replace("\n", "<br/>").replace(" ", "&nbsp;"))
-            err_descr = "[debug mode - traceback below]" + flask.Markup(flask.render_template("errors/_tb.html", tb=tb))
+            tb_str = str(escape(traceback.format_exc()))
+            tb = Markup(tb_str.replace("\n", "<br/>").replace(" ", "&nbsp;"))
+            err_descr = "[debug mode - traceback below]" + Markup(flask.render_template("errors/_tb.html", tb=tb))
         flask.current_app.logger.error(traceback.format_exc())
     db.session.rollback()
     return (

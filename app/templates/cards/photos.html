@@ -25,7 +25,7 @@
 {% endblock %}
 
 {% block card_footer %}
-<a href="{{ url_for("photos.main") }}" class="btn btn-outline-dark">
+<a href="{{ url_for("photos.main") }}" class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}">
     {{ _("Voir les photos") }}
 </a>
 {% endblock %}

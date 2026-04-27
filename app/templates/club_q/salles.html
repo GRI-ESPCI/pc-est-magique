@@ -13,25 +13,12 @@
   <div class="btn-toolbar justify-content-between">
     <h4>{{ _("Salles : ")}}</h4>
     {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
-    <div
-      data-bs-toggle="tooltip"
-      data-bs-placement="right"
-      title="{{ _('Ajouter une salle') }}"
-    >
-      <button
-        type="button"
-        class="btn btn-success"
-        data-bs-target="#mo-salle-add"
-        data-bs-toggle="modal"
-      >
-        <svg
-          class="bi flex-shrink-0"
-          width="24"
-          height="24"
-          role="img"
-        >
-          {{ macros.bootstrap_icon("plus-circle") }}
+    <div>
+      <button type="button" class="btn btn-success d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2" data-bs-target="#mo-salle-add" data-bs-toggle="modal">
+        <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+          {{ macros.bootstrap_icon("plus-lg") }}
         </svg>
+        <span>{{ _('Ajouter') }}</span>
       </button>
     </div>
     {% endif %}
@@ -39,8 +26,8 @@
 </div>
 
 <div class="row mb-3">
-  <div class="col table-responsive">
-    <table class="table table-striped table-hover table-bordered">
+  <div class="col px-0"><div class="table-responsive rounded-4 shadow-sm bg-body-tertiary mb-4">
+    <table class="table table-hover table-bordered">
       <thead>
         <tr>
           <th

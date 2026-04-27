@@ -22,7 +22,7 @@
     <div class="btn-toolbar justify-content-between" role="toolbar">
         <div class=" d-flex align-items-center">
             <span class="me-2">{{ _("Vue :") }}</span>
-            <div class="btn-group" role="group" name="slt">
+            <div class="d-flex flex-wrap gap-2" role="group" name="slt">
                 <a role="button" href="{{ url_for('gris.pceens', view='active') }}"
                    class="btn {{ 'btn-primary' if view == 'active' else 'btn-outline-primary' }}">
                     {{ _("Actifs") }}
@@ -43,7 +43,7 @@
         </div>
 
         <div data-bs-toggle="tooltip" data-bs-placement="right" title="{{ _("Fonctionnalité à venir (peut-être)") }}">
-        <div class="btn-group" role="group" aria-label="Results">
+        <div class="d-flex gap-2" role="group" aria-label="Results">
             <button type="button" class="btn btn-primary pe-none">
                 {{ _("Total :") }}
                 <span class="badge bg-secondary badge-light">{{ len(pceens) }}</span>
@@ -215,7 +215,7 @@
             data-email="{{ pceen.email }}"
             {% if view == "rez" %}
             data-room="{{ pceen.current_room.num if pceen.current_room else 0 }}"
-            data-dev="{{ len(pceen.devices) }}"
+            data-dev="{{ len(pceen.all_devices) }}"
             {% if not subscription %}
             data-sub="0"
             {% elif pceen.sub_state == SubState.subscribed %}
@@ -230,7 +230,7 @@
             data-balance="{{ pceen.bar_balance or 0.0 }}"
             {% endif %}
             data-ls="{{ pceen.last_seen.timestamp() if pceen.last_seen else 0 }}"
-            data-roles="{{ pceen.roles[0].index if pceen.roles else 1000000 }}"
+            data-roles="{{ pceen.all_roles[0].index if pceen.all_roles else 1000000 }}"
             {% if pceen.current_ban %}
             data-ban="{{ int(pceen.current_ban.end.timestamp()) if pceen.current_ban.end else 9999999999 }}"
             {% else %}
@@ -273,7 +273,7 @@
 
             <td><span class="d-flex">
                 <span>
-                    {{ len(pceen.devices) }}
+                    {{ len(pceen.all_devices) }}
                 </span>
                 <span class="ms-auto">
                     <button type="button" class="btn p-0 me-1 d-inline-block"
@@ -358,7 +358,7 @@
             </td>
 
             <td>
-                {% for role in pceen.roles %}
+                {% for role in pceen.all_roles %}
                 <span class="badge rounded-pill border border-2 d-inline-flex align-items-center px-2"
                       style="background-color: #{{ role.color or "ffffff" }}">
                     <a href="{{ url_for("gris.roles") }}#{{ role.id }}"
@@ -384,7 +384,7 @@
                         <div class="dropdown-menu container w-auto px-4" aria-labelledby="new_role_{{ pceen.id }}">
                             <div class="row row-cols">
                                 {% for role in roles %}
-                                {% if role not in pceen.roles %}
+                                {% if role not in pceen.all_roles %}
                                 <a class="col-auto badge rounded-pill border border-2
                                           text-{{ "light" if role.is_dark_colored else "dark" }} text-decoration-none"
                                    style="background-color: #{{ role.color or "ffffff" }}; cursor: pointer;"

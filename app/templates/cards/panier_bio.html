@@ -1,5 +1,5 @@
 {# Panier Bio card - used variables: panier_bio_infos #} {% extends "cards/base.html" %} {% block card_title %} {{
-_("Panier Bio") }} {{ macros.badge() }} {% endblock %} {% block card_icon %} {{ macros.bootstrap_icon("basket") }} {%
+_("Panier Bio") }} {% endblock %} {% block card_icon %} {{ macros.bootstrap_icon("basket") }} {%
 endblock %} {% block card_table %}
 <tr>
   <th
@@ -45,14 +45,14 @@ endblock %} {% block card_table %}
 {% endblock %} {% block card_footer %} {% if panier_bio_infos.visibility and not panier_bio_infos.reserved %}
 <a
   href="{{ url_for('panier_bio.main') }}"
-  class="btn btn-outline-dark"
+  class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}"
 >
   {{ _("Réserver") }}
 </a>
 {% else %}
 <a
   href="{{ url_for('panier_bio.main') }}"
-  class="btn btn-outline-dark"
+  class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}"
 >
   {{ _("Voir l'historique") }}
 </a>

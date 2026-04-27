@@ -11,10 +11,17 @@ from app.routes.rooms import bp, email, forms
 from app.utils import helpers, typing
 
 
-@bp.before_app_first_request
-def create_rez_rooms() -> None:
+_rooms_initialized = False
+
+
+@bp.before_app_request
+def _lazy_create_rez_rooms() -> None:
     """Create Rezidence rooms if not already present."""
-    if not Room.query.first():
+    global _rooms_initialized
+    if _rooms_initialized:
+        return
+    _rooms_initialized = True
+    if not db.session.scalars(db.select(Room)).first():
         rooms = Room.create_rez_rooms()
         db.session.add_all(rooms)
         db.session.commit()
@@ -35,7 +42,7 @@ def register() -> typing.RouteReturn:
     form = forms.RentalRegistrationForm()
     already_rented = None
     if form.validate_on_submit():
-        room = Room.query.get(form.room.data)
+        room = db.session.get(Room, form.room.data)
         room = typing.cast(Room, room)  # type check only
 
         def _register_room() -> typing.RouteReturn:

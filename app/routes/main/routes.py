@@ -11,8 +11,10 @@ import datetime
 import flask
 from flask_babel import _
 from discord_webhook import DiscordWebhook
+from markupsafe import Markup
 
-from app import context
+from app import context, db
+import sqlalchemy
 from app.models import (
     Ban,
     PermissionScope,
@@ -33,6 +35,7 @@ from app.utils import captcha, helpers, typing
 from datetime import date
 from app.routes.club_q.utils import pceen_prix_total
 from app.routes.panier_bio.utils import command_open, what_are_next_days
+from app import db
 
 
 @bp.route("/")
@@ -47,30 +50,32 @@ def index() -> typing.RouteReturn:
     photos_infos = None
     if context.has_permission(PermissionType.read, PermissionScope.photos):
         photos_infos = namedtuple("PhotosInfos", ["nb_collections", "nb_albums", "nb_photos"])(
-            len(Collection.query.all()),
-            len(Album.query.all()),
-            len(Photo.query.all()),
+            db.session.scalar(db.select(sqlalchemy.func.count()).select_from(Collection)),
+            db.session.scalar(db.select(sqlalchemy.func.count()).select_from(Album)),
+            db.session.scalar(db.select(sqlalchemy.func.count()).select_from(Photo)),
         )
 
     club_q_infos = None
     if context.has_permission(PermissionType.read, PermissionScope.club_q):
 
-        season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value
-        season = ClubQSeason.query.filter_by(id=season_id).first()
+        season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value
+        season = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id)).first()
 
-        next_voeu = ClubQVoeu.query.filter(
-            ClubQVoeu._pceen_id == pceen.id,
-            ClubQVoeu.places_attribuees > 0,
-            ClubQVoeu.spectacle.has(ClubQSpectacle.date > date.today()),
+        next_voeu = db.session.scalars(
+            db.select(ClubQVoeu).filter(
+                ClubQVoeu._pceen_id == pceen.id,
+                ClubQVoeu.places_attribuees > 0,
+                ClubQVoeu.spectacle.has(ClubQSpectacle.date > date.today()),
+            )
         ).first()
 
-        voeux = ClubQVoeu.query.filter_by(_pceen_id=pceen.id, _season_id=season_id)
-        if voeux.first() is not None:
+        voeux = db.select(ClubQVoeu).filter_by(_pceen_id=pceen.id, _season_id=season_id)
+        if db.session.scalars(voeux).first() is not None:
             to_pay = pceen_prix_total(pceen, voeux)
         else:
             to_pay = 0
 
-        visibility = GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value
+        visibility = db.session.scalars(db.select(GlobalSetting).filter_by(key="ACCESS_CLUB_Q")).one().value
 
         club_q_infos = namedtuple("ClubQInfos", ["season", "next_voeu", "to_pay", "booking_open", "pceen"])(
             season,
@@ -83,23 +88,28 @@ def index() -> typing.RouteReturn:
     bekk_infos = None
     if context.has_permission(PermissionType.read, PermissionScope.bekk):
 
-        bekks = Bekk.query.order_by(Bekk.date)
-        last_bekk = bekks.first()
+        bekks_stmt = db.select(Bekk).order_by(Bekk.date)
+        last_bekk = db.session.scalars(bekks_stmt).first()
 
-        if bekks.first() is None:
+        if last_bekk is None:
             bekk_infos = namedtuple("BekkInfos", ["last_bekk", "promo", "nb_bekks", "last_bekk_id"])(
                 "Aucun", "-", 0, -1
             )
         else:
+            nb_bekks = db.session.scalar(db.select(sqlalchemy.func.count()).select_from(Bekk))
             bekk_infos = namedtuple("BekkInfos", ["last_bekk", "promo", "nb_bekks", "last_bekk_id"])(
-                last_bekk.name, last_bekk.promo, bekks.count(), last_bekk.id
+                last_bekk.name, last_bekk.promo, nb_bekks, last_bekk.id
             )
 
     panier_bio_infos = None
     
-    panier_bio_day = GlobalSetting.query.filter_by(key="PANIER_BIO_DAY").one().value
+    panier_bio_day = db.session.scalars(db.select(GlobalSetting).filter_by(key="PANIER_BIO_DAY")).one().value
     today = datetime.date.today()
-    all_periods = PeriodPanierBio.query.filter_by(active=True).filter(PeriodPanierBio.end_date>=today).order_by(PeriodPanierBio.start_date.asc()).all()
+    all_periods = db.session.scalars(
+        db.select(PeriodPanierBio).filter_by(active=True)
+        .filter(PeriodPanierBio.end_date >= today)
+        .order_by(PeriodPanierBio.start_date.asc())
+    ).all()
     
     next_days  = what_are_next_days(panier_bio_day, today, all_periods)
     if len(next_days) > 0:
@@ -107,9 +117,13 @@ def index() -> typing.RouteReturn:
     else:
         next_day = None
         
-    all_orders = OrderPanierBio.query.filter_by(_pceen_id=pceen.id).filter(OrderPanierBio.date>=today).order_by(OrderPanierBio.date.asc()).all()
+    all_orders = db.session.scalars(
+        db.select(OrderPanierBio).filter_by(_pceen_id=pceen.id)
+        .filter(OrderPanierBio.date >= today)
+        .order_by(OrderPanierBio.date.asc())
+    ).all()
 
-    visibility = GlobalSetting.query.filter_by(key="ACCESS_PANIER_BIO").one().value
+    visibility = db.session.scalars(db.select(GlobalSetting).filter_by(key="ACCESS_PANIER_BIO")).one().value
 
     reserved = False
     for order in all_orders:
@@ -153,7 +167,7 @@ def contact() -> typing.RouteReturn:
                 return helpers.ensure_safe_redirect("main.index")
 
             flask.flash(
-                flask.Markup(
+                Markup(
                     _(
                         "Oh non ! Le message n'a pas pu être transmis. N'hésitez pas "
                         "à contacter un GRI aux coordonnées en bas de page.<br/>"
@@ -190,7 +204,7 @@ def connect_check() -> typing.RouteReturn:
 def banned() -> typing.RouteReturn:
     """Page shown when the Rezident is banned."""
     try:
-        ban = Ban.query.get(context.g._ban)
+        ban = db.session.get(Ban, context.g._ban)
     except AttributeError:
         return helpers.redirect_to_next()
     return flask.render_template("main/banned.html", ban=ban, title=_("Accès à Internet restreint"))
@@ -322,3 +336,26 @@ def custom_files(folder: str, filename: str) -> typing.RouteReturn:
         path = flask.current_app.config["BEKK_BASE_PATH"]
     filepath = os.path.join(path, filename)
     return flask.send_file(filepath)
+
+
+@bp.route("/set_theme/<theme>")
+def set_theme(theme: str) -> typing.RouteReturn:
+    """Set the interface theme."""
+    valid_themes = ["material", "frost", "classic"]
+    if theme not in valid_themes:
+        theme = "material"
+    
+    resp = flask.make_response(helpers.redirect_to_next())
+    resp.set_cookie("theme", theme, max_age=60*60*24*365)
+    return resp
+
+@bp.route("/set_mode/<mode>")
+def set_mode(mode: str) -> typing.RouteReturn:
+    """Set the interface custom mode (light/dark/auto)."""
+    valid_modes = ["light", "dark", "auto"]
+    if mode not in valid_modes:
+        mode = "auto"
+    
+    resp = flask.make_response(helpers.redirect_to_next())
+    resp.set_cookie("mode", mode, max_age=60*60*24*365)
+    return resp

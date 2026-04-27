@@ -101,7 +101,7 @@
 
 {% block card_footer %}
 <a href="{{ url_for("payments.main", doas=doas) }}"
-   class="btn btn-outline-dark">
+   class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}">
     {{ _("Plus d'informations") }}
 </a>
 {% if pceen.sub_state == SubState.subscribed %}
@@ -109,7 +109,7 @@
 <div class="d-inline-block me-3" data-bs-toggle="tooltip"
      data-bs-placement="top" title="{{ _("Renouvellement possible à partir de "
                                          "la fin de l'abonnement actuel") }}">
-    <button class="ms-2 btn btn-outline-dark" disabled>
+    <button class="ms-2 btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}" disabled>
         {{ _("Payer") }}
     </button>
 </div>
@@ -117,14 +117,14 @@
 {% elif pceen.sub_state == SubState.trial %}
 
 <a href="{{ url_for("payments.pay", doas=doas) }}"
-   class="btn btn-outline-dark btn-primary ms-2">
+   class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }} {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }} ms-2">
     {{ _("Payer") }}
 </a>
 
 {% else %}
 
 <a href="{{ url_for("payments.pay", doas=doas) }}"
-   class="btn btn-danger btn-outline-dark text-white ms-2">
+   class="btn btn-danger {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }} text-white ms-2">
     {{ _("Payer") }}
 </a>
 

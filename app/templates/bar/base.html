@@ -7,6 +7,19 @@ style="background-size: 100%; background-repeat: repeat-y; background-image: url
 }}');"
 {% endblock %}
 
+{% block styles %}
+{{ super() }}
+<style>
+    html[data-theme="dark"] body {
+        background-color: rgba(10, 12, 18, 0.6) !important;
+        background-blend-mode: multiply;
+    }
+    .theme-frost::before {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
 {% block app_content %}
 {% with current_user_is_barman = has_permission(PermissionType.write, PermissionScope.bar) %}
 

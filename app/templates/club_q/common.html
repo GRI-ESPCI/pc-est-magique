@@ -12,21 +12,21 @@
   >
     <div class="d-flex align-items-center">
       <div
-        class="btn-group"
+        class="d-flex flex-wrap gap-2"
         role="group"
         name="clubq_navbar"
       >
         <a
           role="button"
           href="{{ url_for('club_q.main') }}"
-          class="btn {{ 'btn-primary' if view == 'reservations' else 'btn-outline-primary' }}"
+          class="btn rounded-pill fw-bold shadow-sm {{ 'btn-primary' if view == 'reservations' else 'btn-outline-primary' }}"
         >
           {{ _("Réservations") }}
         </a>
         <a
           role="button"
           href="{{ url_for('club_q.pceen_id', id=user.id) }}"
-          class="btn {{ 'btn-primary' if view == 'pceen_reservations' else 'btn-outline-primary' }}"
+          class="btn rounded-pill fw-bold shadow-sm {{ 'btn-primary' if view == 'pceen_reservations' else 'btn-outline-primary' }}"
         >
           {{ _("Mes réservations") }}
         </a>
@@ -34,7 +34,7 @@
         <a
           role="button"
           href="{{ url_for('club_q.pceens') }}"
-          class="btn {{ 'btn-primary' if view in ['pceens', 'pceen_view'] else 'btn-outline-primary' }}"
+          class="btn rounded-pill fw-bold shadow-sm {{ 'btn-primary' if view in ['pceens', 'pceen_view'] else 'btn-outline-primary' }}"
         >
           {{ _("PCéens") }}
         </a>
@@ -42,14 +42,14 @@
         <a
           role="button"
           href="{{ url_for('club_q.spectacles') }}"
-          class="btn {{ 'btn-primary' if view == 'spectacles' else 'btn-outline-primary' }}"
+          class="btn rounded-pill fw-bold shadow-sm {{ 'btn-primary' if view == 'spectacles' else 'btn-outline-primary' }}"
         >
           {{ _("Spectacles") }}
         </a>
         <a
           role="button"
           href="{{ url_for('club_q.salles') }}"
-          class="btn {{ 'btn-primary' if view in ['salles', 'salle'] else 'btn-outline-primary' }}"
+          class="btn rounded-pill fw-bold shadow-sm {{ 'btn-primary' if view in ['salles', 'salle'] else 'btn-outline-primary' }}"
         >
           {{ _("Salles") }}
         </a>
@@ -57,7 +57,7 @@
         <a
           role="button"
           href="{{ url_for('club_q.voeux') }}"
-          class="btn {{ 'btn-primary' if view == 'voeux' else 'btn-outline-primary' }}"
+          class="btn rounded-pill fw-bold shadow-sm {{ 'btn-primary' if view == 'voeux' else 'btn-outline-primary' }}"
         >
           {{ _("Voeux") }}
         </a>
@@ -65,14 +65,14 @@
         <a
           role="button"
           href="{{ url_for('club_q.saisons') }}"
-          class="btn {{ 'btn-primary' if view == 'saisons' else 'btn-outline-primary' }}"
+          class="btn rounded-pill fw-bold shadow-sm {{ 'btn-primary' if view == 'saisons' else 'btn-outline-primary' }}"
         >
           {{ _("Saisons") }}
         </a>
         <a
           role="button"
           href="{{ url_for('club_q.brochures') }}"
-          class="btn {{ 'btn-primary' if view == 'plaquettes' else 'btn-outline-primary' }}"
+          class="btn rounded-pill fw-bold shadow-sm {{ 'btn-primary' if view == 'plaquettes' else 'btn-outline-primary' }}"
         >
           {{ _("Plaquettes") }}
         </a>
@@ -80,21 +80,21 @@
         <a
           role="button"
           href="{{ url_for('club_q.attribution_manager') }}"
-          class="btn {{ 'btn-primary' if view == 'attribution' else 'btn-outline-primary' }}"
+          class="btn rounded-pill fw-bold shadow-sm {{ 'btn-primary' if view == 'attribution' else 'btn-outline-primary' }}"
         >
           {{ _("Attribution") }}
         </a>
         <a
           role="button"
           href="{{ url_for('club_q.mails') }}"
-          class="btn {{ 'btn-primary' if view == 'mails' else 'btn-outline-primary' }}"
+          class="btn rounded-pill fw-bold shadow-sm {{ 'btn-primary' if view == 'mails' else 'btn-outline-primary' }}"
         >
           {{ _("Mails") }}
         </a>
         <a
           role="button"
           href="{{ url_for('club_q.options') }}"
-          class="btn {{ 'btn-primary' if view == 'options' else 'btn-outline-primary' }}"
+          class="btn rounded-pill fw-bold shadow-sm {{ 'btn-primary' if view == 'options' else 'btn-outline-primary' }}"
         >
           {{ _("Options") }}
         </a>
@@ -112,7 +112,7 @@
   >
     <div class="d-flex align-items-center">
       <div
-        class="btn-group"
+        class="d-flex flex-wrap gap-2"
         role="group"
         name="saison_navbar"
       >
@@ -120,28 +120,28 @@
         <a
           role="button"
           href="{{ url_for('club_q.pceen_id', id=pceen.id, season_id = saison.id)}}"
-          class="btn {{ 'btn-primary' if season_id == saison.id else 'btn-outline-primary' }}"
+          class="btn rounded-pill fw-bold shadow-sm {{ 'btn-primary' if season_id == saison.id else 'btn-outline-primary' }}"
           >{{saison.nom}}</a
         >
         {% endfor %} {% elif view == 'salle' %} {% for saison in saisons %}
         <a
           role="button"
           href="{{ url_for('club_q.salle_id', id=salle.id, season_id = saison.id)}}"
-          class="btn {{ 'btn-primary' if season_id == saison.id else 'btn-outline-primary' }}"
+          class="btn rounded-pill fw-bold shadow-sm {{ 'btn-primary' if season_id == saison.id else 'btn-outline-primary' }}"
           >{{saison.nom}}</a
         >
         {% endfor %} {% else %} {% if view == 'salles' %}
         <a
           role="button"
           href="{{ url_for(redirect, season_id = None)}}"
-          class="btn {{ 'btn-primary' if season_id == -1 else 'btn-outline-primary' }}"
+          class="btn rounded-pill fw-bold shadow-sm {{ 'btn-primary' if season_id == -1 else 'btn-outline-primary' }}"
           >Toutes</a
         >
         {% endif %} {% for saison in saisons %}
         <a
           role="button"
           href="{{ url_for(redirect, season_id = saison.id)}}"
-          class="btn {{ 'btn-primary' if season_id == saison.id else 'btn-outline-primary' }}"
+          class="btn rounded-pill fw-bold shadow-sm {{ 'btn-primary' if season_id == saison.id else 'btn-outline-primary' }}"
           >{{saison.nom}}</a
         >
         {% endfor %} {% endif %}

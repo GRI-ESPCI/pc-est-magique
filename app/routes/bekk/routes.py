@@ -23,19 +23,19 @@ import os
 def main() -> typing.RouteReturn:
     """Bekk module main page"""
 
-    bekks = Bekk.query.order_by(Bekk.date.desc()).all()
+    bekks = db.session.scalars(db.select(Bekk).order_by(Bekk.date.desc())).all()
     promos = sorted({bekk.promo for bekk in bekks}, reverse=True)
 
     promo = flask.request.args.get("promo")
     if promo is None:
-        promo = GlobalSetting.query.filter_by(key="PROMO_1A").one().value
+        promo = db.session.scalars(db.select(GlobalSetting).filter_by(key="PROMO_1A")).one().value
         while promo not in promos:
             promo = promo - 1
             if promo == 0:
                 break
     promo = int(promo)
     if promo != 0:
-        bekks = Bekk.query.filter_by(promo=promo).order_by(Bekk.date.desc()).all()
+        bekks = db.session.scalars(db.select(Bekk).filter_by(promo=promo).order_by(Bekk.date.desc())).all()
 
     form = forms.Bekk()
 
@@ -67,7 +67,7 @@ def main() -> typing.RouteReturn:
 
         if not add:
             delete = form["delete"].data
-            bekk = Bekk.query.filter_by(id=form["id"].data).one()
+            bekk = db.session.scalars(db.select(Bekk).filter_by(id=form["id"].data)).one()
 
             bekk_path = os.path.join(flask.current_app.config["BEKKS_BASE_PATH"], str(bekk.id) + ".pdf")
 
@@ -120,7 +120,7 @@ def main() -> typing.RouteReturn:
 def reader(id: int) -> typing.RouteReturn:
     """Bekk module bekk reading page"""
 
-    bekk = Bekk.query.filter_by(id=id).one_or_none()
+    bekk = db.session.scalars(db.select(Bekk).filter_by(id=id)).one_or_none()
 
     filepath = os.path.join(flask.current_app.config["BEKKS_BASE_PATH"], str(id) + ".pdf")
 

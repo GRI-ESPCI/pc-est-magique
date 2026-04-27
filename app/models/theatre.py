@@ -6,6 +6,7 @@ import datetime
 import typing
 
 import sqlalchemy as sa
+from sqlalchemy.orm import Mapped
 
 from app import db
 from app.utils.columns import (
@@ -13,7 +14,6 @@ from app.utils.columns import (
     one_to_many,
     many_to_one,
     Column,
-    Relationship,
 )
 
 
@@ -28,11 +28,7 @@ class Saison(db.Model):
     image_extension: Column[str | None] = column(sa.String(120), nullable=True)
     start_date: Column[datetime.date] = column(sa.Date(), nullable=False)
 
-    spectacles: Relationship[list[Representation]] = one_to_many(
-        "Spectacle.saison",
-        cascade="all, delete-orphan"
-    )
-
+    spectacles: Mapped[list["models.Spectacle"]] = one_to_many("Spectacle.saison", cascade="all, delete-orphan")
 
 class Spectacle(db.Model):
     """All information about ESPCI theatre spectacle information."""
@@ -48,13 +44,9 @@ class Spectacle(db.Model):
     places: Column[str | None] = column(sa.String(255), nullable=True)
 
     _saison_id: Column[int] = column(sa.ForeignKey("saison.id"), nullable=False)
-    saison: Relationship[Saison] = many_to_one("Saison.spectacles")
+    saison: Mapped[Saison] = many_to_one("Saison.spectacles")
 
-    representations: Relationship[list[Representation]] = one_to_many(
-        "Representation.spectacle",
-        order_by="Representation.date",
-        cascade="all, delete-orphan"
-    )
+    representations: Mapped[list["models.Representation"]] = one_to_many("Representation.spectacle", order_by="Representation.date", cascade="all, delete-orphan")
 
 
 class Representation(db.Model):
@@ -64,7 +56,7 @@ class Representation(db.Model):
     date: Column[datetime.datetime] = column(sa.DateTime(), nullable=False)
 
     _spectacle_id: Column[int] = column(sa.ForeignKey("spectacle.id"), nullable=False)
-    spectacle: Relationship[Spectacle] = many_to_one(
+    spectacle: Mapped[Spectacle] = many_to_one(
         "Spectacle.representations"
     )
 

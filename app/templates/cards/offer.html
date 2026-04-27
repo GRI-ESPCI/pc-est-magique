@@ -26,7 +26,7 @@
 
 {% block card_footer %}
 {% if can_change %}
-<a class="btn btn-outline-dark"
+<a class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}"
    href="{{ url_for("payments.pay") }}">
     {{ _("Changer d'offre") }}
 </a>

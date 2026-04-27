@@ -25,7 +25,7 @@ class _SettingDescriptor:
 
 class _QuickAccessItemDescriptor:
     def __get__(self, obj: None, objtype=None):
-        return BarItem.query.get(Settings._quick_access_item_id)
+        return db.session.get(BarItem, Settings._quick_access_item_id)
 
     def __set__(self, obj: None, value: BarItem):
         if not isinstance(value, BarItem):

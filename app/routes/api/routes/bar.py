@@ -4,6 +4,7 @@ import datetime
 
 import flask
 from flask_babel import _, format_currency
+from markupsafe import Markup
 from sqlalchemy import extract
 
 from app import context, db
@@ -20,7 +21,7 @@ def post_deposit(pceen_id: str):
     """Set a user deposit state."""
     if not pceen_id.isdigit():
         flask.abort(400, "Field 'pceen_id' missing or invalid integer")
-    pceen: PCeen | None = PCeen.query.get(int(pceen_id))
+    pceen: PCeen | None = db.session.get(PCeen, int(pceen_id))
     if not pceen or not pceen.has_permission(PermissionType.read, PermissionScope.bar):
         flask.abort(404, f"PCeen #{pceen_id} does not exist or has no access to the Bar module")
 
@@ -43,7 +44,7 @@ def revert_transaction(transaction_id: str):
     if not transaction_id.isdigit():
         flask.abort(400, "Field 'transaction_id' missing or invalid integer")
 
-    transaction: BarTransaction | None = BarTransaction.query.get(int(transaction_id))
+    transaction: BarTransaction | None = db.session.get(BarTransaction, int(transaction_id))
     if not transaction:
         flask.abort(404, f"Transaction #{transaction} does not exist")
 
@@ -72,7 +73,7 @@ def set_quick_access_item(item_id: str):
     """Set the quick access item."""
     if not item_id.isdigit():
         flask.abort(400, "Field 'item_id' missing or invalid integer")
-    item: BarItem | None = BarItem.query.get(int(item_id))
+    item: BarItem | None = db.session.get(BarItem, int(item_id))
     if not item:
         flask.abort(404, f"Item #{item_id} does not exist")
 
@@ -88,7 +89,7 @@ def delete_item(item_id: str):
     """Delete an item from the inventory."""
     if not item_id.isdigit():
         flask.abort(400, "Field 'item_id' missing or invalid integer")
-    item: BarItem | None = BarItem.query.get(int(item_id))
+    item: BarItem | None = db.session.get(BarItem, int(item_id))
     if not item:
         flask.abort(404, f"Item #{item_id} does not exist")
 
@@ -105,7 +106,7 @@ def top_up(pceen_id: str):
     """Top up the user's balance"""
     if not pceen_id.isdigit():
         flask.abort(400, "Field 'pceen_id' missing or invalid integer")
-    pceen: PCeen | None = PCeen.query.get(pceen_id)
+    pceen: PCeen | None = db.session.get(PCeen, pceen_id)
     if not pceen or not pceen.has_permission(PermissionType.read, PermissionScope.bar):
         flask.abort(404, f"PCeen #{pceen_id} does not exist or has no access to the Bar module")
 
@@ -117,7 +118,7 @@ def top_up(pceen_id: str):
         flask.abort(400, "Field 'amount' missing, invalid float or <= 0")
 
     transaction = BarTransaction.create_from_top_up(
-        client=pceen, barman=context.g.pceen, amount=amount, date=datetime.datetime.utcnow()
+        client=pceen, barman=context.g.pceen, amount=amount, date=datetime.datetime.now(datetime.UTC)
     )
     db.session.add(transaction)
     db.session.commit()
@@ -138,11 +139,11 @@ def pay(pceen_id: str, item_id: str):
     if not item_id.isdigit():
         flask.abort(400, "Field 'item_id' missing or invalid integer")
 
-    pceen: PCeen | None = PCeen.query.get(pceen_id)
+    pceen: PCeen | None = db.session.get(PCeen, pceen_id)
     if not pceen or not pceen.has_permission(PermissionType.read, PermissionScope.bar):
         flask.abort(404, f"PCeen #{pceen_id} does not exist or has no access to the Bar module")
 
-    item: BarItem | None = BarItem.query.get(int(item_id))
+    item: BarItem | None = db.session.get(BarItem, int(item_id))
     if not item:
         flask.abort(404, f"Item #{item} does not exist")
 
@@ -150,14 +151,14 @@ def pay(pceen_id: str, item_id: str):
         flask.abort(422, "Cannot buy item")
 
     transaction = BarTransaction.create_from_item_bought(
-        client=pceen, barman=context.g.pceen, item=item, date=datetime.datetime.utcnow()
+        client=pceen, barman=context.g.pceen, item=item, date=datetime.datetime.now(datetime.UTC)
     )
     db.session.add(transaction)
     db.session.commit()
 
     flask.flash(
         _("Achat validé : %(item)s (%(amount)s). Annuler :", item=item.name, amount=format_currency(item.price, "EUR"))
-        + flask.Markup(flask.render_template("bar/_revert_button.html", transaction=transaction)),
+        + Markup(flask.render_template("bar/_revert_button.html", transaction=transaction)),
         "success",
     )
     return {}, 204

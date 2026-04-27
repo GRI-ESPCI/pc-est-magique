@@ -8,8 +8,9 @@ import sys
 
 import flask
 from flask_babel import _
+from markupsafe import Markup
 
-from app import context
+from app import context, db
 from app.routes.gris import bp, forms
 from app.models import PCeen, Role, Permission, PermissionScope, PermissionType
 from app.routes.gris.utils import (
@@ -67,19 +68,19 @@ def pceens(view: str = "active") -> typing.RouteReturn:
             else:
                 return {"message": "Bad formed request", "detail": roles_form.errors}, 400
 
-    query = PCeen.query
+    stmt = db.select(PCeen)
     match view:
         case PCeensViewEnum.active:
-            query = query.filter(PCeen.activated == True)
+            stmt = stmt.filter(PCeen.activated == True)
         case PCeensViewEnum.rez:
-            query = (
-                query.join(PCeen.roles)
+            stmt = (
+                stmt.join(PCeen.roles)
                 .join(Role.permissions)
                 .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.intrarez)
             )
         case PCeensViewEnum.bar:
-            query = (
-                query.join(PCeen.roles)
+            stmt = (
+                stmt.join(PCeen.roles)
                 .join(Role.permissions)
                 .filter(
                     Permission.type == PermissionType.read,
@@ -89,7 +90,7 @@ def pceens(view: str = "active") -> typing.RouteReturn:
         case PCeensViewEnum.all:
             pass
 
-    pceens = query.all()
+    pceens = db.session.scalars(stmt).all()
 
     return flask.render_template(
         "gris/pceens.html",
@@ -97,7 +98,7 @@ def pceens(view: str = "active") -> typing.RouteReturn:
         ban_form=ban_form,
         view=view.name,
         pceens=pceens,
-        roles=Role.query.all(),
+        roles=db.session.scalars(db.select(Role)).all(),
         title=_("Gestion des PCéens"),
     )
 
@@ -130,7 +131,7 @@ def roles() -> typing.RouteReturn:
     return flask.render_template(
         "gris/roles.html",
         form=form,
-        roles=Role.query.all(),
+        roles=db.session.scalars(db.select(Role)).all(),
         title=_("Gestion des rôles"),
     )
 
@@ -160,7 +161,7 @@ def run_script() -> typing.RouteReturn:
             sys.stdin = _stdin
 
         output_str = str(flask.escape(output))
-        output = flask.Markup(output_str.replace("\n", "<br/>").replace(" ", "&nbsp;"))
+        output = Markup(output_str.replace("\n", "<br/>").replace(" ", "&nbsp;"))
         return flask.render_template(
             "gris/run_script.html",
             form=form,
@@ -182,3 +183,4 @@ def monitoring_ds() -> typing.RouteReturn:
 def monitoring_bw() -> typing.RouteReturn:
     """Integration of Bandwidthd network monitoring."""
     return flask.render_template("gris/monitoring_bw.html", title=_("Bandwidthd network monitoring"))
+    

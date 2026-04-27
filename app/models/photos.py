@@ -9,6 +9,7 @@ import typing
 import flask
 import flask_babel
 import sqlalchemy as sa
+from sqlalchemy.orm import Mapped
 
 from app import db
 from app.enums import PermissionType, PermissionScope
@@ -17,7 +18,6 @@ from app.utils.columns import (
     one_to_many,
     many_to_one,
     Column,
-    Relationship,
 )
 from app.utils.nginx import get_nginx_access_token
 
@@ -30,12 +30,12 @@ class Photo(Model):
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
     _album_id: Column[int] = column(sa.ForeignKey("album.id"), nullable=False)
-    album: Relationship[Album] = many_to_one("Album.photos")
+    album: Mapped[Album] = many_to_one("Album.photos")
     file_name: Column[str] = column(sa.String(120), nullable=False)
     width: Column[int] = column(sa.Integer(), nullable=False)
     height: Column[int] = column(sa.Integer(), nullable=False)
     _author_id: Column[int | None] = column(sa.ForeignKey("pceen.id"), nullable=True)
-    author: Relationship[models.PCeen | None] = many_to_one("PCeen.photos")
+    author: Mapped[models.PCeen | None] = many_to_one("PCeen.photos")
     author_str: Column[str | None] = column(sa.String(64), nullable=True)
     timestamp: Column[datetime.datetime | None] = column(sa.DateTime(), nullable=True)
     lat: Column[float | None] = column(sa.Float(), nullable=True)
@@ -104,7 +104,7 @@ class Album(Model):
     id: Column[int] = column(sa.Integer(), primary_key=True)
     visible: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
     _collection_id: Column[int] = column(sa.ForeignKey("collection.id"), nullable=False)
-    collection: Relationship[Collection] = many_to_one("Collection.albums")
+    collection: Mapped[Collection] = many_to_one("Collection.albums")
     dir_name: Column[str] = column(sa.String(120), nullable=False)
     name: Column[str] = column(sa.String(120), nullable=False)
     description: Column[str] = column(sa.String(280), nullable=True)
@@ -113,7 +113,7 @@ class Album(Model):
     featured: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
     nb_photos: Column[int] = column(sa.Integer, nullable=False, default=0)
 
-    photos: Relationship[list[Photo]] = one_to_many("Photo.album", cascade="all, delete-orphan", lazy="dynamic")
+    photos: Mapped[list["models.Photo"]] = one_to_many("Photo.album", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -146,7 +146,10 @@ class Album(Model):
     @property
     def featured_photo(self) -> Photo | None:
         """The (first) photo of this album marked as featured (defaults to the first photo)."""
-        return self.photos.filter_by(featured=True).first() or self.photos.first()
+        featured = [p for p in self.photos if p.featured]
+        if featured:
+            return featured[0]
+        return self.photos[0] if self.photos else None
 
     def get_access_token(self, ip: str, expires: datetime.datetime = None) -> str:
         """Forges the md5 token allowing access to the photos of this album.
@@ -175,7 +178,7 @@ class Collection(Model):
     start: Column[datetime.date] = column(sa.Date(), nullable=True)
     end: Column[datetime.date] = column(sa.Date(), nullable=True)
 
-    albums: Relationship[list[Album]] = one_to_many("Album.collection", cascade="all, delete-orphan", lazy="dynamic")
+    albums: Mapped[list["models.Album"]] = one_to_many("Album.collection", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
@@ -203,7 +206,10 @@ class Collection(Model):
     @property
     def featured_album(self) -> Album | None:
         """The (first) album of this collection marked as featured (defaults to the first album)"""
-        return self.albums.filter_by(featured=True).first() or self.albums.first()
+        featured = [a for a in self.albums if a.featured]
+        if featured:
+            return featured[0]
+        return self.albums[0] if self.albums else None
 
     @property
     def featured_photo(self) -> Photo | None:
@@ -216,12 +222,12 @@ class Collection(Model):
     @property
     def nb_albums(self) -> int:
         """The number of visible albums in the collection."""
-        return len(self.albums.filter_by(visible=True).all())
+        return len([a for a in self.albums if a.visible])
 
     @property
     def nb_photos(self) -> int:
         """The total number of photos in the collection."""
-        return sum(album.nb_photos for album in self.albums.filter_by(visible=True).all())
+        return sum(album.nb_photos for album in self.albums if album.visible)
 
 
 from app import models

@@ -63,7 +63,10 @@ def what_are_next_days(panier_bio_day: int, today: datetime.date, periods):
 
 
 def get_period_id(date, all_periods):
-    date = datetime.datetime.strptime(date,"%A %d %B %Y").date()
+    if isinstance(date, str):
+        date = datetime.datetime.strptime(date, "%A %d %B %Y").date()
+    elif isinstance(date, datetime.datetime):
+        date = date.date()
     for period in all_periods:
         if date > period.start_date and date < period.end_date:
             return(period.id)
@@ -91,6 +94,9 @@ def findPeriodId(date, periods):
     """
     Check if a given date fits inside a period
     """
+    if date is None:
+        return None
+
     for period in periods:
         if date <= period.end_date and date >= period.start_date:
             return(period.id)

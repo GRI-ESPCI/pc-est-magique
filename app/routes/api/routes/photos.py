@@ -25,10 +25,10 @@ def _check_rights_and_get_album() -> Album:
     if not album_name:
         flask.abort(400, "Form field 'album' missing")
 
-    collection = Collection.query.filter_by(dir_name=collection_name).first()
+    collection = db.session.scalars(db.select(Collection).filter_by(dir_name=collection_name)).first()
     if not collection:
         flask.abort(400, f"Invalid collection: '{collection_name}'")
-    album = collection.albums.filter_by(dir_name=album_name).first()
+    album = next((a for a in collection.albums if a.dir_name == album_name), None)
     if not album:
         flask.abort(400, f"Invalid collection: '{collection_name}'")
     if not context.has_permission(PermissionType.write, PermissionScope.album, elem=album):
@@ -47,7 +47,7 @@ def upload():
     if not file:
         flask.abort(400, "Missing file (expected as 'file' multipart field)")
 
-    if album.photos.filter_by(file_name=file.filename).count():
+    if any(p.file_name == file.filename for p in album.photos):
         flask.abort(409, "A photo with the same filename already exists in this album.")
 
     # Save photo
@@ -79,7 +79,7 @@ def edit_photo():
     if not photo_form.validate_on_submit():
         flask.abort(400, "Invalid form body")
 
-    photo: Photo = album.photos.filter_by(file_name=photo_form.photo_name.data).first()
+    photo = next((p for p in album.photos if p.file_name == photo_form.photo_name.data), None)
     if not photo:
         flask.abort(400, "This photo does not exist")
 
@@ -109,7 +109,7 @@ def star_photo():
     if not photo_name:
         flask.abort(400, "Form field 'photo' missing")
 
-    photo: Photo = album.photos.filter_by(file_name=photo_name).first()
+    photo = next((p for p in album.photos if p.file_name == photo_name), None)
     if not photo:
         flask.abort(400, "This photo does not exist")
     if photo.featured:
@@ -131,7 +131,7 @@ def delete_photo():
     if not photo_name:
         flask.abort(400, "Form field 'photo' missing")
 
-    photo: Photo = album.photos.filter_by(file_name=photo_name).first()
+    photo = next((p for p in album.photos if p.file_name == photo_name), None)
     if not photo:
         flask.abort(400, "This photo does not exist")
 

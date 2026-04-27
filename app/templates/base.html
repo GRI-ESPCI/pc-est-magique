@@ -17,6 +17,9 @@
         {% endblock title %}
 
         {% block styles %}
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         {% for filename in [
             "css/compiled/custom-bootstrap.css",
             "css/custom.css",
@@ -25,6 +28,28 @@
         {% endfor %}
         {% endblock styles %}
 
+        {% block scripts_head %}
+        <script>
+            function applyTheme(targetMode) {
+                if (targetMode === 'dark' || (targetMode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+            }
+            applyTheme("{{ g.mode }}");
+
+            function setModeAJAX(mode, event) {
+                event.preventDefault();
+                applyTheme(mode);
+                fetch('/set_mode/' + mode);
+                document.getElementById('modeDropdownBtn').innerHTML = 
+                    mode === 'light' ? '<i class="fas fa-sun me-1"></i> Clair' :
+                    mode === 'dark' ? '<i class="fas fa-moon me-1"></i> Sombre' :
+                    '<i class="fas fa-desktop me-1"></i> Auto';
+            }
+        </script>
+        {% endblock scripts_head %}
         {% block favicon %}
         {% if g.is_gri %}
         <link href="{{ url_for("static", filename="favicon_gri.png") }}" rel="icon" />
@@ -50,13 +75,13 @@
 
         {% endblock head %}
     </head>
-    <body {% block body_attribs %}{% endblock body_attribs %} class="d-flex flex-column min-vh-100">
+    <body {% block body_attribs %}{% endblock body_attribs %} class="d-flex flex-column min-vh-100 theme-{{ g.get('theme', 'vibrant') }}">
         {% block body %}
 
         {% block navbar %}{% include "navbar.html" %}{% endblock navbar %}
 
         {% block content %}
-        <div class="container position-relative">
+        <div class="container position-relative pt-4">
             {% if g.doas %}<div class="row">{% include "doas.html" %}</div>{% endif %}
 
             {% block app_content %}{% endblock app_content %}

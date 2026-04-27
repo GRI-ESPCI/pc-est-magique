@@ -27,9 +27,23 @@
                 <tr>
                     <td>{{ _("Image de fond") }}</td>
                     <td class="container"><div class="row row-cols-1 row-cols-md-2 d-flex align-items-center gy-2">
-                        <div class="col">{{ wtf.form_field(
-                            form.background_image, type="file", accept="image/*", class="form-control"
-                        ) }}</div>
+                        <div class="col">
+                            <input type="file" class="d-none" id="background_image" name="background_image" accept="image/*">
+                            <div class="input-group">
+                                <label class="btn btn-primary mb-0 d-flex align-items-center" for="background_image" style="border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important;">
+                                    <svg class="bi flex-shrink-0 me-2" width="16" height="16" fill="currentColor">
+                                        {{ macros.bootstrap_icon("upload") }}
+                                    </svg>
+                                    {{ _("Parcourir...") }}
+                                </label>
+                                <input type="text" class="form-control bg-body" id="file-chosen" placeholder="{{ _('Aucun fichier sélectionné') }}" readonly style="cursor: pointer; border-left: 0; border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important;" onclick="document.getElementById('background_image').click();">
+                            </div>
+                            <script>
+                                document.getElementById('background_image').addEventListener('change', function(){
+                                    document.getElementById('file-chosen').value = this.files.length > 0 ? this.files[0].name : '';
+                                });
+                            </script>
+                        </div>
                         <div class="col">
                             <div class="form-check form-switch ms-3">
                                 {{ wtf.form_field(form.delete_background_image) }}

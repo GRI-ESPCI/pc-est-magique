@@ -6,6 +6,7 @@ import datetime
 import typing
 
 import sqlalchemy as sa
+from sqlalchemy.orm import Mapped
 
 from app import db
 from app.utils.columns import (
@@ -13,7 +14,6 @@ from app.utils.columns import (
     one_to_many,
     many_to_one,
     Column,
-    Relationship,
 )
 
 
@@ -25,9 +25,9 @@ class Rental(Model):
 
     id: Column[int] = column(sa.Integer(), primary_key=True)
     _pceen_id: Column[int] = column(sa.ForeignKey("pceen.id"), nullable=False)
-    pceen: Relationship[models.PCeen] = many_to_one("PCeen.rentals")
+    pceen: Mapped[models.PCeen] = many_to_one("PCeen.rentals")
     _room_num: Column[int] = column(sa.ForeignKey("room.num"), nullable=False)
-    room: Relationship[Room] = many_to_one("Room.rentals")
+    room: Mapped[Room] = many_to_one("Room.rentals")
     start: Column[datetime.date] = column(sa.Date(), nullable=False)
     end: Column[datetime.date | None] = column(sa.Date(), nullable=True)
 
@@ -49,8 +49,8 @@ class Room(Model):
     base_ip: Column[str] = column(sa.String(4))
     ips_allocated: Column[int] = column(sa.Integer(), nullable=False, default=0)
 
-    rentals: Relationship[list[Rental]] = one_to_many("Rental.room")
-    allocations: Relationship[list[models.Allocation]] = one_to_many("Allocation.room")
+    rentals: Mapped[list["models.Rental"]] = one_to_many("Rental.room")
+    allocations: Mapped[list["models.Allocation"]] = one_to_many("Allocation.room")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""

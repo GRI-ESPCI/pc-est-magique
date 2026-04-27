@@ -49,32 +49,19 @@
   <div class="btn-toolbar justify-content-between">
     <h4>{{ _("Voeux : ")}}</h4>
 
-    <div
-      data-bs-toggle="tooltip"
-      data-bs-placement="right"
-      title="{{ _('Ajouter un voeu') }}"
-    >
-      <button
-        type="button"
-        class="btn btn-success"
-        data-bs-target="#mo-voeu-add"
-        data-bs-toggle="modal"
-      >
-        <svg
-          class="bi flex-shrink-0"
-          width="24"
-          height="24"
-          role="img"
-        >
-          {{ macros.bootstrap_icon("plus-circle") }}
+    <div>
+      <button type="button" class="btn btn-success d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2" data-bs-target="#mo-voeu-add" data-bs-toggle="modal">
+        <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+          {{ macros.bootstrap_icon("plus-lg") }}
         </svg>
+        <span>{{ _('Ajouter') }}</span>
       </button>
     </div>
   </div>
 </div>
 <div class="row mb-3">
-  <div class="col table-responsive">
-    <table class="table table-striped table-hover table-bordered">
+  <div class="col px-0"><div class="table-responsive rounded-4 shadow-sm bg-body-tertiary mb-4">
+    <table class="table table-hover table-bordered">
       <thead>
         <tr>
           <th
@@ -248,7 +235,7 @@
               title="{{ _('Éditer le voeu') }}"
             >
               <button
-                class="btn btn-outline-danger p-1 pt-0"
+                class="btn btn-icon-zoom text-warning p-2 shadow-none"
                 data-bs-target="#mo-voeu-edit"
                 data-bs-toggle="modal"
                 data-voeu-id="{{ voeu.id }}"
@@ -264,7 +251,7 @@
                   width="18"
                   height="18"
                 >
-                  {{ macros.bootstrap_icon("pen") }}
+                  {{ macros.bootstrap_icon("pencil") }}
                 </svg>
               </button>
             </div>
@@ -273,7 +260,7 @@
         {% endfor %}
       </tbody>
       <tbody>
-        <tr>
+        <tr class="table-group-divider">
           <td><b>{{ _("Total") }}</b></td>
           <td><b>{{ _("Nb pcéens : ") }}{{nb_total_voeux}}</b></td>
           <td><b>{{ _("-") }}</b></td>
@@ -290,24 +277,25 @@
   </div>
 </div>
 
-<br />
-<br />
-<div style="display: flex">
+<div class="d-flex flex-wrap gap-2 mb-4">
   <a
-    class="btn btn-primary"
-    style="margin-right: 10px"
-    href="{{
-  url_for('club_q.spect_generate_pdf', id = spectacle.id) }}"
+    class="btn btn-primary d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2"
+    href="{{ url_for('club_q.spect_generate_pdf', id = spectacle.id) }}"
     target="_blank"
   >
+    <svg class="bi flex-shrink-0" width="18" height="18">
+      {{ macros.bootstrap_icon("file-earmark-pdf") }}
+    </svg>
     {{ _("Générer le PDF") }}
   </a>
   <a
-    class="btn btn-primary"
-    href="{{
-  url_for('club_q.spect_generate_excel', id = spectacle.id) }}"
+    class="btn btn-primary d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2"
+    href="{{ url_for('club_q.spect_generate_excel', id = spectacle.id) }}"
     target="_blank"
   >
+    <svg class="bi flex-shrink-0" width="18" height="18">
+      {{ macros.bootstrap_icon("file-earmark-excel") }}
+    </svg>
     {{ _("Générer l'Excel") }}
   </a>
 </div>

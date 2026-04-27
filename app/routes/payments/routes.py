@@ -13,10 +13,17 @@ from app.routes.payments.utils import add_subscription
 from app.utils import helpers, lydia, typing
 
 
-@bp.before_app_first_request
-def create_first_offer() -> None:
+_payments_initialized = False
+
+
+@bp.before_app_request
+def _lazy_create_first_offer() -> None:
     """Create subscription welcome order if not already present."""
-    if not Offer.query.first():
+    global _payments_initialized
+    if _payments_initialized:
+        return
+    _payments_initialized = True
+    if not db.session.scalars(db.select(Offer)).first():
         offer = Offer.create_first_offer()
         db.session.add(offer)
         db.session.commit()
@@ -46,16 +53,16 @@ def pay() -> typing.RouteReturn:
         flask.flash(_("Vous avez déjà un abonnement en cours !"), "warning")
         return helpers.redirect_to_next()
 
-    offers = Offer.query.filter_by(visible=True).order_by(Offer.price).all()
+    offers = db.session.scalars(db.select(Offer).filter_by(visible=True).order_by(Offer.price)).all()
     return flask.render_template("payments/pay.html", title=_("Paiement"), offers=offers)
 
 
 @bp.route("/pay/<method>", methods=["GET", "POST"])
 @bp.route("/pay/<method>/", methods=["GET", "POST"])
-@bp.route("/pay/<method>/<offer>", methods=["GET", "POST"])
+@bp.route("/pay/<method>/<int:offer>", methods=["GET", "POST"])
 @context.intrarez_setup_only
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
-def pay_(method: str, offer: str | None = None) -> typing.RouteReturn:
+def pay_(method: str, offer: int | None = None) -> typing.RouteReturn:
     """Payment page."""
     if context.g.pceen.sub_state == SubState.subscribed:
         flask.flash(_("Vous avez déjà un abonnement en cours !"), "warning")
@@ -68,7 +75,7 @@ def pay_(method: str, offer: str | None = None) -> typing.RouteReturn:
         "magic": _("Ajouter un paiement"),
     }
     if method in methods:
-        offer = Offer.query.get(offer)
+        offer = db.session.get(Offer, offer)
         if offer and offer.visible and offer.active:
             if method == "magic" and not context.g.doas:
                 flask.abort(403)
@@ -94,10 +101,10 @@ def pay_(method: str, offer: str | None = None) -> typing.RouteReturn:
     return helpers.ensure_safe_redirect("payments.pay", next=None)
 
 
-@bp.route("/add_payment/<offer>")
+@bp.route("/add_payment/<int:offer>")
 @context.intrarez_setup_only
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
-def add_payment(offer: str = None) -> typing.RouteReturn:
+def add_payment(offer: int | None = None) -> typing.RouteReturn:
     """Add an arbitrary payment by a GRI."""
     if not context.g.doas:
         flask.abort(403)
@@ -107,7 +114,7 @@ def add_payment(offer: str = None) -> typing.RouteReturn:
         flask.flash(_("Vous avez déjà un abonnement en cours !"), "warning")
         return helpers.redirect_to_next()
 
-    offer = Offer.query.get(offer)
+    offer = db.session.get(Offer, offer)
     if not (offer and offer.visible and offer.active):
         flask.flash("Offre incorrecte", "danger")
         return helpers.redirect_to_next()
@@ -168,7 +175,7 @@ def lydia_callback_confirm() -> typing.RouteReturn:
         return "order_ref invalid", 400
 
     # Retrieve payment
-    payment = Payment.query.get(int(order_ref))
+    payment = db.session.get(Payment, int(order_ref))
     if not payment:
         return f"Payment not existing: {order_ref}", 404
     if payment.status != PaymentStatus.waiting:
@@ -180,7 +187,7 @@ def lydia_callback_confirm() -> typing.RouteReturn:
     payment.payed = datetime.datetime.now()
     payment.lydia_transaction_id = transaction_identifier
     pceen = payment.pceen
-    offer = Offer.query.filter_by(price=payment.amount).one_or_none()
+    offer = db.session.scalars(db.select(Offer).filter_by(price=payment.amount)).one_or_none()
     if not offer:
         return f"No offer for price {payment.amount}", 404
 
@@ -221,7 +228,7 @@ def lydia_callback_cancel() -> typing.RouteReturn:
         return "order_ref invalid", 400
 
     # Retrieve payment
-    payment = Payment.query.get(int(order_ref))
+    payment = db.session.get(Payment, int(order_ref))
     if not payment:
         return f"Payment not existing: {order_ref}", 404
     if payment.status != PaymentStatus.waiting:
@@ -268,17 +275,13 @@ def lydia_fail() -> typing.RouteReturn:
     return helpers.ensure_safe_redirect("payments.pay", next=None)
 
 
-@bp.route("/lydia/validate/<payment_id>")
+@bp.route("/lydia/validate/<int:payment_id>")
 @context.intrarez_setup_only
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def lydia_validate(payment_id: int) -> typing.RouteReturn:
     """Route to register a payment done but not validated (callback error)."""
-    if not payment_id.isdigit():
-        flask.flash(_("Numéro de paiement invalide"), "warning")
-        return helpers.ensure_safe_redirect("payments.pay", next=None)
-
     # Retrieve payment
-    payment = Payment.query.get(int(payment_id))
+    payment = db.session.get(Payment, payment_id)
     if not payment:
         flask.flash(_("Numéro de paiement invalide"), "warning")
         return helpers.ensure_safe_redirect("payments.pay", next=None)
@@ -293,7 +296,7 @@ def lydia_validate(payment_id: int) -> typing.RouteReturn:
     payment.lydia_transaction_id = flask.request.args.get("transaction")
     db.session.commit()
 
-    offer = Offer.query.filter_by(price=payment.amount).one_or_none()
+    offer = db.session.scalars(db.select(Offer).filter_by(price=payment.amount)).one_or_none()
     if not offer:
         return f"No offer for price {payment.amount}", 404
 

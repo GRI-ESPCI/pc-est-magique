@@ -48,20 +48,17 @@ super() }}
   <div class="btn-toolbar justify-content-between">
     <h4>{{title}}</h4>
     {% if can_edit %}
-    <div
-      data-bs-toggle="tooltip"
-      data-bs-placement="right"
-      title="{{ _('Ajouter un bekk') }}"
-    >
+    <div>
       <button
         type="button"
-        class="btn btn-success"
+        class="btn btn-success d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2"
         data-bs-target="#mo-bekk-add"
         data-bs-toggle="modal"
       >
-        <svg class="bi flex-shrink-0" width="24" height="24" role="img">
-          {{ macros.bootstrap_icon("plus-circle") }}
+        <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+          {{ macros.bootstrap_icon("plus-lg") }}
         </svg>
+        <span>{{ _("Ajouter") }}</span>
       </button>
     </div>
     {% endif %}
@@ -74,7 +71,7 @@ super() }}
 <div class="container mb-3">
   <div class="btn-toolbar justify-content-between" role="toolbar">
     <div class="d-flex align-items-center">
-      <div class="btn-group" role="group" name="saison_navbar">
+      <div class="d-flex flex-wrap gap-2" role="group" name="saison_navbar">
         <a
           role="button"
           href="{{ url_for('bekk.main', promo=0)}}"
@@ -152,7 +149,7 @@ super() }}
             >
               {{ _("Annuler") }}
             </button>
-            {{ form.delete(class="btn btn-danger") }} {{ form.submit(class="btn
+            {{ form.delete(class="btn btn-danger rounded-pill px-4 fw-bold") }} {{ form.submit(class="btn
             btn-primary") }}
           </div>
         </div>
@@ -202,9 +199,7 @@ super() }}
           </div>
           <div class="row mb-3">
             <div class="col">
-              <div class="form-floating">
-                {{ wtf.form_field(form.pdf_file) }}
-              </div>
+              {{ wtf.form_field(form.pdf_file, class="form-control") }}
             </div>
             {% if form.pdf_file.errors %}
             <small class="form-text text-danger"
@@ -220,7 +215,7 @@ super() }}
             >
               {{ _("Annuler") }}
             </button>
-            {{ form.add(class="btn btn-primary") }}
+            {{ form.add(class="btn btn-primary rounded-pill px-4 fw-bold") }}
           </div>
         </div>
       </form>

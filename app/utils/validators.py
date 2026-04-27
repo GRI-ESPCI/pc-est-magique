@@ -9,6 +9,7 @@ from flask_babel import lazy_gettext as _l
 
 from app.models import PCeen, Room, Ban, BarItem, PeriodPanierBio
 from app.utils.typing import JinjaStr
+from app import db
 
 
 class CustomValidator:
@@ -116,21 +117,21 @@ class ValidPCeenID(CustomValidator):
     message = _l("PCeen ID invalide.")
 
     def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
-        return field.data.isdigit() and bool(PCeen.query.get(int(field.data)))
+        return field.data.isdigit() and bool(db.session.get(PCeen, int(field.data)))
 
 
 class ValidRoom(CustomValidator):
     message = _l("Numéro de chambre invalide.")
 
     def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
-        return bool(Room.query.get(field.data))
+        return bool(db.session.get(Room, field.data))
 
 
 class ValidBanID(CustomValidator):
     message = _l("Ban ID invalide.")
 
     def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
-        return field.data.isdigit() and bool(Ban.query.get(int(field.data)))
+        return field.data.isdigit() and bool(db.session.get(Ban, int(field.data)))
 
 
 class PastDate(CustomValidator):
@@ -171,7 +172,7 @@ class ValidBarItemID(CustomValidator):
     message = _l("Item ID invalide.")
 
     def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
-        return field.data.isdigit() and bool(BarItem.query.get(int(field.data)))
+        return field.data.isdigit() and bool(db.session.get(BarItem, int(field.data)))
 
 
 

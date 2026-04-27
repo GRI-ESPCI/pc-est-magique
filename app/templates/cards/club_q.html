@@ -10,30 +10,40 @@
   <h4 class="card-title">{{ brochure.season.nom }}</h4>
 </div>
 {% endblock %} {% block card_footer_class %}{{ super() }} px-auto{% endblock %} {% block card_footer %}
-<div style="display: flex; justify-content: space-between; align-items: center">
+<div class="d-flex flex-wrap gap-2 justify-content-center">
   <a
     href="{{ url_for('club_q.brochure_reader', id=brochure.id) }}"
-    class="btn btn-outline-dark"
+    class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }} flex-fill px-3 d-flex align-items-center justify-content-center gap-2"
   >
-    {{ _("Lire") }}
+    <svg class="bi flex-shrink-0" width="18" height="18">
+      {{ macros.bootstrap_icon("book") }}
+    </svg>
+    <span>{{ _("Lire") }}</span>
   </a>
 
   <a
     role="button"
     href="{{brochure.pdf_src_with_token}}"
     download="{{brochure.id}}.pdf"
-    class="btn btn-outline-dark"
+    class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }} flex-fill px-3 d-flex align-items-center justify-content-center gap-2"
   >
-    {{ _("Télécharger (PDF)") }}
+    <svg class="bi flex-shrink-0" width="18" height="18">
+      {{ macros.bootstrap_icon("download") }}
+    </svg>
+    <span>{{ _("PDF") }}</span>
   </a>
 
   {% if can_edit %}
   <a
     role="button"
     href="{{ url_for('club_q.brochure_delete', id=brochure.id) }}"
-    class="btn btn-danger"
+    class="btn btn-danger px-3 d-flex align-items-center justify-content-center"
+    data-bs-toggle="tooltip"
+    title="{{_('Supprimer')}}"
   >
-    {{_("Supprimer")}}
+    <svg class="bi flex-shrink-0" width="18" height="18">
+      {{ macros.bootstrap_icon("trash") }}
+    </svg>
   </a>
   {% endif %}
 </div>

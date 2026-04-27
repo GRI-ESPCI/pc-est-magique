@@ -1,6 +1,6 @@
 <li class="nav-item dropdown me-auto">
     <button type="button" data-bs-toggle="dropdown"
-        class="btn btn-outline-danger dropdown-toggle"
+        class="btn {{ 'btn-outline-danger' if g.theme == 'classic' else 'btn-danger btn-sm mt-1' }} dropdown-toggle"
         id="m_gri" aria-expanded="false">
         {{ _("Menu GRI") }}
     </button>
