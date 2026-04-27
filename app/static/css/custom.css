@@ -204,7 +204,7 @@ html[data-theme="dark"] .btn-pc5 svg { color: #cbd5e1 !important; }
 
 /* Conteneurs et globalités */
 .table-responsive, .card .table-responsive, .card-body.bg-body-tertiary.border {
-    border-radius: 1rem !important; border: 1px solid var(--bs-table-border-color) !important; background-color: var(--bs-tertiary-bg) !important;
+    border-radius: 1rem !important; border: 1px solid var(--bs-table-border-color) !important; background-color: var(--bs-tertiary-bg) !important;  overscroll-behavior-x: none !important;
 }
 .theme-frost :is(.table-responsive, .card .table-responsive, .card-body.bg-body-tertiary.border) { background-color: rgba(255, 255, 255, 0.5) !important; backdrop-filter: blur(24px) saturate(150%); }
 
