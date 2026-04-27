@@ -11,6 +11,7 @@ import datetime
 import flask
 from flask_babel import _
 from discord_webhook import DiscordWebhook
+from markupsafe import Markup
 
 from app import context, db
 import sqlalchemy
@@ -166,7 +167,7 @@ def contact() -> typing.RouteReturn:
                 return helpers.ensure_safe_redirect("main.index")
 
             flask.flash(
-                flask.Markup(
+                Markup(
                     _(
                         "Oh non ! Le message n'a pas pu être transmis. N'hésitez pas "
                         "à contacter un GRI aux coordonnées en bas de page.<br/>"

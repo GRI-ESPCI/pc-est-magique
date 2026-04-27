@@ -4,6 +4,7 @@ import datetime
 
 import flask
 from flask_babel import _, format_currency
+from markupsafe import Markup
 from sqlalchemy import extract
 
 from app import context, db
@@ -157,7 +158,7 @@ def pay(pceen_id: str, item_id: str):
 
     flask.flash(
         _("Achat validé : %(item)s (%(amount)s). Annuler :", item=item.name, amount=format_currency(item.price, "EUR"))
-        + flask.Markup(flask.render_template("bar/_revert_button.html", transaction=transaction)),
+        + Markup(flask.render_template("bar/_revert_button.html", transaction=transaction)),
         "success",
     )
     return {}, 204

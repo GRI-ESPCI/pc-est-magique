@@ -8,6 +8,7 @@ import sys
 
 import flask
 from flask_babel import _
+from markupsafe import Markup
 
 from app import context, db
 from app.routes.gris import bp, forms
@@ -160,7 +161,7 @@ def run_script() -> typing.RouteReturn:
             sys.stdin = _stdin
 
         output_str = str(flask.escape(output))
-        output = flask.Markup(output_str.replace("\n", "<br/>").replace(" ", "&nbsp;"))
+        output = Markup(output_str.replace("\n", "<br/>").replace(" ", "&nbsp;"))
         return flask.render_template(
             "gris/run_script.html",
             form=form,
