@@ -182,7 +182,7 @@ def acs() -> typing.RouteReturn:
     # 1. First Pass: check by exact espci_email
     pceen_matched = None
     for mail in attributes["mail"]:
-        pceen = PCeen.query.filter_by(espci_email=mail).first()
+        pceen = db.session.scalars(db.select(PCeen).filter_by(espci_email=mail)).first()
         if pceen:
             pceen_matched = pceen
             break

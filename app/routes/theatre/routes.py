@@ -33,7 +33,7 @@ TODO:
 @bp.route("/<int:saison_id>")
 def main(saison_id: int | None = None) -> typing.RouteReturn:
     """PC est magique profile page."""
-    saisons = Saison.query.order_by(Saison.start_date.desc()).all()
+    saisons = db.session.scalars(db.select(Saison).order_by(Saison.start_date.desc())).all()
 
     if saison_id is None:
         current_saison = saisons[0]
@@ -78,7 +78,7 @@ def edit_text():
 @context.permission_only(PermissionType.write, PermissionScope.theatre)
 def admin():
 
-    saisons = Saison.query.order_by(Saison.start_date.desc()).all()
+    saisons = db.session.scalars(db.select(Saison).order_by(Saison.start_date.desc())).all()
 
     return flask.render_template(
         "theatre/admin.html",

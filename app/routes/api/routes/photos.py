@@ -25,7 +25,7 @@ def _check_rights_and_get_album() -> Album:
     if not album_name:
         flask.abort(400, "Form field 'album' missing")
 
-    collection = Collection.query.filter_by(dir_name=collection_name).first()
+    collection = db.session.scalars(db.select(Collection).filter_by(dir_name=collection_name)).first()
     if not collection:
         flask.abort(400, f"Invalid collection: '{collection_name}'")
     album = next((a for a in collection.albums if a.dir_name == album_name), None)

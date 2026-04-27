@@ -36,17 +36,27 @@ def main() -> typing.RouteReturn:
     if connected:
         # Previous orders query
         user = context.g.pceen
-        all_orders = OrderPanierBio.query.filter_by(_pceen_id=user.id).filter(OrderPanierBio.date>=today).order_by(OrderPanierBio.date.asc()).all()
+        all_orders = db.session.scalars(
+            db.select(OrderPanierBio)
+            .filter_by(_pceen_id=user.id)
+            .filter(OrderPanierBio.date >= today)
+            .order_by(OrderPanierBio.date.asc())
+        ).all()
     else:
         all_orders = None
         user = None
 
-    visibility = GlobalSetting.query.filter_by(key="ACCESS_PANIER_BIO").one().value
+    visibility = db.session.scalars(db.select(GlobalSetting).filter_by(key="ACCESS_PANIER_BIO")).one().value
     if can_edit:
         visibility = 1
 
-    panier_bio_day = GlobalSetting.query.filter_by(key="PANIER_BIO_DAY").one().value
-    all_periods = PeriodPanierBio.query.filter_by(active=True).filter(PeriodPanierBio.end_date>=today).order_by(PeriodPanierBio.start_date.asc()).all()
+    panier_bio_day = db.session.scalars(db.select(GlobalSetting).filter_by(key="PANIER_BIO_DAY")).one().value
+    all_periods = db.session.scalars(
+        db.select(PeriodPanierBio)
+        .filter_by(active=True)
+        .filter(PeriodPanierBio.end_date >= today)
+        .order_by(PeriodPanierBio.start_date.asc())
+    ).all()
 
 
     folder = "panier_bio"
@@ -128,7 +138,7 @@ def main() -> typing.RouteReturn:
         delete = form["delete"].data
         
         if delete:
-            order_del = OrderPanierBio.query.filter_by(id=form["id"].data).one()
+            order_del = db.session.scalars(db.select(OrderPanierBio).filter_by(id=form["id"].data)).one()
             if type(order_del._pceen_id) == int: #Only a user can delete a wish
                 if order_del._pceen_id == user.id: #Only a given user can delete his wish
                     if command_open(panier_bio_day, datetime.datetime.today(), order_del.date): #Can only delete if not too close to panier bio day
@@ -233,12 +243,12 @@ def admin() -> typing.RouteReturn:
 
     today = datetime.date.today()
 
-    all_periods = PeriodPanierBio.query.order_by(PeriodPanierBio.start_date.asc()).all()
-    all_orders = OrderPanierBio.query.filter(OrderPanierBio.date > today - datetime.timedelta(days=60)).all()
+    all_periods = db.session.scalars(db.select(PeriodPanierBio).order_by(PeriodPanierBio.start_date.asc())).all()
+    all_orders = db.session.scalars(db.select(OrderPanierBio).filter(OrderPanierBio.date > today - datetime.timedelta(days=60))).all()
     date_list = sorted({order.date for order in all_orders}, reverse=True)
 
-    visibility = GlobalSetting.query.filter_by(key="ACCESS_PANIER_BIO").one().value
-    panier_bio_day = GlobalSetting.query.filter_by(key="PANIER_BIO_DAY").one().value
+    visibility = db.session.scalars(db.select(GlobalSetting).filter_by(key="ACCESS_PANIER_BIO")).one().value
+    panier_bio_day = db.session.scalars(db.select(GlobalSetting).filter_by(key="PANIER_BIO_DAY")).one().value
 
     next_days = what_are_next_days(panier_bio_day, today, all_periods)  # But tell me, what is the next day of Panier Bio ?
     if len(next_days) > 0:
@@ -254,7 +264,7 @@ def admin() -> typing.RouteReturn:
 
     if len(date_list) > 0:
         orders = (
-            OrderPanierBio.query.filter(OrderPanierBio.date == date_list[show_date]).order_by(OrderPanierBio.name).all()
+            db.session.scalars(db.select(OrderPanierBio).filter(OrderPanierBio.date == date_list[show_date]).order_by(OrderPanierBio.name)).all()
         )
     else:
         orders = []
@@ -292,11 +302,11 @@ def admin() -> typing.RouteReturn:
         if submit:
             app.logger.info(form_settings.visibility.data)
             if form_settings.visibility.data:
-                GlobalSetting.query.filter_by(key="ACCESS_PANIER_BIO").one().value = 1
+                db.session.scalars(db.select(GlobalSetting).filter_by(key="ACCESS_PANIER_BIO")).one().value = 1
             else:
-                GlobalSetting.query.filter_by(key="ACCESS_PANIER_BIO").one().value = 0
+                db.session.scalars(db.select(GlobalSetting).filter_by(key="ACCESS_PANIER_BIO")).one().value = 0
 
-            GlobalSetting.query.filter_by(key="PANIER_BIO_DAY").one().value = form_settings["day"].data
+            db.session.scalars(db.select(GlobalSetting).filter_by(key="PANIER_BIO_DAY")).one().value = form_settings["day"].data
 
             db.session.commit()
             flask.flash(_("Mis à jour."), "success")
@@ -332,7 +342,7 @@ def admin() -> typing.RouteReturn:
                     return flask.redirect(flask.url_for("panier_bio.admin", show_date=show_date))
 
         elif edit or delete:
-            order = OrderPanierBio.query.filter_by(id=form["id"].data).one()
+            order = db.session.scalars(db.select(OrderPanierBio).filter_by(id=form["id"].data)).one()
 
             if delete:
                 db.session.delete(order)
@@ -377,7 +387,7 @@ def period() -> typing.RouteReturn:
     if not can_edit:
         flask.abort(404)
 
-    periods = PeriodPanierBio.query.order_by(PeriodPanierBio.start_date.desc()).all()
+    periods = db.session.scalars(db.select(PeriodPanierBio).order_by(PeriodPanierBio.start_date.desc())).all()
 
 
     # forms handling
@@ -408,7 +418,7 @@ def period() -> typing.RouteReturn:
                 return flask.redirect(flask.url_for("panier_bio.period"))
 
             elif edit or delete:
-                period = PeriodPanierBio.query.filter_by(id=form["id"].data).one()
+                period = db.session.scalars(db.select(PeriodPanierBio).filter_by(id=form["id"].data)).one()
 
                 if delete:
                     db.session.delete(period)
@@ -480,7 +490,7 @@ def edit_text():
 def generate_excel(date):
     """Sum up of informations concerning panier orders for the given day"""
     # Get orders
-    orders: OrderPanierBio | None = OrderPanierBio.query.filter_by(date=date).all()
+    orders: OrderPanierBio | None = db.session.scalars(db.select(OrderPanierBio).filter_by(date=date)).all()
     if not orders or not context.g.pceen.has_permission(PermissionType.write, PermissionScope.panier_bio):
         flask.abort(404)
 

@@ -12,7 +12,8 @@ import flask
 from flask_babel import _
 from discord_webhook import DiscordWebhook
 
-from app import context
+from app import context, db
+import sqlalchemy
 from app.models import (
     Ban,
     PermissionScope,
@@ -48,30 +49,32 @@ def index() -> typing.RouteReturn:
     photos_infos = None
     if context.has_permission(PermissionType.read, PermissionScope.photos):
         photos_infos = namedtuple("PhotosInfos", ["nb_collections", "nb_albums", "nb_photos"])(
-            len(Collection.query.all()),
-            len(Album.query.all()),
-            len(Photo.query.all()),
+            db.session.scalar(db.select(sqlalchemy.func.count()).select_from(Collection)),
+            db.session.scalar(db.select(sqlalchemy.func.count()).select_from(Album)),
+            db.session.scalar(db.select(sqlalchemy.func.count()).select_from(Photo)),
         )
 
     club_q_infos = None
     if context.has_permission(PermissionType.read, PermissionScope.club_q):
 
-        season_id = GlobalSetting.query.filter_by(key="SEASON_NUMBER_CLUB_Q").one().value
-        season = ClubQSeason.query.filter_by(id=season_id).first()
+        season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value
+        season = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id)).first()
 
-        next_voeu = ClubQVoeu.query.filter(
-            ClubQVoeu._pceen_id == pceen.id,
-            ClubQVoeu.places_attribuees > 0,
-            ClubQVoeu.spectacle.has(ClubQSpectacle.date > date.today()),
+        next_voeu = db.session.scalars(
+            db.select(ClubQVoeu).filter(
+                ClubQVoeu._pceen_id == pceen.id,
+                ClubQVoeu.places_attribuees > 0,
+                ClubQVoeu.spectacle.has(ClubQSpectacle.date > date.today()),
+            )
         ).first()
 
-        voeux = ClubQVoeu.query.filter_by(_pceen_id=pceen.id, _season_id=season_id)
-        if voeux.first() is not None:
+        voeux = db.select(ClubQVoeu).filter_by(_pceen_id=pceen.id, _season_id=season_id)
+        if db.session.scalars(voeux).first() is not None:
             to_pay = pceen_prix_total(pceen, voeux)
         else:
             to_pay = 0
 
-        visibility = GlobalSetting.query.filter_by(key="ACCESS_CLUB_Q").one().value
+        visibility = db.session.scalars(db.select(GlobalSetting).filter_by(key="ACCESS_CLUB_Q")).one().value
 
         club_q_infos = namedtuple("ClubQInfos", ["season", "next_voeu", "to_pay", "booking_open", "pceen"])(
             season,
@@ -84,23 +87,28 @@ def index() -> typing.RouteReturn:
     bekk_infos = None
     if context.has_permission(PermissionType.read, PermissionScope.bekk):
 
-        bekks = Bekk.query.order_by(Bekk.date)
-        last_bekk = bekks.first()
+        bekks_stmt = db.select(Bekk).order_by(Bekk.date)
+        last_bekk = db.session.scalars(bekks_stmt).first()
 
-        if bekks.first() is None:
+        if last_bekk is None:
             bekk_infos = namedtuple("BekkInfos", ["last_bekk", "promo", "nb_bekks", "last_bekk_id"])(
                 "Aucun", "-", 0, -1
             )
         else:
+            nb_bekks = db.session.scalar(db.select(sqlalchemy.func.count()).select_from(Bekk))
             bekk_infos = namedtuple("BekkInfos", ["last_bekk", "promo", "nb_bekks", "last_bekk_id"])(
-                last_bekk.name, last_bekk.promo, bekks.count(), last_bekk.id
+                last_bekk.name, last_bekk.promo, nb_bekks, last_bekk.id
             )
 
     panier_bio_infos = None
     
-    panier_bio_day = GlobalSetting.query.filter_by(key="PANIER_BIO_DAY").one().value
+    panier_bio_day = db.session.scalars(db.select(GlobalSetting).filter_by(key="PANIER_BIO_DAY")).one().value
     today = datetime.date.today()
-    all_periods = PeriodPanierBio.query.filter_by(active=True).filter(PeriodPanierBio.end_date>=today).order_by(PeriodPanierBio.start_date.asc()).all()
+    all_periods = db.session.scalars(
+        db.select(PeriodPanierBio).filter_by(active=True)
+        .filter(PeriodPanierBio.end_date >= today)
+        .order_by(PeriodPanierBio.start_date.asc())
+    ).all()
     
     next_days  = what_are_next_days(panier_bio_day, today, all_periods)
     if len(next_days) > 0:
@@ -108,9 +116,13 @@ def index() -> typing.RouteReturn:
     else:
         next_day = None
         
-    all_orders = OrderPanierBio.query.filter_by(_pceen_id=pceen.id).filter(OrderPanierBio.date>=today).order_by(OrderPanierBio.date.asc()).all()
+    all_orders = db.session.scalars(
+        db.select(OrderPanierBio).filter_by(_pceen_id=pceen.id)
+        .filter(OrderPanierBio.date >= today)
+        .order_by(OrderPanierBio.date.asc())
+    ).all()
 
-    visibility = GlobalSetting.query.filter_by(key="ACCESS_PANIER_BIO").one().value
+    visibility = db.session.scalars(db.select(GlobalSetting).filter_by(key="ACCESS_PANIER_BIO")).one().value
 
     reserved = False
     for order in all_orders:

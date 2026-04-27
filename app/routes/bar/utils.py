@@ -13,6 +13,7 @@ from flask_babel import _
 import xlsxwriter
 
 from app.models import BarItem, PCeen, BarTransaction, BarTransactionType
+from app import db
 from app.utils.global_settings import Settings
 from app.utils.nginx import get_nginx_access_token
 
@@ -89,11 +90,10 @@ def get_items_descriptions(pceen: PCeen) -> typing.Iterator[tuple[BarItem, tuple
     can_buy_anything = _pceen_can_buy_anything(pceen, False)
 
     no_favorites_seen = True
-    for item in (
-        BarItem.query.filter(BarItem.archived == False)
+    for item in db.session.scalars(
+        db.select(BarItem).filter(BarItem.archived == False)
         .order_by(BarItem.favorite_index.desc(), BarItem.name.asc())
-        .all()
-    ):
+    ).all():
         item: BarItem
         can_be_bought = True
         limit_message = ""
@@ -133,10 +133,12 @@ def get_export_data(start: datetime.date, end: datetime.date) -> str:
     workbook = xlsxwriter.Workbook(output, {"in_memory": True})
     worksheet = workbook.add_worksheet()
 
-    transactions: list[BarTransaction] = BarTransaction.query.filter(
-        BarTransaction.date.between(start, end),
-        BarTransaction.type == BarTransactionType.pay_item,
-        BarTransaction.is_reverted == False,
+    transactions: list[BarTransaction] = db.session.scalars(
+        db.select(BarTransaction).filter(
+            BarTransaction.date.between(start, end),
+            BarTransaction.type == BarTransactionType.pay_item,
+            BarTransaction.is_reverted == False,
+        )
     ).all()
 
     header = ["id", "date", "barman", "client", "item", "type", "balance"]

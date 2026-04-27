@@ -21,7 +21,7 @@ def _lazy_create_rez_rooms() -> None:
     if _rooms_initialized:
         return
     _rooms_initialized = True
-    if not Room.query.first():
+    if not db.session.scalars(db.select(Room)).first():
         rooms = Room.create_rez_rooms()
         db.session.add_all(rooms)
         db.session.commit()

@@ -23,7 +23,7 @@ def _lazy_create_first_offer() -> None:
     if _payments_initialized:
         return
     _payments_initialized = True
-    if not Offer.query.first():
+    if not db.session.scalars(db.select(Offer)).first():
         offer = Offer.create_first_offer()
         db.session.add(offer)
         db.session.commit()
@@ -53,7 +53,7 @@ def pay() -> typing.RouteReturn:
         flask.flash(_("Vous avez déjà un abonnement en cours !"), "warning")
         return helpers.redirect_to_next()
 
-    offers = Offer.query.filter_by(visible=True).order_by(Offer.price).all()
+    offers = db.session.scalars(db.select(Offer).filter_by(visible=True).order_by(Offer.price)).all()
     return flask.render_template("payments/pay.html", title=_("Paiement"), offers=offers)
 
 
@@ -187,7 +187,7 @@ def lydia_callback_confirm() -> typing.RouteReturn:
     payment.payed = datetime.datetime.now()
     payment.lydia_transaction_id = transaction_identifier
     pceen = payment.pceen
-    offer = Offer.query.filter_by(price=payment.amount).one_or_none()
+    offer = db.session.scalars(db.select(Offer).filter_by(price=payment.amount)).one_or_none()
     if not offer:
         return f"No offer for price {payment.amount}", 404
 
@@ -296,7 +296,7 @@ def lydia_validate(payment_id: int) -> typing.RouteReturn:
     payment.lydia_transaction_id = flask.request.args.get("transaction")
     db.session.commit()
 
-    offer = Offer.query.filter_by(price=payment.amount).one_or_none()
+    offer = db.session.scalars(db.select(Offer).filter_by(price=payment.amount)).one_or_none()
     if not offer:
         return f"No offer for price {payment.amount}", 404
 

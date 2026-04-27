@@ -9,6 +9,7 @@ import zipfile
 
 from app import db
 from app.models import ClubQSpectacle, ClubQVoeu, PCeen, ClubQSeason, ClubQSalle
+import sqlalchemy
 from app.utils.validators import DataRequired
 import wtforms
 import flask
@@ -388,7 +389,7 @@ def exporter_excel_prix(saison, pceens, spectacles, voeux):
     sheet["A3"] = "Spectacles :"
     sheet["B3"] = len(spectacles)
     sheet["D3"] = "Inscrits :"
-    sheet["E3"] = pceens.count()
+    sheet["E3"] = db.session.scalar(db.select(sqlalchemy.func.count()).select_from(pceens.subquery()))
 
     sheet["A4"] = "Places proposées :"
     sheet["B4"] = sum((spec.nb_tickets or 0) for spec in spectacles)
@@ -462,32 +463,40 @@ def exporter_excel_prix(saison, pceens, spectacles, voeux):
 
 def pceen_sum_places_demandees(pceen, voeux) -> int:
     """Gives the number of wanted places for a pceen for the given saison of Club Q"""
-    voeux = voeux.filter_by(_pceen_id=pceen.id).all()
-    return sum(voeu.places_demandees for voeu in voeux)
+    voeux_list = db.session.scalars(voeux.filter_by(_pceen_id=pceen.id)).all()
+    return sum(voeu.places_demandees for voeu in voeux_list)
 
 
 def pceen_sum_places_attribuees(pceen, voeux) -> int:
     """Gives the number of given places for a pceen for the given saison of Club Q"""
-    voeux = voeux.filter_by(_pceen_id=pceen.id).all()
-    return sum(voeu.places_attribuees for voeu in voeux)
+    voeux_list = db.session.scalars(voeux.filter_by(_pceen_id=pceen.id)).all()
+    return sum(voeu.places_attribuees for voeu in voeux_list)
 
 
 def pceen_prix_total(pceen, voeux) -> int:
     """Gives the the total price for a pceen for the given saison of Club Q"""
-    voeux = voeux.filter_by(_pceen_id=pceen.id).all()
-    return sum(voeu.places_attribuees * voeu.spectacle.unit_price for voeu in voeux)
+    voeux_list = db.session.scalars(voeux.filter_by(_pceen_id=pceen.id)).all()
+    return sum(voeu.places_attribuees * voeu.spectacle.unit_price for voeu in voeux_list)
 
 
 def sum_object(subject, query) -> int:
     """Return the sum of object in the query corresponding to the subject"""
     if type(subject) == PCeen:
-        return query.filter_by(_pceen_id=subject.id).count()
+        return db.session.scalar(
+            db.select(sqlalchemy.func.count()).select_from(query.filter_by(_pceen_id=subject.id).subquery())
+        )
     elif type(subject) == ClubQSpectacle:
-        return query.filter_by(_spectacle_id=subject.id).count()
+        return db.session.scalar(
+            db.select(sqlalchemy.func.count()).select_from(query.filter_by(_spectacle_id=subject.id).subquery())
+        )
     elif type(subject) == ClubQSalle:
-        return query.filter_by(_salle_id=subject.id).count()
+        return db.session.scalar(
+            db.select(sqlalchemy.func.count()).select_from(query.filter_by(_salle_id=subject.id).subquery())
+        )
     elif type(subject) == ClubQSeason:
-        return query.filter_by(_season_id=subject.id).count()
+        return db.session.scalar(
+            db.select(sqlalchemy.func.count()).select_from(query.filter_by(_season_id=subject.id).subquery())
+        )
 
 
 def spectacles_sum_places_attribuees(spectacles) -> int:
@@ -567,7 +576,7 @@ def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect, can_edi
     if form_edit_voeu.is_submitted() and can_edit:
         delete = form_edit_voeu["delete_edit"].data
         if delete:
-            voeu = ClubQVoeu.query.filter_by(id=form_edit_voeu["id_edit"].data).one()
+            voeu = db.session.scalars(db.select(ClubQVoeu).filter_by(id=form_edit_voeu["id_edit"].data)).one()
             db.session.delete(voeu)
 
             db.session.commit()
@@ -575,7 +584,7 @@ def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect, can_edi
             return flask.redirect(redirect)
 
         if form_edit_voeu.validate():
-            voeu = ClubQVoeu.query.filter_by(id=form_edit_voeu["id_edit"].data).one()
+            voeu = db.session.scalars(db.select(ClubQVoeu).filter_by(id=form_edit_voeu["id_edit"].data)).one()
 
             voeu.priorite = form_edit_voeu["priorite_edit"].data
             voeu.places_demandees = form_edit_voeu["places_demandees_edit"].data
@@ -643,7 +652,7 @@ def spectacle_form(salles, salle, season_id, redirect, can_edit):
             return flask.redirect(redirect)
 
         delete = form_spectacle["delete"].data
-        spectacle = ClubQSpectacle.query.filter_by(id=form_spectacle["id"].data).one()
+        spectacle = db.session.scalars(db.select(ClubQSpectacle).filter_by(id=form_spectacle["id"].data)).one()
 
         path = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], str(spectacle.season.id))
         save_path = os.path.join(path, str(spectacle.id) + ".jpg")

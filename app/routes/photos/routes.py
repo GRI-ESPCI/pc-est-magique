@@ -18,7 +18,7 @@ def main() -> typing.RouteReturn:
     # Filter collections to display based on permissions
     collections = [
         collection
-        for collection in Collection.query.order_by(Collection.start.desc()).all()
+        for collection in db.session.scalars(db.select(Collection).order_by(Collection.start.desc())).all()
         if context.has_permission(collection.view_permission_type, PermissionScope.collection, elem=collection)
     ]
     return flask.render_template("photos/main.html", collections=collections, title=_("Photos"))
@@ -28,7 +28,7 @@ def main() -> typing.RouteReturn:
 @context.permission_only(PermissionType.read, PermissionScope.photos)
 def collection(collection_dir: str) -> typing.RouteReturn:
     """Photos collection page (list of albums)."""
-    collection = Collection.query.filter_by(dir_name=collection_dir).first()
+    collection = db.session.scalars(db.select(Collection).filter_by(dir_name=collection_dir)).first()
     if not collection:
         flask.abort(404)
 
@@ -113,7 +113,7 @@ def collection(collection_dir: str) -> typing.RouteReturn:
 @context.permission_only(PermissionType.read, PermissionScope.photos)
 def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
     """Photos album page (list of photos)."""
-    collection = Collection.query.filter_by(dir_name=collection_dir).first()
+    collection = db.session.scalars(db.select(Collection).filter_by(dir_name=collection_dir)).first()
     if not collection:
         flask.abort(404)
     album = next((a for a in collection.albums if a.dir_name == album_dir), None)
@@ -181,7 +181,7 @@ def photo(collection_dir: str, album_dir: str, photo_file: str) -> typing.RouteR
               Flask is considered invalid by Nginx. This *should* however
               never happen.
     """
-    collection = Collection.query.filter_by(dir_name=collection_dir).first()
+    collection = db.session.scalars(db.select(Collection).filter_by(dir_name=collection_dir)).first()
     if not collection:
         flask.abort(404)
     album = next((a for a in collection.albums if a.dir_name == album_dir), None)

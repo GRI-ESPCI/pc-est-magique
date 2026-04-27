@@ -25,7 +25,7 @@ def new_username(prenom: str, nom: str) -> str:
     # Construct first non-existing username
     username = base_username
     discr = 1
-    while PCeen.query.filter_by(username=username).first():
+    while db.session.scalars(db.select(PCeen).filter_by(username=username)).first():
         username = f"{base_username}{discr}"
         discr += 1
     return username

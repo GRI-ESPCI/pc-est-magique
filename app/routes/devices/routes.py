@@ -21,7 +21,7 @@ def register() -> typing.RouteReturn:
     if form.validate_on_submit():
         # Check not already registered
         mac_address = form.mac.data.lower()
-        if Device.query.filter_by(mac_address=mac_address).first():
+        if db.session.scalars(db.select(Device).filter_by(mac_address=mac_address)).first():
             flask.flash(_("Cet appareil est déjà enregistré !"), "danger")
         else:
             device = Device(
@@ -88,7 +88,7 @@ def transfer() -> typing.RouteReturn:
     form = forms.DeviceTransferForm()
     if form.validate_on_submit():
         # Check not already registered
-        device = Device.query.filter_by(mac_address=form.mac.data).first()
+        device = db.session.scalars(db.select(Device).filter_by(mac_address=form.mac.data)).first()
         if not device:
             flask.flash(_("Cet appareil n'est pas encore enregistré !"), "danger")
         elif device.pceen == context.g.pceen:
@@ -117,7 +117,7 @@ def transfer() -> typing.RouteReturn:
             return helpers.redirect_to_next()
 
     mac = flask.request.args.get("mac", "")
-    device = Device.query.filter_by(mac_address=mac).first()
+    device = db.session.scalars(db.select(Device).filter_by(mac_address=mac)).first()
     if (not device) or (device.pceen == context.g.pceen):
         # Block accessing this form to transfer a non-existing device
         return helpers.redirect_to_next()

@@ -89,8 +89,8 @@ def login() -> typing.RouteReturn:
     if form.validate_on_submit():
         # Check user / password
         pceen: PCeen = (
-            PCeen.query.filter_by(username=form.login.data).one_or_none()
-            or PCeen.query.filter_by(email=form.login.data).one_or_none()
+            db.session.scalars(db.select(PCeen).filter_by(username=form.login.data)).one_or_none()
+            or db.session.scalars(db.select(PCeen).filter_by(email=form.login.data)).one_or_none()
         )
         if pceen is None:
             flask.flash(_("Utilisateur inconnu"), "danger")
@@ -104,7 +104,7 @@ def login() -> typing.RouteReturn:
                 db.session.commit()
             
             if flask.session.pop("link_rezident_role", None):
-                rezident_role = Role.query.filter_by(name="Rezident").one()
+                rezident_role = db.session.scalars(db.select(Role).filter_by(name="Rezident")).one()
                 if rezident_role in pceen.roles:
                     flask.flash(_("Ce compte possède déjà le rôle Rezident."), "danger")
                 else:
@@ -141,7 +141,7 @@ def reset_password_request() -> typing.RouteReturn:
 
     form = forms.ResetPasswordRequestForm()
     if form.validate_on_submit():
-        pceen = PCeen.query.filter_by(email=form.email.data).first()
+        pceen = db.session.scalars(db.select(PCeen).filter_by(email=form.email.data)).first()
         if pceen:
             email.send_password_reset_email(pceen)
         flask.flash(
