@@ -94,3 +94,8 @@ class Config:
         NETLOCS = NETLOCS.split(";")
 
     MAINTENANCE = bool(os.environ.get("MAINTENANCE"))
+    
+    GRI_IBAN = os.environ.get("GRI_IBAN")
+    GRI_BIC = os.environ.get("GRI_BIC")
+    CLUB_Q_IBAN = os.environ.get("CLUB_Q_IBAN")
+    CLUB_Q_BIC = os.environ.get("CLUB_Q_BIC")
