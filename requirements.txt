@@ -45,3 +45,5 @@ watchdog>=6.0,<7
 dominate>=2.9,<3
 jours-feries-france>=0.7,<1
 plum-py>=0.8,<1
+gunicorn>=23.0,<24
+psycopg2-binary>=2.9,<3

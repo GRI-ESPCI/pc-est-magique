@@ -329,22 +329,23 @@ def spectacles() -> typing.RouteReturn:
     saison = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id)).one()
     salles = db.session.scalars(db.select(ClubQSalle)).all()
 
-    spectacles = db.select(ClubQSpectacle).filter_by(_season_id=season_id).order_by(ClubQSpectacle.date)
+    spectacles_stmt = db.select(ClubQSpectacle).filter_by(_season_id=season_id).order_by(ClubQSpectacle.date)
     voeux = db.select(ClubQVoeu).filter_by(_season_id=season_id)
 
-    spect_sum_places = spectacles_sum_places(spectacles)
-    spect_sum_places_demandees = spectacles_sum_places_demandees(spectacles)
-    spect_sum_places_attribuees = spectacles_sum_places_attribuees(spectacles)
+    spectacles_list = db.session.scalars(spectacles_stmt).all()
+
+    spect_sum_places = spectacles_sum_places(spectacles_list)
+    spect_sum_places_demandees = spectacles_sum_places_demandees(spectacles_list)
+    spect_sum_places_attribuees = spectacles_sum_places_attribuees(spectacles_list)
 
     spect_nb_voeux = []
 
-    for spectacle in spectacles:
+    for spectacle in spectacles_list:
         spect_sum_voeux = sum_object(spectacle, voeux)
         spect_nb_voeux.append(spect_sum_voeux)
 
     redirect = flask.url_for("club_q.spectacles", season_id=season_id)
-
-    if db.session.scalar(db.select(sqlalchemy.func.count()).select_from(spectacles.subquery())) > 0:
+    if len(spectacles_list) > 0:
         salle = salles[0]
     else:
         salle = None
@@ -358,7 +359,7 @@ def spectacles() -> typing.RouteReturn:
     return flask.render_template(
         "club_q/spectacles.html",
         view="spectacles",
-        spectacles=db.session.scalars(spectacles).all(),
+        spectacles=spectacles_list,       # <-- Le template reçoit la liste itérable
         season_id=int(season_id),
         saisons=saisons,
         redirect="club_q.spectacles",
@@ -368,11 +369,10 @@ def spectacles() -> typing.RouteReturn:
         spect_sum_places_demandees=spect_sum_places_demandees,
         spect_sum_places_attribuees=spect_sum_places_attribuees,
         spect_nb_voeux=spect_nb_voeux,
-        nb_spectacles=sum_object(saison, spectacles),
-        size=range(db.session.scalar(db.select(sqlalchemy.func.count()).select_from(spectacles.subquery()))),
+        nb_spectacles=sum_object(saison, spectacles_stmt),  # <-- sum_object reçoit la requête SQL
+        size=range(len(spectacles_list)), # <-- range sur la longueur de la liste
         total_nb_voeux=sum(spect_nb_voeux),
     )
-
 
 @bp.route("/spectacles/<int:id>/export_pdfs", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.club_q)
@@ -466,7 +466,7 @@ def salles() -> typing.RouteReturn:
     if season_id == None:
         # season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value  # ID of the season to show
         season_id = -1
-        salles = db.select(ClubQSalle).order_by(ClubQSalle.nom)
+        salles = db.session.scalars(db.select(ClubQSalle).order_by(ClubQSalle.nom)).all()
 
     else:
         subquery = (
@@ -534,8 +534,8 @@ def salles() -> typing.RouteReturn:
     return flask.render_template(
         "club_q/salles.html",
         view="salles",
-        salles=db.session.scalars(salles).all(),
-        size=range(db.session.scalar(db.select(sqlalchemy.func.count()).select_from(salles.subquery()))),
+        salles=salles,
+        size=range(len(salles)),
         season_id=int(season_id),
         saisons=saisons,
         redirect="club_q.salles",
@@ -555,11 +555,11 @@ def voeux() -> typing.RouteReturn:
 
     saisons = db.session.scalars(db.select(ClubQSeason).order_by(desc(ClubQSeason.debut))).all()
     spectacles = db.session.scalars(db.select(ClubQSpectacle).filter_by(_season_id=season_id).order_by(ClubQSpectacle.date)).all()
-    pceens = (
+    pceens = db.session.scalars(
         db.select(PCeen).join(PCeen.roles)
         .join(Role.permissions)
         .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q)
-    )
+    ).all()
     voeux = db.session.scalars(db.select(ClubQVoeu).filter_by(_season_id=season_id).order_by(ClubQVoeu.id)).all()
 
     redirect = flask.url_for("club_q.voeux", season_id=season_id)
@@ -594,7 +594,7 @@ def voeux() -> typing.RouteReturn:
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
 def saisons() -> typing.RouteReturn:
 
-    saisons = db.select(ClubQSeason).order_by(desc(ClubQSeason.debut))
+    saisons = db.session.scalars(db.select(ClubQSeason).order_by(desc(ClubQSeason.debut))).all()
     spectacles = db.select(ClubQSpectacle).order_by(ClubQSpectacle.date)
     voeux = db.select(ClubQVoeu)
 
@@ -662,14 +662,14 @@ def saisons() -> typing.RouteReturn:
 
     return flask.render_template(
         "club_q/saisons.html",
-        saisons=db.session.scalars(saisons).all(),
+        saisons=saisons,
         view="saisons",
         user=context.g.pceen,
         form_saison=form_saison,
         saison_nb_pceens=saison_nb_pceens,
         saison_nb_voeux=saison_nb_voeux,
         saison_nb_spectacles=saison_nb_spectacles,
-        size=range(db.session.scalar(db.select(sqlalchemy.func.count()).select_from(saisons.subquery()))),
+        size=range(len(saisons)),
     )
 
 
@@ -957,7 +957,7 @@ def pceen_id(id: int):
         title=_("Récapitulatif - ") + pceen.full_name,
         view=view,
         spectacles=spectacles,
-        voeux=voeux,
+        voeux=db.session.scalars(voeux).all(),
         season_id=int(season_id),
         saisons=saisons,
         pceen=pceen,
