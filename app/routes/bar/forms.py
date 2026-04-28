@@ -64,6 +64,8 @@ class GlobalSettingsForm(FlaskForm):
     """Global settings form."""
 
     max_daily_alcoholic_drinks_per_user = IntegerField("", validators=[DataRequired(), NumberRange(min=0)])
+    bar_recharge_min = DecimalField(_l("Rechargement min (€)"), validators=[DataRequired(), NumberRange(min=0.01)])
+    bar_recharge_max = DecimalField(_l("Rechargement max (€)"), validators=[DataRequired(), NumberRange(min=0.01)])
     background_image = FileField("", validators=[Optional()])
     delete_background_image = BooleanField(_l("Supprimer l'image actuelle"))
 

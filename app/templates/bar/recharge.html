@@ -1,0 +1,76 @@
+{% extends "bar/base.html" %}
+
+{% block bar_app_content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+            <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                <h3 class="fw-bold text-primary mb-1">
+                    {{ _("Recharger mon compte Bar") }}
+                </h3>
+                <p class="text-muted small mb-0">{{ _("Paiement sécurisé via Lydia") }}</p>
+            </div>
+            
+            <div class="card-body p-4">
+                <p class="mb-4 text-body">
+                    {{ _("Vous pouvez recharger votre compte bar instantanément par Lydia. "
+                          "Alternativement, vous pouvez vous rendre directement au bar pour "
+                          "effectuer un rechargement en espèces ou pour des montants spécifiques.") }}
+                </p>
+
+                <form action="{{ url_for('bar.recharge') }}" method="POST">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-uppercase tracking-wider small text-muted mb-3">{{ _("Choisissez un montant") }}</label>
+                        <div class="row g-2 mb-3">
+                            {% for amount in [5, 10, 20, 50] %}
+                            <div class="col-6 col-sm-3">
+                                <input type="radio" class="btn-check" name="amount_preset" id="amt-{{ amount }}" value="{{ amount }}" 
+                                       onclick="document.getElementById('amount').value = '{{ amount }}.00';">
+                                <label class="btn btn-outline-primary w-100 py-3 fw-bold rounded-3" for="amt-{{ amount }}">{{ amount }}€</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input type="number" step="0.01" min="{{ min_recharge }}" max="{{ max_recharge }}" 
+                                   class="form-control rounded-3 fw-bold fs-4 text-body" id="amount" name="amount" 
+                                   placeholder="0.00" required value="10.00">
+                            <label for="amount" class="text-muted">{{ _("Montant personnalisé (€)") }}</label>
+                            <div class="form-text">
+                                {{ _("Entre %(min)s€ et %(max)s€", min=min_recharge, max=max_recharge) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-uppercase tracking-wider small text-muted mb-2">{{ _("Numéro Lydia (optionnel)") }}</label>
+                        <div class="form-floating">
+                            <input type="tel" class="form-control rounded-3 text-body" id="phone" name="phone" placeholder="06 12 34 56 78">
+                            <label for="phone" class="text-muted">{{ _("Numéro de téléphone") }}</label>
+                            <div class="form-text">
+                                {{ _("Si vide, vous serez redirigé vers une page de paiement par carte bancaire.") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                            <svg class="bi" width="20" height="20" fill="currentColor">
+                                {{ macros.bootstrap_icon("credit-card-2-front-fill") }}
+                            </svg>
+                            {{ _("Procéder au paiement") }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="text-center">
+            <a href="{{ url_for('bar.me') }}" class="btn btn-link text-decoration-none text-muted small">
+                <svg class="bi me-1" width="14" height="14" fill="currentColor">{{ macros.bootstrap_icon("arrow-left") }}</svg>
+                {{ _("Retour à mon profil") }}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

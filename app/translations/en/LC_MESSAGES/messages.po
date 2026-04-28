@@ -8,51 +8,51 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2025-05-04 21:11+0200\n"
+"POT-Creation-Date: 2026-04-28 15:41+0200\n"
 "PO-Revision-Date: 2022-10-29 03:04+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.18.0\n"
 
-#: app/context.py:113
+#: app/context.py:116
 msgid "Le site est en mode maintenance : seuls les GRI peuvent y accéder."
 msgstr "The site is under maintenance: only GRI can access it."
 
-#: app/context.py:295 app/context.py:321 app/context.py:356
+#: app/context.py:298 app/context.py:324 app/context.py:359
 msgid "Veuillez vous authentifier pour accéder à cette page."
 msgstr "Please log in to access to this page."
 
-#: app/routes/api/routes/bar.py:35
+#: app/routes/api/routes/bar.py:36
 #, python-format
 msgid "La caution de %(name)s a bien été acceptée"
 msgstr "%(name)s's deposit has been approved"
 
-#: app/routes/api/routes/bar.py:65
+#: app/routes/api/routes/bar.py:66
 #, python-format
 msgid "La transaction #%(transaction_id)s a bien été annulée."
 msgstr "The transaction #%(transaction_id)s has been reverted."
 
-#: app/routes/api/routes/bar.py:81
+#: app/routes/api/routes/bar.py:82
 #, python-format
 msgid "Article %(item)s mis en accès rapide."
 msgstr "Item %(item)s set as quick access."
 
-#: app/routes/api/routes/bar.py:98
+#: app/routes/api/routes/bar.py:99
 #, python-format
 msgid "Article %(item)s supprimé."
 msgstr "Item %(item)s deleted."
 
-#: app/routes/api/routes/bar.py:126
+#: app/routes/api/routes/bar.py:127
 #, python-format
 msgid "%(amount)s ajoutés au solde de %(name)s"
 msgstr "%(amount)s added to %(name)s's balance"
 
-#: app/routes/api/routes/bar.py:159
+#: app/routes/api/routes/bar.py:160
 #, python-format
 msgid "Achat validé : %(item)s (%(amount)s). Annuler :"
 msgstr "Purchase validated: %(item)s (%(amount)s). Revert:"
@@ -73,97 +73,86 @@ msgstr "This photo is now the album's thumbnail."
 msgid "Photo définitivement supprimée."
 msgstr "Photo deleted definitively."
 
-#: app/routes/auth/email.py:17 app/routes/auth/routes.py:48
-msgid "Un compte avec ces informations existe déjà. Veuillez vous connecter pour finaliser la création du compte Rezident."
-msgstr "Account already exists. Please sign in to finalize the creation of the Rezident account."
-
-#: app/routes/auth/email.py:17 app/routes/auth/routes.py:70
-#: app/routes/auth/saml/routes.py:176
+#: app/routes/auth/email.py:17 app/routes/auth/routes.py:74
+#: app/routes/auth/saml/routes.py:215
 msgid "Compte créé avec succès !"
 msgstr "Account successfully created!"
-
-#: app/routes/auth/email.py:17 app/routes/auth/routes.py:105
-msgid "Ce compte possède déjà le rôle Rezident."
-msgstr "This accound already has the Rezident role assigned."
-
-#: app/routes/auth/email.py:17 app/routes/auth/routes.py:109
-msgid "Le rôle Rezident vous a été ajouté."
-msgstr "You have been given the Rezident role."
 
 #: app/routes/auth/email.py:38 app/templates/auth/mails/reset_password.html:7
 msgid "Réinitialisation du mot de passe"
 msgstr "Password reset"
 
-#: app/routes/auth/forms.py:21
+#: app/routes/auth/forms.py:20
 msgid "Nom d'utilisateur / Adresse e-mail"
 msgstr "Username / Mail address"
 
-#: app/routes/auth/forms.py:22 app/routes/auth/forms.py:37
+#: app/routes/auth/forms.py:21 app/routes/auth/forms.py:36
 msgid "Mot de passe"
 msgstr "Password"
 
-#: app/routes/auth/forms.py:23
+#: app/routes/auth/forms.py:22
 msgid "Rester connecté"
 msgstr "Remember me"
 
-#: app/routes/auth/forms.py:24 app/routes/auth/routes.py:87
+#: app/routes/auth/forms.py:23 app/routes/auth/routes.py:119
 #: app/templates/auth/auth_needed.html:17 app/templates/auth/register.html:60
 #: app/templates/auth/register_rezident.html:41
 #: app/templates/auth/reset_password.html:29
 #: app/templates/auth/reset_password_request.html:26
-#: app/templates/bar/welcome.html:48 app/templates/navbar.html:34
+#: app/templates/bar/welcome.html:48 app/templates/navbar.html:52
 msgid "Connexion"
 msgstr "Sign in"
 
-#: app/routes/auth/forms.py:30 app/routes/bar/forms.py:35
-#: app/routes/bar/forms.py:36 app/routes/main/forms.py:15
-#: app/routes/panier_bio/forms.py:31 app/routes/profile/forms.py:14
-#: app/templates/bar/items.html:110 app/templates/cards/account.html:18
+#: app/routes/auth/forms.py:29 app/routes/bar/forms.py:35
+#: app/routes/bar/forms.py:36 app/routes/main/forms.py:14
+#: app/routes/panier_bio/forms.py:29 app/routes/profile/forms.py:13
+#: app/templates/bar/items.html:109 app/templates/cards/account.html:18
 #: app/templates/cards/device.html:87 app/templates/cards/device_modal.html:15
 #: app/templates/cards/offer.html:14 app/templates/club_q/pceens.html:43
-#: app/templates/club_q/saisons.html:68 app/templates/gris/pceens.html:79
-#: app/templates/panier_bio/admin.html:140 app/templates/theatre/admin.html:33
-#: app/templates/theatre/admin_saison.html:120
+#: app/templates/club_q/saisons.html:55 app/templates/gris/pceens.html:79
+#: app/templates/panier_bio/admin.html:127 app/templates/theatre/admin.html:38
+#: app/templates/theatre/admin_saison.html:132
 msgid "Nom"
 msgstr "Name"
 
-#: app/routes/auth/forms.py:31 app/routes/panier_bio/forms.py:32
-#: app/routes/profile/forms.py:15 app/templates/cards/account.html:22
+#: app/routes/auth/forms.py:30 app/routes/panier_bio/forms.py:30
+#: app/routes/profile/forms.py:14 app/templates/cards/account.html:22
 msgid "Prénom"
 msgstr "First name"
 
-#: app/routes/auth/forms.py:32 app/routes/profile/forms.py:16
-#: app/templates/bar/user.html:144 app/templates/cards/account.html:26
+#: app/routes/auth/forms.py:31 app/routes/profile/forms.py:15
+#: app/templates/bar/user.html:137 app/templates/bar/user.html:410
+#: app/templates/cards/account.html:26
 msgid "Promotion"
 msgstr "Promotion"
 
-#: app/routes/auth/forms.py:34 app/routes/auth/forms.py:48
-#: app/routes/profile/forms.py:18 app/templates/gris/pceens.html:99
+#: app/routes/auth/forms.py:33 app/routes/auth/forms.py:47
+#: app/routes/profile/forms.py:17 app/templates/gris/pceens.html:99
 msgid "Adresse e-mail"
 msgstr "Mail address"
 
-#: app/routes/auth/forms.py:39
+#: app/routes/auth/forms.py:38
 msgid "Mot de passe (validation)"
 msgstr "Password (validation)"
 
-#: app/routes/auth/forms.py:42
+#: app/routes/auth/forms.py:41
 msgid "Créer mon compte"
 msgstr "Sign up"
 
-#: app/routes/auth/forms.py:49
+#: app/routes/auth/forms.py:48
 msgid "Envoyer le mail de réinitialisation"
 msgstr "Send reset mail"
 
-#: app/routes/auth/forms.py:55 app/routes/auth/routes.py:148
-#: app/routes/profile/forms.py:28
+#: app/routes/auth/forms.py:54 app/routes/auth/routes.py:180
+#: app/routes/profile/forms.py:27
 msgid "Nouveau mot de passe"
 msgstr "New password"
 
-#: app/routes/auth/forms.py:57 app/routes/profile/forms.py:30
+#: app/routes/auth/forms.py:56 app/routes/profile/forms.py:29
 msgid "Nouveau mot de passe (validation)"
 msgstr "New password (validation)"
 
-#: app/routes/auth/forms.py:60 app/routes/bar/forms.py:29
+#: app/routes/auth/forms.py:59 app/routes/bar/forms.py:29
 #: app/routes/bar/forms.py:45
 #: app/templates/theatre/admin_representation_new.html:43
 #: app/templates/theatre/admin_saison_edit.html:50
@@ -181,29 +170,49 @@ msgstr "Connection needed"
 msgid "Nouveau compte"
 msgstr "New account"
 
-#: app/routes/auth/routes.py:58
+#: app/routes/auth/routes.py:41
+msgid "Veuillez renseigner votre nom et prénom pour l'inscription."
+msgstr "Please provide your first and last name to register."
+
+#: app/routes/auth/routes.py:52
+msgid ""
+"Un compte avec ces informations existe déjà. Veuillez vous connecter pour"
+" finaliser la création du compte Rezident."
+msgstr ""
+"Account already exists. Please sign in to finalize the creation of the "
+"Rezident account."
+
+#: app/routes/auth/routes.py:79
 msgid "Nouveau compte Rezident"
 msgstr "New Rezident account"
 
-#: app/routes/auth/routes.py:75
+#: app/routes/auth/routes.py:96
 #, fuzzy
 msgid "Utilisateur inconnu"
 msgstr "Unknown username"
 
-#: app/routes/auth/routes.py:77
+#: app/routes/auth/routes.py:98
 msgid "Mot de passe incorrect"
 msgstr "Wrong password"
 
-#: app/routes/auth/routes.py:84 app/routes/auth/saml/routes.py:168
+#: app/routes/auth/routes.py:109
+msgid "Ce compte possède déjà le rôle Rezident."
+msgstr "This accound already has the Rezident role assigned."
+
+#: app/routes/auth/routes.py:113
+msgid "Le rôle Rezident vous a été ajouté."
+msgstr "You have been given the Rezident role."
+
+#: app/routes/auth/routes.py:115 app/routes/auth/saml/routes.py:207
 #: app/templates/main/connect_check.html:54
 msgid "Connecté !"
 msgstr "Connected!"
 
-#: app/routes/auth/routes.py:99
+#: app/routes/auth/routes.py:131
 msgid "Vous avez été déconnecté."
 msgstr "You have been signed out."
 
-#: app/routes/auth/routes.py:116
+#: app/routes/auth/routes.py:149
 msgid ""
 "Un email a été envoyé avec les instructions pour réinitialiser le mot de "
 "passe. Pensez à vérifier vos spams."
@@ -211,30 +220,30 @@ msgstr ""
 "An email has been send with password reset instructions. Please check "
 "your spams."
 
-#: app/routes/auth/routes.py:125
+#: app/routes/auth/routes.py:157
 msgid "Mot de passe oublié"
 msgstr "Password Lost"
 
-#: app/routes/auth/routes.py:132
+#: app/routes/auth/routes.py:164
 msgid "Ce lien n'est pas utilisable en étant authentifié."
 msgstr "This link cannot be used by an authenticated user."
 
-#: app/routes/auth/routes.py:137
+#: app/routes/auth/routes.py:169
 msgid "Lien de réinitialisation invalide ou expiré."
 msgstr "Reset link invalid or expired."
 
-#: app/routes/auth/routes.py:145
+#: app/routes/auth/routes.py:177
 msgid "Le mot de passe a été réinitialisé avec succès."
 msgstr "Your password has been successfully reset."
 
-#: app/routes/auth/saml/routes.py:153
+#: app/routes/auth/saml/routes.py:172
 #, python-format
 msgid ""
 "L'authentification SSO a échoué (%(exc)s). Merci de réessayer "
 "ultérieurement."
 msgstr "SSO authentication failed (%(exc)s). Please try again later."
 
-#: app/routes/auth/saml/routes.py:181
+#: app/routes/auth/saml/routes.py:221
 #, python-format
 msgid ""
 "Le compte %(mail)s n'a pas les droits requis pour accéder à ce site. "
@@ -243,7 +252,7 @@ msgstr ""
 "Account %(mail)s does not have required rights to access this "
 "site.Registration is restricted to students for now."
 
-#: app/routes/auth/saml/utils.py:69
+#: app/routes/auth/saml/utils.py:74
 #, python-format
 msgid ""
 "Compte mis à jour depuis les infos ESPCI (prénom : %(prenom)s, nom : "
@@ -257,7 +266,8 @@ msgid "Surnom"
 msgstr "Nickname"
 
 #: app/routes/bar/forms.py:26 app/templates/bar/transactions.html:37
-#: app/templates/bar/user.html:129 app/templates/bar/user.html:197
+#: app/templates/bar/user.html:113 app/templates/bar/user.html:199
+#: app/templates/bar/user.html:395 app/templates/bar/user.html:462
 msgid "Barman / barmaid"
 msgstr "Barman/barmaid"
 
@@ -265,7 +275,7 @@ msgstr "Barman/barmaid"
 msgid "Quantifiable"
 msgstr "Quantifiable"
 
-#: app/routes/bar/forms.py:38 app/templates/bar/items.html:111
+#: app/routes/bar/forms.py:38 app/templates/bar/items.html:110
 msgid "Quantité"
 msgstr "Quantity"
 
@@ -273,7 +283,7 @@ msgstr "Quantity"
 msgid "Prix (€)"
 msgstr ""
 
-#: app/routes/bar/forms.py:40 app/templates/bar/items.html:113
+#: app/routes/bar/forms.py:40 app/templates/bar/items.html:112
 msgid "Alcoolisé"
 msgstr "Alcoholic"
 
@@ -294,7 +304,7 @@ msgstr "Priority in items list"
 msgid "Doit être postérieur à la date de début !"
 msgstr "Must be posterior to start date!"
 
-#: app/routes/bar/forms.py:59 app/routes/photos/forms.py:16
+#: app/routes/bar/forms.py:59 app/routes/photos/forms.py:15
 msgid "Nom du fichier"
 msgstr "File name"
 
@@ -302,84 +312,92 @@ msgstr "File name"
 msgid "Télécharger"
 msgstr "Download"
 
+#: app/routes/bar/forms.py:67
+msgid "Rechargement min (€)"
+msgstr "Min recharge (€)"
+
 #: app/routes/bar/forms.py:68
+msgid "Rechargement max (€)"
+msgstr "Max recharge (€)"
+
+#: app/routes/bar/forms.py:70
 msgid "Supprimer l'image actuelle"
 msgstr "Delete current image"
 
-#: app/routes/bar/forms.py:70 app/templates/theatre/admin_saison.html:97
-#: app/templates/theatre/admin_spectacle.html:100
+#: app/routes/bar/forms.py:72 app/templates/theatre/admin_saison.html:99
+#: app/templates/theatre/admin_spectacle.html:100 app/templates/wysiwyg.html:23
 msgid "Sauvegarder"
 msgstr "Save"
 
-#: app/routes/bar/routes.py:113
+#: app/routes/bar/routes.py:128
 msgid "Stats – Bar"
 msgstr "Stats – Bar"
 
-#: app/routes/bar/routes.py:167
+#: app/routes/bar/routes.py:182
 msgid "Recherche – Bar"
 msgstr "Search – Bar"
 
-#: app/routes/bar/routes.py:209
+#: app/routes/bar/routes.py:224
 #, python-format
 msgid "Le surnom de %(name)s a bien été modifié"
 msgstr "%(name)s's nickname has been modified"
 
-#: app/routes/bar/routes.py:216
+#: app/routes/bar/routes.py:231
 #, python-format
 msgid "%(name)s n'est maintenant plus barman / barmaid"
 msgstr "%(name)s is no longer barman / barmaid"
 
-#: app/routes/bar/routes.py:221
+#: app/routes/bar/routes.py:236
 #, python-format
 msgid "%(name)s est maintenant barmaid / barmaid"
 msgstr "%(name)s is now barman / barmaid"
 
-#: app/routes/bar/routes.py:227
+#: app/routes/bar/routes.py:242
 #, python-format
 msgid "Erreur lors de la transformation de la photo : %(exc)s"
 msgstr "Error during picture transformation: %(exc)s"
 
-#: app/routes/bar/routes.py:229
+#: app/routes/bar/routes.py:244
 #, python-format
 msgid "L'avatar de %(name)s a bien été modifié"
 msgstr "%(name)s's avatar has been modified"
 
-#: app/routes/bar/routes.py:254
+#: app/routes/bar/routes.py:274
 #, python-format
 msgid "%(name)s – Profil Bar"
 msgstr "%(name)s – Bar Profile"
 
-#: app/routes/bar/routes.py:280
+#: app/routes/bar/routes.py:301
 msgid "Transactions – Bar"
 msgstr "Transactions – Bar"
 
-#: app/routes/bar/routes.py:303
+#: app/routes/bar/routes.py:324
 #, python-format
 msgid "Article %(item)s modifié."
 msgstr "Item %(item)s edited."
 
-#: app/routes/bar/routes.py:315
+#: app/routes/bar/routes.py:336
 #, python-format
 msgid "Article %(item)s créé."
 msgstr "Item %(item)s created."
 
-#: app/routes/bar/routes.py:344
+#: app/routes/bar/routes.py:365
 msgid "Articles – Bar"
 msgstr "Items – Bar"
 
-#: app/routes/bar/routes.py:399
+#: app/routes/bar/routes.py:420
 msgid "Export de données – Bar"
 msgstr "Data export – Bar"
 
-#: app/routes/bar/routes.py:420
+#: app/routes/bar/routes.py:445
 msgid "Paramètres mis à jour."
 msgstr "Settings updated."
 
-#: app/routes/bar/routes.py:424
+#: app/routes/bar/routes.py:449
 msgid "Paramètres – Bar"
 msgstr "Settings – Bar"
 
-#: app/routes/bar/routes.py:436
+#: app/routes/bar/routes.py:463
 msgid ""
 "Bonjour, camarade ! Ton compte du Bar a été migré dans ton compte PC est "
 "magique. Profite bien !"
@@ -387,7 +405,7 @@ msgstr ""
 "Hello, comrade! Your Bar account has been migrated into your PC est "
 "magique account. Enjoy!"
 
-#: app/routes/bar/routes.py:442
+#: app/routes/bar/routes.py:470
 msgid ""
 "Les comptes du Bar ont été migrés dans PC est magique. En revanche, pas "
 "de trace du tien... Pas de panique, il n'est pas perdu ! Contacte "
@@ -396,26 +414,76 @@ msgstr ""
 "Bar accounts have been migrated into PC est magique. However, no trace of"
 " yours... No need to panic, it is not lost! Simply contact a GRI."
 
-#: app/routes/bar/routes.py:450
+#: app/routes/bar/routes.py:477
 msgid "Migration du site du Bar"
 msgstr "Bar site migration"
 
-#: app/routes/bar/utils.py:32
+#: app/routes/bar/routes.py:487
+msgid "Veuillez choisir un montant."
+msgstr "Please choose an amount."
+
+#: app/routes/bar/routes.py:493
+#, fuzzy
+msgid "Montant invalide."
+msgstr "Invalid Ban ID."
+
+#: app/routes/bar/routes.py:500
+#, fuzzy, python-format
+msgid "Le montant doit être compris entre %(min)s€ et %(max)s€."
+msgstr "The amount must be between %(min)s€ and %(max)s€."
+
+#: app/routes/bar/routes.py:521
+#, fuzzy, python-format
+msgid "Rechargement compte Bar de %(name)s"
+msgstr "Bar account top-up for %(name)s"
+
+#: app/routes/bar/routes.py:530
+msgid ""
+"Le service de paiement Lydia n'est pas encore configuré pour le Bar. "
+"Veuillez vous rendre directement au Bar pour recharger."
+msgstr ""
+"The Lydia payment service is not yet configured for the Bar. "
+"Please go directly to the Bar to top up."
+
+#: app/routes/bar/routes.py:538 app/templates/bar/recharge.html:9
+msgid "Recharger mon compte Bar"
+msgstr "Top up my Bar account"
+
+#: app/routes/bar/routes.py:647 app/routes/bar/routes.py:674
+#, python-format
+msgid "Compte bar rechargé de %(amount)s€ !"
+msgstr ""
+
+#: app/routes/bar/routes.py:649
+#, fuzzy
+msgid "Pas de rechargement en cours détecté."
+msgstr "No payment detected"
+
+#: app/routes/bar/routes.py:676
+#, fuzzy
+msgid "Paiement en attente de validation."
+msgstr "Payment pending, try again"
+
+#: app/routes/bar/routes.py:684
+msgid "Le rechargement a été annulé ou a échoué."
+msgstr ""
+
+#: app/routes/bar/utils.py:33
 #, python-format
 msgid "%(pceen)s n'a pas fourni de caution."
 msgstr "%(pceen)s hasn't given a deposit."
 
-#: app/routes/bar/utils.py:45
+#: app/routes/bar/utils.py:47
 #, python-format
 msgid "%(pceen)s a atteint la limite de %(limit)s boissons alcoolisées par jour."
 msgstr "%(pceen)s has reached the limit of %(limit)s alcohol drinks per night."
 
-#: app/routes/bar/utils.py:60
+#: app/routes/bar/utils.py:61
 #, python-format
 msgid "Article %(item)s épuisé."
 msgstr "No %(item)s left."
 
-#: app/routes/bar/utils.py:76
+#: app/routes/bar/utils.py:77
 #, python-format
 msgid "%(pceen)s n'a pas assez d'argent pour acheter %(item)s."
 msgstr "%(pceen)s doesn't have enough funds to buy %(item)s."
@@ -440,54 +508,62 @@ msgstr "Item out of stock (can be modified on Items page)"
 msgid "IP non détectable, impossible d'afficher les avatars"
 msgstr "Unable to detect your IP, the avatars can't be shown"
 
-#: app/routes/bekk/forms.py:16
+#: app/routes/bekk/forms.py:15
 msgid "Nom du Bekk"
 msgstr "Name of Bekk"
 
-#: app/routes/bekk/forms.py:17 app/templates/cards/bekk_accueil.html:18
-#: app/templates/club_q/pceens.html:61 app/templates/gris/pceens.html:89
+#: app/routes/bekk/forms.py:16 app/templates/cards/bekk_accueil.html:17
+#: app/templates/club_q/attribution.html:23 app/templates/club_q/pceens.html:61
+#: app/templates/gris/pceens.html:89
 msgid "Promo"
 msgstr "Grad class"
 
-#: app/routes/bekk/forms.py:18 app/templates/bar/transactions.html:41
-#: app/templates/bar/user.html:201 app/templates/club_q/id/salle.html:149
-#: app/templates/club_q/main.html:220 app/templates/club_q/spectacles.html:122
-#: app/templates/panier_bio/admin.html:149
-#: app/templates/panier_bio/main.html:173
+#: app/routes/bekk/forms.py:17 app/templates/bar/transactions.html:41
+#: app/templates/bar/user.html:198 app/templates/bar/user.html:466
+#: app/templates/club_q/id/salle.html:136 app/templates/club_q/main.html:220
+#: app/templates/club_q/spectacles.html:109
+#: app/templates/panier_bio/admin.html:136
+#: app/templates/panier_bio/main.html:176
 msgid "Date"
 msgstr "Date"
 
-#: app/routes/bekk/forms.py:20 app/routes/club_q/forms.py:46
-#: app/routes/club_q/forms.py:67 app/routes/club_q/forms.py:80
-#: app/routes/club_q/forms.py:95 app/routes/club_q/forms.py:126
-#: app/templates/gris/roles.html:203
+#: app/routes/bekk/forms.py:19 app/routes/club_q/forms.py:45
+#: app/routes/club_q/forms.py:66 app/routes/club_q/forms.py:79
+#: app/routes/club_q/forms.py:94 app/routes/club_q/forms.py:125
+#: app/templates/bekk/main.html:61 app/templates/club_q/brochures.html:41
+#: app/templates/club_q/id/pceen.html:50 app/templates/club_q/id/salle.html:47
+#: app/templates/club_q/id/spectacle.html:57
+#: app/templates/club_q/saisons.html:22 app/templates/club_q/salles.html:21
+#: app/templates/club_q/spectacles.html:20 app/templates/club_q/voeux.html:22
+#: app/templates/gris/roles.html:203 app/templates/panier_bio/admin.html:105
+#: app/templates/panier_bio/period.html:60
 msgid "Ajouter"
 msgstr "Add"
 
-#: app/routes/bekk/forms.py:21 app/routes/club_q/forms.py:55
-#: app/routes/club_q/forms.py:68 app/routes/club_q/forms.py:81
-#: app/routes/club_q/forms.py:96 app/routes/club_q/forms.py:103
-#: app/routes/panier_bio/forms.py:51 app/routes/panier_bio/forms.py:66
-#: app/routes/rooms/forms.py:25 app/templates/bar/items.html:115
-#: app/templates/bar/user.html:299 app/templates/photos/album.html:212
+#: app/routes/bekk/forms.py:20 app/routes/club_q/forms.py:54
+#: app/routes/club_q/forms.py:67 app/routes/club_q/forms.py:80
+#: app/routes/club_q/forms.py:95 app/routes/club_q/forms.py:102
+#: app/routes/panier_bio/forms.py:49 app/routes/panier_bio/forms.py:64
+#: app/routes/rooms/forms.py:24 app/templates/bar/items.html:114
+#: app/templates/bar/user.html:564 app/templates/photos/album.html:212
 #: app/templates/photos/collection.html:180 app/templates/photos/main.html:57
 #: app/templates/rooms/register.html:106
-#: app/templates/theatre/admin_saison.html:54
-#: app/templates/theatre/admin_spectacle.html:57
+#: app/templates/theatre/admin_saison.html:59
+#: app/templates/theatre/admin_spectacle.html:57 app/templates/wysiwyg.html:9
 msgid "Modifier"
 msgstr "Edit"
 
-#: app/routes/bekk/forms.py:22 app/routes/club_q/forms.py:56
-#: app/routes/club_q/forms.py:69 app/routes/club_q/forms.py:82
-#: app/routes/club_q/forms.py:97 app/routes/panier_bio/forms.py:52
-#: app/routes/panier_bio/forms.py:67 app/templates/cards/club_q.html:36
-#: app/templates/photos/album.html:226 app/templates/theatre/admin.html:76
-#: app/templates/theatre/admin_saison.html:169
+#: app/routes/bekk/forms.py:21 app/routes/club_q/forms.py:55
+#: app/routes/club_q/forms.py:68 app/routes/club_q/forms.py:81
+#: app/routes/club_q/forms.py:96 app/routes/panier_bio/forms.py:50
+#: app/routes/panier_bio/forms.py:65 app/templates/cards/club_q.html:42
+#: app/templates/photos/album.html:226 app/templates/theatre/admin.html:91
+#: app/templates/theatre/admin_saison.html:186
 #: app/templates/theatre/admin_spectacle.html:150
 msgid "Supprimer"
 msgstr "Delete"
 
-#: app/routes/bekk/routes.py:48 app/routes/club_q/routes.py:1206
+#: app/routes/bekk/routes.py:48 app/routes/club_q/routes.py:1202
 msgid "Aucun fichier choisi."
 msgstr "No choosen file"
 
@@ -510,94 +586,94 @@ msgstr "Edited Bekk."
 msgid "Page du Bekk ESPCI"
 msgstr "ESPCI Bekk newspaper"
 
-#: app/routes/bekk/routes.py:158 app/routes/club_q/routes.py:1306
-#: app/routes/panier_bio/routes.py:460 app/routes/theatre/routes.py:74
+#: app/routes/bekk/routes.py:158 app/routes/club_q/routes.py:1302
+#: app/routes/panier_bio/routes.py:484 app/routes/theatre/routes.py:74
 #, fuzzy
 msgid "Introduction mise à jour."
 msgstr "Changelog"
 
-#: app/routes/club_q/forms.py:23 app/routes/club_q/forms.py:29
-#: app/routes/club_q/forms.py:37 app/routes/panier_bio/forms.py:73
-#: app/routes/profile/forms.py:21 app/routes/profile/forms.py:33
+#: app/routes/club_q/forms.py:22 app/routes/club_q/forms.py:28
+#: app/routes/club_q/forms.py:36 app/routes/panier_bio/forms.py:71
+#: app/routes/profile/forms.py:20 app/routes/profile/forms.py:32
 msgid "Mettre à jour"
 msgstr "Update"
 
-#: app/routes/club_q/forms.py:35
+#: app/routes/club_q/forms.py:34
 msgid "Sauvegarder l'attribution"
 msgstr "Save attribution"
 
-#: app/routes/club_q/forms.py:36
+#: app/routes/club_q/forms.py:35
 #, fuzzy
 msgid "Corruption"
 msgstr "Corruption"
 
-#: app/routes/club_q/forms.py:38
+#: app/routes/club_q/forms.py:37
 msgid "Lancer l'algorithme"
 msgstr "Launch algorithm"
 
-#: app/routes/club_q/forms.py:42 app/routes/club_q/routes.py:90
-#: app/templates/bar/items.html:114 app/templates/club_q/id/pceen.html:121
-#: app/templates/club_q/id/spectacle.html:121
+#: app/routes/club_q/forms.py:41 app/routes/club_q/routes.py:91
+#: app/templates/bar/items.html:113 app/templates/club_q/id/pceen.html:102
+#: app/templates/club_q/id/spectacle.html:108
 #: app/templates/club_q/main.html:113 app/templates/club_q/main.html:256
-#: app/templates/club_q/voeux.html:104 app/templates/gris/roles.html:47
+#: app/templates/club_q/voeux.html:91 app/templates/gris/roles.html:47
 msgid "Priorité"
 msgstr "Priority"
 
-#: app/routes/club_q/forms.py:43 app/templates/club_q/pceens.html:97
+#: app/routes/club_q/forms.py:42 app/templates/club_q/pceens.html:97
 #, fuzzy
 msgid "Places demandées"
 msgstr "Places requested"
 
-#: app/routes/club_q/forms.py:44 app/templates/club_q/main.html:127
+#: app/routes/club_q/forms.py:43 app/templates/club_q/main.html:127
 #: app/templates/club_q/main.html:292
 msgid "Places minimum"
 msgstr "Minimal no. of seats"
 
-#: app/routes/club_q/forms.py:45 app/templates/club_q/pceens.html:115
+#: app/routes/club_q/forms.py:44 app/templates/club_q/pceens.html:115
 #, fuzzy
 msgid "Places attribuées"
 msgstr "Places allocated"
 
-#: app/routes/club_q/forms.py:102 app/templates/club_q/pceens.html:133
+#: app/routes/club_q/forms.py:101 app/templates/club_q/pceens.html:133
 #, fuzzy
 msgid "Mécontentement"
 msgstr "Discontent"
 
-#: app/routes/club_q/forms.py:108
+#: app/routes/club_q/forms.py:107
 #, fuzzy
 msgid "Adresse e-mail de réponse"
 msgstr "Reply-to email address"
 
-#: app/routes/club_q/forms.py:117
+#: app/routes/club_q/forms.py:116
 #, fuzzy
 msgid "Envoyer les e-mails"
 msgstr "Send e-mails"
 
-#: app/routes/club_q/forms.py:124 app/routes/club_q/routes.py:1192
+#: app/routes/club_q/forms.py:123 app/routes/club_q/routes.py:1188
 #, fuzzy
 msgid "Saison"
 msgstr "Season"
 
-#: app/routes/club_q/routes.py:100
+#: app/routes/club_q/routes.py:101
 #, fuzzy
 msgid "Nombre places demandées"
 msgstr "No. of wanted seats"
 
-#: app/routes/club_q/routes.py:110
+#: app/routes/club_q/routes.py:111
 msgid "Nombre places minimum demandées"
 msgstr "Minimal no. of seats"
 
-#: app/routes/club_q/routes.py:141
+#: app/routes/club_q/routes.py:142
 msgid "Un voeu a été défini avec une priorité mais sans un nombre de places."
 msgstr ""
 "A wish has been made with a priority but without a number of wanted "
 "places."
 
-#: app/routes/club_q/routes.py:146
+#: app/routes/club_q/routes.py:147
 msgid "Un voeu a été défini avec un nombre de places mais sans priorité."
 msgstr "A wish has been made with a number of places but without any priority."
 
-#: app/routes/club_q/routes.py:156
+#: app/routes/club_q/routes.py:158
 msgid ""
 "Un voeu a été défini avec un nombre de places minimum supérieur au nombre"
 " de places demandées."
@@ -605,66 +681,66 @@ msgstr ""
 "A wish has been made with a minimal number of places superior to the "
 "number of asked seats."
 
-#: app/routes/club_q/routes.py:170
+#: app/routes/club_q/routes.py:171
 msgid "Deux voeux ne peuvent avoir la même priorité."
 msgstr "Two wishes cannot have the same priority."
 
-#: app/routes/club_q/routes.py:177
+#: app/routes/club_q/routes.py:178
 msgid "Les priorités doivent être croissantes de 1 en 1 en partant de 1."
 msgstr "Priorities must start at 1 and increase 1 by 1."
 
-#: app/routes/club_q/routes.py:211
+#: app/routes/club_q/routes.py:212
 msgid "Vos choix ont été enregistrés."
 msgstr "Your choices has been saved."
 
-#: app/routes/club_q/routes.py:216
+#: app/routes/club_q/routes.py:217
 msgid "Page de réservation pour le Club Q"
 msgstr "Club Q-ulture booking page."
 
-#: app/routes/club_q/routes.py:269
+#: app/routes/club_q/routes.py:270
 msgid "Mécontentement édité."
 msgstr "Edited discontent."
 
-#: app/routes/club_q/routes.py:505
+#: app/routes/club_q/routes.py:510
 msgid "Salle ajoutée."
 msgstr "Added location."
 
-#: app/routes/club_q/routes.py:514
+#: app/routes/club_q/routes.py:519
 msgid "Salle supprimée."
 msgstr "Deleted location."
 
-#: app/routes/club_q/routes.py:526
+#: app/routes/club_q/routes.py:531
 msgid "Salle éditée."
 msgstr "Edited location."
 
-#: app/routes/club_q/routes.py:630
+#: app/routes/club_q/routes.py:635
 #, fuzzy
 msgid "Saison ajoutée."
 msgstr "Added season."
 
-#: app/routes/club_q/routes.py:643
+#: app/routes/club_q/routes.py:648
 msgid "Saison supprimée."
 msgstr "Deleted season."
 
-#: app/routes/club_q/routes.py:655
+#: app/routes/club_q/routes.py:660
 msgid "Saison éditée."
 msgstr "Edited season."
 
-#: app/routes/club_q/routes.py:724 app/routes/club_q/routes.py:893
-#: app/routes/panier_bio/routes.py:289
+#: app/routes/club_q/routes.py:729 app/routes/club_q/routes.py:893
+#: app/routes/panier_bio/routes.py:312
 #, fuzzy
 msgid "Mis à jour."
 msgstr "Updated."
 
-#: app/routes/club_q/routes.py:758
+#: app/routes/club_q/routes.py:763
 msgid "Algorithme exécuté et résultats sauvegardés."
 msgstr "Executed algorithm and saved results."
 
-#: app/routes/club_q/routes.py:762
+#: app/routes/club_q/routes.py:767
 msgid "Algorithme exécuté."
 msgstr "Executed algorithm."
 
-#: app/routes/club_q/routes.py:867 app/routes/panier_bio/routes.py:253
+#: app/routes/club_q/routes.py:867 app/routes/panier_bio/routes.py:276
 msgid "Visibilité de la page de réservation"
 msgstr "Show booking page"
 
@@ -678,63 +754,63 @@ msgstr "Current season"
 msgid "Récapitulatif - "
 msgstr "Summary"
 
-#: app/routes/club_q/routes.py:1211
+#: app/routes/club_q/routes.py:1207
 msgid "Il y a déjà une plaquette associée à cette saison."
 msgstr "There is already a brochure for this season."
 
-#: app/routes/club_q/routes.py:1226
+#: app/routes/club_q/routes.py:1222
 #, fuzzy
 msgid "Plaquette ajoutée."
 msgstr "Added brochure."
 
-#: app/routes/club_q/routes.py:1235
+#: app/routes/club_q/routes.py:1231
 msgid "Plaquettes Club Q"
 msgstr "Club Q Brochures"
 
-#: app/routes/club_q/routes.py:1293
+#: app/routes/club_q/routes.py:1289
 #, fuzzy
 msgid "Plaquette supprimée."
 msgstr "Deleted brochure."
 
-#: app/routes/club_q/utils.py:516 app/routes/club_q/utils.py:528
-#: app/templates/club_q/id/pceen.html:103 app/templates/club_q/id/salle.html:95
-#: app/templates/club_q/main.html:166 app/templates/club_q/spectacles.html:68
-#: app/templates/club_q/voeux.html:68
+#: app/routes/club_q/utils.py:530 app/routes/club_q/utils.py:542
+#: app/templates/club_q/id/pceen.html:84 app/templates/club_q/id/salle.html:82
+#: app/templates/club_q/main.html:166 app/templates/club_q/spectacles.html:55
+#: app/templates/club_q/voeux.html:55
 msgid "Spectacle"
 msgstr "Spectacle"
 
-#: app/routes/club_q/utils.py:537
+#: app/routes/club_q/utils.py:551
 #, fuzzy
 msgid "Pcéen"
 msgstr "PCéen"
 
-#: app/routes/club_q/utils.py:564
+#: app/routes/club_q/utils.py:578
 msgid "Voeu ajouté."
 msgstr "Added wish."
 
-#: app/routes/club_q/utils.py:574
+#: app/routes/club_q/utils.py:588
 msgid "Voeu supprimé."
 msgstr "Deleted wish."
 
-#: app/routes/club_q/utils.py:586
+#: app/routes/club_q/utils.py:600
 msgid "Voeu édité."
 msgstr "Edited wish."
 
-#: app/routes/club_q/utils.py:597 app/routes/club_q/utils.py:608
-#: app/templates/club_q/id/salle.html:113 app/templates/club_q/main.html:184
-#: app/templates/club_q/salles.html:69 app/templates/club_q/spectacles.html:86
+#: app/routes/club_q/utils.py:611 app/routes/club_q/utils.py:622
+#: app/templates/club_q/id/salle.html:100 app/templates/club_q/main.html:184
+#: app/templates/club_q/salles.html:56 app/templates/club_q/spectacles.html:73
 msgid "Salle"
 msgstr "Location"
 
-#: app/routes/club_q/utils.py:642
+#: app/routes/club_q/utils.py:656
 msgid "Spectacle ajouté."
 msgstr "Added spectacle."
 
-#: app/routes/club_q/utils.py:660 app/routes/theatre/routes.py:267
+#: app/routes/club_q/utils.py:674 app/routes/theatre/routes.py:267
 msgid "Spectacle supprimé."
 msgstr "Deleted spectacle."
 
-#: app/routes/club_q/utils.py:680
+#: app/routes/club_q/utils.py:694
 msgid "Spectacle édité."
 msgstr "Edited spectacle"
 
@@ -756,7 +832,7 @@ msgstr "MAC address*"
 msgid "Enregistrer l'appareil"
 msgstr "Register device"
 
-#: app/routes/devices/forms.py:24 app/templates/cards/device.html:130
+#: app/routes/devices/forms.py:24 app/templates/cards/device.html:131
 #: app/templates/cards/device_modal.html:62
 msgid "Modifier l'appareil"
 msgstr "Edit device"
@@ -802,7 +878,7 @@ msgstr "This device is not already registered!"
 msgid "Cet appareil vous appartient déjà !"
 msgstr "This device already belong to you!"
 
-#: app/routes/devices/routes.py:98
+#: app/routes/devices/routes.py:99
 msgid ""
 "Cet appareil appartient à un utilisateur banni. Son transfert est donc "
 "bloqué pour éviter les tentatives de contournement ; contactez-nous si la"
@@ -860,7 +936,7 @@ msgstr "I'll have warned you!"
 msgid "Détection d'appareil impossible"
 msgstr "Device detection impossible"
 
-#: app/routes/errors/handlers.py:24 app/routes/errors/handlers.py:40
+#: app/routes/errors/handlers.py:25 app/routes/errors/handlers.py:41
 #: app/templates/errors/401.html:8 app/templates/errors/403.html:8
 msgid "Accès restreint"
 msgstr "Access restricted"
@@ -869,64 +945,64 @@ msgstr "Access restricted"
 msgid "Perte de l'accès Élève... contre l'accès Alumni !"
 msgstr "Student access revoked... in favor of Alumni access!"
 
-#: app/routes/gris/forms.py:23
+#: app/routes/gris/forms.py:21
 msgid "Script"
 msgstr "Script"
 
-#: app/routes/gris/forms.py:27
+#: app/routes/gris/forms.py:25
 msgid "Exécuter"
 msgstr "Run"
 
-#: app/routes/gris/forms.py:54
+#: app/routes/gris/forms.py:52
 msgid "Illimité"
 msgstr "Unlimited"
 
-#: app/routes/gris/forms.py:55
+#: app/routes/gris/forms.py:53
 msgid "Heures"
 msgstr "Hours"
 
-#: app/routes/gris/forms.py:56
+#: app/routes/gris/forms.py:54
 msgid "Jours"
 msgstr "Days"
 
-#: app/routes/gris/forms.py:57
+#: app/routes/gris/forms.py:55
 msgid "Mois"
 msgstr "Months"
 
-#: app/routes/gris/forms.py:58
+#: app/routes/gris/forms.py:56
 msgid "Motif court"
 msgstr "Short reason"
 
-#: app/routes/gris/forms.py:59
+#: app/routes/gris/forms.py:57
 msgid "Message détaillé"
 msgstr "Detailed message"
 
-#: app/routes/gris/forms.py:60
+#: app/routes/gris/forms.py:58
 msgid "Bannez-moi ça les modos || Mettre à jour le ban"
 msgstr "Ban this person || Update ban"
 
-#: app/routes/gris/forms.py:61
+#: app/routes/gris/forms.py:59
 msgid "Mettre fin au ban"
 msgstr "Terminate ban"
 
-#: app/routes/gris/routes.py:101
+#: app/routes/gris/routes.py:102
 msgid "Gestion des PCéens"
 msgstr "Manage PCéens"
 
-#: app/routes/gris/routes.py:134
+#: app/routes/gris/routes.py:135
 msgid "Gestion des rôles"
 msgstr "Manage roles"
 
-#: app/routes/gris/routes.py:168 app/routes/gris/routes.py:170
+#: app/routes/gris/routes.py:169 app/routes/gris/routes.py:171
 #: app/templates/gris/menu.html:18
 msgid "Exécuter un script"
 msgstr "Run a script"
 
-#: app/routes/gris/routes.py:177
+#: app/routes/gris/routes.py:178
 msgid "Darkstat network monitoring"
 msgstr "Darkstat network monitoring"
 
-#: app/routes/gris/routes.py:184
+#: app/routes/gris/routes.py:185
 msgid "Bandwidthd network monitoring"
 msgstr "Bandwidthd network monitoring"
 
@@ -946,38 +1022,38 @@ msgstr "This PCéen is already banned!"
 msgid "Le mécréant a bien été banni."
 msgstr "The miscreant has been banned."
 
-#: app/routes/main/forms.py:16
+#: app/routes/main/forms.py:15
 msgid "Adresse e-mail (optionnel)"
 msgstr "Mail address (optional)"
 
-#: app/routes/main/forms.py:17
+#: app/routes/main/forms.py:16
 msgid "Titre"
 msgstr "Title"
 
-#: app/routes/main/forms.py:18
+#: app/routes/main/forms.py:17
 msgid "Message"
 msgstr "Message"
 
-#: app/routes/main/forms.py:19
+#: app/routes/main/forms.py:18
 msgid "Envoyer"
 msgstr "Send"
 
-#: app/routes/main/routes.py:125 app/templates/errors/401.html:29
+#: app/routes/main/routes.py:139 app/templates/errors/401.html:29
 #: app/templates/errors/403.html:26 app/templates/errors/404.html:23
 #: app/templates/errors/other.html:17 app/templates/footer.html:19
 #: app/templates/mails_base.html:74
 msgid "Accueil"
 msgstr "Home"
 
-#: app/routes/main/routes.py:140 app/routes/panier_bio/routes.py:144
+#: app/routes/main/routes.py:154 app/routes/panier_bio/routes.py:155
 msgid "Le captcha n'a pas pu être vérifié. Veuillez réessayer."
 msgstr "The captcha could not be verified. Please try again."
 
-#: app/routes/main/routes.py:152
+#: app/routes/main/routes.py:166
 msgid "Message transmis !"
 msgstr "Message transmitted!"
 
-#: app/routes/main/routes.py:157
+#: app/routes/main/routes.py:172
 msgid ""
 "Oh non ! Le message n'a pas pu être transmis. N'hésitez pas à contacter "
 "un GRI aux coordonnées en bas de page.<br/>(Erreur : "
@@ -985,172 +1061,176 @@ msgstr ""
 "O no! The message could not be transmitted. Please feel free to reach GRI"
 " at the contact information below.<br/>(Error: "
 
-#: app/routes/main/routes.py:167
+#: app/routes/main/routes.py:181
 msgid "Contact"
 msgstr "Contact"
 
-#: app/routes/main/routes.py:173 app/templates/footer.html:35
+#: app/routes/main/routes.py:187 app/templates/footer.html:35
 msgid "Mentions légales"
 msgstr "Legal notice"
 
-#: app/routes/main/routes.py:179
+#: app/routes/main/routes.py:193
 msgid "Notes de mise à jour"
 msgstr "Changelog"
 
-#: app/routes/main/routes.py:186
+#: app/routes/main/routes.py:200
 msgid "Accès à Internet"
 msgstr "Internet Access"
 
-#: app/routes/main/routes.py:196
+#: app/routes/main/routes.py:210
 msgid "Accès à Internet restreint"
 msgstr "Internet access restricted"
 
-#: app/routes/main/routes.py:212
+#: app/routes/main/routes.py:226
 msgid "TEST"
 msgstr "TEST"
 
-#: app/routes/panier_bio/forms.py:33
+#: app/routes/panier_bio/forms.py:31
 msgid "Promo, labo..."
 msgstr "Student promotion, Lab..."
 
-#: app/routes/panier_bio/forms.py:34
+#: app/routes/panier_bio/forms.py:32
 #, fuzzy
 msgid "Méthode de payement"
 msgstr "Payment method"
 
-#: app/routes/panier_bio/forms.py:35 app/routes/panier_bio/forms.py:36
+#: app/routes/panier_bio/forms.py:33 app/routes/panier_bio/forms.py:34
 msgid "Date du Panier Bio"
 msgstr "Date of Panier Bio"
 
-#: app/routes/panier_bio/forms.py:37
+#: app/routes/panier_bio/forms.py:35
 #, fuzzy
 msgid "Numéro de téléphone (Optionnel)"
 msgstr "Phone number (optional)"
 
-#: app/routes/panier_bio/forms.py:38 app/templates/panier_bio/admin.html:155
+#: app/routes/panier_bio/forms.py:36 app/templates/panier_bio/admin.html:142
 #, fuzzy
 msgid "Commentaire"
 msgstr "Comment"
 
-#: app/routes/panier_bio/forms.py:39
+#: app/routes/panier_bio/forms.py:37
 msgid "Payée ?"
 msgstr "Payed?"
 
-#: app/routes/panier_bio/forms.py:41
+#: app/routes/panier_bio/forms.py:39
 #, fuzzy
 msgid "Payement validé par trésorier ?"
 msgstr "Payment validate by treasurer?"
 
-#: app/routes/panier_bio/forms.py:43
+#: app/routes/panier_bio/forms.py:41
 msgid "Récupérée ?"
 msgstr "Taken?"
 
-#: app/routes/panier_bio/forms.py:46
+#: app/routes/panier_bio/forms.py:44
 msgid "En commandant, je m'engage à payer et à venir prendre le panier."
 msgstr "By ordering, I undertake to pay and to collect the basket."
 
-#: app/routes/panier_bio/forms.py:50 app/routes/panier_bio/forms.py:65
+#: app/routes/panier_bio/forms.py:48 app/routes/panier_bio/forms.py:63
 msgid "Commander"
 msgstr "Ordering"
 
-#: app/routes/panier_bio/forms.py:59 app/routes/theatre/forms.py:34
-#: app/templates/panier_bio/period.html:87 app/templates/payments/main.html:197
-#: app/templates/theatre/admin.html:34
+#: app/routes/panier_bio/forms.py:57 app/routes/theatre/forms.py:31
+#: app/templates/panier_bio/period.html:73 app/templates/payments/main.html:197
+#: app/templates/theatre/admin.html:39
 msgid "Date de début"
 msgstr "Start date"
 
-#: app/routes/panier_bio/forms.py:60 app/templates/panier_bio/period.html:90
+#: app/routes/panier_bio/forms.py:58 app/templates/panier_bio/period.html:76
 #: app/templates/payments/main.html:198
 msgid "Date de fin"
 msgstr "End date"
 
-#: app/routes/panier_bio/forms.py:61
+#: app/routes/panier_bio/forms.py:59
 msgid "Jours sans panier bio"
 msgstr "Days without Panier Bio"
 
-#: app/routes/panier_bio/forms.py:62
+#: app/routes/panier_bio/forms.py:60
 msgid "Activée ?"
 msgstr "Active?"
 
-#: app/routes/panier_bio/routes.py:137
+#: app/routes/panier_bio/routes.py:148
 #, fuzzy
 msgid "Commande supprimée"
 msgstr "Deleted order."
 
-#: app/routes/panier_bio/routes.py:150
+#: app/routes/panier_bio/routes.py:161
 msgid "Si non connecté, un numéro de téléphone est obligatoire"
 msgstr "If non-connected, a phone number is mandatory"
 
-#: app/routes/panier_bio/routes.py:159
+#: app/routes/panier_bio/routes.py:179
 #, python-format
 msgid "Vous avez déjà commandé un panier bio pour le %s"
 msgstr "You already ordered a panier bio for the %s"
 
-#: app/routes/panier_bio/routes.py:169
+#: app/routes/panier_bio/routes.py:189
 msgid "Vous devez vous engager à payer et venir chercher le panier"
 msgstr "You must engage yourself to pay and to collect the basket"
 
-#: app/routes/panier_bio/routes.py:185
+#: app/routes/panier_bio/routes.py:208
 #, fuzzy
 msgid "Votre panier a été commandé avec succès !"
 msgstr "Your order has been successfully made."
 
-#: app/routes/panier_bio/routes.py:193
+#: app/routes/panier_bio/routes.py:216
 msgid "Page du Panier Bio"
 msgstr "Page of Panier Bio"
 
-#: app/routes/panier_bio/routes.py:259
+#: app/routes/panier_bio/routes.py:282
 msgid "Jour du panier bio"
 msgstr "Day of Panier Bio"
 
-#: app/routes/panier_bio/routes.py:304
-msgid "No compatible period founded for choosen date."
+#: app/routes/panier_bio/routes.py:322
+msgid "Veuillez choisir une date."
 msgstr ""
 
-#: app/routes/panier_bio/routes.py:317
+#: app/routes/panier_bio/routes.py:327
+msgid "Aucune période compatible trouvée pour la date choisie."
+msgstr ""
+
+#: app/routes/panier_bio/routes.py:341
 msgid "Commande effectuée."
 msgstr "Order complete."
 
-#: app/routes/panier_bio/routes.py:327
+#: app/routes/panier_bio/routes.py:351
 #, fuzzy
 msgid "Commande supprimée."
 msgstr "Deleted order."
 
-#: app/routes/panier_bio/routes.py:339
+#: app/routes/panier_bio/routes.py:363
 #, fuzzy
 msgid "Commande éditée."
 msgstr "Edited order."
 
-#: app/routes/panier_bio/routes.py:344
+#: app/routes/panier_bio/routes.py:368
 msgid "Administration Panier Bio"
 msgstr "Administration Panier Bio"
 
-#: app/routes/panier_bio/routes.py:393
+#: app/routes/panier_bio/routes.py:417
 #, fuzzy
 msgid "Periode ajoutée."
 msgstr "Added period."
 
-#: app/routes/panier_bio/routes.py:403
+#: app/routes/panier_bio/routes.py:427
 #, fuzzy
 msgid "Période supprimée."
 msgstr "Deleted period."
 
-#: app/routes/panier_bio/routes.py:413
+#: app/routes/panier_bio/routes.py:437
 #, fuzzy
 msgid "Période éditée."
 msgstr "Edited period."
 
-#: app/routes/panier_bio/routes.py:418
+#: app/routes/panier_bio/routes.py:442
 msgid "Administration Périodes Panier Bio"
 msgstr "Administration Period Panier Bio"
 
-#: app/routes/panier_bio/utils.py:76
+#: app/routes/panier_bio/utils.py:79
 #, fuzzy
 msgid "La date de fin ne peut être antérieure à la date de début"
 msgstr "Ending date can not be anterior to starting date!"
 
-#: app/routes/payments/email.py:21 app/routes/payments/routes.py:243
-#: app/routes/payments/routes.py:302
+#: app/routes/payments/email.py:21 app/routes/payments/routes.py:250
+#: app/routes/payments/routes.py:305
 msgid "Paiement validé !"
 msgstr "Payment validated!"
 
@@ -1168,179 +1248,179 @@ msgstr "Your Internet access has been cut"
 msgid "IMPORTANT - Votre accès Internet va bientôt couper !"
 msgstr "IMPORTANT - Your Internet access will soon be cut off!"
 
-#: app/routes/payments/forms.py:15
+#: app/routes/payments/forms.py:14
 msgid "Numéro de téléphone associé à Lydia"
 msgstr "Phone number associated with Lydia"
 
-#: app/routes/payments/forms.py:18
+#: app/routes/payments/forms.py:17
 msgid "Envoyer une demande via Lydia"
 msgstr "Send a Lydia payment request"
 
-#: app/routes/payments/forms.py:19
+#: app/routes/payments/forms.py:18
 msgid "Payer par carte bancaire"
 msgstr "Pay with a credit card"
 
-#: app/routes/payments/routes.py:35
+#: app/routes/payments/routes.py:42
 msgid "Mon abonnement Internet"
 msgstr "My Internet subscription"
 
-#: app/routes/payments/routes.py:46 app/routes/payments/routes.py:61
-#: app/routes/payments/routes.py:107
+#: app/routes/payments/routes.py:53 app/routes/payments/routes.py:68
+#: app/routes/payments/routes.py:114
 msgid "Vous avez déjà un abonnement en cours !"
 msgstr "You already have an active subscription!"
 
-#: app/routes/payments/routes.py:50 app/templates/cards/payment.html:5
+#: app/routes/payments/routes.py:57 app/templates/cards/payment.html:5
 #: app/templates/payments/main.html:200 app/templates/payments/main.html:240
 #: app/templates/payments/main.html:287
 msgid "Paiement"
 msgstr "Payment"
 
-#: app/routes/payments/routes.py:65 app/templates/payments/pay.html:132
+#: app/routes/payments/routes.py:72 app/templates/payments/pay.html:132
 msgid "Payer avec Lydia"
 msgstr "Pay with Lydia"
 
-#: app/routes/payments/routes.py:66 app/templates/payments/pay.html:159
+#: app/routes/payments/routes.py:73 app/templates/payments/pay.html:159
 msgid "Payer par virement"
 msgstr "Pay by bank transfer"
 
-#: app/routes/payments/routes.py:67 app/templates/payments/pay.html:186
+#: app/routes/payments/routes.py:74 app/templates/payments/pay.html:186
 msgid "Payer en main propre"
 msgstr "Pay in person"
 
-#: app/routes/payments/routes.py:68 app/templates/payments/pay.html:96
+#: app/routes/payments/routes.py:75 app/templates/payments/pay.html:96
 msgid "Ajouter un paiement"
 msgstr "Add a payment"
 
-#: app/routes/payments/routes.py:249
+#: app/routes/payments/routes.py:256
 msgid "Pas de paiement détecté"
 msgstr "No payment detected"
 
-#: app/routes/payments/routes.py:267
+#: app/routes/payments/routes.py:274
 msgid "Paiement annulé"
 msgstr "Payment cancelled"
 
-#: app/routes/payments/routes.py:277 app/routes/payments/routes.py:283
+#: app/routes/payments/routes.py:286
 msgid "Numéro de paiement invalide"
 msgstr "Invalid payment number"
 
-#: app/routes/payments/routes.py:286
+#: app/routes/payments/routes.py:289
 msgid "Paiement en attente, réessayer"
 msgstr "Payment pending, try again"
 
-#: app/routes/payments/routes.py:289
+#: app/routes/payments/routes.py:292
 msgid "Paiement invalide, réessayer"
 msgstr "Payment invalid, try again"
 
-#: app/routes/photos/forms.py:17
+#: app/routes/photos/forms.py:16
 msgid "Légende (optionnel)"
 msgstr "Caption (optional)"
 
-#: app/routes/photos/forms.py:18
+#: app/routes/photos/forms.py:17
 msgid "Auteur (optionnel)"
 msgstr "Author (optional)"
 
-#: app/routes/photos/forms.py:19
+#: app/routes/photos/forms.py:18
 msgid "Date (optionnel)"
 msgstr "Date (optional)"
 
-#: app/routes/photos/forms.py:20
+#: app/routes/photos/forms.py:19
 msgid "Heure (optionnel)"
 msgstr "Time (optional)"
 
-#: app/routes/photos/forms.py:22
+#: app/routes/photos/forms.py:21
 msgid "Latitude (optionnel)"
 msgstr "Latitude (optional)"
 
-#: app/routes/photos/forms.py:26
+#: app/routes/photos/forms.py:25
 msgid "Longitude (optionnel)"
 msgstr "Longitude (optional)"
 
-#: app/routes/photos/forms.py:29 app/templates/photos/album.html:262
+#: app/routes/photos/forms.py:28 app/templates/photos/album.html:262
 msgid "Modifier la photo"
 msgstr "Edit photo"
 
-#: app/routes/photos/forms.py:35 app/routes/photos/forms.py:50
+#: app/routes/photos/forms.py:34 app/routes/photos/forms.py:49
 msgid "Nom de l'album"
 msgstr "Album name"
 
-#: app/routes/photos/forms.py:36 app/routes/photos/forms.py:63
+#: app/routes/photos/forms.py:35 app/routes/photos/forms.py:62
 msgid "Description (optionnel)"
 msgstr "Description (optional)"
 
-#: app/routes/photos/forms.py:37 app/routes/photos/forms.py:64
+#: app/routes/photos/forms.py:36 app/routes/photos/forms.py:63
 msgid "Date de début (optionnel)"
 msgstr "Start date (optional)"
 
-#: app/routes/photos/forms.py:38 app/routes/photos/forms.py:65
+#: app/routes/photos/forms.py:37 app/routes/photos/forms.py:64
 msgid "Date de fin (optionnel)"
 msgstr "End date (optional)"
 
-#: app/routes/photos/forms.py:39
+#: app/routes/photos/forms.py:38
 msgid "Album visible"
 msgstr "Album visible"
 
-#: app/routes/photos/forms.py:40 app/templates/photos/album.html:99
+#: app/routes/photos/forms.py:39 app/templates/photos/album.html:99
 msgid "Modifier l'album"
 msgstr "Edit album"
 
-#: app/routes/photos/forms.py:51 app/templates/photos/collection.html:203
+#: app/routes/photos/forms.py:50 app/templates/photos/collection.html:203
 msgid "Nouvel album"
 msgstr "New album"
 
-#: app/routes/photos/forms.py:56
+#: app/routes/photos/forms.py:55
 msgid "Un album avec un nom similaire existe déjà dans cette collection !"
 msgstr "An album with a similar name already exists in this collection!"
 
-#: app/routes/photos/forms.py:62
+#: app/routes/photos/forms.py:61
 msgid "Nom de la collection"
 msgstr "Collection name"
 
-#: app/routes/photos/forms.py:66
+#: app/routes/photos/forms.py:65
 msgid "Collection visible"
 msgstr "Collection visible"
 
-#: app/routes/photos/forms.py:67 app/templates/photos/collection.html:49
+#: app/routes/photos/forms.py:66 app/templates/photos/collection.html:49
 msgid "Modifier la collection"
 msgstr "Edit collection"
 
 #: app/routes/photos/routes.py:24 app/templates/cards/photos.html:5
-#: app/templates/cards/photos.html:22 app/templates/navbar.html:71
+#: app/templates/cards/photos.html:22 app/templates/navbar.html:89
 #: app/templates/photos/album.html:46 app/templates/photos/collection.html:18
 #: app/templates/photos/main.html:7
 msgid "Photos"
 msgstr "Photos"
 
-#: app/routes/photos/routes.py:75
+#: app/routes/photos/routes.py:76
 msgid ""
 "Une collection ne peut pas être rendue visible si elle ne contient aucun "
 "album visible !"
 msgstr "A collection cannot be made visible if it contains no visible album!"
 
-#: app/routes/photos/routes.py:78
+#: app/routes/photos/routes.py:79
 msgid "Collection modifiée avec succès !"
 msgstr "Collection successfully edited!"
 
-#: app/routes/photos/routes.py:94
+#: app/routes/photos/routes.py:95
 msgid "Album créé !"
 msgstr "Album created!"
 
-#: app/routes/photos/routes.py:126
+#: app/routes/photos/routes.py:127
 msgid "IP non détectable, impossible d'accéder aux photos"
 msgstr "Unable to detect your IP, photos can't be loaded"
 
-#: app/routes/photos/routes.py:143
+#: app/routes/photos/routes.py:144
 msgid "Un album ne peut pas être rendu visible si il ne contient aucune photo !"
 msgstr "An album cannot be made visible if it contains no photos!"
 
-#: app/routes/photos/routes.py:145
+#: app/routes/photos/routes.py:146
 msgid "Album modifié avec succès !"
 msgstr "Album successfully edited!"
 
-#: app/routes/profile/forms.py:27
+#: app/routes/profile/forms.py:26
 msgid "Mot de passe actuel"
 msgstr "Current password"
 
-#: app/routes/profile/routes.py:15 app/templates/navbar.html:85
+#: app/routes/profile/routes.py:15 app/templates/navbar.html:105
 msgid "Profil"
 msgstr "Profile"
 
@@ -1368,7 +1448,7 @@ msgstr "Change my password"
 msgid "Attention : Chambre transférée, Internet coupé"
 msgstr "Warning: Room transferred, Internet cut"
 
-#: app/routes/rooms/forms.py:14 app/templates/cards/room.html:5
+#: app/routes/rooms/forms.py:13 app/templates/cards/room.html:5
 #: app/templates/cards/room.html:62 app/templates/devices/register.html:13
 #: app/templates/devices/transfer.html:13 app/templates/gris/pceens.html:110
 #: app/templates/gris/pceens.html:267 app/templates/gris/pceens.html:452
@@ -1377,51 +1457,51 @@ msgstr "Warning: Room transferred, Internet cut"
 msgid "Chambre"
 msgstr "Room"
 
-#: app/routes/rooms/forms.py:15 app/routes/rooms/forms.py:23
+#: app/routes/rooms/forms.py:14 app/routes/rooms/forms.py:22
 msgid "Début de la location"
 msgstr "Rental start date"
 
-#: app/routes/rooms/forms.py:16 app/routes/rooms/forms.py:24
+#: app/routes/rooms/forms.py:15 app/routes/rooms/forms.py:23
 msgid "Fin de la location (optionnel)"
 msgstr "Rental end date (optional)"
 
-#: app/routes/rooms/forms.py:17
+#: app/routes/rooms/forms.py:16
 msgid "Enregistrer"
 msgstr "Register"
 
-#: app/routes/rooms/forms.py:31
+#: app/routes/rooms/forms.py:30
 msgid "Fin de la location"
 msgstr "Rental end date"
 
-#: app/routes/rooms/forms.py:32
+#: app/routes/rooms/forms.py:31
 msgid "Terminer la location"
 msgstr "Terminate rental"
 
-#: app/routes/rooms/routes.py:32
+#: app/routes/rooms/routes.py:39
 msgid "Vous avez déjà une location en cours !"
 msgstr "You already have a rental in progress!"
 
-#: app/routes/rooms/routes.py:49
+#: app/routes/rooms/routes.py:56
 msgid "Chambre enregistrée avec succès !"
 msgstr "Room successfully registered!"
 
-#: app/routes/rooms/routes.py:76
+#: app/routes/rooms/routes.py:83
 msgid "Nouvelle location"
 msgstr "New rental"
 
-#: app/routes/rooms/routes.py:94
+#: app/routes/rooms/routes.py:101
 msgid "Location modifiée avec succès !"
 msgstr "Rental successfully modified!"
 
-#: app/routes/rooms/routes.py:96
+#: app/routes/rooms/routes.py:103
 msgid "Pas de location en cours !"
 msgstr "No rental in progress!"
 
-#: app/routes/rooms/routes.py:99
+#: app/routes/rooms/routes.py:106
 msgid "Mettre à jour ma location"
 msgstr "Modify rental"
 
-#: app/routes/rooms/routes.py:127 app/templates/cards/room.html:95
+#: app/routes/rooms/routes.py:134 app/templates/cards/room.html:95
 msgid "Changer de chambre"
 msgstr "Change room"
 
@@ -1429,37 +1509,37 @@ msgstr "Change room"
 msgid "Nom de la saison"
 msgstr "Name of the season"
 
-#: app/routes/theatre/forms.py:26 app/routes/theatre/forms.py:52
-#: app/templates/cards/offer.html:18 app/templates/club_q/salles.html:105
-#: app/templates/theatre/admin_saison.html:122
+#: app/routes/theatre/forms.py:26 app/routes/theatre/forms.py:49
+#: app/templates/cards/offer.html:18 app/templates/club_q/salles.html:92
+#: app/templates/theatre/admin_saison.html:134
 msgid "Description"
 msgstr "Description"
 
-#: app/routes/theatre/forms.py:44
+#: app/routes/theatre/forms.py:41
 msgid "Nom du spectacle"
 msgstr "Name of the show"
 
-#: app/routes/theatre/forms.py:60
+#: app/routes/theatre/forms.py:54
 msgid "Metteur ou metteuse en scène"
 msgstr "Director"
 
-#: app/routes/theatre/forms.py:67
+#: app/routes/theatre/forms.py:61
 msgid "Auteur ou autrice de la pièce"
 msgstr "Author of the play"
 
-#: app/routes/theatre/forms.py:74
+#: app/routes/theatre/forms.py:68
 msgid "Lien vers la billeterie"
 msgstr "Link to ticket booking"
 
-#: app/routes/theatre/forms.py:80
+#: app/routes/theatre/forms.py:74
 msgid "Lien vers la résérvation des places"
 msgstr "Link to seats booking"
 
-#: app/routes/theatre/forms.py:90
+#: app/routes/theatre/forms.py:84
 msgid "Date de la représentation"
 msgstr "Date of the representation"
 
-#: app/routes/theatre/forms.py:101
+#: app/routes/theatre/forms.py:95
 msgid "Photo à téléverser"
 msgstr "Picture to upload"
 
@@ -1493,27 +1573,26 @@ msgstr "Error while uploading the image."
 msgid "Action réalisée en tant que %(doas)s"
 msgstr "Action done as %(doas)s"
 
-#: app/templates/bar/items.html:241 app/templates/bekk/main.html:124
-#: app/templates/bekk/main.html:180 app/templates/cards/device_modal.html:10
-#: app/templates/cards/device_modal.html:66
-#: app/templates/club_q/brochures.html:97
+#: app/templates/bar/items.html:233 app/templates/bekk/main.html:121
+#: app/templates/bekk/main.html:177 app/templates/cards/device_modal.html:10
+#: app/templates/cards/device_modal.html:65
+#: app/templates/club_q/brochures.html:84
 #: app/templates/club_q/modals/modals_spectacles.html:22
 #: app/templates/club_q/modals/modals_spectacles.html:118
 #: app/templates/club_q/modals/modals_voeux.html:22
 #: app/templates/club_q/modals/modals_voeux.html:99
-#: app/templates/club_q/pceens.html:277 app/templates/club_q/saisons.html:339
-#: app/templates/club_q/saisons.html:411 app/templates/club_q/salles.html:285
-#: app/templates/club_q/salles.html:362 app/templates/devices/modify.html:66
+#: app/templates/club_q/pceens.html:277 app/templates/club_q/saisons.html:326
+#: app/templates/club_q/saisons.html:398 app/templates/club_q/salles.html:272
+#: app/templates/club_q/salles.html:349 app/templates/devices/modify.html:66
 #: app/templates/doas.html:5 app/templates/gris/pceens.html:453
 #: app/templates/gris/pceens.html:459 app/templates/gris/pceens.html:470
 #: app/templates/gris/pceens.html:476 app/templates/gris/pceens.html:488
 #: app/templates/gris/pceens.html:494 app/templates/gris/pceens.html:515
-#: app/templates/gris/roles.html:202 app/templates/macros.html:54
-#: app/templates/panier_bio/admin.html:364
-#: app/templates/panier_bio/admin.html:470
-#: app/templates/panier_bio/main.html:257
-#: app/templates/panier_bio/period.html:207
-#: app/templates/panier_bio/period.html:277
+#: app/templates/gris/roles.html:202 app/templates/macros.html:55
+#: app/templates/macros.html:73 app/templates/panier_bio/admin.html:354
+#: app/templates/panier_bio/admin.html:460
+#: app/templates/panier_bio/period.html:193
+#: app/templates/panier_bio/period.html:263
 #: app/templates/payments/main.html:263 app/templates/payments/main.html:272
 #: app/templates/payments/main.html:289 app/templates/payments/main.html:296
 #: app/templates/photos/album.html:264 app/templates/photos/album.html:331
@@ -1533,6 +1612,33 @@ msgstr "Contact us"
 #: app/templates/footer.html:30
 msgid "Code source"
 msgstr "Source code"
+
+#: app/templates/footer.html:40 app/templates/footer.html:43
+msgid "Thème M3"
+msgstr ""
+
+#: app/templates/footer.html:40 app/templates/footer.html:44
+msgid "Thème Frost"
+msgstr ""
+
+#: app/templates/footer.html:40 app/templates/footer.html:45
+msgid "Thème Classique"
+msgstr ""
+
+#: app/templates/footer.html:51 app/templates/footer.html:54
+#, fuzzy
+msgid "Clair"
+msgstr "Title"
+
+#: app/templates/footer.html:51 app/templates/footer.html:55
+#, fuzzy
+msgid "Sombre"
+msgstr "Room"
+
+#: app/templates/footer.html:51 app/templates/footer.html:56
+#, fuzzy
+msgid "Auto"
+msgstr "Deposit"
 
 #: app/templates/macros.html:37
 msgid "Information :"
@@ -1564,54 +1670,53 @@ msgstr "I no longer wish to receive emails"
 msgid "Se désinscrire"
 msgstr "Unsubscribe"
 
-#: app/templates/cards/panier_bio.html:2 app/templates/navbar.html:23
+#: app/templates/cards/panier_bio.html:2 app/templates/navbar.html:39
 msgid "Panier Bio"
 msgstr ""
 
-#: app/templates/navbar.html:28
+#: app/templates/navbar.html:46
 #, fuzzy
 msgid "Théâtre"
 msgstr "Theatre Club"
 
-#: app/templates/auth/auth_needed.html:21 app/templates/auth/login.html:53
-#: app/templates/navbar.html:39
+#: app/templates/auth/auth_needed.html:21 app/templates/auth/login.html:41
+#: app/templates/navbar.html:57
 msgid "Créer un compte"
 msgstr "Sign up"
 
 #: app/templates/devices/register.html:19
 #: app/templates/devices/transfer.html:19
-#: app/templates/main/connect_check.html:28 app/templates/navbar.html:47
+#: app/templates/main/connect_check.html:28 app/templates/navbar.html:65
 #: app/templates/rooms/register.html:25
 msgid "Internet"
 msgstr "Internet"
 
-#: app/templates/cards/bekk_accueil.html:1 app/templates/navbar.html:55
+#: app/templates/cards/bekk_accueil.html:1 app/templates/navbar.html:73
 msgid "Bekk"
 msgstr "Bekk"
 
-#: app/templates/cards/club_q_accueil.html:1 app/templates/navbar.html:63
+#: app/templates/cards/club_q_accueil.html:1 app/templates/navbar.html:81
 msgid "Club Q"
 msgstr "Q-ulture Club"
 
 #: app/templates/cards/bar.html:5 app/templates/gris/pceens.html:36
-#: app/templates/navbar.html:79
+#: app/templates/navbar.html:98
 msgid "Bar"
 msgstr "Bar"
 
-#: app/templates/devices/transfer.html:42 app/templates/navbar.html:90
+#: app/templates/devices/transfer.html:42 app/templates/navbar.html:110
 msgid "Déconnexion"
 msgstr "Sign out"
 
-#: app/templates/devices/modify.html:55 app/templates/panier_bio/admin.html:36
-#: app/templates/panier_bio/period.html:36
+#: app/templates/devices/modify.html:55 app/templates/panier_bio/admin.html:31
+#: app/templates/panier_bio/period.html:31
 #: app/templates/profile/modify_account.html:34
 #: app/templates/profile/update_password.html:31 app/templates/reader.html:90
 #: app/templates/rooms/modify.html:31
 msgid "Retour"
 msgstr "Back"
 
-#: app/templates/cards/bekk.html:46 app/templates/cards/club_q.html:27
-#: app/templates/reader.html:99
+#: app/templates/cards/bekk.html:46 app/templates/reader.html:99
 #, fuzzy
 msgid "Télécharger (PDF)"
 msgstr "Download (PDF)"
@@ -1628,40 +1733,31 @@ msgstr "If any problem, do not hesitate to "
 msgid "nous contacter"
 msgstr "contact us"
 
-#: app/templates/auth/login.html:34
+#: app/templates/auth/login.html:30
+msgid "Mot de passe oublié ?"
+msgstr "Password lost?"
+
+#: app/templates/auth/login.html:39
+msgid "Pas inscrit ?"
+msgstr "Not registered?"
+
+#: app/templates/auth/login.html:54
+#, fuzzy
+msgid "Ou"
+msgstr "OR"
+
+#: app/templates/auth/login.html:65
+#, fuzzy
 msgid ""
-"Si vous possédez un compte élève ESPCI, vous pouvez également vous "
-"connecter directement grâce à l'authentification centrale (SSO) de "
-"l'ESPCI :"
+"Si vous possédez un compte élève ESPCI, connectez-vous directement grâce "
+"à l'authentification centrale (SSO) de l'ESPCI :"
 msgstr ""
 "If you own an ESPCI account, you can also connect directly using ESPCI "
 "central authentication (SSO):"
 
-#: app/templates/auth/login.html:39
+#: app/templates/auth/login.html:68
 msgid "Connexion via espci.psl.eu"
 msgstr "Connect via espci.psl.eu"
-
-#: app/templates/auth/login.html:42
-msgid ""
-"Si vous avez déjà un compte PC est magique (ou IntraRez) avec votre "
-"adresse ESPCI, il sera lié automatiquement et vous donnera l'accès aux "
-"services réservés aux élèves."
-msgstr ""
-"If you already have a PC est magique (or IntraRez) account with your "
-"ESPCI address, it will be automatically linked and will grant you access "
-"to students-only services."
-
-#: app/templates/auth/login.html:50
-msgid "Pas inscrit ?"
-msgstr "Not registered?"
-
-#: app/templates/auth/login.html:56
-msgid "Mot de passe oublié ?"
-msgstr "Password lost?"
-
-#: app/templates/auth/login.html:59
-msgid "Réinitialiser"
-msgstr "Reset"
 
 #: app/templates/auth/register.html:12
 msgid "Trois méthodes sont possibles pour créer un compte PC est magique :"
@@ -1829,11 +1925,11 @@ msgstr ""
 msgid "Exporter les données"
 msgstr "Export data"
 
-#: app/templates/bar/export.html:15 app/templates/club_q/saisons.html:104
+#: app/templates/bar/export.html:15 app/templates/club_q/saisons.html:91
 msgid "Début"
 msgstr "Start"
 
-#: app/templates/bar/export.html:16 app/templates/club_q/saisons.html:122
+#: app/templates/bar/export.html:16 app/templates/club_q/saisons.html:109
 msgid "Fin"
 msgstr "End"
 
@@ -1841,90 +1937,168 @@ msgstr "End"
 msgid "Fichier"
 msgstr "File"
 
-#: app/templates/bar/items.html:74
+#: app/templates/bar/items.html:73
 msgid "Articles en stock"
 msgstr "Items in inventory"
 
-#: app/templates/bar/items.html:84 app/templates/bar/transactions.html:24
+#: app/templates/bar/items.html:83 app/templates/bar/transactions.html:24
 #: app/templates/gris/pceens.html:48
 msgid "Total :"
 msgstr "Total:"
 
-#: app/templates/bar/items.html:112 app/templates/cards/offer.html:22
-#: app/templates/club_q/id/salle.html:167 app/templates/club_q/main.html:238
-#: app/templates/club_q/spectacles.html:140
+#: app/templates/bar/items.html:111 app/templates/cards/offer.html:22
+#: app/templates/club_q/id/salle.html:154 app/templates/club_q/main.html:238
+#: app/templates/club_q/spectacles.html:127
 msgid "Prix"
 msgstr "Price"
 
-#: app/templates/bar/items.html:124
+#: app/templates/bar/items.html:123
 msgid "N/A"
 msgstr "N/A"
 
-#: app/templates/bar/items.html:127 app/templates/bar/user.html:172
+#: app/templates/bar/items.html:126 app/templates/bar/user.html:170
+#: app/templates/bar/user.html:438
 msgid "g"
 msgstr ""
 
-#: app/templates/bar/items.html:235
+#: app/templates/bar/items.html:146
+#, fuzzy
+msgid "Mettre en accès rapide"
+msgstr "Director"
+
+#: app/templates/bar/items.html:157
+#, fuzzy
+msgid "Modifier cet article"
+msgstr "Can be modified in Items tab"
+
+#: app/templates/bar/items.html:179
+#, fuzzy
+msgid "Supprimer cet article"
+msgstr "Delete current image"
+
+#: app/templates/bar/items.html:227
 msgid "Nouvel article || Modifier : _name_"
 msgstr "New item || Edit _name_"
 
-#: app/templates/bar/items.html:304 app/templates/bar/transactions.html:42
-#: app/templates/bar/user.html:202 app/templates/bar/user.html:300
-#: app/templates/bar/user.html:327 app/templates/bekk/main.html:153
-#: app/templates/bekk/main.html:221 app/templates/club_q/brochures.html:127
+#: app/templates/bar/items.html:296 app/templates/bar/transactions.html:42
+#: app/templates/bar/user.html:242 app/templates/bar/user.html:467
+#: app/templates/bar/user.html:565 app/templates/bar/user.html:591
+#: app/templates/bekk/main.html:150 app/templates/bekk/main.html:216
+#: app/templates/club_q/brochures.html:114
 #: app/templates/club_q/modals/modals_spectacles.html:87
 #: app/templates/club_q/modals/modals_spectacles.html:183
 #: app/templates/club_q/modals/modals_voeux.html:68
 #: app/templates/club_q/modals/modals_voeux.html:135
-#: app/templates/club_q/pceens.html:298 app/templates/club_q/saisons.html:380
-#: app/templates/club_q/saisons.html:452 app/templates/club_q/salles.html:331
-#: app/templates/club_q/salles.html:408 app/templates/devices/modify.html:79
-#: app/templates/panier_bio/admin.html:548
-#: app/templates/panier_bio/main.html:272
-#: app/templates/panier_bio/period.html:319 app/templates/theatre/admin.html:75
-#: app/templates/theatre/admin_saison.html:96
-#: app/templates/theatre/admin_saison.html:168
+#: app/templates/club_q/pceens.html:298 app/templates/club_q/saisons.html:367
+#: app/templates/club_q/saisons.html:439 app/templates/club_q/salles.html:318
+#: app/templates/club_q/salles.html:395 app/templates/devices/modify.html:79
+#: app/templates/panier_bio/admin.html:538
+#: app/templates/panier_bio/period.html:305 app/templates/theatre/admin.html:90
+#: app/templates/theatre/admin_saison.html:98
+#: app/templates/theatre/admin_saison.html:185
 #: app/templates/theatre/admin_spectacle.html:99
 #: app/templates/theatre/admin_spectacle.html:149
 msgid "Annuler"
 msgstr "Cancel"
 
-#: app/templates/bar/navbar.html:6
+#: app/templates/bar/navbar.html:7 app/templates/bar/navbar.html:100
 msgid "Menu Bar"
 msgstr "Bar Menu"
 
-#: app/templates/bar/navbar.html:14
-msgid "Rechercher un utilisateur"
+#: app/templates/bar/navbar.html:18
+#, fuzzy
+msgid "Rechercher un utilisateur..."
 msgstr "Search for an user"
 
-#: app/templates/bar/navbar.html:15 app/templates/bar/stats.html:118
+#: app/templates/bar/navbar.html:20 app/templates/bar/navbar.html:109
+#: app/templates/bar/stats.html:124 app/templates/bar/stats.html:262
 msgid "Go"
 msgstr "Go"
 
-#: app/templates/bar/navbar.html:29
+#: app/templates/bar/navbar.html:36 app/templates/bar/navbar.html:123
 msgid "Stats"
 msgstr "Stats"
 
-#: app/templates/bar/navbar.html:34
+#: app/templates/bar/navbar.html:41 app/templates/bar/navbar.html:128
 msgid "Articles"
 msgstr "Items"
 
-#: app/templates/bar/navbar.html:39 app/templates/bar/transactions.html:21
-#: app/templates/bar/user.html:191
+#: app/templates/bar/navbar.html:46 app/templates/bar/navbar.html:133
+#: app/templates/bar/transactions.html:21 app/templates/bar/user.html:456
 msgid "Transactions"
 msgstr "Transactions"
 
-#: app/templates/bar/navbar.html:45
+#: app/templates/bar/navbar.html:52 app/templates/bar/navbar.html:139
 msgid "Outils"
 msgstr "Tools"
 
-#: app/templates/bar/navbar.html:50
+#: app/templates/bar/navbar.html:62 app/templates/bar/navbar.html:144
 msgid "Exports"
 msgstr "Exports"
 
-#: app/templates/bar/navbar.html:55 app/templates/bar/settings.html:7
+#: app/templates/bar/navbar.html:72 app/templates/bar/navbar.html:149
+#: app/templates/bar/settings.html:7
 msgid "Paramètres"
 msgstr "Settings"
+
+#: app/templates/bar/navbar.html:84
+#, fuzzy
+msgid "Mon Profil Bar"
+msgstr "My profile"
+
+#: app/templates/bar/navbar.html:108
+msgid "Rechercher un utilisateur"
+msgstr "Search for an user"
+
+#: app/templates/bar/recharge.html:11
+msgid "Paiement sécurisé via Lydia"
+msgstr "Secure payment via Lydia"
+
+#: app/templates/bar/recharge.html:16
+msgid ""
+"Vous pouvez recharger votre compte bar instantanément par Lydia. "
+"Alternativement, vous pouvez vous rendre directement au bar pour "
+"effectuer un rechargement en espèces ou pour des montants spécifiques."
+msgstr ""
+"You can top up your bar account instantly via Lydia. Alternatively, you "
+"can go directly to the bar for a cash top-up or for specific amounts."
+
+#: app/templates/bar/recharge.html:23
+msgid "Choisissez un montant"
+msgstr "Choose an amount"
+
+#: app/templates/bar/recharge.html:38
+msgid "Montant personnalisé (€)"
+msgstr "Custom amount (€)"
+
+#: app/templates/bar/recharge.html:40
+#, fuzzy, python-format
+msgid "Entre %(min)s€ et %(max)s€"
+msgstr "Between %(min)s€ and %(max)s€"
+
+#: app/templates/bar/recharge.html:46
+msgid "Numéro Lydia (optionnel)"
+msgstr "Lydia number (optional)"
+
+#: app/templates/bar/recharge.html:49
+msgid "Numéro de téléphone"
+msgstr "Phone number"
+
+#: app/templates/bar/recharge.html:51
+msgid "Si vide, vous serez redirigé vers une page de paiement par carte bancaire."
+msgstr "If empty, you will be redirected to a credit card payment page."
+
+#: app/templates/bar/recharge.html:61
+msgid "Procéder au paiement"
+msgstr "Proceed to payment"
+
+#: app/templates/bar/recharge.html:70
+msgid "Vos informations bancaires ne sont jamais stockées sur nos serveurs."
+msgstr "Your banking information is never stored on our servers."
+
+#: app/templates/bar/recharge.html:78
+msgid "Retour à mon profil"
+msgstr "Back to my profile"
 
 #: app/templates/bar/search.html:34
 msgid "Recherche"
@@ -1934,7 +2108,7 @@ msgstr "Search"
 msgid "Résultats :"
 msgstr "Results:"
 
-#: app/templates/bar/search.html:54
+#: app/templates/bar/search.html:62
 msgid "(exté)"
 msgstr "(external)"
 
@@ -1946,9 +2120,18 @@ msgstr "Parameter"
 msgid "Valeur"
 msgstr "Value"
 
-#: app/templates/bar/settings.html:28
+#: app/templates/bar/settings.html:38
 msgid "Image de fond"
 msgstr "Background image"
+
+#: app/templates/bar/settings.html:47
+msgid "Parcourir..."
+msgstr ""
+
+#: app/templates/bar/settings.html:49
+#, fuzzy
+msgid "Aucun fichier sélectionné"
+msgstr "No choosen file"
 
 #: app/templates/bar/stats.html:17
 msgid "aujourd’hui"
@@ -1958,62 +2141,191 @@ msgstr "today"
 msgid "le "
 msgstr "on "
 
-#: app/templates/bar/stats.html:48
+#: app/templates/bar/stats.html:32
+#, fuzzy
+msgid "Clients"
+msgstr "Rezidents"
+
+#: app/templates/bar/stats.html:51 app/templates/bar/stats.html:193
 msgid "Alcool vendu"
 msgstr "Alcohol sold"
 
-#: app/templates/bar/stats.html:65
-msgid "Recette totale"
+#: app/templates/bar/stats.html:55
+#, fuzzy
+msgid "Vendu"
+msgstr "Suspended"
+
+#: app/templates/bar/stats.html:70
+#, fuzzy
+msgid "Recette"
 msgstr "Total income"
 
-#: app/templates/bar/stats.html:82
-msgid "Moula totale des clients"
+#: app/templates/bar/stats.html:74 app/templates/club_q/id/pceen.html:307
+#: app/templates/club_q/id/salle.html:322
+#: app/templates/club_q/id/spectacle.html:264
+#: app/templates/club_q/pceens.html:233
+#: app/templates/club_q/spectacles.html:317
+#, fuzzy
+msgid "Total"
+msgstr "Total:"
+
+#: app/templates/bar/stats.html:89
+#, fuzzy
+msgid "Moula clients"
 msgstr "Total clients moula"
 
-#: app/templates/bar/stats.html:99
+#: app/templates/bar/stats.html:93
+#, fuzzy
+msgid "Somme totale des soldes"
+msgstr "Total clients moula"
+
+#: app/templates/bar/stats.html:108
+msgid "Top client"
+msgstr ""
+
+#: app/templates/bar/stats.html:112 app/templates/bar/stats.html:244
 msgid "Meilleur client du mois"
 msgstr "Best customer of the month"
 
-#: app/templates/bar/stats.html:116
-msgid "Date&nbsp;:"
-msgstr "Date:"
+#: app/templates/bar/stats.html:121
+#, fuzzy
+msgid "Changer de date"
+msgstr "Change room"
 
-#: app/templates/bar/transactions.html:36 app/templates/bar/user.html:133
+#: app/templates/bar/stats.html:138
+#, fuzzy
+msgid "Recettes mensuelles"
+msgstr "Total income"
+
+#: app/templates/bar/stats.html:152
+#, fuzzy
+msgid "Transactions par jour"
+msgstr "Transactions – Bar"
+
+#: app/templates/bar/stats.html:210
+msgid "Recette totale"
+msgstr "Total income"
+
+#: app/templates/bar/stats.html:227
+msgid "Moula totale des clients"
+msgstr "Total clients moula"
+
+#: app/templates/bar/transactions.html:36 app/templates/bar/user.html:399
 msgid "Client&middot;e"
 msgstr "Client:"
 
-#: app/templates/bar/transactions.html:38 app/templates/bar/user.html:198
-#: app/templates/cards/device.html:19 app/templates/cards/device_modal.html:20
+#: app/templates/bar/transactions.html:38 app/templates/bar/user.html:195
+#: app/templates/bar/user.html:463 app/templates/cards/device.html:19
+#: app/templates/cards/device_modal.html:20
 msgid "Type"
 msgstr "Type"
 
-#: app/templates/bar/transactions.html:39 app/templates/bar/user.html:199
+#: app/templates/bar/transactions.html:39 app/templates/bar/user.html:196
+#: app/templates/bar/user.html:464
 msgid "Article"
 msgstr "Item"
 
-#: app/templates/bar/transactions.html:40 app/templates/bar/user.html:200
+#: app/templates/bar/transactions.html:40 app/templates/bar/user.html:465
 #: app/templates/gris/pceens.html:151
 msgid "Balance"
 msgstr "Funds"
 
-#: app/templates/bar/transactions.html:60 app/templates/bar/user.html:215
+#: app/templates/bar/transactions.html:60 app/templates/bar/user.html:208
+#: app/templates/bar/user.html:480
 msgid "Conso"
 msgstr "Consumed"
 
-#: app/templates/bar/transactions.html:63 app/templates/bar/user.html:218
+#: app/templates/bar/transactions.html:63 app/templates/bar/user.html:210
+#: app/templates/bar/user.html:483
 msgid "Recharge"
 msgstr "Top up"
 
-#: app/templates/bar/user.html:16
-msgid "Profil Bar :"
+#: app/templates/bar/user.html:29
+#, fuzzy
+msgid "Profil Bar"
 msgstr "Bar Profile:"
 
-#: app/templates/bar/user.html:34 app/templates/bar/user.html:326
-#: app/templates/cards/bar.html:40
+#: app/templates/bar/user.html:39 app/templates/bar/user.html:302
+#: app/templates/bar/user.html:590 app/templates/cards/bar.html:38
 msgid "Recharger"
 msgstr "Top up"
 
-#: app/templates/bar/user.html:43 app/templates/cards/subscription.html:113
+#: app/templates/bar/user.html:66 app/templates/bar/user.html:73
+#: app/templates/bar/user.html:337 app/templates/bar/user.html:349
+msgid "Pas de favori"
+msgstr "No favorite"
+
+#: app/templates/bar/user.html:79 app/templates/bar/user.html:360
+#, python-format
+msgid "Accepter la caution de %(name)s ?"
+msgstr "Accept %(name)s deposit?"
+
+#: app/templates/bar/user.html:83
+#, fuzzy
+msgid "Valider la caution"
+msgstr "Validate deposit"
+
+#: app/templates/bar/user.html:113 app/templates/bar/user.html:393
+msgid "GRI tout-puissant"
+msgstr "Almighty GRI"
+
+#: app/templates/bar/user.html:113
+#, fuzzy
+msgid "Client·e"
+msgstr "Client:"
+
+#: app/templates/bar/user.html:126 app/templates/bar/user.html:404
+#: app/templates/cards/account.html:30
+msgid "Email"
+msgstr "Mail"
+
+#: app/templates/bar/user.html:138 app/templates/bar/user.html:413
+msgid "Externe"
+msgstr "External"
+
+#: app/templates/bar/user.html:148 app/templates/bar/user.html:416
+msgid "Solde actuel"
+msgstr "Current founds"
+
+#: app/templates/bar/user.html:168
+msgid "Consommation d'alcool"
+msgstr ""
+
+#: app/templates/bar/user.html:188
+#, fuzzy
+msgid "Historique des transactions"
+msgstr "Order history"
+
+#: app/templates/bar/user.html:197 app/templates/cards/payment.html:22
+msgid "Montant"
+msgstr "Amount"
+
+#: app/templates/bar/user.html:200 app/templates/panier_bio/main.html:178
+#: app/templates/theatre/admin.html:40
+#: app/templates/theatre/admin_saison.html:135
+#, fuzzy
+msgid "Actions"
+msgstr "Active"
+
+#: app/templates/bar/user.html:217
+#, fuzzy
+msgid "Crédit compte"
+msgstr "Sign up"
+
+#: app/templates/bar/user.html:220
+#, fuzzy
+msgid "Annulée"
+msgstr "Cancel"
+
+#: app/templates/bar/user.html:244
+msgid "Annuler cette transaction ?"
+msgstr ""
+
+#: app/templates/bar/user.html:284
+msgid "Profil Bar :"
+msgstr "Bar Profile:"
+
+#: app/templates/bar/user.html:311 app/templates/cards/subscription.html:113
 #: app/templates/cards/subscription.html:121
 #: app/templates/cards/subscription.html:128
 #: app/templates/payments/main.html:86 app/templates/payments/main.html:94
@@ -2021,86 +2333,45 @@ msgstr "Top up"
 msgid "Payer"
 msgstr "Pay"
 
-#: app/templates/bar/user.html:46
-msgid "Favoris"
-msgstr "Favorites"
-
-#: app/templates/bar/user.html:50
-msgid "Autres articles"
-msgstr "Other items"
-
-#: app/templates/bar/user.html:71
-msgid "Modifiable depuis l'onglet Articles"
-msgstr "Can be modified in Items tab"
-
-#: app/templates/bar/user.html:83
-msgid "Pas de favori"
-msgstr "No favorite"
-
-#: app/templates/bar/user.html:92 app/templates/gris/pceens.html:141
+#: app/templates/bar/user.html:358 app/templates/gris/pceens.html:141
 msgid "Caution"
 msgstr "Deposit"
 
-#: app/templates/bar/user.html:94
-#, python-format
-msgid "Accepter la caution de %(name)s ?"
-msgstr "Accept %(name)s deposit?"
-
-#: app/templates/bar/user.html:97
+#: app/templates/bar/user.html:363
 msgid "Valider le dépôt de caution"
 msgstr "Validate deposit"
 
-#: app/templates/bar/user.html:103
+#: app/templates/bar/user.html:369
 msgid "Modifier le surnom"
 msgstr "Edit nickname"
 
-#: app/templates/bar/user.html:122 app/templates/gris/roles.html:36
+#: app/templates/bar/user.html:388 app/templates/gris/roles.html:36
 msgid "Rôle"
 msgstr "Role"
 
-#: app/templates/bar/user.html:127
-msgid "GRI tout-puissant"
-msgstr "Almighty GRI"
-
-#: app/templates/bar/user.html:131
+#: app/templates/bar/user.html:397
 msgid "Observateur"
 msgstr "Observer"
 
-#: app/templates/bar/user.html:138 app/templates/cards/account.html:30
-msgid "Email"
-msgstr "Mail"
-
-#: app/templates/bar/user.html:138 app/templates/cards/account.html:36
-msgid "Email ESPCI"
-msgstr "ESPCI Mail"
-
-#: app/templates/bar/user.html:147
-msgid "Externe"
-msgstr "External"
-
-#: app/templates/bar/user.html:150
-msgid "Solde actuel"
-msgstr "Current founds"
-
-#: app/templates/bar/user.html:166
+#: app/templates/bar/user.html:432
 msgid "Limite d'alcool aujourd’hui"
 msgstr "Alcohol limit today"
 
-#: app/templates/bar/user.html:278
+#: app/templates/bar/user.html:543
 #, python-format
 msgid "Modifier les infos Bar de %(name)s"
 msgstr "Edit %(name)s's Bar info"
 
-#: app/templates/bar/user.html:293
+#: app/templates/bar/user.html:558
 msgid "Nouvel avatar (sera recadré en 160x200 px) :"
 msgstr "New avatar (will be cropped to 160x200px):"
 
-#: app/templates/bar/user.html:315
+#: app/templates/bar/user.html:579
 #, python-format
 msgid "Recharger le compte de %(name)s"
 msgstr "Top up %(name)s's account"
 
-#: app/templates/bar/user.html:322
+#: app/templates/bar/user.html:586
 msgid "Montant en euros"
 msgstr "Amount in euros"
 
@@ -2168,19 +2439,19 @@ msgstr "If any problem, do not hesitate to "
 msgid "contacter les GRI"
 msgstr "contact GRI"
 
-#: app/templates/bekk/main.html:54 app/templates/bekk/main.html:175
-#, fuzzy
-msgid "Ajouter un bekk"
-msgstr "Add bekk"
-
-#: app/templates/bekk/main.html:82 app/templates/gris/pceens.html:40
+#: app/templates/bekk/main.html:79 app/templates/gris/pceens.html:40
 msgid "Tous"
 msgstr "Everyone"
 
-#: app/templates/bekk/main.html:118
+#: app/templates/bekk/main.html:115
 #, fuzzy
 msgid "Editer bekk"
 msgstr "Edit bekk"
+
+#: app/templates/bekk/main.html:172
+#, fuzzy
+msgid "Ajouter un bekk"
+msgstr "Add bekk"
 
 #: app/templates/cards/account.html:5 app/templates/devices/register.html:10
 #: app/templates/devices/transfer.html:10
@@ -2193,16 +2464,20 @@ msgstr "Account"
 msgid "Identifiant"
 msgstr "ID"
 
-#: app/templates/cards/account.html:36 app/templates/gris/menu.html:14
+#: app/templates/cards/account.html:37 app/templates/cards/account.html:44
+msgid "Email ESPCI"
+msgstr "ESPCI Mail"
+
+#: app/templates/cards/account.html:51 app/templates/gris/menu.html:14
 #: app/templates/gris/pceens.html:172
 msgid "Rôles"
 msgstr "Roles"
 
-#: app/templates/cards/account.html:45
+#: app/templates/cards/account.html:61
 msgid "Modifier une information"
 msgstr "Edit an information"
 
-#: app/templates/cards/account.html:51
+#: app/templates/cards/account.html:66
 msgid "Changer de mot de passe"
 msgstr "Change password"
 
@@ -2228,38 +2503,38 @@ msgstr "Spent today"
 msgid "Détails"
 msgstr "Details"
 
-#: app/templates/cards/bar.html:38
-msgid "Fonctionnalité à venir - voir directement au Bar"
-msgstr "Upcoming feature – see directly at the Bar"
-
 #: app/templates/cards/bekk.html:37
 msgid "Lire le Bekk"
 msgstr "Read Bekk"
 
-#: app/templates/cards/bekk_accueil.html:9
+#: app/templates/cards/bekk_accueil.html:8
 #, fuzzy
 msgid "Dernier bekk"
 msgstr "Last bekk"
 
-#: app/templates/cards/bekk_accueil.html:27
+#: app/templates/cards/bekk_accueil.html:26
 #, fuzzy
 msgid "Nombre de bekks"
 msgstr "Number of bekks"
 
-#: app/templates/cards/bekk_accueil.html:36
+#: app/templates/cards/bekk_accueil.html:35
 #, fuzzy
 msgid "Bekks"
 msgstr "Bekks"
 
-#: app/templates/cards/bekk_accueil.html:43
+#: app/templates/cards/bekk_accueil.html:42
 #, fuzzy
 msgid "Lire le dernier"
 msgstr "Read last"
 
-#: app/templates/cards/club_q.html:18
+#: app/templates/cards/club_q.html:21
 #, fuzzy
 msgid "Lire"
 msgstr "Title"
+
+#: app/templates/cards/club_q.html:33
+msgid "PDF"
+msgstr ""
 
 #: app/templates/cards/club_q_accueil.html:14
 #: app/templates/gris/pceens.html:254
@@ -2376,14 +2651,9 @@ msgid "Voir l'historique"
 msgstr "History"
 
 #: app/templates/cards/payment.html:18
-#: app/templates/club_q/id/spectacle.html:103
-#: app/templates/club_q/voeux.html:86
+#: app/templates/club_q/id/spectacle.html:90 app/templates/club_q/voeux.html:73
 msgid "PCéen"
 msgstr "PCéen"
-
-#: app/templates/cards/payment.html:22
-msgid "Montant"
-msgstr "Amount"
 
 #: app/templates/cards/payment.html:26 app/templates/payments/pay.html:70
 msgid "Mode de paiement"
@@ -2459,11 +2729,11 @@ msgstr "To"
 msgid "Anciennes locations :"
 msgstr "Former rentals:"
 
-#: app/templates/cards/room.html:63 app/templates/panier_bio/admin.html:158
+#: app/templates/cards/room.html:63 app/templates/panier_bio/admin.html:145
 msgid "Période"
 msgstr "Dates"
 
-#: app/templates/cards/room.html:89
+#: app/templates/cards/room.html:90
 msgid "Modifier les dates"
 msgstr "Edit dates"
 
@@ -2510,58 +2780,36 @@ msgstr "More information"
 msgid "Renouvellement possible à partir de la fin de l'abonnement actuel"
 msgstr "Renewal possible from the end of the current subscription"
 
-#: app/templates/club_q/attribution.html:3
-msgid "Algorithme d'attribution"
-msgstr "Attribution algorithm"
+#: app/templates/club_q/attribution.html:10
+#, fuzzy
+msgid "Paramètres de l'algorithme"
+msgstr "Algorithm settings"
 
-#: app/templates/club_q/attribution.html:14
-msgid "Bonus de mécontentement :"
+#: app/templates/club_q/attribution.html:17
+#, fuzzy
+msgid "Bonus de mécontentement"
 msgstr "Discontent bonus: "
 
-#: app/templates/club_q/attribution.html:15
+#: app/templates/club_q/attribution.html:27
 #, fuzzy
 msgid "Promotion actuelle en 1A"
 msgstr "Current promotion in 1st year"
 
-#: app/templates/club_q/attribution.html:16
-msgid "Mécontentement 1A"
-msgstr "Discontent 1A"
+#: app/templates/club_q/attribution.html:43
+msgid "Options d'exécution"
+msgstr ""
 
-#: app/templates/club_q/attribution.html:17
-msgid "Mécontentement 2A"
-msgstr "Discontent 2A"
-
-#: app/templates/club_q/attribution.html:18
-msgid "Mécontentement 3A"
-msgstr "Discontent 3A"
-
-#: app/templates/club_q/attribution.html:19
-msgid "Mécontentement 4A"
-msgstr "Discontent 4A"
-
-#: app/templates/club_q/attribution.html:25
-msgid "Options de l'algorithme"
-msgstr "Algorithm settings"
-
-#: app/templates/club_q/attribution.html:28
-msgid ""
-"Si coché, à la suite de l'exécution de l'algorithme, les résultats seront"
-" sauvegardés dans la base de\n"
-"        données"
-msgstr "If checked, following algorithm run, results will be saved in database"
-
-#: app/templates/club_q/brochures.html:39
-#: app/templates/club_q/brochures.html:91
-#, fuzzy
-msgid "Ajouter une plaquette"
-msgstr "Add a brochure"
-
-#: app/templates/club_q/brochures.html:63
+#: app/templates/club_q/brochures.html:50
 msgid ""
 "Cette page répertorie les plaquettes du Club Q, à des fins de "
 "présentation de la saison actuelle autant bien\n"
 "    que pour les archives."
 msgstr "This page gives access to all Club Q brochures."
+
+#: app/templates/club_q/brochures.html:78
+#, fuzzy
+msgid "Ajouter une plaquette"
+msgstr "Add a brochure"
 
 #: app/templates/club_q/common.html:24
 #, fuzzy
@@ -2573,12 +2821,13 @@ msgstr "My bookings"
 msgid "Mes réservations"
 msgstr "My bookings"
 
-#: app/templates/club_q/common.html:39 app/templates/club_q/saisons.html:162
+#: app/templates/club_q/common.html:39 app/templates/club_q/saisons.html:149
 #: app/templates/gris/menu.html:10
 msgid "PCéens"
 msgstr "PCéens"
 
-#: app/templates/club_q/common.html:47 app/templates/club_q/saisons.html:180
+#: app/templates/club_q/common.html:47 app/templates/club_q/saisons.html:167
+#: app/templates/theatre/admin_saison.html:116
 msgid "Spectacles"
 msgstr "Spectacles"
 
@@ -2586,7 +2835,7 @@ msgstr "Spectacles"
 msgid "Salles"
 msgstr "Locations"
 
-#: app/templates/club_q/common.html:62 app/templates/club_q/saisons.html:198
+#: app/templates/club_q/common.html:62 app/templates/club_q/saisons.html:185
 msgid "Voeux"
 msgstr "Wishes"
 
@@ -2650,8 +2899,8 @@ msgstr "No. of wanted seats"
 msgid "Mise à jour"
 msgstr "Update"
 
-#: app/templates/club_q/id/salle.html:131 app/templates/club_q/main.html:202
-#: app/templates/club_q/spectacles.html:104
+#: app/templates/club_q/id/salle.html:118 app/templates/club_q/main.html:202
+#: app/templates/club_q/spectacles.html:91
 msgid "Catégorie"
 msgstr "Category"
 
@@ -2671,12 +2920,12 @@ msgstr "Wishes page: "
 msgid "PCéens : "
 msgstr "PCéens: "
 
-#: app/templates/club_q/id/pceen.html:85 app/templates/club_q/id/salle.html:77
-#: app/templates/club_q/id/spectacle.html:85
-#: app/templates/club_q/pceens.html:25 app/templates/club_q/saisons.html:50
-#: app/templates/club_q/salles.html:51 app/templates/club_q/spectacles.html:50
-#: app/templates/club_q/voeux.html:50 app/templates/gris/pceens.html:69
-#: app/templates/gris/roles.html:25 app/templates/panier_bio/period.html:84
+#: app/templates/club_q/id/pceen.html:66 app/templates/club_q/id/salle.html:64
+#: app/templates/club_q/id/spectacle.html:72
+#: app/templates/club_q/pceens.html:25 app/templates/club_q/saisons.html:37
+#: app/templates/club_q/salles.html:38 app/templates/club_q/spectacles.html:37
+#: app/templates/club_q/voeux.html:37 app/templates/gris/pceens.html:69
+#: app/templates/gris/roles.html:25 app/templates/panier_bio/period.html:70
 #: app/templates/payments/main.html:195
 msgid "ID"
 msgstr "ID"
@@ -2691,37 +2940,28 @@ msgstr "No. of wanted seats"
 msgid "Éditer le mécontement"
 msgstr "Edit discontent"
 
-#: app/templates/club_q/id/pceen.html:326
-#: app/templates/club_q/id/salle.html:335
-#: app/templates/club_q/id/spectacle.html:277
-#: app/templates/club_q/pceens.html:233
-#: app/templates/club_q/spectacles.html:330
-#, fuzzy
-msgid "Total"
-msgstr "Total:"
-
 #: app/templates/club_q/pceens.html:234
 #, fuzzy
 msgid "Nb de PCéens : "
 msgstr "No. of PCéens: "
 
-#: app/templates/club_q/id/pceen.html:328
-#: app/templates/club_q/id/pceen.html:330
-#: app/templates/club_q/id/pceen.html:337
-#: app/templates/club_q/id/pceen.html:338
-#: app/templates/club_q/id/salle.html:337
-#: app/templates/club_q/id/salle.html:338
-#: app/templates/club_q/id/salle.html:339
-#: app/templates/club_q/id/salle.html:340
-#: app/templates/club_q/id/salle.html:345
-#: app/templates/club_q/id/spectacle.html:279
-#: app/templates/club_q/id/spectacle.html:281
+#: app/templates/club_q/id/pceen.html:309
+#: app/templates/club_q/id/pceen.html:311
+#: app/templates/club_q/id/pceen.html:318
+#: app/templates/club_q/id/pceen.html:319
+#: app/templates/club_q/id/salle.html:324
+#: app/templates/club_q/id/salle.html:325
+#: app/templates/club_q/id/salle.html:326
+#: app/templates/club_q/id/salle.html:327
+#: app/templates/club_q/id/salle.html:332
+#: app/templates/club_q/id/spectacle.html:266
+#: app/templates/club_q/id/spectacle.html:268
 #: app/templates/club_q/pceens.html:235 app/templates/club_q/pceens.html:239
-#: app/templates/club_q/spectacles.html:332
-#: app/templates/club_q/spectacles.html:333
-#: app/templates/club_q/spectacles.html:334
-#: app/templates/club_q/spectacles.html:335
-#: app/templates/club_q/spectacles.html:341
+#: app/templates/club_q/spectacles.html:319
+#: app/templates/club_q/spectacles.html:320
+#: app/templates/club_q/spectacles.html:321
+#: app/templates/club_q/spectacles.html:322
+#: app/templates/club_q/spectacles.html:328
 msgid "-"
 msgstr "-"
 
@@ -2734,106 +2974,104 @@ msgstr "Payements summary"
 msgid "Saisons : "
 msgstr "Seasons: "
 
-#: app/templates/club_q/saisons.html:20 app/templates/club_q/saisons.html:405
-#: app/templates/theatre/admin.html:25
-#, fuzzy
-msgid "Ajouter une saison"
-msgstr "Add a season"
-
-#: app/templates/club_q/saisons.html:86
+#: app/templates/club_q/saisons.html:73
 msgid "Promo orga."
 msgstr "Organiser promo"
 
-#: app/templates/club_q/saisons.html:140
+#: app/templates/club_q/saisons.html:127
 #, fuzzy
 msgid "Fin inscription"
 msgstr "End of subscriptions"
 
-#: app/templates/club_q/saisons.html:155
+#: app/templates/club_q/saisons.html:142
 #, fuzzy
 msgid "Attribution visible"
 msgstr "Attribution"
 
-#: app/templates/club_q/saisons.html:285
+#: app/templates/club_q/saisons.html:272
 #, fuzzy
 msgid "Éditer la saison"
 msgstr "Edit season"
 
-#: app/templates/club_q/saisons.html:333
+#: app/templates/club_q/saisons.html:320
 msgid "Editer saison ID"
 msgstr "Edit season ID"
+
+#: app/templates/club_q/saisons.html:392 app/templates/theatre/admin.html:28
+#, fuzzy
+msgid "Ajouter une saison"
+msgstr "Add a season"
 
 #: app/templates/club_q/salles.html:14
 msgid "Salles : "
 msgstr "Locations: "
 
-#: app/templates/club_q/salles.html:19 app/templates/club_q/salles.html:356
-#: app/templates/club_q/spectacles.html:18
-#, fuzzy
-msgid "Ajouter une salle"
-msgstr "Add a location"
-
-#: app/templates/club_q/salles.html:87
+#: app/templates/club_q/salles.html:74
 msgid "Spects."
 msgstr "Spects."
 
-#: app/templates/club_q/id/salle.html:23 app/templates/club_q/salles.html:123
+#: app/templates/club_q/id/salle.html:23 app/templates/club_q/salles.html:110
 #, fuzzy
 msgid "Site internet"
 msgstr "Website"
 
-#: app/templates/club_q/salles.html:141
+#: app/templates/club_q/salles.html:128
 #, fuzzy
 msgid "Adresse"
 msgstr "Address"
 
-#: app/templates/club_q/salles.html:159 app/templates/club_q/salles.html:177
+#: app/templates/club_q/salles.html:146 app/templates/club_q/salles.html:164
 msgid "Latitude"
 msgstr "Latitude"
 
-#: app/templates/club_q/salles.html:279
+#: app/templates/club_q/salles.html:266
 msgid "Editer salle ID"
 msgstr "Edit location ID"
+
+#: app/templates/club_q/salles.html:343
+#, fuzzy
+msgid "Ajouter une salle"
+msgstr "Add a location"
 
 #: app/templates/club_q/id/salle.html:40
 #: app/templates/club_q/spectacles.html:13
 msgid "Spectacles : "
 msgstr "Spectacles: "
 
-#: app/templates/club_q/spectacles.html:159
+#: app/templates/club_q/spectacles.html:146
 msgid "Vx."
 msgstr "Wsh."
 
-#: app/templates/club_q/spectacles.html:177
+#: app/templates/club_q/spectacles.html:164
 msgid "Pl."
 msgstr "Pl."
 
-#: app/templates/club_q/id/pceen.html:139
-#: app/templates/club_q/id/salle.html:204
-#: app/templates/club_q/spectacles.html:195
+#: app/templates/club_q/id/pceen.html:120
+#: app/templates/club_q/id/salle.html:191
+#: app/templates/club_q/spectacles.html:182
 msgid "Dem."
 msgstr "Ask."
 
-#: app/templates/club_q/id/salle.html:222
-#: app/templates/club_q/spectacles.html:213
+#: app/templates/club_q/id/salle.html:209
+#: app/templates/club_q/spectacles.html:200
 msgid "Att."
 msgstr "Giv."
 
-#: app/templates/club_q/id/salle.html:240
-#: app/templates/club_q/spectacles.html:231
+#: app/templates/club_q/id/salle.html:227
+#: app/templates/club_q/spectacles.html:218
 msgid "Rst."
 msgstr "Rem."
 
-#: app/templates/club_q/spectacles.html:331
+#: app/templates/club_q/spectacles.html:318
 msgid "Nb de spectacles : "
 msgstr "Nb of spectacles :"
 
-#: app/templates/club_q/spectacles.html:358
+#: app/templates/club_q/spectacles.html:345
 #, fuzzy
 msgid "Exporter les PDFs "
 msgstr "Export data"
 
-#: app/templates/club_q/spectacles.html:366
+#: app/templates/club_q/spectacles.html:353
 #, fuzzy
 msgid "Exporter les Excels"
 msgstr "Export Excels"
@@ -2843,40 +3081,32 @@ msgstr "Export Excels"
 msgid "Voeux : "
 msgstr "Wishes: "
 
-#: app/templates/club_q/id/pceen.html:52
-#: app/templates/club_q/id/spectacle.html:55
-#: app/templates/club_q/modals/modals_voeux.html:16
-#: app/templates/club_q/voeux.html:20
-#, fuzzy
-msgid "Ajouter un voeu"
-msgstr "Add wish"
-
-#: app/templates/club_q/id/spectacle.html:139
-#: app/templates/club_q/voeux.html:122
+#: app/templates/club_q/id/spectacle.html:126
+#: app/templates/club_q/voeux.html:109
 msgid "Demandées"
 msgstr "Asked"
 
-#: app/templates/club_q/id/spectacle.html:157
-#: app/templates/club_q/voeux.html:140
+#: app/templates/club_q/id/spectacle.html:144
+#: app/templates/club_q/voeux.html:127
 #, fuzzy
 msgid "Minimum"
 msgstr "Minimum"
 
-#: app/templates/club_q/id/spectacle.html:175
-#: app/templates/club_q/voeux.html:158
+#: app/templates/club_q/id/spectacle.html:162
+#: app/templates/club_q/voeux.html:145
 #, fuzzy
 msgid "Attribuées"
 msgstr "Allocated"
 
-#: app/templates/club_q/id/pceen.html:231
-#: app/templates/club_q/id/spectacle.html:193
-#: app/templates/club_q/voeux.html:176
+#: app/templates/club_q/id/pceen.html:212
+#: app/templates/club_q/id/spectacle.html:180
+#: app/templates/club_q/voeux.html:163
 msgid "Prix total"
 msgstr "Total price"
 
-#: app/templates/club_q/id/pceen.html:296
-#: app/templates/club_q/id/spectacle.html:248
-#: app/templates/club_q/voeux.html:235
+#: app/templates/club_q/id/pceen.html:277
+#: app/templates/club_q/id/spectacle.html:235
+#: app/templates/club_q/voeux.html:222
 msgid "Éditer le voeu"
 msgstr "Edit wish"
 
@@ -2901,38 +3131,33 @@ msgstr "Mail: "
 msgid "Mécontentement : "
 msgstr "Discontent:"
 
-#: app/templates/club_q/id/pceen.html:36
-#, fuzzy
-msgid "Imprimer la facture"
-msgstr "Print invoice"
-
-#: app/templates/club_q/id/pceen.html:44
+#: app/templates/club_q/id/pceen.html:38
 msgid "Facture"
 msgstr ""
 
-#: app/templates/club_q/id/pceen.html:157
+#: app/templates/club_q/id/pceen.html:138
 msgid "Min."
 msgstr "Min."
 
-#: app/templates/club_q/id/pceen.html:175
+#: app/templates/club_q/id/pceen.html:156
 msgid "Attr."
 msgstr "All."
 
-#: app/templates/club_q/id/pceen.html:194
+#: app/templates/club_q/id/pceen.html:175
 #, fuzzy
 msgid "Places"
 msgstr "Pl."
 
-#: app/templates/club_q/id/pceen.html:212
+#: app/templates/club_q/id/pceen.html:193
 msgid "Rest."
 msgstr "Rem."
 
-#: app/templates/club_q/id/pceen.html:285
-#: app/templates/club_q/id/pceen.html:334
+#: app/templates/club_q/id/pceen.html:266
+#: app/templates/club_q/id/pceen.html:315
 msgid "En attente"
 msgstr "Coming soon"
 
-#: app/templates/club_q/id/pceen.html:327
+#: app/templates/club_q/id/pceen.html:308
 msgid "Nb de voeux : "
 msgstr "Nb of whishes: "
 
@@ -2941,18 +3166,11 @@ msgstr "Nb of whishes: "
 msgid "Adresse : "
 msgstr "Address: "
 
-#: app/templates/club_q/id/salle.html:45
-#: app/templates/club_q/modals/modals_spectacles.html:112
-#: app/templates/theatre/admin_saison.html:112
-#, fuzzy
-msgid "Ajouter un spectacle"
-msgstr "Add spectacle"
-
-#: app/templates/club_q/id/salle.html:186
+#: app/templates/club_q/id/salle.html:173
 msgid "Nbr."
 msgstr "Nbr."
 
-#: app/templates/club_q/id/salle.html:336
+#: app/templates/club_q/id/salle.html:323
 #, fuzzy
 msgid "Nb spectacles : "
 msgstr "Nb of spectacles: "
@@ -2993,17 +3211,17 @@ msgstr "Asked places: "
 msgid "Places attribuées : "
 msgstr "Allocated places: "
 
-#: app/templates/club_q/id/spectacle.html:278
+#: app/templates/club_q/id/spectacle.html:265
 #, fuzzy
 msgid "Nb pcéens : "
 msgstr "No. of PCéens: "
 
-#: app/templates/club_q/id/spectacle.html:303
+#: app/templates/club_q/id/spectacle.html:289
 #, fuzzy
 msgid "Générer le PDF"
 msgstr "Generate PDF"
 
-#: app/templates/club_q/id/spectacle.html:311
+#: app/templates/club_q/id/spectacle.html:299
 #, fuzzy
 msgid "Générer l'Excel"
 msgstr "Generate Excel"
@@ -3086,9 +3304,20 @@ msgstr ""
 "By bank transfer, with the same informations as the cheque. If any of "
 "this two means is not possible, please contact the Club Q treasurer."
 
+#: app/templates/club_q/mails/reservation.html:66
+#: app/templates/payments/pay_transfer.html:29
+msgid "IBAN :"
+msgstr "IBAN:"
+
 #: app/templates/club_q/mails/reservation.html:67
-msgid "RIB Club Q"
-msgstr "RIB Club Q"
+#: app/templates/payments/pay_transfer.html:35
+msgid "BIC :"
+msgstr "BIC:"
+
+#: app/templates/club_q/mails/reservation.html:68
+#, fuzzy
+msgid "Titulaire :"
+msgstr "Title"
 
 #: app/templates/club_q/modals/modals_spectacles.html:16
 msgid "Editer spectacle ID"
@@ -3098,6 +3327,17 @@ msgstr "Edit spectacle ID"
 #: app/templates/club_q/modals/modals_spectacles.html:171
 msgid "Image : "
 msgstr "Image : "
+
+#: app/templates/club_q/modals/modals_spectacles.html:112
+#: app/templates/theatre/admin_saison.html:122
+#, fuzzy
+msgid "Ajouter un spectacle"
+msgstr "Add spectacle"
+
+#: app/templates/club_q/modals/modals_voeux.html:16
+#, fuzzy
+msgid "Ajouter un voeu"
+msgstr "Add wish"
 
 #: app/templates/club_q/modals/modals_voeux.html:93
 msgid "Editer voeu"
@@ -3810,25 +4050,35 @@ msgid "sur GitHub"
 msgstr "On GitHub"
 
 #: app/templates/main/changelog.html:23
+msgid "Ajout de nouveaux thèmes M3 et Frost dotés chacun d'un thème sombre."
+msgstr ""
+
+#: app/templates/main/changelog.html:32
+msgid ""
+"Refonte du système de comptes pour empêcher la création de plus d'un "
+"compte par personne."
+msgstr ""
+
+#: app/templates/main/changelog.html:42
 msgid ""
 "Ajout du module du Panier Bio sur pc-est-magique : possibilité de "
 "commander des panier bios et de suivre son historique. Page "
 "d'administration pour le suivi des gérants."
 msgstr "Added Panier Bio module on pc-est-magique."
 
-#: app/templates/main/changelog.html:33
+#: app/templates/main/changelog.html:52
 msgid ""
 "Ajout du module du Bekk sur pc-est-magique : possibilité de le lire en "
 "ligne, de le télécharger. Outils d'administration pour l'équipe du Bekk."
 msgstr "Added Bekk module on pc-est-magique"
 
-#: app/templates/main/changelog.html:43
+#: app/templates/main/changelog.html:62
 msgid ""
 "Refonte complète de la page Club Q pour une meilleure expérience "
 "utilisateur et administrative."
 msgstr "Refreshed Club Q module"
 
-#: app/templates/main/changelog.html:53
+#: app/templates/main/changelog.html:72
 msgid ""
 "Ajout de la page de voeux \"Club Q\" pour la réservation des spectacles "
 "du club culture de l'ESPCI."
@@ -3836,7 +4086,7 @@ msgstr ""
 "Added Club Q module for the reservation of spectacles for the culture "
 "club of the ESPCI"
 
-#: app/templates/main/changelog.html:63
+#: app/templates/main/changelog.html:82
 msgid ""
 "Ajout d'une page \"Théâtre\" qui recueille les informations sur la "
 "prochaine saison théâtre à l'ESPCI ainsi que les billeteries."
@@ -3844,130 +4094,130 @@ msgstr ""
 "Added a Theater module to present the information about the theater "
 "season at the ESPCI"
 
-#: app/templates/main/changelog.html:72
+#: app/templates/main/changelog.html:91
 msgid ""
 "Gestion des photos directement depuis le site (création d'albums, upload,"
 " suppression...)"
 msgstr "Photos management directly from the site"
 
-#: app/templates/main/changelog.html:81
+#: app/templates/main/changelog.html:100
 msgid "Intégration du site du Bar comme module de ce site."
 msgstr "Bar site integration to pc-est-magique"
 
-#: app/templates/main/changelog.html:90
+#: app/templates/main/changelog.html:109
 msgid "Mise en place de l'authentification avec le SSO de l'ESPCI."
 msgstr "Included SSO authentification with ESPCI"
 
-#: app/templates/main/changelog.html:93
+#: app/templates/main/changelog.html:112
 msgid "Accès effectif aux photos."
 msgstr "Photos access"
 
-#: app/templates/main/changelog.html:102
+#: app/templates/main/changelog.html:121
 msgid "Intégration du site de l'IntraRez dans ce site."
 msgstr "IntraRez site integration to pc-est-magique"
 
-#: app/templates/main/changelog.html:105
+#: app/templates/main/changelog.html:124
 #, fuzzy
 msgid "Ajout du module de photos."
 msgstr "Added Photos module on pc-est-magique"
 
-#: app/templates/main/changelog.html:108
+#: app/templates/main/changelog.html:127
 msgid "Nouveau système de rôles et permissions."
 msgstr "New roles and permissions system"
 
-#: app/templates/main/changelog.html:117
+#: app/templates/main/changelog.html:136
 msgid ""
 "Système de coupure d'accès Internet en cas de non-paiement ou autre (en "
 "fait avant c'était du bluff eheh) ;"
 msgstr "System to cut internet access in case of non-payement"
 
-#: app/templates/main/changelog.html:121
+#: app/templates/main/changelog.html:140
 msgid "Correction de divers bugs mineurs."
 msgstr "Correction of minor bugs"
 
-#: app/templates/main/changelog.html:130
+#: app/templates/main/changelog.html:149
 #, fuzzy
 msgid "Mise en service des paiements : "
 msgstr "Commissioning of Internet payments"
 
-#: app/templates/main/changelog.html:132
+#: app/templates/main/changelog.html:151
 #, fuzzy
 msgid "Page générique d'information ;"
 msgstr "More information"
 
-#: app/templates/main/changelog.html:133
+#: app/templates/main/changelog.html:152
 #, fuzzy
 msgid "Page de choix de l'offre et du moyen de paiement ;"
 msgstr "Chose an offer and a payment method."
 
-#: app/templates/main/changelog.html:134
+#: app/templates/main/changelog.html:153
 msgid "Pages de paiement par Lydia / CB, virement bancaire ou espèces ;"
 msgstr "Payement page with Lydia / Card / Bank transfer and liquid ;"
 
-#: app/templates/main/changelog.html:135
+#: app/templates/main/changelog.html:154
 msgid "Page d'ajout / validation de paiement pour les GRI ;"
 msgstr "Page to add/validation payment for GRI ;"
 
-#: app/templates/main/changelog.html:136
+#: app/templates/main/changelog.html:155
 msgid ""
 "Souscription automatique à l'offre de bienvenue lors de la première "
 "connexion ;"
 msgstr "Gives welcome offer on first connexion ;"
 
-#: app/templates/main/changelog.html:137
+#: app/templates/main/changelog.html:156
 msgid "Intégration à la page d'accueil et à la barre de menu."
 msgstr "Integration at the welcome page and menu bar."
 
-#: app/templates/main/changelog.html:141
+#: app/templates/main/changelog.html:160
 msgid "Envoi de mails riches, au format HTML :"
 msgstr "Send rich emails, with HTML format:"
 
-#: app/templates/main/changelog.html:143
+#: app/templates/main/changelog.html:162
 #, fuzzy
 msgid "Lors de la création de compte ;"
 msgstr "On account creation ;"
 
-#: app/templates/main/changelog.html:144
+#: app/templates/main/changelog.html:163
 #, fuzzy
 msgid "En cas d'oubli de mot de passe ;"
 msgstr "In case of forgotten password ;"
 
-#: app/templates/main/changelog.html:145
+#: app/templates/main/changelog.html:164
 msgid "Lors de la perte de sa chambre ;"
 msgstr "In case of lost room ;"
 
-#: app/templates/main/changelog.html:146
+#: app/templates/main/changelog.html:165
 msgid "À la validation d'un paiement ;"
 msgstr "At the payement validation ;"
 
-#: app/templates/main/changelog.html:147
+#: app/templates/main/changelog.html:166
 msgid "Un mois avant, une semaine avant et le jour d'expiration d'un abonnement."
 msgstr ""
 "A month before, a week before and on the day of the subscription "
 "expiration."
 
-#: app/templates/main/changelog.html:151
+#: app/templates/main/changelog.html:170
 msgid "Ajout de la possibilité de modifier : "
 msgstr "Added possibility to modify :"
 
-#: app/templates/main/changelog.html:153
+#: app/templates/main/changelog.html:172
 msgid "Une information sur son profil ;"
 msgstr "An information of its profile ;"
 
-#: app/templates/main/changelog.html:154
+#: app/templates/main/changelog.html:173
 #, fuzzy
 msgid "Son mot de passe ;"
 msgstr "Its password:"
 
-#: app/templates/main/changelog.html:155
+#: app/templates/main/changelog.html:174
 msgid "Les dates d'une location ;"
 msgstr "Dates of a renting ;"
 
-#: app/templates/main/changelog.html:156
+#: app/templates/main/changelog.html:175
 msgid "Les informations sur un appareil."
 msgstr "Informations about a device."
 
-#: app/templates/main/changelog.html:160
+#: app/templates/main/changelog.html:179
 msgid ""
 "La langue préférée (français ou anglais, selon les paramètres du "
 "navigateur) est enregistrée pour chaque PCéen, et utilisée pour l'envoi "
@@ -3976,15 +4226,15 @@ msgstr ""
 "Favorite language (depending on navigator) is registered and used for "
 "sending emails."
 
-#: app/templates/main/changelog.html:164
+#: app/templates/main/changelog.html:183
 msgid "Ajout d'un mode maintenance activable par les GRI."
 msgstr "Added maintenance mode for GRI."
 
-#: app/templates/main/changelog.html:167
+#: app/templates/main/changelog.html:186
 msgid "Ajout d'une page GRI pour exécuter un script."
 msgstr "Added GRI page to execute a script."
 
-#: app/templates/main/changelog.html:175
+#: app/templates/main/changelog.html:194
 msgid ""
 "L'IntraRez est maintenant utilisable depuis l'extérieur de la Rezidence, "
 "à l'adresse "
@@ -3992,43 +4242,43 @@ msgstr ""
 "The IntraRez is now accessible from the exterior of the Rezidence, by the"
 " adress "
 
-#: app/templates/main/changelog.html:177
+#: app/templates/main/changelog.html:196
 msgid "(sauf pour la création de compte)."
 msgstr "(except for the account creation)."
 
-#: app/templates/main/changelog.html:180
+#: app/templates/main/changelog.html:199
 msgid ""
 "L'utilisation du formulaire de contact depuis l'extérieur est maintenant "
 "soumise à un captcha."
 msgstr "The use of the contact from is now subject to a captcha."
 
-#: app/templates/main/changelog.html:188
+#: app/templates/main/changelog.html:207
 msgid "Ajout du mécanisme de changement de chambre."
 msgstr "Added mechanism to change chamber."
 
-#: app/templates/main/changelog.html:191
+#: app/templates/main/changelog.html:210
 msgid "Ajout de l'adresse IP attribuée aux appareils dans le profil."
 msgstr "Added IP adress attribution to device in profile."
 
-#: app/templates/main/changelog.html:194
+#: app/templates/main/changelog.html:213
 msgid "Les GRI peuvent maintenant gérer les chambres et les appareils des PCéens."
 msgstr "GRI can now manage room and devices from PCeens."
 
-#: app/templates/main/changelog.html:197
+#: app/templates/main/changelog.html:216
 msgid "Ajout de cette page."
 msgstr "Added this page."
 
-#: app/templates/main/changelog.html:205
+#: app/templates/main/changelog.html:224
 msgid ""
 "Ajout d'options GRI pour la gestion des PCéens et la surveillance du "
 "réseau."
 msgstr "Added options for GRI to manage PCeens and monitor network."
 
-#: app/templates/main/changelog.html:213
+#: app/templates/main/changelog.html:232
 msgid "Mise en place d'un portail captif pour simplifier la connexion au réseau."
 msgstr "Added captive portail to simplify network connexion."
 
-#: app/templates/main/changelog.html:219
+#: app/templates/main/changelog.html:238
 msgid "Première version publique."
 msgstr "First public version."
 
@@ -4103,12 +4353,13 @@ msgid "Bonjour, %(name)s !"
 msgstr "Hello, %(name)s!"
 
 #: app/templates/main/index.html:12
+#, fuzzy
 msgid ""
-"Bienvenue sur PC est magique ! Ce nouveau portail a pour ambition de "
-"réunir le maximum de services informatiques des PCéens (élèves et alumni,"
-" mais aussi locataires de la Rez, dans le futur doctorants etc) : photos,"
-" site du Bar, accès à Internet à la Rez (ancien IntraRez), les commandes "
-"du Club Q, et plein d'autres choses..."
+"Bienvenue sur PC est magique ! Ce portail a pour ambition de réunir le "
+"maximum de services informatiques des PCéens (élèves et alumni, mais "
+"aussi locataires de la Rez, dans le futur doctorants etc) : photos, site "
+"du Bar, accès à Internet à la Rez, les commandes du Club Q, et plein "
+"d'autres choses..."
 msgstr ""
 "Welcome on PC est magique! This new portal is intended to gather various "
 "IT services of the ESPCI community (students and alumni, but also "
@@ -4157,29 +4408,18 @@ msgstr "Contact us"
 msgid "pour toute question relative à la gestion de vos données."
 msgstr "for every question about the management of your data."
 
-#: app/templates/panier_bio/admin.html:16 app/templates/panier_bio/main.html:43
-#: app/templates/panier_bio/period.html:23
-#, fuzzy
-msgid "Administration"
-msgstr "Administration"
-
-#: app/templates/panier_bio/admin.html:23
-#: app/templates/panier_bio/period.html:55
+#: app/templates/panier_bio/admin.html:21
+#: app/templates/panier_bio/period.html:49
 #, fuzzy
 msgid "Périodes"
 msgstr "Period"
 
-#: app/templates/panier_bio/admin.html:29
-#: app/templates/panier_bio/period.html:29
-msgid "Retourner à la page principale"
-msgstr "Back to main page"
-
-#: app/templates/panier_bio/admin.html:44
+#: app/templates/panier_bio/admin.html:38
 #, fuzzy
 msgid "Paramètres :"
 msgstr "Settings"
 
-#: app/templates/panier_bio/admin.html:67
+#: app/templates/panier_bio/admin.html:61
 msgid ""
 "Les réservations sont fermées automatiquement à 14h la veille du jour du "
 "panier bio (Exemple : Si mardi, les\n"
@@ -4189,109 +4429,128 @@ msgstr ""
 "Orders are automatically closed from 2pm on the day before the panier bio"
 " day."
 
-#: app/templates/panier_bio/admin.html:71
+#: app/templates/panier_bio/admin.html:65
 msgid "Prochain Panier-Bio : "
 msgstr "Next Panier-Bio :"
 
-#: app/templates/panier_bio/admin.html:100
+#: app/templates/panier_bio/admin.html:94
 msgid "Commandes pour le "
 msgstr "Orders for "
 
-#: app/templates/panier_bio/admin.html:104
-#: app/templates/panier_bio/admin.html:358
-#, fuzzy
-msgid "Ajouter une commande"
-msgstr "Add an order"
-
-#: app/templates/panier_bio/admin.html:132
+#: app/templates/panier_bio/admin.html:118
 msgid " : Commande liée à un compte pc-est-magique"
 msgstr " : Order linked with pc-est-magique account"
 
-#: app/templates/panier_bio/admin.html:143
+#: app/templates/panier_bio/admin.html:130
 msgid "Promo/service"
 msgstr "Promotion/Lab"
 
-#: app/templates/panier_bio/admin.html:146
+#: app/templates/panier_bio/admin.html:133
 msgid "Téléphone"
 msgstr "Phone number"
 
-#: app/templates/panier_bio/admin.html:152
-#: app/templates/panier_bio/main.html:176
+#: app/templates/panier_bio/admin.html:139
+#: app/templates/panier_bio/main.html:177
 #, fuzzy
 msgid "Payement"
 msgstr "Payment"
 
-#: app/templates/panier_bio/admin.html:161
+#: app/templates/panier_bio/admin.html:148
 msgid "Payé"
 msgstr "Payed"
 
-#: app/templates/panier_bio/admin.html:164
+#: app/templates/panier_bio/admin.html:151
 msgid "Validé par Trésorier"
 msgstr "Validate by treasurer"
 
-#: app/templates/panier_bio/admin.html:167
+#: app/templates/panier_bio/admin.html:154
 msgid "Récupéré"
 msgstr "Taken"
 
-#: app/templates/panier_bio/admin.html:296
+#: app/templates/panier_bio/admin.html:283
 #, fuzzy
 msgid "Éditer la commande"
 msgstr "Edit order"
 
-#: app/templates/panier_bio/admin.html:338
+#: app/templates/panier_bio/admin.html:328
 #, fuzzy
 msgid "Exporter excel"
 msgstr "Export Excels"
 
-#: app/templates/panier_bio/admin.html:464
+#: app/templates/panier_bio/admin.html:348
+#, fuzzy
+msgid "Ajouter une commande"
+msgstr "Add an order"
+
+#: app/templates/panier_bio/admin.html:454
 #, fuzzy
 msgid "Editer commande"
 msgstr "Edit order"
 
-#: app/templates/panier_bio/main.html:64
+#: app/templates/panier_bio/main.html:49
+#: app/templates/panier_bio/period.html:21
+#, fuzzy
+msgid "Administration"
+msgstr "Administration"
+
+#: app/templates/panier_bio/main.html:56
 msgid ""
 "La réservation pour le panier bio n'est pas possible pour le\n"
 "moment."
 msgstr "Ordering for Panier Bio is not available at the moment."
 
-#: app/templates/panier_bio/main.html:81
-msgid "Vous avez commandé un Panier Bio pour le "
+#: app/templates/panier_bio/main.html:67
+#, fuzzy
+msgid "Commande confirmée !"
+msgstr "Deleted order."
+
+#: app/templates/panier_bio/main.html:69
+#, fuzzy
+msgid "Vous avez réservé votre Panier Bio pour le "
 msgstr "You ordered a Panier Bio for "
 
-#: app/templates/panier_bio/main.html:87
-msgid "Vous pouvez commander les paniers bios pour ces prochains jours :"
-msgstr "You can order Panier Bio for these next days :"
+#: app/templates/panier_bio/main.html:79
+#, fuzzy, python-format
+msgid "Prochain Panier-Bio : %(date)s"
+msgstr "Next Panier-Bio :"
 
-#: app/templates/panier_bio/main.html:93
+#: app/templates/panier_bio/main.html:91
 #, fuzzy
 msgid "Formulaire de commande"
 msgstr "Put an order"
 
-#: app/templates/panier_bio/main.html:159
+#: app/templates/panier_bio/main.html:161
 msgid ""
 "Vous avez commandé des paniers bios pour tous les jours réservables pour "
 "le moment."
 msgstr "You ordered Panier Bio for all the available days"
 
-#: app/templates/panier_bio/main.html:166
+#: app/templates/panier_bio/main.html:170
 msgid "Historique des commandes"
 msgstr "Order history"
 
-#: app/templates/panier_bio/main.html:206
+#: app/templates/panier_bio/main.html:193
 #, fuzzy
 msgid "Supprimer la commande"
 msgstr "Delete order"
 
-#: app/templates/panier_bio/main.html:251
-msgid "Supprimer commande"
-msgstr "Delete order"
-
-#: app/templates/panier_bio/period.html:16
+#: app/templates/panier_bio/main.html:228
 #, fuzzy
-msgid "Configuration des périodes"
-msgstr "Period configuration"
+msgid "Annuler la commande"
+msgstr "Edit order"
 
-#: app/templates/panier_bio/period.html:45
+#: app/templates/panier_bio/main.html:234
+msgid ""
+"Êtes-vous sûr de vouloir annuler votre commande de Panier Bio ? Cette "
+"action est irréversible."
+msgstr ""
+
+#: app/templates/panier_bio/main.html:237
+#, fuzzy
+msgid "Garder la commande"
+msgstr "Edit order"
+
+#: app/templates/panier_bio/period.html:39
 msgid ""
 "Lorsqu'une période est créée et activée, tous les jours &quot;paniers-"
 "bios&quot; valides sont proposés à la\n"
@@ -4307,30 +4566,29 @@ msgstr ""
 "  format de jours désactivés est &quot;ANNEE1-MOIS1-JOUR1 "
 "ANNEE2-MOIS2-JOUR2 ANNEE3-MOIS3-JOUR3&quot;.\""
 
-#: app/templates/panier_bio/period.html:50
+#: app/templates/panier_bio/period.html:44
 msgid "Période en cours : "
 msgstr "Period in progress: "
 
-#: app/templates/panier_bio/period.html:59
-#: app/templates/panier_bio/period.html:201
-#, fuzzy
-msgid "Ajouter une période"
-msgstr "Add period"
-
-#: app/templates/panier_bio/period.html:93
+#: app/templates/panier_bio/period.html:79
 msgid "Jours désactivés"
 msgstr "Days without Panier Bio"
 
-#: app/templates/panier_bio/period.html:96
+#: app/templates/panier_bio/period.html:82
 msgid "Activée"
 msgstr "Active"
 
-#: app/templates/panier_bio/period.html:155
+#: app/templates/panier_bio/period.html:141
 #, fuzzy
 msgid "Éditer la période"
 msgstr "Edit period"
 
-#: app/templates/panier_bio/period.html:271
+#: app/templates/panier_bio/period.html:187
+#, fuzzy
+msgid "Ajouter une période"
+msgstr "Add period"
+
+#: app/templates/panier_bio/period.html:257
 #, fuzzy
 msgid "Editer période"
 msgstr "Edit period"
@@ -4640,14 +4898,6 @@ msgid ""
 "suivants :"
 msgstr "It is possible to pay by bank transfer, with the following parameters:"
 
-#: app/templates/payments/pay_transfer.html:29
-msgid "IBAN :"
-msgstr "IBAN:"
-
-#: app/templates/payments/pay_transfer.html:35
-msgid "BIC :"
-msgstr "BIC:"
-
 #: app/templates/payments/pay_transfer.html:54
 msgid ""
 "Une fois le virement effectué, merci de nous en informer en utilisant le "
@@ -4928,7 +5178,7 @@ msgid "Nouvelle miniature de la collection"
 msgstr "New collection's thumbnail"
 
 #: app/templates/photos/album.html:120 app/templates/photos/collection.html:175
-#: app/templates/photos/main.html:52
+#: app/templates/photos/main.html:51
 msgid "photo"
 msgstr "photo"
 
@@ -4970,7 +5220,7 @@ msgstr "Issue with photo: %(path)s/__photo__"
 msgid "Collection masquée"
 msgstr "Hidden collection"
 
-#: app/templates/photos/collection.html:70 app/templates/photos/main.html:51
+#: app/templates/photos/collection.html:70 app/templates/photos/main.html:50
 msgid "album"
 msgstr "album"
 
@@ -4994,7 +5244,7 @@ msgstr "collection"
 msgid "visible"
 msgstr "visible"
 
-#: app/templates/photos/main.html:32
+#: app/templates/photos/main.html:30
 msgid "Collection non visible"
 msgstr "Collection not visible"
 
@@ -5149,18 +5399,41 @@ msgstr "Theatre - Administration"
 msgid "Page admin"
 msgstr "Admin page"
 
-#: app/templates/theatre/admin.html:22
+#: app/templates/theatre/admin.html:23
 msgid "Liste des saisons théâtrales"
 msgstr "Liste of theatre seasons"
 
-#: app/templates/theatre/admin.html:32
-#: app/templates/theatre/admin_saison.html:119
+#: app/templates/theatre/admin.html:37
+#: app/templates/theatre/admin_saison.html:131
 msgid "Id"
 msgstr ""
 
-#: app/templates/theatre/admin.html:71
-#: app/templates/theatre/admin_saison.html:164
-msgid "Es-tu sûr de vouloir supprimer ce spectacle ?"
+#: app/templates/theatre/admin.html:53
+#, fuzzy
+msgid "Voir la saison"
+msgstr "Edit season"
+
+#: app/templates/theatre/admin.html:60
+#, fuzzy
+msgid "Modifier la saison"
+msgstr "Edit season"
+
+#: app/templates/theatre/admin.html:68
+#, fuzzy
+msgid "Supprimer la saison"
+msgstr "Delete order"
+
+#: app/templates/theatre/admin.html:82
+#, fuzzy
+msgid "Supprimer la saison ?"
+msgstr "Delete device?"
+
+#: app/templates/theatre/admin.html:87
+#: app/templates/theatre/admin_saison.html:182
+#, fuzzy
+msgid ""
+"Es-tu sûr de vouloir supprimer ce spectacle ? Cette action est "
+"irréversible."
 msgstr "Are you sure you want to delete this show?"
 
 #: app/templates/theatre/admin_representation_new.html:22
@@ -5176,18 +5449,43 @@ msgstr "The season begins on the"
 msgid "Affiche"
 msgstr "Poster"
 
-#: app/templates/theatre/admin_saison.html:88
+#: app/templates/theatre/admin_saison.html:78
+#, fuzzy
+msgid "Modifier l'affiche"
+msgstr "Edit album"
+
+#: app/templates/theatre/admin_saison.html:89
 msgid "Modification du poster de la saison"
 msgstr "Modification of the season poster"
 
-#: app/templates/theatre/admin_saison.html:106
+#: app/templates/theatre/admin_saison.html:108
 #: app/templates/theatre/admin_spectacle.html:110
 msgid "Pas de description."
 msgstr "No description."
 
-#: app/templates/theatre/admin_saison.html:121
+#: app/templates/theatre/admin_saison.html:133
 msgid "Metteur en scène"
 msgstr "Director"
+
+#: app/templates/theatre/admin_saison.html:149
+#, fuzzy
+msgid "Voir le spectacle"
+msgstr "Name of the show"
+
+#: app/templates/theatre/admin_saison.html:156
+#, fuzzy
+msgid "Modifier le spectacle"
+msgstr "Edit dates"
+
+#: app/templates/theatre/admin_saison.html:164
+#, fuzzy
+msgid "Supprimer le spectacle"
+msgstr "Delete current image"
+
+#: app/templates/theatre/admin_saison.html:177
+#, fuzzy
+msgid "Supprimer le spectacle ?"
+msgstr "Delete current image"
 
 #: app/templates/theatre/admin_saison_edit.html:19
 #: app/templates/theatre/admin_spectacle_edit.html:22
@@ -5250,11 +5548,11 @@ msgstr "No representation planned yet."
 msgid "Création d'un nouveau spectacle"
 msgstr "Creation of a new show"
 
-#: app/utils/lydia.py:82
+#: app/utils/lydia.py:64
 msgid "Offre Internet à la Rez :"
 msgstr "Rezidence Internet offer:"
 
-#: app/utils/lydia.py:130
+#: app/utils/lydia.py:171
 msgid "Signature invalide, impossible de valider le paiement"
 msgstr "Invalid signature, unable to validate payment"
 
@@ -5262,90 +5560,90 @@ msgstr "Invalid signature, unable to validate payment"
 msgid "Accès aux modules IntraRez débloqué !"
 msgstr "IntraRez modules access granted!"
 
-#: app/utils/validators.py:37
+#: app/utils/validators.py:38
 msgid "Ce champ est requis."
 msgstr "This field is required."
 
-#: app/utils/validators.py:44
+#: app/utils/validators.py:45
 msgid "Adresse email invalide."
 msgstr "Invalid email address."
 
-#: app/utils/validators.py:51
+#: app/utils/validators.py:52
 msgid "Valeur différente du champ précédent."
 msgstr "The value differ from the previous field."
 
-#: app/utils/validators.py:60
+#: app/utils/validators.py:61
 #, python-format
 msgid "Valeur incohérente avec le champ %(field)s."
 msgstr "Value inconsistent with field %(field)s."
 
-#: app/utils/validators.py:70
+#: app/utils/validators.py:71
 msgid "Adresse MAC invalide (format attendu : xx:xx:xx:xx:xx:xx)."
 msgstr "Invalid MAC address (expected format: xx:xx:xx:xx:xx:xx)."
 
-#: app/utils/validators.py:80
+#: app/utils/validators.py:81
 #, python-format
 msgid "Doit faire moins de %(max)d caractères."
 msgstr "Must be less than %(max)d characters long."
 
-#: app/utils/validators.py:82
+#: app/utils/validators.py:83
 #, python-format
 msgid "Doit faire au moins %(min)d caractères."
 msgstr "Must be at least %(min)d characters long."
 
-#: app/utils/validators.py:84
+#: app/utils/validators.py:85
 #, python-format
 msgid "Doit faire entre %(min)d et %(max)d caractères."
 msgstr "Must be between %(min)d and %(max)d characters."
 
-#: app/utils/validators.py:99
+#: app/utils/validators.py:100
 #, python-format
 msgid "Doit être inférieur à %(max)f."
 msgstr "Must be lower than %(max)f."
 
-#: app/utils/validators.py:101
+#: app/utils/validators.py:102
 #, python-format
 msgid "Doit être supérieur à %(min)f."
 msgstr "Must be higher than %(min)f."
 
-#: app/utils/validators.py:103
+#: app/utils/validators.py:104
 #, python-format
 msgid "Doit être entre %(min)f et %(max)f."
 msgstr "Must be between %(min)f and %(max)f."
 
-#: app/utils/validators.py:108
+#: app/utils/validators.py:109
 msgid "Adresse e-mail déjà liée à un autre compte."
 msgstr "Mail address already linked to an account."
 
-#: app/utils/validators.py:116
+#: app/utils/validators.py:117
 msgid "PCeen ID invalide."
 msgstr "Invalid PCéen ID."
 
-#: app/utils/validators.py:123
+#: app/utils/validators.py:124
 msgid "Numéro de chambre invalide."
 msgstr "Invalid room number."
 
-#: app/utils/validators.py:130
+#: app/utils/validators.py:131
 msgid "Ban ID invalide."
 msgstr "Invalid Ban ID."
 
-#: app/utils/validators.py:137
+#: app/utils/validators.py:138
 msgid "Cette date doit être dans le passé !"
 msgstr "This date must be in the past!"
 
-#: app/utils/validators.py:146
+#: app/utils/validators.py:147
 msgid "Cette date doit être dans le futur !"
 msgstr "This date must be in the future!"
 
-#: app/utils/validators.py:155
+#: app/utils/validators.py:156
 msgid "Numéro de téléphone invalide (il doit être français)."
 msgstr "Invalid phone number (must be a French one)."
 
-#: app/utils/validators.py:163
+#: app/utils/validators.py:164
 msgid "Il existe déjà un article avec ce nom."
 msgstr "An item with this name already exists."
 
-#: app/utils/validators.py:171
+#: app/utils/validators.py:172
 msgid "Item ID invalide."
 msgstr "Invalid item ID."
 
@@ -5701,10 +5999,6 @@ msgstr "Invalid item ID."
 #~ "à un captcha."
 #~ msgstr "Use of contact form from the exterior now needs captcha completation."
 
-#: app/routes/auth/routes.py:41
-msgid "Veuillez renseigner votre nom et prénom pour l'inscription."
-msgstr "Please provide your first and last name to register."
-
 #~ msgid "Ajout du mécanisme de changement de chambre."
 #~ msgstr "Added room change mecanism."
 
@@ -5744,4 +6038,76 @@ msgstr "Please provide your first and last name to register."
 
 #~ msgid "Choix des places : "
 #~ msgstr "Choice of seats:"
+
+#~ msgid "No compatible period founded for choosen date."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Si vous avez déjà un compte PC "
+#~ "est magique (ou IntraRez) avec votre "
+#~ "adresse ESPCI, il sera lié "
+#~ "automatiquement et vous donnera l'accès "
+#~ "aux services réservés aux élèves."
+#~ msgstr ""
+#~ "If you already have a PC est "
+#~ "magique (or IntraRez) account with your"
+#~ " ESPCI address, it will be "
+#~ "automatically linked and will grant you"
+#~ " access to students-only services."
+
+#~ msgid "Réinitialiser"
+#~ msgstr "Reset"
+
+#~ msgid "Date&nbsp;:"
+#~ msgstr "Date:"
+
+#~ msgid "Favoris"
+#~ msgstr "Favorites"
+
+#~ msgid "Autres articles"
+#~ msgstr "Other items"
+
+#~ msgid "Fonctionnalité à venir - voir directement au Bar"
+#~ msgstr "Upcoming feature – see directly at the Bar"
+
+#~ msgid "Algorithme d'attribution"
+#~ msgstr "Attribution algorithm"
+
+#~ msgid "Mécontentement 1A"
+#~ msgstr "Discontent 1A"
+
+#~ msgid "Mécontentement 2A"
+#~ msgstr "Discontent 2A"
+
+#~ msgid "Mécontentement 3A"
+#~ msgstr "Discontent 3A"
+
+#~ msgid "Mécontentement 4A"
+#~ msgstr "Discontent 4A"
+
+#~ msgid ""
+#~ "Si coché, à la suite de "
+#~ "l'exécution de l'algorithme, les résultats "
+#~ "seront sauvegardés dans la base de\n"
+#~ ""
+#~ "        données"
+#~ msgstr "If checked, following algorithm run, results will be saved in database"
+
+#~ msgid "Imprimer la facture"
+#~ msgstr "Print invoice"
+
+#~ msgid "RIB Club Q"
+#~ msgstr "RIB Club Q"
+
+#~ msgid "Retourner à la page principale"
+#~ msgstr "Back to main page"
+
+#~ msgid "Vous pouvez commander les paniers bios pour ces prochains jours :"
+#~ msgstr "You can order Panier Bio for these next days :"
+
+#~ msgid "Supprimer commande"
+#~ msgstr "Delete order"
+
+#~ msgid "Configuration des périodes"
+#~ msgstr "Period configuration"
 

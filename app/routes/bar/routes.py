@@ -23,11 +23,13 @@ from app.models import (
     Role,
     Permission,
     BarDailyData,
+    Payment,
 )
+from app.enums import PaymentType, PaymentStatus
 from app.routes.bar import bp
 from app.routes.bar.forms import AddOrEditItemForm, GlobalSettingsForm, DataExport, EditBarUserForm
 from app.routes.bar.utils import get_avatar_token_args, get_export_data, get_items_descriptions, save_bar_avatar
-from app.utils import helpers, roles
+from app.utils import helpers, roles, lydia, typing
 from app.utils.global_settings import Settings
 
 
@@ -423,9 +425,13 @@ def export():
 def settings():
     """Render the global settings page."""
     max_daily_alcoholic_drink_per_user = db.session.scalars(db.select(GlobalSetting).filter_by(key="MAX_DAILY_ALCOHOLIC_DRINKS_PER_USER")).one()
+    bar_recharge_min = db.session.scalars(db.select(GlobalSetting).filter_by(key="BAR_RECHARGE_MIN")).one()
+    bar_recharge_max = db.session.scalars(db.select(GlobalSetting).filter_by(key="BAR_RECHARGE_MAX")).one()
     form = GlobalSettingsForm()
     if form.validate_on_submit():
         Settings.max_daily_alcoholic_drinks_per_user = form.max_daily_alcoholic_drinks_per_user.data
+        Settings.bar_recharge_min = int(form.bar_recharge_min.data * 100)
+        Settings.bar_recharge_max = int(form.bar_recharge_max.data * 100)
         if form.delete_background_image.data:
             try:
                 os.remove(os.path.join("app", "static", "img", "bar_background.png"))
@@ -443,6 +449,8 @@ def settings():
         title=_("Paramètres – Bar"),
         form=form,
         max_daily_alcoholic_drink_per_user=max_daily_alcoholic_drink_per_user,
+        bar_recharge_min=bar_recharge_min,
+        bar_recharge_max=bar_recharge_max,
     )
 
 
@@ -467,3 +475,208 @@ def welcome():
         return helpers.ensure_safe_redirect("main.index")
 
     return flask.render_template("bar/welcome.html", title=_("Migration du site du Bar"))
+
+
+@bp.route("/recharge", methods=["GET", "POST"])
+@context.permission_only(PermissionType.read, PermissionScope.bar)
+def recharge():
+    if flask.request.method == "POST":
+        amount_str = flask.request.form.get("amount")
+        phone = flask.request.form.get("phone")
+        if not amount_str:
+            flask.flash(_("Veuillez choisir un montant."), "danger")
+            return flask.redirect(flask.url_for("bar.recharge"))
+
+        try:
+            amount = float(amount_str.replace(",", "."))
+        except ValueError:
+            flask.flash(_("Montant invalide."), "danger")
+            return flask.redirect(flask.url_for("bar.recharge"))
+
+        min_amount = Settings.bar_recharge_min / 100
+        max_amount = Settings.bar_recharge_max / 100
+
+        if amount < min_amount or amount > max_amount:
+            flask.flash(_("Le montant doit être compris entre %(min)s€ et %(max)s€.",
+                          min=format(min_amount, ".2f"), max=format(max_amount, ".2f")), "danger")
+            return flask.redirect(flask.url_for("bar.recharge"))
+
+        if phone:
+            phone = phone.replace("+33", "0").replace(" ", "")
+        else:
+            phone = None
+
+        payment = Payment(
+            pceen=context.g.pceen,
+            amount=amount,
+            created=datetime.datetime.now(),
+            type=PaymentType.bar,
+        )
+        db.session.add(payment)
+        db.session.commit()
+
+        try:
+            lydia_url = lydia.create_payment(
+                payment,
+                message=_("Rechargement compte Bar de %(name)s", name=context.g.pceen.full_name),
+                phone=phone,
+                confirm_url=flask.url_for("bar.lydia_callback_confirm", _external=True),
+                cancel_url=flask.url_for("bar.lydia_callback_cancel", _external=True),
+                success_url=flask.url_for("bar.lydia_success", _external=True),
+                fail_url=flask.url_for("bar.lydia_fail", _external=True),
+            )
+        except RuntimeError as e:
+            flask.current_app.logger.error(f"Lydia payment creation failed: {e}")
+            flask.flash(_("Le service de paiement Lydia n'est pas encore configuré pour le Bar. "
+                          "Veuillez vous rendre directement au Bar pour recharger."), "danger")
+            return flask.redirect(flask.url_for("bar.recharge"))
+
+        return flask.redirect(lydia_url)
+
+    return flask.render_template(
+        "bar/recharge.html",
+        title=_("Recharger mon compte Bar"),
+        min_recharge=Settings.bar_recharge_min / 100,
+        max_recharge=Settings.bar_recharge_max / 100,
+    )
+
+
+@bp.route("/lydia_callback/confirm", methods=["POST"])
+def lydia_callback_confirm() -> typing.RouteReturn:
+    try:
+        currency = flask.request.form["currency"]
+        request_id = flask.request.form["request_id"]
+        amount = flask.request.form["amount"]
+        signed = flask.request.form["signed"]
+        transaction_identifier = flask.request.form["transaction_identifier"]
+        vendor_token = flask.request.form["vendor_token"]
+        order_ref = flask.request.form["order_ref"]
+        sig = flask.request.form["sig"]
+    except LookupError:
+        return "Wrong parameters", 400
+
+    if not lydia.check_signature(
+        sig,
+        payment_type=PaymentType.bar,
+        currency=currency,
+        request_id=request_id,
+        amount=amount,
+        signed=signed,
+        transaction_identifier=transaction_identifier,
+        vendor_token=vendor_token,
+        order_ref=order_ref,
+    ):
+        return "Invalid signature", 403
+
+    # On récupère le paiement grâce à son identifiant unique Lydia
+    payment = db.session.scalar(db.select(Payment).filter_by(lydia_uuid=request_id))
+    if not payment:
+        return f"Payment not existing: {request_id}", 404
+    if payment.status != PaymentStatus.waiting:
+        return f"Bad payment state: {payment.status.name}", 400
+    if abs(payment.amount - float(amount)) > 0.001:
+        return f"Bad amount {amount}: expected {payment.amount}", 400
+
+    payment.status = PaymentStatus.accepted
+    payment.payed = datetime.datetime.now()
+    payment.lydia_transaction_id = transaction_identifier
+
+    # Credit the account
+    # Barman is set to None, which displays "PEM" to signify this is an automated transaction.
+    transaction = BarTransaction.create_from_top_up(
+        client=payment.pceen,
+        barman=None,
+        amount=payment.amount,
+        date=payment.payed
+    )
+    db.session.add(transaction)
+    db.session.commit()
+    helpers.log_action(f"Top-up of {payment.amount}€ for {payment.pceen} via Lydia (callback)")
+    return "", 204
+
+
+@bp.route("/lydia_callback/cancel", methods=["POST"])
+def lydia_callback_cancel() -> typing.RouteReturn:
+    try:
+        currency = flask.request.form["currency"]
+        request_id = flask.request.form["request_id"]
+        amount = flask.request.form["amount"]
+        signed = flask.request.form["signed"]
+        vendor_token = flask.request.form["vendor_token"]
+        order_ref = flask.request.form["order_ref"]
+        sig = flask.request.form["sig"]
+    except LookupError:
+        return "Wrong parameters", 400
+
+    if not lydia.check_signature(
+        sig,
+        payment_type=PaymentType.bar,
+        currency=currency,
+        request_id=request_id,
+        amount=amount,
+        signed=signed,
+        vendor_token=vendor_token,
+        order_ref=order_ref,
+    ):
+        return "Invalid signature", 403
+
+    # Find payment with Lydia UUID
+    payment = db.session.scalar(db.select(Payment).filter_by(lydia_uuid=request_id))
+    if not payment:
+        return f"Payment not existing: {request_id}", 404
+    if payment.status != PaymentStatus.waiting:
+        return f"Bad payment state: {payment.status.name}", 400
+
+    payment.status = PaymentStatus.cancelled
+    db.session.commit()
+    return "", 204
+
+
+@bp.route("/lydia/success")
+@context.permission_only(PermissionType.read, PermissionScope.bar)
+def lydia_success() -> typing.RouteReturn:
+    try:
+        payment = next(p for p in context.g.pceen.payments if p.status == PaymentStatus.waiting and p.type == PaymentType.bar)
+    except StopIteration:
+        # Check if already accepted
+        payment = next((p for p in context.g.pceen.payments if p.type == PaymentType.bar and (datetime.datetime.now() - p.created).total_seconds() < 300), None)
+        if payment and payment.status == PaymentStatus.accepted:
+            flask.flash(_("Compte bar rechargé de %(amount)s€ !", amount=format(payment.amount, ".2f")), "success")
+            return flask.redirect(flask.url_for("bar.me"))
+        flask.flash(_("Pas de rechargement en cours détecté."), "warning")
+        return flask.redirect(flask.url_for("bar.me"))
+
+    lydia.update_payment(payment)
+    if payment.status == PaymentStatus.accepted:
+        # Callback might not have been called yet or failed
+        # Check if transaction already exists to avoid double credit
+        from app.models import BarTransactionType
+        existing_tx = db.session.scalar(db.select(BarTransaction).filter_by(
+            _client_id=payment.pceen.id,
+            type=BarTransactionType.top_up,
+            balance_change=payment.amount,
+            date=payment.payed
+        ))
+        if not existing_tx:
+             transaction = BarTransaction.create_from_top_up(
+                client=payment.pceen,
+                barman=None,
+                amount=payment.amount,
+                date=payment.payed or datetime.datetime.now()
+            )
+             db.session.add(transaction)
+             db.session.commit()
+             helpers.log_action(f"Top-up of {payment.amount}€ for {payment.pceen} via Lydia (success page)")
+
+        flask.flash(_("Compte bar rechargé de %(amount)s€ !", amount=format(payment.amount, ".2f")), "success")
+    else:
+        flask.flash(_("Paiement en attente de validation."), "info")
+
+    return flask.redirect(flask.url_for("bar.me"))
+
+
+@bp.route("/lydia/fail")
+@context.permission_only(PermissionType.read, PermissionScope.bar)
+def lydia_fail() -> typing.RouteReturn:
+    flask.flash(_("Le rechargement a été annulé ou a échoué."), "danger")
+    return flask.redirect(flask.url_for("bar.recharge"))
