@@ -591,7 +591,7 @@ def lydia_callback_confirm() -> typing.RouteReturn:
     )
     db.session.add(transaction)
     db.session.commit()
-    helpers.log_action(f"Top-up of {payment.amount}€ for {payment.pceen} via Lydia (callback)")
+    helpers.log_action(f"Bar top-up of {payment.amount}€ for {payment.pceen} via Lydia (callback)")
     return "", 204
 
 
