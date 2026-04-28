@@ -101,7 +101,6 @@ html[data-theme="dark"] :is(.theme-frost, .theme-material) .text-primary { color
 html[data-theme="dark"] :is(.theme-material, .theme-frost) .navbar-toggler-icon { filter: invert(1) grayscale(100%) brightness(200%); }
 html[data-theme="dark"] :is(.theme-material, .theme-frost) .navbar-toggler { border-color: rgba(255, 255, 255, 0.15) !important; }
 
-
 /* =============================================
     COMPONENTS (CARDS, MODALS, TOASTS, BADGES)
    ============================================= */
@@ -139,16 +138,21 @@ html[data-theme="dark"] :is(.theme-material, .theme-frost) :is(.img-thumbnail, .
 }
 
 /* --- Toast notifications --- */
-.toast-container, .toast {
-    position: fixed !important;  /* Les toasts suivent l'écran pendant le scroll */
+.toast-container {
+    position: fixed !important;  /* Le conteneur suit l'écran pendant le scroll */
     top: 125px !important;       
     right: 1.5rem !important;  
     z-index: 1000 !important; 
     pointer-events: none;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important; /* Espace entre chaque toast */
 }
 
 .toast {
-    pointer-events: auto;        /* Permet de cliquer sur la croix du toast */
+    pointer-events: auto;          /* Permet de cliquer sur la croix du toast */
+    position: relative !important; /* Permet au toast de s'empiler dans le conteneur */
+    margin: 0 !important;
 }
 
 /* Material Light */
@@ -182,7 +186,6 @@ html[data-theme="dark"] .theme-frost .glass-toast {
 /* Ajustements globaux Dark */
 html[data-theme="dark"] :is(.theme-material, .theme-frost) .glass-toast { color: #f8fafc; }
 html[data-theme="dark"] :is(.theme-material, .theme-frost) .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
-
 /* --- Modals --- */
 .modal-content { border: none !important; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important; }
 .modal-header, .modal-footer { border-color: rgba(0, 0, 0, 0.08) !important; }

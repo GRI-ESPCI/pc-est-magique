@@ -26,6 +26,9 @@ def pdf_client(pceen, season, voeux):
     # Create a PDF buffer
     buffer = io.BytesIO()
 
+    # Liste des voeux
+    voeux_list = db.session.scalars(voeux).all()
+
     # Code de génération de facture du Club Q originalement par Loïc Simon - Adapté aux besoin de pem
     canvas = rl.pdfgen.canvas.Canvas(buffer, pagesize=rl.lib.pagesizes.A4)
     canvas.setAuthor("Club Q ESPCI Paris - PSL")
@@ -45,7 +48,7 @@ def pdf_client(pceen, season, voeux):
 
     specs = [
         f"{voeu.spectacle.nom} - {voeu.places_attribuees} place(s) -\t\t {voeu.spectacle.unit_price} € /place"
-        for voeu in voeux
+        for voeu in voeux_list
     ]
 
     specs.append("-" * 158)
@@ -376,6 +379,8 @@ def exporter_excel_prix(saison, pceens, spectacles, voeux):
     sheet = workbook.active
     sheet.title = "Récapitulatif"
 
+    voeux_list = db.session.scalars(voeux).all()
+
     sheet["A1"] = f"Club Q – Récapitulatif saison {saison.nom}"
     sheet["A1"].font = openpyxl.styles.Font(bold=True)
 
@@ -394,7 +399,7 @@ def exporter_excel_prix(saison, pceens, spectacles, voeux):
     sheet["A4"] = "Places proposées :"
     sheet["B4"] = sum((spec.nb_tickets or 0) for spec in spectacles)
     sheet["D4"] = "Places vendues :"
-    sheet["E4"] = sum((voeu.places_attribuees or 0) for voeu in voeux)
+    sheet["E4"] = sum((voeu.places_attribuees or 0) for voeu in voeux_list)
 
     sheet["A6"] = "NOM"
     sheet["B6"] = "Prénom"
