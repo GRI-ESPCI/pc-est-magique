@@ -24,7 +24,7 @@ def add_subscription(pceen: PCeen, offer: Offer, payment: Payment) -> Subscripti
         The subscription created.
     """
     # Determine new subscription dates
-    start = pceen.current_subscription.renew_day
+    start = pceen.current_subscription.renew_day if pceen.current_subscription else datetime.date.today()
     end = start + offer.delay
 
     # Add new subscription

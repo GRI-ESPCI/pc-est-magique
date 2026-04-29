@@ -50,7 +50,7 @@ class BarTransaction(db.Model):
     _client_id: Column[int] = column(sa.ForeignKey("pceen.id"), nullable=False)
     client: Mapped[models.PCeen] = many_to_one("PCeen.bar_transactions_made", foreign_keys=[_client_id])
 
-    _barman_id: Column[str] = column(sa.ForeignKey("pceen.id"), nullable=False)
+    _barman_id: Column[str] = column(sa.ForeignKey("pceen.id"), nullable=True)
     barman: Mapped[models.PCeen] = many_to_one("PCeen.bar_transactions_cashed", foreign_keys=[_barman_id])
 
     date: Column[datetime.datetime] = column(sa.DateTime(), default=datetime.datetime.utcnow, nullable=False)
@@ -89,7 +89,7 @@ class BarTransaction(db.Model):
 
     @classmethod
     def create_from_item_bought(
-        cls, client: models.PCeen, barman: models.PCeen, item: models.PCeen, date: datetime.datetime
+        cls, client: models.PCeen, barman: models.PCeen | None, item: models.PCeen, date: datetime.datetime
     ) -> BarTransaction:
         transaction = cls(
             client=client,
@@ -104,7 +104,7 @@ class BarTransaction(db.Model):
 
     @classmethod
     def create_from_top_up(
-        cls, client: models.PCeen, barman: models.PCeen, amount: float, date: datetime.datetime
+        cls, client: models.PCeen, barman: models.PCeen | None, amount: float, date: datetime.datetime
     ) -> BarTransaction:
         transaction = cls(
             client=client, barman=barman, date=date, type=BarTransactionType.top_up, balance_change=amount

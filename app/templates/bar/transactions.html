@@ -52,9 +52,13 @@
                     </a>
                 </td>
                 <td class="align-middle text-nowrap">
+                    {% if transaction.barman %}
                     <a href="{{ url_for("bar.user", username=transaction.barman.username) }}" class="text-secondary">
                         {{ transaction.barman.full_name }}
                     </a>
+                    {% else %}
+                    <span class="text-secondary">PEM</span>
+                    {% endif %}
                 </td>
                 {% if transaction.type == BarTransactionType.pay_item %}
                 <td class="align-middle">{{ _("Conso") }}</td>

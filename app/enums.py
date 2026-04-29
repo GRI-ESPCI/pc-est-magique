@@ -7,7 +7,7 @@ from types import ModuleType
 from typing import Callable, NamedTuple
 
 
-__all__ = ["PermissionType", "PermissionScope", "SubState", "PaymentStatus", "BarTransactionType"]
+__all__ = ["PermissionType", "PermissionScope", "SubState", "PaymentStatus", "BarTransactionType", "PaymentType"]
 
 
 class PermissionType(enum.Enum):
@@ -125,3 +125,10 @@ class BarTransactionType(enum.Enum):
 
     pay_item = enum.auto()
     top_up = enum.auto()
+
+
+class PaymentType(enum.Enum):
+    """The type of a Payment."""
+
+    internet = enum.auto()
+    bar = enum.auto()

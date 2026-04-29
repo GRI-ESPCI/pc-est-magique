@@ -229,9 +229,13 @@
                             {{ moment(transaction.date).format('lll') }}
                         </td>
                         <td>
+                            {% if transaction.barman %}
                             <a href="{{ url_for("bar.user", username=transaction.barman.username) }}" class="text-muted small text-decoration-none hover-primary">
                                 {{ transaction.barman.full_name }}
                             </a>
+                            {% else %}
+                            <span class="text-muted small">PEM</span>
+                            {% endif %}
                         </td>
                         {% if current_user_is_barman %}
                         <td class="text-end pe-3">
@@ -472,9 +476,13 @@
                 <tr {% if transaction.is_reverted %}class="table-danger text-decoration-line-through"{% endif %}>
                     <th class="align-middle">{{ transaction.id }}</th>
                     <td class="align-middle text-nowrap">
+                        {% if transaction.barman %}
                         <a href="{{ url_for("bar.user", username=transaction.barman.username) }}" class="text-secondary">
                             {{ transaction.barman.full_name }}
                         </a>
+                        {% else %}
+                        <span class="text-secondary">PEM</span>
+                        {% endif %}
                     </td>
                     {% if transaction.type == BarTransactionType.pay_item %}
                     <td class="align-middle">{{ _("Conso") }}</td>
