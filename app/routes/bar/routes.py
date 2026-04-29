@@ -428,6 +428,12 @@ def settings():
     bar_recharge_min = db.session.scalars(db.select(GlobalSetting).filter_by(key="BAR_RECHARGE_MIN")).one()
     bar_recharge_max = db.session.scalars(db.select(GlobalSetting).filter_by(key="BAR_RECHARGE_MAX")).one()
     form = GlobalSettingsForm()
+   
+    if flask.request.method == "GET":
+        form.max_daily_alcoholic_drinks_per_user.data = max_daily_alcoholic_drink_per_user.value
+        form.bar_recharge_min.data = bar_recharge_min.value / 100
+        form.bar_recharge_max.data = bar_recharge_max.value / 100
+
     if form.validate_on_submit():
         Settings.max_daily_alcoholic_drinks_per_user = form.max_daily_alcoholic_drinks_per_user.data
         Settings.bar_recharge_min = int(form.bar_recharge_min.data * 100)

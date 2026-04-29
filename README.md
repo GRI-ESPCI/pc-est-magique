@@ -21,6 +21,7 @@ Seules les fonctionnalités majeures sont listées ici ; voir
 ### 2.10
 
 - Nouveaux thèmes "M3" et "Frost" avec variantes clair/sombre.
+- Ajout de la recharge du compte bar via Lydia
 - Localisation des dates de réservation du panier bio.
 
 
