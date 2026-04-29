@@ -648,25 +648,15 @@ def lydia_success() -> typing.RouteReturn:
 
     lydia.update_payment(payment)
     if payment.status == PaymentStatus.accepted:
-        # Callback might not have been called yet or failed
-        # Check if transaction already exists to avoid double credit
-        from app.models import BarTransactionType
-        existing_tx = db.session.scalar(db.select(BarTransaction).filter_by(
-            _client_id=payment.pceen.id,
-            type=BarTransactionType.top_up,
-            balance_change=payment.amount,
-            date=payment.payed
-        ))
-        if not existing_tx:
-             transaction = BarTransaction.create_from_top_up(
-                client=payment.pceen,
-                barman=None,
-                amount=payment.amount,
-                date=payment.payed or datetime.datetime.now()
-            )
-             db.session.add(transaction)
-             db.session.commit()
-             helpers.log_action(f"Top-up of {payment.amount}€ for {payment.pceen} via Lydia (success page)")
+        transaction = BarTransaction.create_from_top_up(
+            client=payment.pceen,
+            barman=None,
+            amount=payment.amount,
+            date=payment.payed or datetime.datetime.now()
+        )
+        db.session.add(transaction)
+        db.session.commit()
+        helpers.log_action(f"Top-up of {payment.amount}€ for {payment.pceen} via Lydia (success page)")
 
         flask.flash(_("Compte bar rechargé de %(amount)s€ !", amount=format(payment.amount, ".2f")), "success")
     else:
