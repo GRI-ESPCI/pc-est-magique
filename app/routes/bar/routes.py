@@ -639,8 +639,8 @@ def lydia_success() -> typing.RouteReturn:
         payment = next(p for p in context.g.pceen.payments if p.status == PaymentStatus.waiting and p.type == PaymentType.bar)
     except StopIteration:
         # Check if already accepted
-        payment = next((p for p in context.g.pceen.payments if p.type == PaymentType.bar and (datetime.datetime.now() - p.created).total_seconds() < 300), None)
-        if payment and payment.status == PaymentStatus.accepted:
+        payment = next((p for p in context.g.pceen.payments if p.type == PaymentType.bar and (datetime.datetime.now() - p.created).total_seconds() < 300 and p.status == PaymentStatus.accepted), None)
+        if payment:
             flask.flash(_("Compte bar rechargé de %(amount)s€ !", amount=format(payment.amount, ".2f")), "success")
             return flask.redirect(flask.url_for("bar.me"))
         flask.flash(_("Pas de rechargement en cours détecté."), "warning")
