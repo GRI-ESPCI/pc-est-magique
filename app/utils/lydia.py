@@ -105,7 +105,7 @@ def create_payment(
         "vendor_token": vendor_token,
         "amount": format(float(payment.amount), ".2f"),
         "currency": "EUR",
-        "recipient": (phone or payment.pceen.email or f"{payment.pceen.username}@no-email.org"),
+        "recipient": (phone or payment.pceen.email),
         "type": "phone" if phone else "email",
         "message": message,
         "order_ref": f"PEM-{payment.id}-{int(payment.created.timestamp())}",

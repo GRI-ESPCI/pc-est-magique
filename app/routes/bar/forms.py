@@ -65,7 +65,21 @@ class GlobalSettingsForm(FlaskForm):
 
     max_daily_alcoholic_drinks_per_user = IntegerField("", validators=[DataRequired(), NumberRange(min=0)])
     bar_recharge_min = DecimalField(_l("Rechargement min (€)"), validators=[DataRequired(), NumberRange(min=0.01)])
-    bar_recharge_max = DecimalField(_l("Rechargement max (€)"), validators=[DataRequired(), NumberRange(min=0.01)])
+    
+    # Make sure that max amount is greater or equal to min amount
+    bar_recharge_max = DecimalField(
+        _l("Rechargement max (€)"), 
+        validators=[
+            DataRequired(), 
+            NumberRange(min=0.01),
+            CompareFields(
+                operator.ge, 
+                "bar_recharge_min", 
+                _l("Le rechargement maximum doit être supérieur ou égal au rechargement minimum.")
+            )
+        ]
+    )
+    
     background_image = FileField("", validators=[Optional()])
     delete_background_image = BooleanField(_l("Supprimer l'image actuelle"))
 

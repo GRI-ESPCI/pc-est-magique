@@ -582,7 +582,7 @@ def lydia_callback_confirm() -> typing.RouteReturn:
     payment.lydia_transaction_id = transaction_identifier
 
     # Credit the account
-    # Barman is set to None, which displays "PEM" to signify this is an automated transaction.
+    # Barman is set to None, which displays "Recharge Site" to signify this is an automated transaction.
     transaction = BarTransaction.create_from_top_up(
         client=payment.pceen,
         barman=None,
