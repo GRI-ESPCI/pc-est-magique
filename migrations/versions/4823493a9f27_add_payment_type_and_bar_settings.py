@@ -34,6 +34,10 @@ def upgrade():
         sa.column('value', sa.Integer)
     )
     op.execute("DELETE FROM global_setting WHERE key IN ('BAR_RECHARGE_MIN', 'BAR_RECHARGE_MAX')") # Clean up if partially failed
+    op.execute("""
+        SELECT setval(pg_get_serial_sequence('global_setting', 'id'), coalesce(max(id), 0) + 1, false) 
+        FROM global_setting;
+    """)
     op.bulk_insert(global_setting, [
         {'name_fr': 'Rechargement bar min', 'name_en': 'Min bar recharge', 'key': 'BAR_RECHARGE_MIN', 'value': 30},
         {'name_fr': 'Rechargement bar max', 'name_en': 'Max bar recharge', 'key': 'BAR_RECHARGE_MAX', 'value': 10000},

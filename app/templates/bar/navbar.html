@@ -1,36 +1,51 @@
 {% if g.theme != 'classic' %}
 
-<nav class="navbar navbar-expand-md mb-4 mt-2 bg-body-tertiary border border-secondary-subtle border-dark-transparent rounded-pill shadow px-4 py-2" style="overflow: visible !important; z-index: 10 !important;">
-<div class="container-fluid p-0 d-flex flex-nowrap align-items-center gap-3">
+<nav class="navbar navbar-expand-md mb-4 mt-2 bg-body-tertiary border border-secondary-subtle border-dark-transparent shadow px-3 px-md-4 py-2" style="border-radius: 2rem; z-index: 10 !important; transition: all 0.3s ease;">
+    <div class="container-fluid d-flex flex-wrap align-items-center p-0 gap-2 gap-md-3">
 
-    <div class="d-none d-md-block pe-3" style="border-right: 1px solid rgba(130, 140, 155, 0.45);">
-        <h2 class="fs-5 fw-bold text-primary mb-0" style="letter-spacing: -0.5px;">{{ _("Menu Bar") }}</h2>
-    </div>
-
-    <form action="{{ url_for("bar.search") }}" method="get" class="flex-grow-1">
-        <div class="d-flex align-items-center bg-body rounded-pill px-2 py-1 shadow-sm" style="transition: all 0.3s;">
-            <div class="text-body opacity-50 ps-2 pe-1 d-flex align-items-center">
-                <svg class="bi flex-shrink-0" width="16" height="16" fill="currentColor">
-                    {{ macros.bootstrap_icon("search") }}
-                </svg>
-            </div>
-            <input type="text" name="q" class="form-control bg-transparent border-0 shadow-none px-2 py-1 text-body w-100"
-                   placeholder="{{ _("Rechercher un utilisateur...") }}" style="min-width: 120px;">
-            <button type="submit" class="btn btn-primary rounded-pill px-3 py-1 fw-bold shadow-sm ms-2" style="font-size: 0.9rem;">
-                {{ _("Go") }}
-            </button>
+        <!-- 1. Titre (Caché sur mobile) -->
+        <div class="d-none d-md-block pe-3 order-0" style="border-right: 1px solid rgba(130, 140, 155, 0.45);">
+            <h2 class="fs-5 fw-bold text-primary mb-0" style="letter-spacing: -0.5px;">{{ _("Menu Bar") }}</h2>
         </div>
-    </form>
 
-    <div class="d-flex align-items-center">
-        <button class="navbar-toggler border-0 p-1" type="button" data-bs-toggle="collapse"
+        <!-- 2. Barre de recherche (Libérée, elle va prendre tout l'espace !) -->
+        <form action="{{ url_for("bar.search") }}" method="get" class="flex-grow-1 order-1 me-md-2">
+            <div class="d-flex align-items-center bg-body rounded-pill px-2 py-1 shadow-sm" style="transition: all 0.3s;">
+                <div class="text-body opacity-50 ps-2 pe-1 d-flex align-items-center">
+                    <svg class="bi flex-shrink-0" width="16" height="16" fill="currentColor">
+                        {{ macros.bootstrap_icon("search") }}
+                    </svg>
+                </div>
+                <input type="text" name="q" class="form-control bg-transparent border-0 shadow-none px-2 py-1 text-body w-100"
+                       placeholder="{{ _("Rechercher un utilisateur...") }}" style="min-width: 120px;">
+                <button type="submit" class="btn btn-primary rounded-pill px-3 py-1 fw-bold shadow-sm ms-2" style="font-size: 0.9rem;">
+                    {{ _("Go") }}
+                </button>
+            </div>
+        </form>
+
+        <!-- 3. Bouton Hamburger (Mobile) -->
+        <button class="navbar-toggler border-0 p-1 ms-1 order-2" type="button" data-bs-toggle="collapse"
                 data-bs-target="#bar_navbar_content" aria-controls="bar_navbar_content"
                 aria-expanded="false" aria-label="Toggle Bar navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         
-        <div class="collapse navbar-collapse" id="bar_navbar_content">
-            <ul class="navbar-nav flex-row flex-wrap align-items-center gap-1 mb-0">
+        <!-- 4. Bouton Profil (Avatar) -->
+        <div class="col col-auto ps-1 pe-0 order-3 order-md-5">
+            <a class="btn btn-primary rounded-circle p-2 d-flex align-items-center shadow-sm"
+               href="{{ url_for("bar.user", username=g.pceen.username) }}"
+               title="{{ _("Mon Profil Bar") }}">
+                <svg class="bi flex-shrink-0" width="22" height="22" fill="currentColor" role="img">
+                    {{ macros.bootstrap_icon("person-fill") }}
+                </svg>
+            </a>
+        </div>
+
+        <!-- 5. MENU DÉROULANT (Avec flex-md-grow-0 pour laisser la recherche s'étendre) -->
+        <div class="collapse navbar-collapse flex-md-grow-0 order-4 mt-3 mt-md-0" id="bar_navbar_content">
+            <!-- J'ai remis justify-content-md-end pour bien coller les liens à droite -->
+            <ul class="navbar-nav flex-row flex-wrap align-items-center justify-content-center justify-content-md-end gap-2 w-100 mb-0">
                 <li class="nav-item">
                     <a class="px-3 py-1 fw-bold rounded-pill {{ 'btn btn-primary shadow-sm' if request.endpoint == 'bar.stats' else 'nav-link text-body opacity-75 hover-lift' }}" href="{{ url_for("bar.stats") }}" style="font-size: 0.95rem;">
                         {{ _("Stats") }}
@@ -46,14 +61,15 @@
                         {{ _("Transactions") }}
                     </a>
                 </li>
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown position-relative">
                     <button type="button" class="nav-link px-3 py-1 fw-bold rounded-pill dropdown-toggle border-0 bg-transparent text-body opacity-75 hover-lift"
                             data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.95rem;">
                         {{ _("Outils") }}
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 mt-2">
+                    <!-- Sous-menu flottant -->
+                    <ul id="menu-outils-flottant" class="dropdown-menu dropdown-menu-md-end shadow-sm border-0 rounded-4 mt-2 text-center text-md-start">
                         <li>
-                            <a class="dropdown-item py-2 px-4 d-flex align-items-center gap-3 fw-medium" href="{{ url_for("bar.export") }}">
+                            <a class="dropdown-item py-2 px-4 d-flex align-items-center justify-content-center justify-content-md-start gap-3 fw-medium" href="{{ url_for("bar.export") }}">
                                 <span class="bg-primary-subtle text-primary rounded-circle p-2 d-flex">
                                     <svg class="bi flex-shrink-0" width="14" height="14" fill="currentColor">
                                         {{ macros.bootstrap_icon("file-earmark-spreadsheet-fill") }}
@@ -63,7 +79,7 @@
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item py-2 px-4 d-flex align-items-center gap-3 fw-medium" href="{{ url_for("bar.settings") }}">
+                            <a class="dropdown-item py-2 px-4 d-flex align-items-center justify-content-center justify-content-md-start gap-3 fw-medium" href="{{ url_for("bar.settings") }}">
                                 <span class="bg-secondary-subtle text-secondary rounded-circle p-2 d-flex">
                                     <svg class="bi flex-shrink-0" width="14" height="14" fill="currentColor">
                                         {{ macros.bootstrap_icon("gear-fill") }}
@@ -76,19 +92,8 @@
                 </li>
             </ul>
         </div>
-    </div>
 
-    <div class="col col-auto ps-3 pe-0">
-        <a class="btn btn-primary rounded-circle p-2 d-flex align-items-center shadow-sm"
-           href="{{ url_for("bar.user", username=g.pceen.username) }}"
-           title="{{ _("Mon Profil Bar") }}">
-            <svg class="bi flex-shrink-0" width="22" height="22" fill="currentColor" role="img">
-                {{ macros.bootstrap_icon("person-fill") }}
-            </svg>
-        </a>
     </div>
-
-</div>
 </nav>
 
 {% else %}
