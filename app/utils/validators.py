@@ -62,7 +62,10 @@ class CompareFields(CustomValidator):
         super().__init__(message)
 
     def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
-        return self.comparator(field.data, getattr(form, self.fieldname).data)
+        other_data = getattr(form, self.fieldname).data
+        if field.data is None or other_data is None:
+            return True
+        return self.comparator(field.data, other_data)
 
 
 class MacAddress(wtforms.validators.MacAddress):

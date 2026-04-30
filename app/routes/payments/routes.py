@@ -6,7 +6,7 @@ import flask
 from flask_babel import _
 
 from app import context, db
-from app.enums import PaymentStatus, SubState
+from app.enums import PaymentStatus, SubState, PaymentType
 from app.models import Offer, Payment, PermissionScope, PermissionType
 from app.routes.payments import bp, forms
 from app.routes.payments.utils import add_subscription
@@ -59,10 +59,10 @@ def pay() -> typing.RouteReturn:
 
 @bp.route("/pay/<method>", methods=["GET", "POST"])
 @bp.route("/pay/<method>/", methods=["GET", "POST"])
-@bp.route("/pay/<method>/<int:offer>", methods=["GET", "POST"])
+@bp.route("/pay/<method>/<offer>", methods=["GET", "POST"])
 @context.intrarez_setup_only
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
-def pay_(method: str, offer: int | None = None) -> typing.RouteReturn:
+def pay_(method: str, offer: str | None = None) -> typing.RouteReturn:
     """Payment page."""
     if context.g.pceen.sub_state == SubState.subscribed:
         flask.flash(_("Vous avez déjà un abonnement en cours !"), "warning")
@@ -128,6 +128,7 @@ def add_payment(offer: int | None = None) -> typing.RouteReturn:
         created=datetime.datetime.now(),
         payed=datetime.datetime.now(),
         status=PaymentStatus.manual,
+        type=PaymentType.internet,
         gri=context.g.logged_in_user,
     )
     db.session.add(payment)
@@ -159,8 +160,14 @@ def lydia_callback_confirm() -> typing.RouteReturn:
     except LookupError as exc:
         return "Wrong parameters", 400
 
+    # On récupère le paiement grâce à son identifiant unique Lydia
+    payment = db.session.scalar(db.select(Payment).filter_by(lydia_uuid=request_id))
+    if not payment:
+        return f"Payment not existing: {request_id}", 404
+
     if not lydia.check_signature(
         sig,
+        payment_type=payment.type,
         currency=currency,
         request_id=request_id,
         amount=amount,
@@ -171,13 +178,6 @@ def lydia_callback_confirm() -> typing.RouteReturn:
     ):
         return "Invalid signature", 403
 
-    if not order_ref.isdigit():
-        return "order_ref invalid", 400
-
-    # Retrieve payment
-    payment = db.session.get(Payment, int(order_ref))
-    if not payment:
-        return f"Payment not existing: {order_ref}", 404
     if payment.status != PaymentStatus.waiting:
         return f"Bad payment state: {payment.status.name}", 400
     if payment.amount != float(amount):
@@ -213,8 +213,14 @@ def lydia_callback_cancel() -> typing.RouteReturn:
     except LookupError as exc:
         return "Wrong parameters", 400
 
+    # On récupère le paiement grâce à son identifiant unique Lydia
+    payment = db.session.scalar(db.select(Payment).filter_by(lydia_uuid=request_id))
+    if not payment:
+        return f"Payment not existing: {request_id}", 404
+
     if not lydia.check_signature(
         sig,
+        payment_type=payment.type,
         currency=currency,
         request_id=request_id,
         amount=amount,
@@ -224,13 +230,6 @@ def lydia_callback_cancel() -> typing.RouteReturn:
     ):
         return "Invalid signature", 403
 
-    if not order_ref.isdigit():
-        return "order_ref invalid", 400
-
-    # Retrieve payment
-    payment = db.session.get(Payment, int(order_ref))
-    if not payment:
-        return f"Payment not existing: {order_ref}", 404
     if payment.status != PaymentStatus.waiting:
         return f"Bad payment state: {payment.status.name}", 400
     if payment.amount != float(amount):

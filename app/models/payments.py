@@ -11,7 +11,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, WriteOnlyMapped
 
 from app import db
-from app.enums import PaymentStatus
+from app.enums import PaymentStatus, PaymentType
 from app.utils.columns import (
     column,
     one_to_many,
@@ -80,6 +80,7 @@ class Payment(Model):
     created: Column[datetime.date] = column(sa.DateTime(), nullable=False)
     payed: Column[datetime.date] = column(sa.DateTime(), nullable=True)
     status: Column[PaymentStatus] = column(Enum(PaymentStatus), nullable=False, default=PaymentStatus.creating)
+    type: Column[PaymentType] = column(Enum(PaymentType), nullable=False, default=PaymentType.internet)
     lydia_uuid: Column[str | None] = column(sa.String(32), nullable=True)
     lydia_transaction_id: Column[str | None] = column(sa.String(32), nullable=True)
     _gri_id: Column[int | None] = column(sa.ForeignKey("pceen.id"), nullable=True)

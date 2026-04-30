@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated app to use Python 3.14, Flask 3.x, SQLAlchemy 2.x and more.
 - Added new "M3" and "Frost" themes with light/dark variants.
+- Bar users can top up their account through Lydia
 - Panier bio now displays localized dates
 - Updated banking information for Club Q and IntraRez
 

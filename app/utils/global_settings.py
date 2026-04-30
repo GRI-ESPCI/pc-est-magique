@@ -40,6 +40,8 @@ class _SettingsMeta:
     quick_access_item: BarItem = _QuickAccessItemDescriptor()
 
     season_number_club_q: int = _SettingDescriptor("SEASON_NUMBER_CLUB_Q")
+    bar_recharge_min: int = _SettingDescriptor("BAR_RECHARGE_MIN")
+    bar_recharge_max: int = _SettingDescriptor("BAR_RECHARGE_MAX")
 
 
 Settings = _SettingsMeta()

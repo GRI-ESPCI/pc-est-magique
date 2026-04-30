@@ -394,7 +394,7 @@ def exporter_excel_prix(saison, pceens, spectacles, voeux):
     sheet["A3"] = "Spectacles :"
     sheet["B3"] = len(spectacles)
     sheet["D3"] = "Inscrits :"
-    sheet["E3"] = db.session.scalar(db.select(sqlalchemy.func.count()).select_from(pceens.subquery()))
+    sheet["E3"] = len(pceens)
 
     sheet["A4"] = "Places proposées :"
     sheet["B4"] = sum((spec.nb_tickets or 0) for spec in spectacles)

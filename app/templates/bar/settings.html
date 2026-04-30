@@ -24,6 +24,15 @@
                     <td>{{ wtf.form_field(form.max_daily_alcoholic_drinks_per_user, type="number", min="0",
                            value=max_daily_alcoholic_drink_per_user.value) }}</td>
                 </tr>
+            <tr>
+            <tr>
+                <td>{{ bar_recharge_min.name }}</td>
+                <td>{{ wtf.form_field(form.bar_recharge_min, type="text", inputmode="decimal", oninput="this.value = this.value.replace(',', '.')") }}</td>
+            </tr>
+            <tr>
+                <td>{{ bar_recharge_max.name }}</td>
+                <td>{{ wtf.form_field(form.bar_recharge_max, type="text", inputmode="decimal", oninput="this.value = this.value.replace(',', '.')") }}</td>
+            </tr>
                 <tr>
                     <td>{{ _("Image de fond") }}</td>
                     <td class="container"><div class="row row-cols-1 row-cols-md-2 d-flex align-items-center gy-2">
