@@ -117,4 +117,10 @@ const uppy = new Uppy.Uppy({
     getResponseError: (responseText, response) => {
       return new Error(`${JSON.parse(responseText).error.message} (HTTP ${JSON.parse(responseText).error.status})`);
     },
+  })
+
+  .on('complete', (result) => { 
+    if (result.successful.length > 0) {
+      window.location.reload(); // Reload to show the new images in the album as soon as they are uploaded
+    }
   });

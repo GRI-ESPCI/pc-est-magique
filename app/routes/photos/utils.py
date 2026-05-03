@@ -90,6 +90,7 @@ def register_new_photo(album: Album, file_name: str) -> Photo | None:
 
 def _create_thumbnail(photo: Photo) -> None:
     try:
+        os.makedirs(os.path.dirname(photo.thumb_full_path), exist_ok=True)
         subprocess.run(
             [
                 "convert",

@@ -4,37 +4,44 @@
 {% block scripts %}
 {{ super() }}
 {% if can_edit %}
-<script src="{{ url_for("static", filename="js/photos/edit-form.js") }}" defer></script>
+<script src="{{ url_for('static', filename='js/photos/edit-form.js') }}" defer></script>
 {% endif %}
 {% endblock %}
 
 {% block app_content %}
 
-<div class="row">
+<div class="row mb-3">
     <nav class="col">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-            <a href="{{ url_for("photos.main") }}">
-                {{ _("Photos") }}
-            </a>
-        </li>
-        <li class="breadcrumb-item active" aria-current="page">
-            {{ collection.name }}
-        </li>
-    </ol>
+        <style>
+            .breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before {
+                color: #888 !important; 
+            }
+            .breadcrumb-custom .active {
+                color: inherit !important;
+                opacity: 0.9;
+            }
+        </style>
+        
+        <ol class="breadcrumb breadcrumb-custom mb-0">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('photos.main') }}" class="text-decoration-none fw-semibold">
+                    {{ _("Photos") }}
+                </a>
+            </li>
+            <li class="breadcrumb-item active fw-bold" aria-current="page">
+                {{ collection.name }}
+            </li>
+        </ol>
     </nav>
 </div>
 
 <div class="view-mode-only {{ ' d-none' if is_edit_mode else '' }}">
     <div class="row mb-2">
         <div class="col">
-            <p {% if not collection.visible %}
-               class="text-muted d-flex align-items-center"
-               {% endif %}>
-                <span class="h1">{{ collection.name }}</span>
+            <p {% if not collection.visible %}class="text-muted d-flex align-items-center"{% endif %}>
+                <span class="h1 fw-bold">{{ collection.name }}</span>
                 {% if not collection.visible %}
-                <span class="badge bg-danger px-2 py-1 ms-3 d-flex
-                             align-items-center">
+                <span class="badge bg-danger px-2 py-1 ms-3 d-flex align-items-center rounded-pill">
                     <svg class="bi flex-shrink-0 me-2" width="18" height="18">
                         {{ macros.bootstrap_icon("eye-slash") }}
                     </svg>
@@ -45,27 +52,26 @@
         </div>
         {% if can_edit %}
         <div class="col col-auto me-3 d-flex align-items-center">
-            <button class="btn btn-pc5 p-2" type="button" role="button"
-                    title="{{ _("Modifier la collection") }}"
+            <button class="btn btn-outline-secondary rounded-pill shadow-sm d-flex align-items-center px-3 py-2 transition-all" type="button" role="button"
                     onclick="enable_edit_mode()">
-                <svg class="bi flex-shrink-0 text-secondary"
-                    width="24" height="24">
+                <svg class="bi flex-shrink-0 me-2" width="16" height="16">
                     {{ macros.bootstrap_icon("pencil") }}
                 </svg>
+                <span class="fw-semibold" style="font-size: 0.95rem;">{{ _("Modifier la collection") }}</span>
             </button>
         </div>
         {% endif %}
     </div>
     {% if collection.description %}
     <div class="row mb-4 fst-italic">
-        <div class="col">
+        <div class="col text-muted">
             {{ collection.description }}
         </div>
     </div>
     {% endif %}
-    <div class="row">
+    <div class="row mb-4">
         <div class="col">
-        <p>
+        <p class="text-muted small">
             <span>
                 {{ macros.s(collection.nb_albums, _("album")) }}
             </span>
@@ -94,10 +100,9 @@
         </div>
         <div class="col col-auto me-3 d-flex align-items-center">
             <button class="btn btn-pc5 p-2" type="button" role="button"
-                    title="{{ _("Arrêter de modifier") }}"
+                    title="{{ _('Arrêter de modifier') }}"
                     onclick="disable_edit_mode()">
-                <svg class="bi flex-shrink-0 text-secondary"
-                     width="24" height="24">
+                <svg class="bi flex-shrink-0 text-secondary" width="24" height="24">
                     {{ macros.bootstrap_icon("x-circle") }}
                 </svg>
             </button>
@@ -106,8 +111,7 @@
     <div class="row">
         <div class="col col-12 col-md mb-3">
             <div class="form-floating">
-                {{ wtf.form_field(edit_form.description,
-                                  value=collection.description or "") }}
+                {{ wtf.form_field(edit_form.description, value=collection.description or '') }}
             </div>
         </div>
         <div class="col-auto me-4 d-flex align-items-center mb-3">
@@ -119,12 +123,12 @@
     <div class="row">
         <div class="col col-12 col-md mb-3">
             <div class="form-floating">
-                {{ wtf.form_field(edit_form.start, value=collection.start or "") }}
+                {{ wtf.form_field(edit_form.start, value=collection.start or '') }}
             </div>
         </div>
         <div class="col col-12 col-md mb-3 me-4">
             <div class="form-floating">
-                {{ wtf.form_field(edit_form.end, value=collection.end or "") }}
+                {{ wtf.form_field(edit_form.end, value=collection.end or '') }}
             </div>
         </div>
     </div>
@@ -136,34 +140,41 @@
 </form>
 {% endif %}
 
-<div class="row row-cols g-2">
+<div class="row row-cols-auto g-3">
     {% for album in albums %}
-    {% with url = url_for("photos.album", collection_dir=collection.dir_name,
-                          album_dir=album.dir_name) %}
+    {% with url = url_for("photos.album", collection_dir=collection.dir_name, album_dir=album.dir_name) %}
     <div class="col">
-        <div class="card{{ "" if album.visible else " text-muted" }}"
-             style="width: 15rem;">
-            <a href="{{ url }}">
+        <div class="card h-100 border-0 shadow-sm rounded-4 {{ '' if album.visible else ' opacity-75' }}"
+             style="width: 16rem; overflow: hidden;">
+             
+            <a href="{{ url }}" class="text-decoration-none">
+                {% if album.featured_photo %}
                 <img src="{{ album.featured_photo.src_with_token }}"
-                     class="card-img-top{{ "" if album.visible
-                           else " opacity-75" }}" alt="[NO PHOTOS]">
+                     class="card-img-top w-100" alt="Miniature" style="height: 180px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top d-flex align-items-center justify-content-center text-muted" style="height: 180px; background-color: rgba(0,0,0,0.05);">
+                    <span class="small fw-semibold">{{ _("PAS DE PHOTO") }}</span>
+                </div>
+                {% endif %}
             </a>
-            <div class="card-body">
-                <h5 class="card-title">
+            <div class="card-body d-flex flex-column p-4">
+                <h5 class="card-title fw-bold mb-2 text-body">
                     {{ album.name }}
                     {% if not album.visible %}
-                    <span class="fw-normal badge bg-danger p-1 align-top"
-                          data-bs-toggle="tooltip" data-bs-title="{{ _("Album non visible") }}">
-                        <svg class="bi flex-shrink-0" width="18" height="18">
+                    <span class="fw-normal badge bg-danger p-1 align-middle ms-1"
+                          data-bs-toggle="tooltip" data-bs-title="{{ _('Album non visible') }}">
+                        <svg class="bi flex-shrink-0" width="14" height="14">
                             {{ macros.bootstrap_icon("eye-slash") }}
                         </svg>
                     </span>
                     {% endif %}
                 </h5>
+                
                 {% if album.description %}
-                <p class="card-text">{{ album.description }}</p>
+                <p class="card-text text-body-secondary small mb-3">{{ album.description }}</p>
                 {% endif %}
-                <p class="card-text text-muted mb-1">
+                
+                <p class="card-text text-muted small mb-1">
                     {% if album.start %}
                     {{ moment(album.start).format("LL") }}
                     {% if album.end %}
@@ -171,47 +182,53 @@
                     {% endif %}
                     {% endif %}
                 </p>
-                <p class="card-text text-muted">
+                <p class="card-text text-muted small mb-3">
                     {{ macros.s(album.nb_photos, _("photo")) }}
                 </p>
-                <a href="{{ url }}" class="btn btn-primary">Voir les photos</a>
-                {% if has_permission(PermissionType.write, PermissionScope.album, elem=album) %}
-                <a href="{{ url }}?edit" class="btn btn-pc5 ms-3"
-                   title={{ _("Modifier") }}>
-                    <svg class="bi flex-shrink-0 text-secondary"
-                        width="20" height="20">
-                        {{ macros.bootstrap_icon("pencil") }}
-                    </svg>
-                </a>
-                {% endif %}
+                
+                <div class="mt-auto d-flex justify-content-between align-items-center pt-2">
+                    <a href="{{ url }}" class="btn btn-primary rounded-pill px-3 py-2 fw-semibold" style="font-size: 0.9rem;">
+                        {{ _("Voir les photos") }}
+                    </a>
+                    
+                    {% if has_permission(PermissionType.write, PermissionScope.album, elem=album) %}
+                    <a href="{{ url }}?edit" class="btn btn-outline-secondary rounded-circle shadow-sm d-flex align-items-center justify-content-center border-0 transition-all"
+                    style="width: 40px; height: 40px; background-color: var(--bs-tertiary-bg);" title="{{ _('Modifier') }}">
+                        <svg class="bi flex-shrink-0" width="16" height="16">
+                            {{ macros.bootstrap_icon("pencil") }}
+                        </svg>
+                    </a>
+                    {% endif %}
+                </div>
             </div>
-          </div>
+        </div>
     </div>
     {% endwith %}
     {% endfor %}
+    
     {% if can_edit %}
     <!-- Create album form -->
     <div class="col edit-mode-only{{ '' if is_edit_mode else ' d-none' }}">
-        <div class="card" style="width: 15rem;">
-            <div class="d-flex align-items-center w-100 p-5 border border-success bg-muted">
-                <svg class="bi flex-shrink-0 mx-auto text-success" width="61px" height="61px">
+        <div class="card h-100 border-0 shadow-sm rounded-4" style="width: 16rem; overflow: hidden;">
+            <div class="d-flex align-items-center justify-content-center w-100" style="height: 180px; background-color: rgba(25, 135, 84, 0.1);">
+                <svg class="bi flex-shrink-0 text-success" width="48px" height="48px">
                     {{ macros.bootstrap_icon("plus-circle-dotted") }}
                 </svg>
             </div>
-            <div class="card-body">
-                <h5 class="card-title">
+            <div class="card-body d-flex flex-column p-4">
+                <h5 class="card-title fw-bold mb-3 text-body">
                     {{ _("Nouvel album") }}
                 </h5>
-                <form action="?" method="post" role="form">
-                    <p class="card-text">
+                <form action="?" method="post" role="form" class="d-flex flex-column flex-grow-1">
+                    <p class="card-text text-body-secondary small mb-3">
                         {{ _("Il est maintenant possible de créer un album (puis d'y ajouter des photos) "
                              "directement depuis l'app :") }}
                     </p>
                     {{ create_form.hidden_tag() }}
-                    <div class="form-floating mb-3">
+                    <div class="form-floating mb-3 mt-auto">
                         {{ wtf.form_field(create_form.album_name) }}
                     </div>
-                    {{ wtf.form_field(create_form.submit, class="btn btn-success") }}
+                    {{ wtf.form_field(create_form.submit, class="btn btn-success rounded-pill fw-semibold w-100 py-2") }}
                 </form>
             </div>
         </div>

@@ -10,19 +10,19 @@
     "bower_components/lightgallery/dist/css/lg-fullscreen.css",
     "_dist/uppy/css/uppy.min.css",
 ] %}
-<link href="{{ url_for("static", filename=filename) }}" rel="stylesheet" />
+<link href="{{ url_for('static', filename=filename) }}" rel="stylesheet" />
 {% endfor %}
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
 {% if can_edit %}
-<script src="{{ url_for("static", filename="js/photos/edit-form.js") }}" defer></script>
-<script src="{{ url_for("static", filename="_dist/uppy/js/uppy.min.js") }}" defer></script>
+<script src="{{ url_for('static', filename='js/photos/edit-form.js') }}" defer></script>
+<script src="{{ url_for('static', filename='_dist/uppy/js/uppy.min.js') }}" defer></script>
 {% if babel.get_locale().language == "fr" %}
-<script src="{{ url_for("static", filename="_dist/uppy/js/fr_FR.min.js") }}" defer></script>
+<script src="{{ url_for('static', filename='_dist/uppy/js/fr_FR.min.js') }}" defer></script>
 {% endif %}
-<script src="{{ url_for("static", filename="js/photos/album-edit.js") }}" defer></script>
+<script src="{{ url_for('static', filename='js/photos/album-edit.js') }}" defer></script>
 {% endif %}
 {% for filename in [
     "bower_components/lightgallery/dist/lightgallery.umd.js",
@@ -32,43 +32,48 @@
     "js/photos/album.js",
     "js/popovers.js",
 ] %}
-<script src="{{ url_for("static", filename=filename) }}" defer></script>
+<script src="{{ url_for('static', filename=filename) }}" defer></script>
 {% endfor %}
 {% endblock %}
 
 {% block app_content %}
 
-<div class="row">
+<div class="row mb-3">
     <nav class="col">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-            <a href="{{ url_for("photos.main") }}">
-                {{ _("Photos") }}
-            </a>
-        </li>
-        <li class="breadcrumb-item">
-            <a href="{{ url_for("photos.collection",
-                                collection_dir=album.collection.dir_name) }}">
-                {{ album.collection.name }}
-            </a>
-        </li>
-        <li class="breadcrumb-item active" aria-current="page">
-            {{ album.name }}
-        </li>
-    </ol>
+        <style>
+            .breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before {
+                color: #888 !important; 
+            }
+            .breadcrumb-custom .active {
+                color: inherit !important;
+                opacity: 0.9;
+            }
+        </style>
+        <ol class="breadcrumb breadcrumb-custom mb-0">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('photos.main') }}" class="text-decoration-none fw-semibold">
+                    {{ _("Photos") }}
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('photos.collection', collection_dir=album.collection.dir_name) }}" class="text-decoration-none fw-semibold">
+                    {{ album.collection.name }}
+                </a>
+            </li>
+            <li class="breadcrumb-item active fw-bold" aria-current="page">
+                {{ album.name }}
+            </li>
+        </ol>
     </nav>
 </div>
 
 <div class="view-mode-only{{ ' d-none' if is_edit_mode else '' }}">
     <div class="row mb-2">
         <div class="col">
-            <p {% if not album.visible %}
-               class="text-muted d-flex align-items-center"
-               {% endif %}>
-                <span class="h1">{{ album.name }}</span>
+            <p {% if not album.visible %}class="text-muted d-flex align-items-center"{% endif %}>
+                <span class="h1 fw-bold">{{ album.name }}</span>
                 {% if not album.visible %}
-                <span class="badge bg-danger px-2 py-1 ms-3 d-flex
-                             align-items-center">
+                <span class="badge bg-danger px-2 py-1 ms-3 d-flex align-items-center rounded-pill">
                     <svg class="bi flex-shrink-0 me-2" width="18" height="18">
                         {{ macros.bootstrap_icon("eye-slash") }}
                     </svg>
@@ -78,44 +83,39 @@
             </p>
         </div>
         {% if can_edit %}
-        <div class="col col-auto d-flex align-items-center"
-             title="{{ _("Miniature actuelle") if album.featured
-                   else _("Nouvelle miniature de la collection") }}">
-            <button role="button"
+        <div class="col col-auto d-flex align-items-center" title="{{ _('Miniature actuelle') if album.featured else _('Nouvelle miniature de la collection') }}">
+            <button role="button" name="set_featured" value="1"
                     {% if album.featured %}
-                    class="btn btn-success pe-none p-2" type="button"
+                    class="btn btn-warning rounded-circle shadow-sm d-flex align-items-center justify-content-center border-0" style="width: 42px; height: 42px;" type="button"
                     {% else %}
-                    class="btn btn-outline-success p-2" type="submit"
-                    form="modify-form"
+                    class="btn btn-outline-secondary rounded-circle shadow-sm d-flex align-items-center justify-content-center border-0 transition-all" style="width: 42px; height: 42px; background-color: var(--bs-tertiary-bg);" type="submit" form="modify-form"
                     {% endif %}>
-                <svg class="bi flex-shrink-0 text-secondary"
-                    width="24" height="24">
-                    {{ macros.bootstrap_icon("star") }}
+                <svg class="bi flex-shrink-0" width="18" height="18">
+                    {{ macros.bootstrap_icon("star-fill" if album.featured else "star") }}
                 </svg>
             </button>
         </div>
         <div class="col col-auto me-3 d-flex align-items-center">
-            <button class="btn btn-pc5 p-2" type="button" role="button"
-                    title="{{ _("Modifier l'album") }}"
+            <button class="btn btn-outline-secondary rounded-pill shadow-sm d-flex align-items-center px-3 py-2 transition-all" type="button" role="button"
                     onclick="enable_edit_mode()">
-                <svg class="bi flex-shrink-0 text-secondary"
-                    width="24" height="24">
+                <svg class="bi flex-shrink-0 me-2" width="16" height="16">
                     {{ macros.bootstrap_icon("pencil") }}
                 </svg>
+                <span class="fw-semibold" style="font-size: 0.95rem;">{{ _("Modifier l'album") }}</span>
             </button>
         </div>
         {% endif %}
     </div>
     {% if album.description %}
     <div class="row mb-4 fst-italic">
-        <div class="col">
+        <div class="col text-muted">
             {{ album.description }}
         </div>
     </div>
     {% endif %}
-    <div class="row">
+    <div class="row mb-4">
         <div class="col">
-        <p>
+        <p class="text-muted small">
             <span>
                 {{ macros.s(album.nb_photos, _("photo")) }}
             </span>
@@ -134,7 +134,7 @@
 </div>
 
 {% if can_edit %}
-<form action="?" method="post" role="form" class="edit-mode-only{{ ' d-none' if not is_edit_mode else '' }}">
+<form action="?" method="post" role="form" id="modify-form" class="edit-mode-only{{ ' d-none' if not is_edit_mode else '' }}">
     {{ album_form.hidden_tag() }}
     <div class="row mb-3">
         <div class="col">
@@ -146,8 +146,7 @@
             <button class="btn btn-pc5 p-2" type="button" role="button"
                     title="{{ _("Arrêter de modifier") }}"
                     onclick="disable_edit_mode()">
-                <svg class="bi flex-shrink-0 text-secondary"
-                     width="24" height="24">
+                <svg class="bi flex-shrink-0 text-secondary" width="24" height="24">
                     {{ macros.bootstrap_icon("x-circle") }}
                 </svg>
             </button>
@@ -156,8 +155,7 @@
     <div class="row">
         <div class="col col-12 col-md mb-3">
             <div class="form-floating">
-                {{ wtf.form_field(album_form.description,
-                                  value=album.description or "") }}
+                {{ wtf.form_field(album_form.description, value=album.description or "") }}
             </div>
         </div>
         <div class="col-auto me-4 d-flex align-items-center mb-3">
@@ -186,9 +184,9 @@
 </form>
 {% endif %}
 
-<div class="row row-cols g-2 justify-content-center" id="lightgallery">
+<div class="row row-cols-auto g-2 justify-content-center" id="lightgallery">
     {% for photo in photos %}
-    <div class="col col-auto position-relative">
+    <div class="col position-relative">
         <a href="{{ photo.src }}?{{ token_args }}"
            data-lg-size="{{ min(photo.height, photo.width) }}-{{ photo.height }}"
            data-file_name="{{ photo.file_name }}"
@@ -200,32 +198,37 @@
            data-featured="{{ photo.featured or "" }}"
            {% if photo.info %} title="{{ photo.info }}"{% endif %}
         >
-            <img src="{{ url_for("static", filename="img/loading.gif") }}"
-                 data-src="{{ photo.thumb_src }}?{{ token_args }}"/>
             {# Si on veut changer la taille de la miniature, il faut la modifier dans app/routes/photos/utils.py,
                et tout re-générer à l'aide de scripts/sync_photos.py ! (pas de script pour ça pour l'instant) #}
+            <img src="{{ url_for('static', filename='img/loading.gif') }}"
+                 data-src="{{ photo.thumb_src }}?{{ token_args }}" 
+                 class="shadow-sm" 
+                 style="display: block; width: 136px; height: 136px; object-fit: cover; border-radius: 12px; overflow: hidden;" />
         </a>
         {% if can_edit %}
         <!-- Photo edit ribbon -->
-        <div class="position-absolute d-flex bg-warning justify-content-evenly py-2 edit-mode-only
-                    {{ 'd-none' if not is_edit_mode else '' }}" style="bottom:0; width: 136px;">
-            <button type="button" title="{{ _('Modifier') }}" class="btn btn-secondary btn-sm"
+        <div class="position-absolute d-flex justify-content-evenly align-items-center edit-mode-only rounded-pill shadow-lg {{ 'd-none' if not is_edit_mode else '' }}" 
+             style="bottom: 8px; left: 50%; transform: translateX(-50%); width: 110px; padding: 4px; background: rgba(33, 37, 41, 0.75); backdrop-filter: blur(4px);">
+            
+            <button type="button" title="{{ _('Modifier') }}" class="btn btn-link text-white p-1 m-0 text-decoration-none border-0"
                     data-bs-target="#mo-edit" data-bs-toggle="modal" onclick="preparePhotoEdit(this);">
-                <svg class="bi flex-shrink-0" width="16" height="16">{{ macros.bootstrap_icon("pencil") }}</svg>
+                <svg class="bi" width="16" height="16">{{ macros.bootstrap_icon("pencil") }}</svg>
             </button>
+            
             {% if photo.featured %}
-            <button type="button" title="{{ _('Miniature actuelle') }}" class="btn btn-success btn-sm current-feat">
-                <svg class="bi flex-shrink-0" width="16" height="16">{{ macros.bootstrap_icon("star-fill") }}</svg>
+            <button type="button" title="{{ _('Miniature actuelle') }}" class="btn btn-link text-warning p-1 m-0 text-decoration-none border-0 current-feat">
+                <svg class="bi" width="16" height="16">{{ macros.bootstrap_icon("star-fill") }}</svg>
             </button>
             {% else %}
-            <button type="button" title="{{ _('Nouvelle miniature') }}" class="btn btn-success btn-sm"
+            <button type="button" title="{{ _('Nouvelle miniature') }}" class="btn btn-link text-light p-1 m-0 text-decoration-none border-0"
                     onclick="favoritePhoto(this);">
-                <svg class="bi flex-shrink-0" width="16" height="16">{{ macros.bootstrap_icon("star") }}</svg>
+                <svg class="bi" width="16" height="16">{{ macros.bootstrap_icon("star") }}</svg>
             </button>
             {% endif %}
-            <button type="button" title="{{ _('Supprimer') }}" class="btn btn-danger btn-sm"
+            
+            <button type="button" title="{{ _('Supprimer') }}" class="btn btn-link text-danger p-1 m-0 text-decoration-none border-0"
                     onclick="confirm('Supprimer cette photo ? Cette action est irréversible !') && deletePhoto(this);">
-                <svg class="bi flex-shrink-0" width="16" height="16">{{ macros.bootstrap_icon("trash") }}</svg>
+                <svg class="bi" width="16" height="16">{{ macros.bootstrap_icon("trash") }}</svg>
             </button>
         </div>
         {% endif %}
@@ -234,9 +237,10 @@
     {% if can_edit %}
     <!-- Uploader -->
     <div class="col col-auto edit-mode-only{{ '' if is_edit_mode else ' d-none' }}" id="uppy-photo-uploader">
-        <button type="button" class="btn btn-outline-success p-5" height="100%" width="136px"
-                title="{{ _('Ajouter des photos') }}" class="lg-icon d-flex align-items-center">
-            <svg class="bi flex-shrink-0 mx-auto" width="38px" height="38px">
+        <button type="button" class="btn btn-outline-success border-2 d-flex align-items-center justify-content-center transition-all" 
+                style="width: 136px; height: 136px; border-radius: 12px !important;"
+                title="{{ _('Ajouter des photos') }}">
+            <svg class="bi flex-shrink-0" width="42" height="42">
                 {{ macros.bootstrap_icon("cloud-upload") }}
             </svg>
         </button>
@@ -256,101 +260,99 @@
 {% if can_edit %}
 <!-- Edit modal -->
 <div class="modal fade" id="mo-edit" tabindex="-1" aria-labelledby="mo-edit-lab" aria-hidden="true">
-    <div class="modal-dialog"><div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="mo-edit-lab">
-                {{ _("Modifier la photo") }}
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _("Fermer") }}"></button>
+    <div class="modal-dialog">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold" id="mo-edit-lab">
+                    {{ _("Modifier la photo") }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Fermer') }}"></button>
+            </div>
+            <form action="" method="" role="form" id="edit-photo-form">
+                <div class="modal-body container">
+                    {{ photo_form.hidden_tag() }}
+                    <input name="collection" value="{{ album.collection.dir_name }}" hidden>
+                    <input name="album" value="{{ album.dir_name }}" hidden>
+                    <div class="row mb-3"><div class="col">
+                        <div class="form-floating">
+                            {{ wtf.form_field(photo_form.photo_name, readonly=True) }}
+                        </div>
+                    </div></div>
+                    <div class="row mb-3"><div class="col">
+                        <div class="form-floating">
+                            {{ wtf.form_field(photo_form.caption, maxlength=280) }}
+                        </div>
+                    </div></div>
+                    <div class="row mb-3"><div class="col">
+                        <div class="form-floating">
+                            {{ wtf.form_field(photo_form.author_str, maxlength=64) }}
+                        </div>
+                    </div></div>
+                    <div class="row mb-3">
+                        <div class="col col-6">
+                            <div class="form-floating">
+                                {{ wtf.form_field(photo_form.date) }}
+                            </div>
+                        </div>
+                        <div class="col col-6">
+                            <div class="form-floating">
+                                {{ wtf.form_field(photo_form.time, step=1) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col col-6">
+                            <div class="form-floating">
+                                {{ wtf.form_field(photo_form.lat) }}
+                            </div>
+                        </div>
+                        <div class="col col-6">
+                            <div class="form-floating">
+                                {{ wtf.form_field(photo_form.lng) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0">
+                    {{ wtf.form_field(photo_form.submit) }}
+                    <button type="button" class="btn btn-secondary rounded-pill fw-semibold px-4" data-bs-dismiss="modal">
+                        {{ _("En fait non") }}
+                    </button>
+                </div>
+            </form>
         </div>
-        <form action="" method="" role="form" id="edit-photo-form">
-            <div class="modal-body container">
-                {{ photo_form.hidden_tag() }}
-                <input name="collection" value="{{ album.collection.dir_name }}" hidden>
-                <input name="album" value="{{ album.dir_name }}" hidden>
-                <div class="row mb-3"><div class="col">
-                    <div class="form-floating">
-                        {{ wtf.form_field(photo_form.photo_name, readonly=True) }}
-                    </div>
-                </div></div>
-                <div class="row mb-3"><div class="col">
-                    <div class="form-floating">
-                        {{ wtf.form_field(photo_form.caption, maxlength=280) }}
-                    </div>
-                </div></div>
-                <div class="row mb-3"><div class="col">
-                    <div class="form-floating">
-                        {{ wtf.form_field(photo_form.author_str, maxlength=64) }}
-                    </div>
-                </div></div>
-                <div class="row mb-3">
-                    <div class="col col-6">
-                        <div class="form-floating">
-                            {{ wtf.form_field(photo_form.date) }}
-                        </div>
-                    </div>
-                    <div class="col col-6">
-                        <div class="form-floating">
-                            {{ wtf.form_field(photo_form.time, step=1) }}
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col col-6">
-                        <div class="form-floating">
-                            {{ wtf.form_field(photo_form.lat) }}
-                        </div>
-                    </div>
-                    <div class="col col-6">
-                        <div class="form-floating">
-                            {{ wtf.form_field(photo_form.lng) }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                {{ wtf.form_field(photo_form.submit) }}
-                <button class="btn btn-secondary" data-bs-dismiss="modal">
-                    {{ _("En fait non") }}
-                </button>
-            </div>
-        </form>
-    </div></div>
+    </div>
 </div>
 {% endif %}
 
 <!-- Report modal -->
-<div class="modal fade" id="mo-report" tabindex="-1"
-     aria-labelledby="mo-report-lab" aria-hidden="true">
-    <div class="modal-dialog"><div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="mo-report-lab">
-                {{ _("Signaler un problème") }}
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                    aria-label="{{ _("Fermer") }}"></button>
-        </div>
-        <div class="modal-body container">
-            <div class="row mb-3">
-                <div class="col">
-                    {{ _("Un problème avec cette photo ? Elle porte atteinte "
-                         "à votre image et vous souhaitez la supprimer, ou "
-                         "simplement une information est erronnée ? "
-                         "Dites-le nous !") }}
+<div class="modal fade" id="mo-report" tabindex="-1" aria-labelledby="mo-report-lab" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold" id="mo-report-lab">
+                    {{ _("Signaler un problème") }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Fermer') }}"></button>
+            </div>
+            <div class="modal-body container text-body-secondary">
+                <div class="row mb-3">
+                    <div class="col">
+                        {{ _("Un problème avec cette photo ? Elle porte atteinte à votre image et vous souhaitez la supprimer, ou simplement une information est erronnée ? Dites-le nous !") }}
+                    </div>
                 </div>
             </div>
+            <div class="modal-footer border-top-0">
+                <a class="btn btn-danger rounded-pill fw-semibold px-4" id="send-report-button"
+                   href="{{ url_for('main.contact') }}?title={{ _('Problème avec la photo : %(path)s/__photo__', path=album.src) }}">
+                    {{ _("Signaler") }}
+                </a>
+                <button type="button" class="btn btn-secondary rounded-pill fw-semibold px-4" data-bs-dismiss="modal">
+                    {{ _("Annuler") }}
+                </button>
+            </div>
         </div>
-        <div class="modal-footer">
-            <a class="btn btn-danger" id="send-report-button"
-               href="{{ url_for("main.contact") }}?title={{ _("Problème avec "
-                     "la photo : %(path)s/__photo__", path=album.src) }}">
-                {{ _("Signaler un problème") }}
-            </a>
-            <button class="btn btn-secondary" data-bs-dismiss="modal">
-                {{ _("En fait non") }}
-            </button>
-        </div>
-    </div></div>
+    </div>
 </div>
 
 {% endblock %}

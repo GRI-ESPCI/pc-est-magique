@@ -6,15 +6,14 @@ import datetime
 import hashlib
 import logging
 import os
-import datetime
 
 import flask
 from flask_babel import _
 from discord_webhook import DiscordWebhook
 from markupsafe import Markup
+import sqlalchemy
 
 from app import context, db
-import sqlalchemy
 from app.models import (
     Ban,
     PermissionScope,
@@ -32,10 +31,8 @@ from app.models import (
 )
 from app.routes.main import bp, forms
 from app.utils import captcha, helpers, typing
-from datetime import date
 from app.routes.club_q.utils import pceen_prix_total
 from app.routes.panier_bio.utils import command_open, what_are_next_days
-from app import db
 
 
 @bp.route("/")
@@ -43,9 +40,6 @@ from app import db
 @context.logged_in_only
 def index() -> typing.RouteReturn:
     """PC est magique home page."""
-    # if context.has_permission(PermissionType.read, PermissionScope.intrarez) and not context.g.intrarez_setup:
-    #    return helpers.safe_redirect(context.g.redemption_endpoint, **context.g.redemption_params)
-
     pceen = context.g.pceen
     photos_infos = None
     if context.has_permission(PermissionType.read, PermissionScope.photos):
@@ -65,7 +59,7 @@ def index() -> typing.RouteReturn:
             db.select(ClubQVoeu).filter(
                 ClubQVoeu._pceen_id == pceen.id,
                 ClubQVoeu.places_attribuees > 0,
-                ClubQVoeu.spectacle.has(ClubQSpectacle.date > date.today()),
+                ClubQVoeu.spectacle.has(ClubQSpectacle.date > datetime.date.today()),
             )
         ).first()
 
@@ -265,38 +259,34 @@ def photo(collection_dir: str, album_dir: str, photo_file: str) -> typing.RouteR
         # Bad token: redirect to photos.photo to build new token (if
         # authorized) then redirect back here
         return flask.redirect(flask.request.url.replace("/photo/", "/photos/"))
-    album_dir = os.path.join(
+    base_dir = os.path.join(
         flask.current_app.config["PHOTOS_BASE_PATH"],
         collection_dir,
         album_dir,
     )
-    if "/_thumbs/" in flask.request.url:
-        return flask.send_file(os.path.join(album_dir, "_thumbs", photo_file))
-    else:
-        return flask.send_file(os.path.join(album_dir, photo_file))
+    target_dir = os.path.join(base_dir, "_thumbs") if "/_thumbs/" in flask.request.url else base_dir
+    return flask.send_from_directory(target_dir, photo_file)
 
 
 @bp.route("/bar_avatar/<promo>/<filename>")
 def bar_avatar(promo: str, filename: str) -> typing.RouteReturn:
     """Serve bar avatar (fallback if no Nginx, should NOT be used!)"""
-    filepath = os.path.join(
+    target_dir = os.path.join(
         flask.current_app.config["PHOTOS_BASE_PATH"],
         "bar_avatars",
         promo,
-        filename,
     )
-    return flask.send_file(filepath)
+    return flask.send_from_directory(target_dir, filename)
 
 
 @bp.route("/theatre_posters/<saison>/<filename>")
 def theatre_posters(saison: str, filename: str) -> typing.RouteReturn:
     """Serve theatre poster (fallback if no Nginx, should NOT be used!)"""
-    filepath = os.path.join(
+    target_dir = os.path.join(
         flask.current_app.config["THEATRE_BASE_PATH"],
         saison,
-        filename,
     )
-    return flask.send_file(filepath)
+    return flask.send_from_directory(target_dir, filename)
 
 
 @bp.route("/bekks/<filename>")
@@ -304,8 +294,8 @@ def bekks(filename: str) -> typing.RouteReturn:
     """Serve Bekks files (fallback if no Nginx, should NOT be used!)"""
     logging.warning("Bekk served by Flask and not nginx!")
 
-    filepath = os.path.join(flask.current_app.config["BEKKS_BASE_PATH"], filename)
-    return flask.send_file(filepath)
+    target_dir = flask.current_app.config["BEKKS_BASE_PATH"]
+    return flask.send_from_directory(target_dir, filename)
 
 
 @bp.route("/club_q_images/<season_id>/<filename>")
@@ -313,8 +303,8 @@ def club_q_images(season_id: str, filename: str) -> typing.RouteReturn:
     """Serve Club Q files (fallback if no Nginx, should NOT be used!)"""
     logging.warning("Club Q served by Flask and not nginx!")
 
-    filepath = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], season_id, filename)
-    return flask.send_file(filepath)
+    target_dir = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], season_id)
+    return flask.send_from_directory(target_dir, filename)
 
 
 @bp.route("/club_q_plaquettes/<filename>")
@@ -322,8 +312,8 @@ def club_q_plaquettes(filename: str) -> typing.RouteReturn:
     """Serve Club Q files (fallback if no Nginx, should NOT be used!)"""
     logging.warning("Club Q served by Flask and not nginx!")
 
-    filepath = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "plaquettes", filename)
-    return flask.send_file(filepath)
+    target_dir = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], "plaquettes")
+    return flask.send_from_directory(target_dir, filename)
 
 
 @bp.route("/custom_files/<folder>/<filename>")
@@ -331,11 +321,13 @@ def custom_files(folder: str, filename: str) -> typing.RouteReturn:
     """Serve WYSIYG files (fallback if no Nginx, should NOT be used!)"""
     logging.warning("WYSIYG served by Flask and not nginx!")
     if folder == "club_q":
-        path = flask.current_app.config["CLUB_Q_BASE_PATH"]
+        target_dir = flask.current_app.config["CLUB_Q_BASE_PATH"]
     elif folder == "bekk":
-        path = flask.current_app.config["BEKK_BASE_PATH"]
-    filepath = os.path.join(path, filename)
-    return flask.send_file(filepath)
+        target_dir = flask.current_app.config["BEKK_BASE_PATH"]
+    else:
+        flask.abort(404)
+        
+    return flask.send_from_directory(target_dir, filename)
 
 
 @bp.route("/set_theme/<theme>")

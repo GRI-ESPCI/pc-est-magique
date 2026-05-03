@@ -2,6 +2,7 @@
 
 import os
 import flask
+import sqlalchemy as sa
 from flask_babel import _
 
 from app import context, db
@@ -87,8 +88,8 @@ def collection(collection_dir: str) -> typing.RouteReturn:
         dir_name = get_dir_name(name)
 
         album = Album(collection=collection, dir_name=dir_name, name=f"[CREATED] {name}", visible=False)
-        os.mkdir(album.full_path)
-        os.mkdir(album.thumbs_full_path)
+        os.makedirs(album.full_path, exist_ok=True)
+        os.makedirs(album.thumbs_full_path, exist_ok=True)
 
         db.session.add(album)
         db.session.commit()
@@ -116,7 +117,7 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
     collection = db.session.scalars(db.select(Collection).filter_by(dir_name=collection_dir)).first()
     if not collection:
         flask.abort(404)
-    album = next((a for a in collection.albums if a.dir_name == album_dir), None)
+    album = db.session.scalars(db.select(Album).filter_by(collection=collection, dir_name=album_dir)).first()
     if not album:
         flask.abort(404)
 
@@ -134,16 +135,26 @@ def album(collection_dir: str, album_dir: str) -> typing.RouteReturn:
     if album_form.validate_on_submit():
         if not can_edit:
             flask.abort(403)
-        album.name = album_form.name.data
-        album.description = album_form.description.data
-        album.visible = album_form.visible.data
-        album.start = album_form.start.data
-        album.end = album_form.end.data
-        if album.visible and not album.photos:
-            album.visible = False
-            flask.flash(_("Un album ne peut pas être rendu visible si il ne contient aucune photo !"), "warning")
+        if "set_featured" in flask.request.form:
+            db.session.execute(
+                sa.update(Album)
+                .where(Album._collection_id == collection.id)
+                .values(featured=False)
+            )
+            album.featured = True
+            flask.flash(_("Cet album est maintenant la miniature de la collection."), "success")
         else:
-            flask.flash(_("Album modifié avec succès !"), "success")
+            album.name = album_form.name.data
+            album.description = album_form.description.data
+            album.visible = album_form.visible.data
+            album.start = album_form.start.data
+            album.end = album_form.end.data
+            if album.visible and not album.photos:
+                album.visible = False
+                flask.flash(_("Un album ne peut pas être rendu visible si il ne contient aucune photo !"), "warning")
+            else:
+                flask.flash(_("Album modifié avec succès !"), "success")
+        
         db.session.commit()
 
     photo_form = forms.EditPhotoForm()
@@ -184,7 +195,7 @@ def photo(collection_dir: str, album_dir: str, photo_file: str) -> typing.RouteR
     collection = db.session.scalars(db.select(Collection).filter_by(dir_name=collection_dir)).first()
     if not collection:
         flask.abort(404)
-    album = next((a for a in collection.albums if a.dir_name == album_dir), None)
+    album = db.session.scalars(db.select(Album).filter_by(collection=collection, dir_name=album_dir)).first()
     if not album:
         flask.abort(404)
 

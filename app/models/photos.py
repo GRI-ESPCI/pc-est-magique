@@ -111,7 +111,7 @@ class Album(Model):
     start: Column[datetime.date] = column(sa.Date(), nullable=True)
     end: Column[datetime.date] = column(sa.Date(), nullable=True)
     featured: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
-    nb_photos: Column[int] = column(sa.Integer, nullable=False, default=0)
+    nb_photos: Column[int] = column(sa.Integer(), nullable=False, default=0)
 
     photos: Mapped[list["models.Photo"]] = one_to_many("Photo.album", cascade="all, delete-orphan")
 
@@ -146,10 +146,10 @@ class Album(Model):
     @property
     def featured_photo(self) -> Photo | None:
         """The (first) photo of this album marked as featured (defaults to the first photo)."""
-        featured = [p for p in self.photos if p.featured]
-        if featured:
-            return featured[0]
-        return self.photos[0] if self.photos else None
+        if not self.photos:
+            return None
+        feat = next((p for p in self.photos if p.featured), None)
+        return feat if feat else self.photos[0]
 
     def get_access_token(self, ip: str, expires: datetime.datetime = None) -> str:
         """Forges the md5 token allowing access to the photos of this album.
@@ -205,11 +205,14 @@ class Collection(Model):
 
     @property
     def featured_album(self) -> Album | None:
-        """The (first) album of this collection marked as featured (defaults to the first album)"""
-        featured = [a for a in self.albums if a.featured]
-        if featured:
-            return featured[0]
-        return self.albums[0] if self.albums else None
+        """The (first) album of this collection marked as featured (defaults to the first visible album)"""
+        if not self.albums:
+            return None
+        feat_vis = next((a for a in self.albums if a.featured and a.visible), None)
+        if feat_vis:
+            return feat_vis
+        vis = next((a for a in self.albums if a.visible), None)
+        return vis
 
     @property
     def featured_photo(self) -> Photo | None:
@@ -222,7 +225,7 @@ class Collection(Model):
     @property
     def nb_albums(self) -> int:
         """The number of visible albums in the collection."""
-        return len([a for a in self.albums if a.visible])
+        return sum(1 for a in self.albums if a.visible)
 
     @property
     def nb_photos(self) -> int:
