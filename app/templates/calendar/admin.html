@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+<div class="row mb-4 align-items-center">
+    <div class="col d-flex align-items-center">
+        <a href="{{ url_for('calendar.index') }}" class="btn btn-outline-secondary rounded-circle p-2 me-3 d-flex align-items-center shadow-sm">
+            <svg class="bi flex-shrink-0" width="20" height="20">
+                {{ macros.bootstrap_icon("arrow-left") }}
+            </svg>
+        </a>
+        <h1 class="fw-bold mb-0">{{ _("Administration du Calendrier") }}</h1>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('calendar.admin_club_new') }}" class="btn btn-success d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2">
+            <svg class="bi flex-shrink-0 me-2" width="16" height="16">
+                {{ macros.bootstrap_icon("plus-lg") }}
+            </svg>
+            {{ _("Nouveau Club") }}
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 rounded-4 shadow-sm mb-4">
+    <div class="card-body p-4">
+        <h4 class="card-title fw-bold mb-4">{{ _("Clubs") }}</h4>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col" style="width: 50%;">{{ _("Nom") }}</th>
+                        <th scope="col" style="width: 30%;">{{ _("Couleur") }}</th>
+                        <th scope="col" style="width: 20%;" class="text-end">{{ _("Actions") }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for club in clubs %}
+                    <tr>
+                        <td class="fw-semibold">{{ club.name }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <svg width="24" height="24" class="me-2 flex-shrink-0" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="11" fill="{{ club.color }}" stroke="rgba(0,0,0,0.15)" stroke-width="1"/>
+                                </svg>
+                                <span class="font-monospace small text-body-secondary">{{ club.color }}</span>
+                            </div>
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end gap-1 flex-wrap">
+                                <a href="{{ url_for('calendar.admin_club_edit', id=club.id) }}" class="btn btn-icon-zoom text-warning p-2 shadow-none" data-bs-toggle="tooltip" title="{{ _('Modifier ce club') }}">
+                                    <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+                                        {{ macros.bootstrap_icon("pencil") }}
+                                    </svg>
+                                </a>
+                                <form action="{{ url_for('calendar.admin_club_delete', id=club.id) }}" method="POST" class="m-0" onsubmit="return confirm('{{ _('Voulez-vous vraiment supprimer ce club ? Cela supprimera tous ses évènements associés.') }}');">
+                                    <button type="submit" class="btn btn-icon-zoom text-danger p-2 shadow-none" data-bs-toggle="tooltip" title="{{ _('Supprimer ce club') }}">
+                                        <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+                                            {{ macros.bootstrap_icon("trash") }}
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-4">
+                            {{ _("Aucun club n'a été créé.") }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

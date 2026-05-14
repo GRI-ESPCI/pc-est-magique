@@ -1,8 +1,8 @@
 <footer class="bd-footer pt-3 mt-5">
-    <div class="container py-3">
-        <div class="row gx-4">
-            <div class="col-auto">
-                <a class="d-inline-flex align-items-center mb-2 link-dark text-decoration-none fs-5"
+    <div class="container-fluid px-4 px-xxl-5 py-3">
+        <div class="row gx-4 justify-content-center align-items-center">
+            <div class="col-12 col-lg-auto mb-4 mb-lg-0 text-center">
+                <a class="d-inline-flex align-items-center justify-content-center mb-2 link-dark text-decoration-none fs-5 w-100"
                    href="{{ url_for("main.index") }}">
                     PC est magique
                 </a>
@@ -13,48 +13,49 @@
                     </a>
                 </div>
             </div>
-            <div class="col-lg-auto px-0"></div>
-            <div class="col-6 col-lg-auto offset-lg-1 mb-2 me-lg-4 d-flex align-items-center">
-                <a class="link-secondary" href="{{ url_for("main.index") }}">
-                    {{ _("Accueil") }}
-                </a>
-            </div>
-            <div class="col-6 col-lg-auto mb-2 me-lg-4 d-flex align-items-center">
-                <a class="link-secondary" href="{{ url_for("main.contact") }}">
-                    {{ _("Nous contacter") }}
-                </a>
-            </div>
-            <div class="col-6 col-lg-auto mb-2 me-lg-4 d-flex align-items-center">
-                <a class="link-secondary" href="https://github.com/GRI-ESPCI/pc-est-magique"
-                   target="_blank" rel="external">
-                    {{ _("Code source") -}}
-                </a>
-            </div>
-            <div class="col-6 col-lg-auto mb-2 me-lg-4 d-flex align-items-center">
-                <a class="link-secondary" href="{{ url_for("main.legal") }}">
-                    {{ _("Mentions légales") }}
-                </a>
-            </div>
-            <div class="col-6 col-lg-auto mb-2 me-lg-4 d-flex align-items-center dropup">
-                <a class="link-secondary dropdown-toggle text-decoration-none" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-palette me-1"></i> {{ _("Thème M3") if g.theme == 'material' else (_("Thème Frost") if g.theme == 'frost' else _("Thème Classique")) }}
-                </a>
-                <ul class="dropdown-menu shadow-sm border-0">
-                    <li><a class="dropdown-item {{ 'active' if g.theme == 'material' else '' }}" href="{{ url_for('main.set_theme', theme='material') }}">{{ _("Thème M3") }}</a></li>
-                    <li><a class="dropdown-item {{ 'active' if g.theme == 'frost' else '' }}" href="{{ url_for('main.set_theme', theme='frost') }}">{{ _("Thème Frost") }}</a></li>
-                    <li><a class="dropdown-item {{ 'active' if g.theme == 'classic' else '' }}" href="{{ url_for('main.set_theme', theme='classic') }}">{{ _("Thème Classique") }}</a></li>
-                </ul>
-            </div>
-            <div class="col-6 col-lg-auto mb-2 me-lg-4 d-flex align-items-center dropup">
-                <a class="link-secondary dropdown-toggle text-decoration-none" href="#" id="modeDropdownBtn" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas {{ 'fa-sun' if g.mode == 'light' else ('fa-moon' if g.mode == 'dark' else 'fa-desktop') }} me-1"></i> 
-                    {{ _("Clair") if g.mode == 'light' else (_("Sombre") if g.mode == 'dark' else _("Auto")) }}
-                </a>
-                <ul class="dropdown-menu shadow-sm border-0">
-                    <li><a class="dropdown-item" href="#" onclick="setModeAJAX('light', event)"><i class="fas fa-sun me-2 w-15px"></i>{{ _("Clair") }}</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setModeAJAX('dark', event)"><i class="fas fa-moon me-2 w-15px"></i>{{ _("Sombre") }}</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="setModeAJAX('auto', event)"><i class="fas fa-desktop me-2 w-15px"></i>{{ _("Auto") }}</a></li>
-                </ul>
+            <div class="col-12 col-lg d-flex flex-wrap justify-content-center align-items-center">
+                <div class="mx-3 mb-2">
+                    <a class="link-secondary" href="{{ url_for("main.index") }}">
+                        {{ _("Accueil") }}
+                    </a>
+                </div>
+                <div class="mx-3 mb-2">
+                    <a class="link-secondary" href="{{ url_for("main.contact") }}">
+                        {{ _("Nous contacter") }}
+                    </a>
+                </div>
+                <div class="mx-3 mb-2">
+                    <a class="link-secondary" href="https://github.com/GRI-ESPCI/pc-est-magique"
+                       target="_blank" rel="external">
+                        {{ _("Code source") -}}
+                    </a>
+                </div>
+                <div class="mx-3 mb-2">
+                    <a class="link-secondary" href="{{ url_for("main.legal") }}">
+                        {{ _("Mentions légales") }}
+                    </a>
+                </div>
+                <div class="mx-3 mb-2 dropup">
+                    <a class="link-secondary dropdown-toggle text-decoration-none" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-palette me-1"></i> {{ _("Thème M3") if g.theme == 'material' else (_("Thème Frost") if g.theme == 'frost' else _("Thème Classique")) }}
+                    </a>
+                    <ul class="dropdown-menu shadow-sm border-0">
+                        <li><a class="dropdown-item {{ 'active' if g.theme == 'material' else '' }}" href="{{ url_for('main.set_theme', theme='material') }}">{{ _("Thème M3") }}</a></li>
+                        <li><a class="dropdown-item {{ 'active' if g.theme == 'frost' else '' }}" href="{{ url_for('main.set_theme', theme='frost') }}">{{ _("Thème Frost") }}</a></li>
+                        <li><a class="dropdown-item {{ 'active' if g.theme == 'classic' else '' }}" href="{{ url_for('main.set_theme', theme='classic') }}">{{ _("Thème Classique") }}</a></li>
+                    </ul>
+                </div>
+                <div class="mx-3 mb-2 dropup">
+                    <a class="link-secondary dropdown-toggle text-decoration-none" href="#" id="modeDropdownBtn" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas {{ 'fa-sun' if g.mode == 'light' else ('fa-moon' if g.mode == 'dark' else 'fa-desktop') }} me-1"></i> 
+                        {{ _("Clair") if g.mode == 'light' else (_("Sombre") if g.mode == 'dark' else _("Auto")) }}
+                    </a>
+                    <ul class="dropdown-menu shadow-sm border-0">
+                        <li><a class="dropdown-item" href="#" onclick="setModeAJAX('light', event)"><i class="fas fa-sun me-2 w-15px"></i>{{ _("Clair") }}</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setModeAJAX('dark', event)"><i class="fas fa-moon me-2 w-15px"></i>{{ _("Sombre") }}</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="setModeAJAX('auto', event)"><i class="fas fa-desktop me-2 w-15px"></i>{{ _("Auto") }}</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

@@ -2,12 +2,12 @@
 
 {% block app_content %}
 
-<div class="row mb-3">
+<div class="row mb-3 text-center text-md-start">
     <div class="col">
         <h1>{{ _("Bonjour, %(name)s !", name=g.pceen.prenom) }}</h1>
     </div>
 </div>
-<div class="row">
+<div class="row text-center text-md-start">
     <div class="col"><p>
         {{ _("Bienvenue sur PC est magique ! Ce portail a pour ambition de réunir le maximum de services "
              "informatiques des PCéens (élèves et alumni, mais aussi locataires de la Rez, dans le futur doctorants "
@@ -16,7 +16,7 @@
     </p></div>
 </div>
 
-<div class="row mb-3">
+<div class="row mb-3 text-center text-md-start">
     <div class="col"><p>
         {{ _("Une idée, un commentaire ? N'hésitez pas à ") }}
         <a href="{{ url_for("main.contact") }}">{{ _("nous en faire part") }}
@@ -24,7 +24,7 @@
     </p></div>
 </div>
 
-<div class="row row-cols row-cols-xl-3 gy-4 gx-1">
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 gy-4 gx-1 justify-content-center">
     {% with pceen = g.pceen %}
     <div class="col">
         {% include "cards/profile.html" %}
@@ -57,6 +57,11 @@
     <div class="col">
         {% include "cards/panier_bio.html" %}
     </div>
+    {% if calendar_infos %}
+    <div class="col">
+        {% include "cards/calendar.html" %}
+    </div>
+    {% endif %}
     {% endwith %}
     <div class="col">
         {% include "cards/coming_soon.html" %}

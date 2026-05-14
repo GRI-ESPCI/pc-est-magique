@@ -111,6 +111,8 @@ class PCeen(flask_login.UserMixin, Model):
     clubq_voeux: Mapped[list["models.ClubQVoeu"]] = one_to_many("ClubQVoeu.pceen")
 
     order_panier_bio: Mapped[list["models.OrderPanierBio"]] = one_to_many("OrderPanierBio.pceen")
+    events_created: Mapped[list["models.Event"]] = one_to_many("Event.author")
+
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
