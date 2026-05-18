@@ -77,7 +77,7 @@ def main() -> None:
                 with flask_babel.force_locale(pceen.locale or "en"):
                     ban = Ban(
                         pceen=pceen,
-                        start=datetime.datetime.now(datetime.timezone.utc),
+                        start=datetime.datetime.now(datetime.UTC).replace(tzinfo=None),
                         end=None,
                         reason=_("Pas d'abonnement actif"),
                         message=_(

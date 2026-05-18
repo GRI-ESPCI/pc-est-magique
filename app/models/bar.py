@@ -53,7 +53,11 @@ class BarTransaction(db.Model):
     _barman_id: Column[str] = column(sa.ForeignKey("pceen.id"), nullable=True)
     barman: Mapped[models.PCeen] = many_to_one("PCeen.bar_transactions_cashed", foreign_keys=[_barman_id])
 
-    date: Column[datetime.datetime] = column(sa.DateTime(), default=datetime.datetime.utcnow, nullable=False)
+    date: Column[datetime.datetime] = column(
+        sa.DateTime(),
+        default=lambda: datetime.datetime.now(datetime.UTC).replace(tzinfo=None),
+        nullable=False
+    )
     type: Column[BarTransactionType] = column(sa.Enum(BarTransactionType), nullable=False)
 
     _item_id: Column[int] = column(sa.ForeignKey("bar_item.id"), nullable=True)
@@ -117,7 +121,7 @@ class BarTransaction(db.Model):
             raise ValueError(f"Transaction {self} is already reverted!")
         # BarTransaction is now reverted: it won't ever be 'unreverted'
         self.is_reverted = True
-        self.revert_date = datetime.datetime.now(datetime.UTC)
+        self.revert_date = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
         self.reverter = reverter
         self._update_linked_objects(revert=True)
 

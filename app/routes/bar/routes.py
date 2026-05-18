@@ -515,7 +515,7 @@ def recharge():
         payment = Payment(
             pceen=context.g.pceen,
             amount=amount,
-            created=datetime.datetime.now(),
+            created=datetime.datetime.now(datetime.UTC).replace(tzinfo=None),
             type=PaymentType.bar,
         )
         db.session.add(payment)
@@ -584,7 +584,7 @@ def lydia_callback_confirm() -> typing.RouteReturn:
         return f"Bad amount {amount}: expected {payment.amount}", 400
 
     payment.status = PaymentStatus.accepted
-    payment.payed = datetime.datetime.now()
+    payment.payed = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
     payment.lydia_transaction_id = transaction_identifier
 
     # Credit the account
@@ -645,7 +645,7 @@ def lydia_success() -> typing.RouteReturn:
         payment = next(p for p in context.g.pceen.payments if p.status == PaymentStatus.waiting and p.type == PaymentType.bar)
     except StopIteration:
         # Check if already accepted
-        payment = next((p for p in context.g.pceen.payments if p.type == PaymentType.bar and (datetime.datetime.now() - p.created).total_seconds() < 300 and p.status == PaymentStatus.accepted), None)
+        payment = next((p for p in context.g.pceen.payments if p.type == PaymentType.bar and (datetime.datetime.now(datetime.UTC).replace(tzinfo=None) - p.created).total_seconds() < 300 and p.status == PaymentStatus.accepted), None)
         if payment:
             flask.flash(_("Compte bar rechargé de %(amount)s€ !", amount=format(payment.amount, ".2f")), "success")
             return flask.redirect(flask.url_for("bar.me"))
@@ -658,7 +658,7 @@ def lydia_success() -> typing.RouteReturn:
             client=payment.pceen,
             barman=None,
             amount=payment.amount,
-            date=payment.payed or datetime.datetime.now()
+            date=payment.payed or datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
         )
         db.session.add(transaction)
         db.session.commit()
