@@ -11,42 +11,54 @@
 
 {% block card_table %}
 {% if g.internal and pceen == g.pceen %}
-<tr>
-    <th scope="row" class="ps-4">{{ _("Appareil actuel") }}</th>
-    <td class="text-break">{{ g.device.name }}</td>
-</tr>
-<tr>
-    <th scope="row" class="ps-4">{{ _("Type") }}</th>
-    <td class="text-break">{{ g.device.type }}</td>
-</tr>
-<tr>
-    <th scope="row" class="ps-4">{{ _("Adresse MAC") }}</th>
-    <td class="text-break">{{ g.device.mac_address }}</td>
-</tr>
-<tr>
-    <th scope="row" class="ps-4">{{ _("IP attribuée") }}</th>
-    <td class="text-break">{{ g.device.current_ip }} &rarr; {{ g.remote_ip }}</td>
-</tr>
-<tr>
-    <th scope="row" class="ps-4">{{ _("Enregistrement") }}</th>
-    <td class="text-break">
-        <span title="{{ g.device.registered }} UTC">
-            {{ moment(g.device.registered).format("LL") }}
-        </span>
-    </td>
-</tr>
-<tr>
-    <th scope="row" class="ps-4">{{ _("Dernière connexion") }}</th>
-    <td class="text-break">
-        {% if g.device.last_seen %}
-        <span title="{{ g.device.last_seen }} UTC">
-            {{ moment(g.device.last_seen).fromNow() }}
-        </span>
-        {% else %}
-        <span>{{ _("Jamais") }}</span>
-        {% endif %}
-    </td>
-</tr>
+    {% if g.device %}
+        <tr>
+            <th scope="row" class="ps-4">{{ _("Appareil actuel") }}</th>
+            <td class="text-break">{{ g.device.name }}</td>
+        </tr>
+        <tr>
+            <th scope="row" class="ps-4">{{ _("Type") }}</th>
+            <td class="text-break">{{ g.device.type }}</td>
+        </tr>
+        <tr>
+            <th scope="row" class="ps-4">{{ _("Adresse MAC") }}</th>
+            <td class="text-break">{{ g.device.mac_address }}</td>
+        </tr>
+        <tr>
+            <th scope="row" class="ps-4">{{ _("IP attribuée") }}</th>
+            <td class="text-break">{{ g.device.current_ip }} &rarr; {{ g.remote_ip }}</td>
+        </tr>
+        <tr>
+            <th scope="row" class="ps-4">{{ _("Enregistrement") }}</th>
+            <td class="text-break">
+                <span title="{{ g.device.registered }} UTC">
+                    {{ moment(g.device.registered).format("LL") }}
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row" class="ps-4">{{ _("Dernière connexion") }}</th>
+            <td class="text-break">
+                {% if g.device.last_seen %}
+                <span title="{{ g.device.last_seen }} UTC">
+                    {{ moment(g.device.last_seen).fromNow() }}
+                </span>
+                {% else %}
+                <span>{{ _("Jamais") }}</span>
+                {% endif %}
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <th scope="row" class="ps-4">{{ _("Appareil actuel") }}</th>
+            <td class="text-break text-muted fst-italic">{{ _("Appareil non enregistré") }}</td>
+        </tr>
+        <tr>
+            <th scope="row" class="ps-4">{{ _("IP locale") }}</th>
+            <td class="text-break">{{ g.remote_ip }}</td>
+        </tr>
+    {% endif %}
+
 {% else %}          {# if not g.internal #}
 <tr>
     <th scope="row" class="ps-4">{{ _("Appareil actuel") }}</th>

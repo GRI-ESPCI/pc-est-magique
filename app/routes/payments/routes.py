@@ -125,8 +125,8 @@ def add_payment(offer: int | None = None) -> typing.RouteReturn:
     payment = Payment(
         pceen=pceen,
         amount=offer.price,
-        created=datetime.datetime.now(),
-        payed=datetime.datetime.now(),
+        created=datetime.datetime.now(datetime.UTC).replace(tzinfo=None),
+        payed=datetime.datetime.now(datetime.UTC).replace(tzinfo=None),
         status=PaymentStatus.manual,
         type=PaymentType.internet,
         gri=context.g.logged_in_user,
@@ -184,7 +184,7 @@ def lydia_callback_confirm() -> typing.RouteReturn:
         return f"Bad amount {amount}: expected {payment.amount}", 400
 
     payment.status = PaymentStatus.accepted
-    payment.payed = datetime.datetime.now()
+    payment.payed = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
     payment.lydia_transaction_id = transaction_identifier
     pceen = payment.pceen
     offer = db.session.scalars(db.select(Offer).filter_by(price=payment.amount)).one_or_none()
@@ -291,7 +291,7 @@ def lydia_validate(payment_id: int) -> typing.RouteReturn:
         flask.flash(_("Paiement invalide, réessayer"), "warning")
         return helpers.ensure_safe_redirect("payments.pay", next=None)
 
-    payment.payed = datetime.datetime.now()
+    payment.payed = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
     payment.lydia_transaction_id = flask.request.args.get("transaction")
     db.session.commit()
 

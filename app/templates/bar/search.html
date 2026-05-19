@@ -44,7 +44,7 @@
     <div class="row mt-3">
         {% for pceen in paginator.items %}
         <div class="col-xl-2 col-md-3 col-sm-4 col-6">
-            <div class="card mx-auto mb-4 shadow text-secondary border-secondary"
+            <div class="card mx-auto mb-4 overflow-hidden shadow text-secondary border-secondary"
                 style="width: 160px;">
                 <a href="{{ url_for("bar.user", username=pceen.username) }}" class="text-decoration-none" style="display: block;">
                     {% if pceen.has_bar_avatar %}
@@ -62,24 +62,6 @@
                         {{ pceen.prenom }} {{ pceen.nom }} {{ pceen.promo or _("(exté)") }}
                     </h5>
                 </div>
-                <!-- <div class="card-footer">
-                    {% if pceen.bar_deposit %}
-                    <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Pay and quick access item">
-                    <div class="btn-group" role="group" aria-label="Pay">
-                        PAY
-                    </div>
-                        <div class="btn-group" role="group" aria-label="Quick access item">
-                        QAI
-                        </div>
-                    </div>
-                    {% else %}
-                    <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Deposit">
-                        <div class="btn-group" role="group" aria-label="Deposit">
-                        DEP
-                        </div>
-                    </div>
-                    {% endif %}
-                </div> -->
             </div>
         </div>
         {% endfor %}

@@ -49,7 +49,7 @@ class Device(Model):
 
     def update_last_seen(self) -> None:
         """Change :attr:`.Device.last_seen` timestamp to now."""
-        self.last_seen = datetime.datetime.now(datetime.UTC)
+        self.last_seen = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
         db.session.commit()
 
     def allocate_ip_for(self, room: models.Room) -> str:

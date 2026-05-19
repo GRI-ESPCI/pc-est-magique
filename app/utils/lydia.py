@@ -53,7 +53,7 @@ def create_internet_payment(pceen: PCeen, offer: Offer, phone: str | None) -> st
     payment = Payment(
         pceen=pceen,
         amount=offer.price,
-        created=datetime.datetime.now(),
+        created=datetime.datetime.now(datetime.UTC).replace(tzinfo=None),
         type=PaymentType.internet,
     )
     db.session.add(payment)
@@ -178,7 +178,7 @@ def update_payment(payment: Payment) -> None:
     }.get(state, PaymentStatus.error)
 
     if new_status == PaymentStatus.accepted and payment.status != PaymentStatus.accepted:
-        payment.payed = datetime.datetime.now()
+        payment.payed = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
         payment.lydia_transaction_id = rep.json().get("transaction_identifier")
 
     payment.status = new_status
