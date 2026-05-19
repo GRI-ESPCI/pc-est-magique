@@ -54,6 +54,14 @@ def not_found_error(error: HTTPException) -> typing.RouteReturn:
         404,
     )
 
+@bp.app_errorhandler(405)
+def method_not_allowed_error(error: HTTPException) -> typing.RouteReturn:
+    err_name = f"{error.code} {error.name}"
+    err_descr = error.description
+    return (
+        flask.render_template("errors/other.html", err_name=err_name, err_descr=err_descr, title=err_name),
+        405,
+    )
 
 @bp.app_errorhandler(418)
 def theiere_error(error: HTTPException) -> typing.RouteReturn:

@@ -245,7 +245,7 @@ class PCeen(flask_login.UserMixin, Model):
     def first_seen(self) -> datetime.datetime:
         """The first time the pceen registered a device, or now."""
         if not self.devices:
-            return datetime.datetime.now(datetime.UTC)
+            return datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
         return min(device.registered for device in self.devices)
 
     @property
@@ -390,7 +390,7 @@ class PCeen(flask_login.UserMixin, Model):
     def current_bar_daily_data(self) -> models.BarDailyData:
         """Current readonly Bar daily data of the PCeen."""
         return models.BarDailyData.from_pceen_and_timestamp(
-            pceen=self, timestamp=datetime.datetime.utcnow(), create=False
+            pceen=self, timestamp=datetime.datetime.now(datetime.UTC).replace(tzinfo=None), create=False
         )
 
     @property

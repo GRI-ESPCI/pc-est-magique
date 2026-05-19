@@ -118,7 +118,7 @@ def top_up(pceen_id: str):
         flask.abort(400, "Field 'amount' missing, invalid float or <= 0")
 
     transaction = BarTransaction.create_from_top_up(
-        client=pceen, barman=context.g.pceen, amount=amount, date=datetime.datetime.now(datetime.UTC)
+        client=pceen, barman=context.g.pceen, amount=amount, date=datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
     )
     db.session.add(transaction)
     db.session.commit()
@@ -151,7 +151,7 @@ def pay(pceen_id: str, item_id: str):
         flask.abort(422, "Cannot buy item")
 
     transaction = BarTransaction.create_from_item_bought(
-        client=pceen, barman=context.g.pceen, item=item, date=datetime.datetime.now(datetime.UTC)
+        client=pceen, barman=context.g.pceen, item=item, date=datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
     )
     db.session.add(transaction)
     db.session.commit()

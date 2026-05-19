@@ -5,7 +5,7 @@ import re
 import flask
 from flask_babel import _
 import unidecode
-
+from app import db
 from app.models import PCeen, Role
 
 

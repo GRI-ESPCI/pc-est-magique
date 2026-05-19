@@ -29,7 +29,7 @@ def register() -> typing.RouteReturn:
                 name=form.nom.data,
                 mac_address=mac_address,
                 type=form.type.data,
-                registered=datetime.datetime.now(datetime.timezone.utc),
+                registered=datetime.datetime.now(datetime.UTC).replace(tzinfo=None),
             )
             db.session.add(device)
             db.session.commit()
