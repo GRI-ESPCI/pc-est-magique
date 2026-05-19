@@ -315,7 +315,7 @@
 
 {% block scripts %}
 {{ super() }}
-<script src="{{ url_for('static', filename='dist/fullcalendar.min.js') }}"></script>
+<script src="{{ url_for('calendar.serve_fullcalendar') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const calendarEl = document.getElementById('calendar');

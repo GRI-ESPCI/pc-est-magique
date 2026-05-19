@@ -249,3 +249,16 @@ def admin_club_delete(id: int):
     flask.flash(_("Club supprimé."), "success")
     return flask.redirect(flask.url_for("calendar.admin"))
 
+
+@bp.route("/static/fullcalendar.min.js")
+@context.logged_in_only
+def serve_fullcalendar():
+    """Serve FullCalendar from node_modules."""
+    import os
+    from werkzeug.utils import safe_join
+    proj_root = os.path.dirname(flask.current_app.root_path)
+    return flask.send_from_directory(
+        safe_join(proj_root, "node_modules", "fullcalendar"),
+        "index.global.min.js"
+    )
+

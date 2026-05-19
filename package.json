@@ -5,9 +5,8 @@
   "main": "n/a",
   "scripts": {
     "test": "n/a",
-    "build": "rollup -c && mkdir -p app/static/dist && cp node_modules/fullcalendar/index.global.min.js app/static/dist/fullcalendar.min.js",
-    "watch": "rollup -c --watch",
-    "postinstall": "mkdir -p app/static/dist && cp node_modules/fullcalendar/index.global.min.js app/static/dist/fullcalendar.min.js"
+    "build": "rollup -c",
+    "watch": "rollup -c --watch"
   },
   "repository": {
     "type": "git",
