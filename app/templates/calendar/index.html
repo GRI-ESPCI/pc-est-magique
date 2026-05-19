@@ -1,0 +1,571 @@
+{% extends "base.html" %}
+
+{% block styles %}
+{{ super() }}
+
+<style>
+    #calendar-container {
+        background-color: transparent; 
+        border-radius: 1rem;
+        padding: 1.5rem;
+    }
+    
+    /* Calendar themes */
+    .fc {
+        --fc-page-bg-color: transparent;
+        --fc-neutral-bg-color: rgba(120, 130, 140, 0.05);
+        --fc-border-color: rgba(120, 130, 140, 0.2);
+        color: inherit;
+
+        --cal-accent: #0b5ed7;
+        --cal-accent-bg: rgba(11, 94, 215, 0.1);
+        --cal-event-text: #ffffff; 
+
+        --fc-event-bg-color: var(--cal-accent);
+        --fc-event-border-color: var(--cal-accent);
+        --fc-today-bg-color: var(--cal-accent-bg);
+        --fc-button-active-bg-color: var(--cal-accent);
+        --fc-button-active-border-color: var(--cal-accent);
+
+        /* Inactive buttons */
+        --fc-button-bg-color: #6c757d;
+        --fc-button-border-color: #6c757d;
+        --fc-button-hover-bg-color: #5c636a;
+        --fc-button-hover-border-color: #565e64;
+
+        --cal-solid-border-color: #e4e6e8;
+
+        --fc-list-event-hover-bg-color: rgba(0, 0, 0, 0.08);
+    }
+
+    /* Frost-specific changes */
+    [data-theme="frost"] .fc,
+    body.theme-frost .fc,
+    .theme-frost .fc {
+        --cal-accent: #64b9e9;
+        --cal-accent-bg: rgba(100, 185, 233, 0.1);
+        --cal-event-text: #152f4e;
+    }
+    .fc .fc-button-group {
+        gap: 0.5rem;
+    }
+    .fc .fc-button {
+        border-radius: 50rem !important;
+        text-transform: capitalize;
+        font-weight: 600;
+        padding: 0.4rem 1.2rem;
+        border: none !important;
+        box-shadow: none !important;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .fc .fc-button:focus,
+    .fc .fc-button:active,
+    .fc .fc-button.fc-button-active {
+        box-shadow: none !important;
+    }
+    
+    /* Focus ring for keyboard navigation */
+    .fc .fc-button:focus-visible {
+        box-shadow: 0 0 0 0.25rem rgba(11, 94, 215, 0.25) !important;
+    }
+    
+    [data-theme="dark"] .fc .fc-button:focus-visible,
+    .theme-dark .fc .fc-button:focus-visible {
+        box-shadow: 0 0 0 0.25rem rgba(100, 185, 233, 0.25) !important;
+    }
+    .fc a {
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    /* Prevent header from sticking at the top while scrolling in list view */
+    .fc .fc-list-sticky .fc-list-day > * {
+        position: relative !important;
+        top: auto !important;
+        background-color: transparent !important;
+    }
+
+    /* Rounded corners */
+    .fc .fc-view {
+        border-radius: 0.75rem;
+        overflow: hidden;
+        position: relative;
+        border: none !important;
+    }
+
+    .fc .fc-view::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        border-radius: 0.75rem;
+        box-shadow: inset 0 0 0 1px var(--cal-solid-border-color);
+        pointer-events: none;
+        z-index: 10;
+    }
+    
+    .fc .fc-scrollgrid {
+        border: none !important;
+    }
+
+    .fc-event-title, .fc-event-time, .fc-event-details {
+        font-weight: 600;
+    }
+
+    [data-theme="dark"] #calendar-container,
+    .theme-dark #calendar-container {
+        background-color: #212529; 
+    }
+
+    [data-theme="dark"] .fc,
+    .theme-dark .fc {
+        --fc-border-color: rgba(255, 255, 255, 0.1);
+        --fc-button-bg-color: #2b3035;
+        --fc-button-border-color: #343a40;
+        --fc-button-text-color: #f8f9fa;
+        --fc-button-hover-bg-color: #343a40;
+        --fc-button-hover-border-color: #495057;
+        --fc-list-event-hover-bg-color: rgba(255, 255, 255, 0.05);
+        --cal-solid-border-color: #373b3e;
+    }
+
+    [data-theme="dark"] .fc .fc-toolbar-title,
+    [data-theme="dark"] .fc .fc-col-header-cell-cushion,
+    [data-theme="dark"] .fc .fc-daygrid-day-number,
+    [data-theme="dark"] .fc .fc-timegrid-slot-label-cushion,
+    [data-theme="dark"] .fc .fc-timegrid-axis-cushion,
+    [data-theme="dark"] .fc .fc-list-day-text {
+        color: #f8f9fa !important;
+    }
+
+    [data-theme="dark"] .fc .fc-day-other .fc-daygrid-day-number {
+        color: #6c757d !important;
+    }
+
+    .fc .fc-timegrid-axis-cushion {
+        white-space: nowrap !important;
+        font-size: 0.85rem; 
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+
+    /* Improved responsiveness */
+    @media (max-width: 767.98px) {
+        #calendar-container {
+            padding: 0.75rem;
+            margin-left: -0.5rem;
+            margin-right: -0.5rem;
+            border-radius: 0;
+        }
+        .fc .fc-toolbar {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .fc .fc-toolbar-title {
+            font-size: 1.2rem !important;
+        }
+        .fc .fc-button {
+            padding: 0.35rem 0.75rem !important;
+            font-size: 0.85rem !important;
+        }
+        .fc .fc-header-toolbar {
+            margin-bottom: 1.25rem !important;
+        }
+
+        .fc .fc-daygrid-event {
+            font-size: 0.7rem !important;
+            padding: 1px 2px !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block app_content %}
+<div class="row mb-4 align-items-center gy-3">
+    <div class="col d-flex align-items-center">
+        <svg class="bi flex-shrink-0 me-3 text-primary" width="32" height="32">
+            {{ macros.bootstrap_icon("calendar-event") }}
+        </svg>
+        <h1 class="fw-bold mb-0 fs-2">{{ _("Calendrier PCéen") }}</h1>
+    </div>
+    {% if can_admin %}
+    <div class="col-12 col-md-auto">
+        <a href="{{ url_for('calendar.admin') }}" class="btn btn-danger d-flex align-items-center justify-content-center gap-2 fw-bold shadow-sm px-4 py-2 w-100">
+            <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+                {{ macros.bootstrap_icon("gear-fill") }}
+            </svg>
+            <span>{{ _("Administration") }}</span>
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div id="calendar-container" class="shadow-sm mb-5">
+    <div id="calendar"></div>
+</div>
+
+<!-- Modal View -->
+<div class="modal fade" id="viewEventModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-bottom-0 pb-0 px-4 pt-4">
+                <h4 class="modal-title fw-bold" id="viewEventTitle"></h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Fermer') }}"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="p-3 rounded-4 mb-3 bg-body-tertiary">
+                    <span class="small text-primary fw-bold text-uppercase d-block mb-1">{{ _("Date & Heure") }}</span>
+                    <div id="viewEventTime" class="fw-bold fs-5 text-body"></div>
+                </div>
+                <div class="p-3 rounded-4 mb-3 bg-body-tertiary">
+                    <span class="small text-primary fw-bold text-uppercase d-block mb-1">{{ _("Localisation") }}</span>
+                    <div id="viewEventLocation" class="fw-semibold text-body"></div>
+                </div>
+                <div class="p-3 rounded-4 mb-3 bg-body-tertiary">
+                    <span class="small text-primary fw-bold text-uppercase d-block mb-1">{{ _("Organisé par") }}</span>
+                    <div id="viewEventClub" class="fw-semibold text-body"></div>
+                </div>
+                <div class="p-3 rounded-4 mb-4 bg-body-tertiary">
+                    <span class="small text-primary fw-bold text-uppercase d-block mb-1">{{ _("À propos") }}</span>
+                    <div id="viewEventDescription" class="text-body" style="white-space: pre-wrap;"></div>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="button" id="editEventBtn" class="btn btn-primary rounded-pill flex-grow-1 d-none fw-semibold shadow-sm d-flex justify-content-center align-items-center">
+                        <svg class="bi flex-shrink-0 me-2" width="16" height="16">
+                            {{ macros.bootstrap_icon("pencil") }}
+                        </svg>
+                        {{ _("Modifier l'évènement") }}
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-semibold" data-bs-dismiss="modal">{{ _("Fermer") }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Creation/Edition -->
+<div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-bottom-0 pb-0 px-4 pt-4">
+                <h4 class="modal-title fw-bold" id="createEventModalLabel"></h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Fermer') }}"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="createEventForm">
+                    <input type="hidden" id="event_id" name="event_id">
+                    
+                    <div id="formError" class="alert alert-danger d-none small mb-3" role="alert"></div>
+                    
+                    <div class="mb-3">
+                        <label for="title" class="form-label fw-semibold">{{ _("Titre de l'évènement") }}</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="{{ _('Titre de l\'évènement') }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="start" class="form-label fw-semibold">{{ _("Date de début") }}</label>
+                        <input type="datetime-local" class="form-control" id="start" name="start" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="end" class="form-label fw-semibold">{{ _("Date de fin") }}</label>
+                        <input type="datetime-local" class="form-control" id="end" name="end" required>
+                    </div>
+
+                    <div class="form-check form-switch mb-3 ms-1">
+                        <input class="form-check-input" type="checkbox" role="switch" id="all_day" name="all_day">
+                        <label class="form-check-label fw-semibold" for="all_day">{{ _("Toute la journée") }}</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="club_id" class="form-label fw-semibold">{{ _("Club organisateur") }}</label>
+                        <select class="form-select" id="club_id" name="club_id" aria-label="{{ _('Club organisateur') }}" required>
+                            <option value="" selected disabled>{{ _("Choisir un club...") }}</option>
+                            {% for club in clubs %}
+                            <option value="{{ club.id }}">{{ club.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="location" class="form-label fw-semibold">{{ _("Lieu / Salle") }}</label>
+                        <input type="text" class="form-control" id="location" name="location" placeholder="{{ _('Lieu / Salle') }}">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="description" class="form-label fw-semibold">{{ _("Détails supplémentaires") }}</label>
+                        <textarea class="form-control" id="description" name="description" placeholder="{{ _('Détails supplémentaires') }}" style="height: 100px"></textarea>
+                    </div>
+
+                    <div class="d-grid mt-2">
+                        <button type="submit" class="btn btn-primary rounded-pill fw-semibold py-2 shadow-sm d-flex justify-content-center align-items-center">
+                            <span id="btn-text">{{ _('Créer') }}</span>
+                            <div id="btn-loader" class="spinner-border spinner-border-sm ms-2 d-none" role="status">
+                                <span class="visually-hidden">{{ _('Chargement...') }}</span>
+                            </div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('calendar.serve_fullcalendar') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        const createModal = new bootstrap.Modal(document.getElementById('createEventModal'));
+        const viewModal = new bootstrap.Modal(document.getElementById('viewEventModal'));
+        const form = document.getElementById('createEventForm');
+        let currentEvent = null;
+        
+        function updateDateInputTypes() {
+            let isAllDay = document.getElementById('all_day').checked;
+            let type = isAllDay ? 'date' : 'datetime-local';
+            
+            const startLabel = document.querySelector('label[for="start"]');
+            const endContainer = document.getElementById('end').closest('.mb-3');
+            
+            if (isAllDay) {
+                startLabel.innerText = "{{ _('Date') }}";
+                endContainer.classList.add('d-none');
+                document.getElementById('end').required = false;
+            } else {
+                startLabel.innerText = "{{ _('Date de début') }}";
+                endContainer.classList.remove('d-none');
+                document.getElementById('end').required = true;
+            }
+            
+            ['start', 'end'].forEach(id => {
+                let input = document.getElementById(id);
+                let val = input.value;
+                input.type = type;
+                if (val) {
+                    if (isAllDay) {
+                        input.value = val.split('T')[0];
+                    } else if (!val.includes('T')) {
+                        input.value = val + 'T00:00';
+                    }
+                }
+            });
+        }
+        document.getElementById('all_day').addEventListener('change', updateDateInputTypes);
+        
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: window.innerWidth < 768 ? 'listMonth' : 'dayGridMonth',
+            locale: 'fr',
+            height: window.innerWidth < 768 ? 'auto' : 'calc(100vh - 100px)',
+            allDayText: "{{ _('Journée ') }}",
+            buttonText: {
+                today: "{{ _("Aujourd'hui") }}",
+                month: "{{ _('Mois') }}",
+                week: "{{ _('Semaine') }}",
+                list: "{{ _('Liste') }}"
+            },
+            firstDay: 1,
+            headerToolbar: window.innerWidth < 768 ? {
+                left: 'prev,next',
+                center: 'title',
+                right: 'today dayGridMonth,timeGridWeek,listMonth'
+            } : {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listMonth'
+            },
+            dayMaxEvents: true,
+            events: '{{ url_for("calendar.get_events") }}',
+            displayEventEnd: window.innerWidth >= 768,
+            eventTimeFormat: { hour: '2-digit', minute: '2-digit', meridiem: false, hour12: false },
+            eventDidMount: function(info) {
+                let isMonth = info.view.type === 'dayGridMonth';
+
+                let isBlock = info.el.classList.contains('fc-timegrid-event') || info.el.classList.contains('fc-daygrid-block-event');
+                if (isBlock && info.event.extendedProps.contrast_color) {
+                    info.el.style.setProperty('--fc-event-text-color', info.event.extendedProps.contrast_color);
+                    info.el.style.setProperty('color', info.event.extendedProps.contrast_color, 'important');
+
+                    let inner = info.el.querySelector('.fc-event-main') || info.el.querySelector('.fc-event-main-frame');
+                    if (inner) {
+                        inner.style.setProperty('color', info.event.extendedProps.contrast_color, 'important');
+                    }
+                }
+                
+                let details = [];
+                if (info.event.extendedProps.club) {
+                    details.push(info.event.extendedProps.club);
+                }
+                if (info.event.extendedProps.location) {
+                    details.push(info.event.extendedProps.location);
+                }
+                
+                if (isMonth) {
+                    // In month view, keep it inline to prevent vertical overflow (on desktop only, to prevent clutter on mobile)
+                    if (window.innerWidth >= 768 && details.length > 0) {
+                        let titleEl = info.el.querySelector('.fc-event-title');
+                        if (titleEl) {
+                            titleEl.insertAdjacentHTML('beforeend', ' <span style="font-weight: normal; opacity: 0.85;">- ' + details.join(' • ') + '</span>');
+                        }
+                    }
+                } else {
+                    // Week and Day views. No extra details if the event is very short (prevents visual overflows)
+                    if (info.el.classList.contains('fc-timegrid-event-short')) {
+                        return;
+                    }
+                    
+                    let clubLocHtml = '';
+                    if (details.length > 0) {
+                        // Make club bold in detail view
+                        let richDetails = [];
+                        if (info.event.extendedProps.club) richDetails.push('<span class="fw-bold">' + info.event.extendedProps.club + '</span>');
+                        if (info.event.extendedProps.location) richDetails.push(info.event.extendedProps.location);
+                        
+                        clubLocHtml = '<div class="fc-event-details mt-1" style="line-height: 1.2; font-size: 0.85em; opacity: 0.95; white-space: normal;">' + richDetails.join(' • ') + '</div>';
+                    }
+                    
+                    let descHtml = '';
+                    if (info.event.extendedProps.description) {
+                        descHtml = '<div class="fc-event-description mt-2 fst-italic" style="font-size: 0.8em; opacity: 0.8; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">' + info.event.extendedProps.description + '</div>';
+                    }
+                    
+                    // Done so that club and location are stickied with the title
+                    let titleEl = info.el.querySelector('.fc-event-title');
+                    if (titleEl) {
+                        if (clubLocHtml) {
+                            titleEl.insertAdjacentHTML('beforeend', clubLocHtml);
+                        }
+                        
+                        // Opaque background for title so that description is hidden while scrolling
+                        let bgColor = info.event.backgroundColor;
+                        if (bgColor) {
+                            titleEl.style.backgroundColor = bgColor;
+                            titleEl.style.paddingBottom = '4px';
+                            titleEl.style.zIndex = '2';
+                        }
+                    }
+
+                    if (descHtml) {
+                        let titleContainer = info.el.querySelector('.fc-event-title-container');
+                        if (titleContainer) {
+                            titleContainer.insertAdjacentHTML('beforeend', descHtml);
+                        }
+                    }
+                }
+            },
+            selectable: {% if can_admin %}true{% else %}false{% endif %},
+            select: function(info) {
+                currentEvent = null;
+                document.getElementById('event_id').value = '';
+                document.getElementById('createEventModalLabel').innerText = "{{ _('Nouvel Évènement') }}";
+                document.getElementById('btn-text').innerText = "{{ _("Créer l'évènement") }}";
+                form.reset();
+
+                let end = info.end;
+                if (info.allDay) {
+                    end.setDate(end.getDate() - 1);
+                }
+                
+                document.getElementById('start').type = 'datetime-local';
+                document.getElementById('end').type = 'datetime-local';
+                document.getElementById('start').value = moment(info.start).format('YYYY-MM-DDTHH:mm');
+                document.getElementById('end').value = moment(end).format('YYYY-MM-DDTHH:mm');
+                document.getElementById('all_day').checked = info.allDay;
+                updateDateInputTypes();
+                
+                createModal.show();
+            },
+            eventClick: function(info) {
+                const event = info.event;
+                currentEvent = event;
+                document.getElementById('viewEventTitle').innerText = event.title;
+                document.getElementById('viewEventTime').innerText = event.allDay 
+                    ? moment(event.start).format('LL')
+                    : moment(event.start).format('LLL') + " → " + moment(event.end).format('LT');
+                document.getElementById('viewEventLocation').innerText = event.extendedProps.location || "{{ _('Non spécifié') }}";
+                document.getElementById('viewEventClub').innerText = event.extendedProps.club;
+                document.getElementById('viewEventDescription').innerText = event.extendedProps.description || "{{ _('Aucune description supplémentaire.') }}";
+                
+                const editBtn = document.getElementById('editEventBtn');
+                if (event.extendedProps.can_edit) {
+                    editBtn.classList.remove('d-none');
+                } else {
+                    editBtn.classList.add('d-none');
+                }
+                viewModal.show();
+            }
+        });
+
+        calendar.render();
+
+        document.getElementById('editEventBtn').addEventListener('click', function() {
+            if (!currentEvent) return;
+            viewModal.hide();
+            document.getElementById('event_id').value = currentEvent.id;
+            document.getElementById('createEventModalLabel').innerText = "{{ _("Modifier l'évènement") }}";
+            document.getElementById('btn-text').innerText = "{{ _('Enregistrer') }}";
+            document.getElementById('title').value = currentEvent.title;
+            document.getElementById('start').type = 'datetime-local';
+            document.getElementById('end').type = 'datetime-local';
+            document.getElementById('start').value = moment(currentEvent.start).format('YYYY-MM-DDTHH:mm');
+            document.getElementById('end').value = moment(currentEvent.end).format('YYYY-MM-DDTHH:mm');
+            document.getElementById('all_day').checked = currentEvent.allDay;
+            updateDateInputTypes();
+            document.getElementById('club_id').value = currentEvent.extendedProps.club_id;
+            document.getElementById('location').value = currentEvent.extendedProps.location || '';
+            document.getElementById('description').value = currentEvent.extendedProps.description || '';
+            createModal.show();
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btnText = document.getElementById('btn-text');
+            const btnLoader = document.getElementById('btn-loader');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const eventId = document.getElementById('event_id').value;
+            const formError = document.getElementById('formError');
+            
+            formError.classList.add('d-none');
+            formError.innerText = '';
+            
+            btnText.classList.add('d-none');
+            btnLoader.classList.remove('d-none');
+            submitBtn.disabled = true;
+            
+            const formData = new FormData(form);
+            const isAllDay = document.getElementById('all_day').checked;
+            formData.set('all_day', isAllDay);
+            
+            if (isAllDay) {
+                // End date is the same as start date for all day events
+                formData.set('end', document.getElementById('start').value);
+            }
+            
+            const url = eventId ? `/calendar/api/events/edit/${eventId}` : '/calendar/api/events/create';
+            fetch(url, { method: 'POST', body: formData })
+            .then(async response => { 
+                const data = await response.json().catch(() => null);
+                if (!response.ok) {
+                    throw new Error(data && data.message ? data.message : 'Erreur réseau');
+                }
+                return data;
+            })
+            .then(data => { 
+                createModal.hide(); 
+                calendar.refetchEvents();
+                if (data.message && typeof showToast !== 'undefined') {
+                    showToast(data.message, 'success');
+                }
+            })
+            .catch(error => { 
+                formError.innerText = error.message;
+                formError.classList.remove('d-none');
+            })
+            .finally(() => { btnText.classList.remove('d-none'); btnLoader.classList.add('d-none'); submitBtn.disabled = false; });
+        });
+    });
+</script>
+{% endblock %}
