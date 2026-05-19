@@ -47,6 +47,8 @@ def permissions() -> dict[str, dict[str, typing.Any]]:
         "manage_bekk": dict(type=PermissionType.all, scope=PermissionScope.bekk, ref_id=None),
         "manage_theatre": dict(type=PermissionType.all, scope=PermissionScope.theatre, ref_id=None),
         "manage_panier_bio": dict(type=PermissionType.all, scope=PermissionScope.panier_bio, ref_id=None),
+        "access_calendar": dict(type=PermissionType.read, scope=PermissionScope.calendar, ref_id=None),
+        "manage_calendar": dict(type=PermissionType.all, scope=PermissionScope.calendar, ref_id=None),
     }
 
 
@@ -71,6 +73,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["manage_bekk"],
                 perms["manage_panier_bio"],
                 perms["access_bar_stats"],
+                perms["manage_calendar"],
             ],
         ),
         "Rezident": dict(  # NE PAS RENOMMER - nom utilisé dans app/utils/roles.py
@@ -89,6 +92,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["access_club_q"],
                 perms["access_bekk"],
                 perms["access_panier_bio"],
+                perms["access_calendar"],
             ],
         ),
         "Alumni": dict(

@@ -42,12 +42,42 @@ def upgrade():
 
     # --- UPDATE PERMISSION ENUM ---
     with op.get_context().autocommit_block():
-        op.execute("ALTER TYPE permission_scope ADD VALUE 'club'")
-        op.execute("ALTER TYPE permission_scope ADD VALUE 'calendar'")
+        op.execute("ALTER TYPE permission_scope ADD VALUE IF NOT EXISTS 'club'")
+        op.execute("ALTER TYPE permission_scope ADD VALUE IF NOT EXISTS 'calendar'")
 
     # --- INSERT DEFAULT CLUBS ---
     op.execute("INSERT INTO club (name, color) VALUES ('Club Q', '#dc8add') ON CONFLICT (name) DO NOTHING")
     op.execute("INSERT INTO club (name, color) VALUES ('Autre', '#757575') ON CONFLICT (name) DO NOTHING")
+
+    # --- INSERT CALENDAR PERMISSIONS & ASSIGN TO ROLES ---
+    op.execute(
+        "INSERT INTO permission (type, scope, ref_id) "
+        "SELECT 'read'::permission_type, 'calendar'::permission_scope, NULL "
+        "WHERE NOT EXISTS ( "
+        "    SELECT 1 FROM permission WHERE type = 'read' AND scope = 'calendar' AND ref_id IS NULL "
+        ")"
+    )
+    op.execute(
+        "INSERT INTO permission (type, scope, ref_id) "
+        "SELECT 'all'::permission_type, 'calendar'::permission_scope, NULL "
+        "WHERE NOT EXISTS ( "
+        "    SELECT 1 FROM permission WHERE type = 'all' AND scope = 'calendar' AND ref_id IS NULL "
+        ")"
+    )
+    op.execute(
+        "INSERT INTO _role_permission_at (_role_id, _permission_id) "
+        "SELECT r.id, p.id "
+        "FROM role r, permission p "
+        "WHERE r.name = 'Admin' AND p.type = 'all' AND p.scope = 'calendar' AND p.ref_id IS NULL "
+        "ON CONFLICT DO NOTHING"
+    )
+    op.execute(
+        "INSERT INTO _role_permission_at (_role_id, _permission_id) "
+        "SELECT r.id, p.id "
+        "FROM role r, permission p "
+        "WHERE r.name = 'Élève' AND p.type = 'read' AND p.scope = 'calendar' AND p.ref_id IS NULL "
+        "ON CONFLICT DO NOTHING"
+    )
 
 
 def downgrade():
