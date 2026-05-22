@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% import "_form.html" as wtf %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href='{{url_for("static", filename="css/quill.snow.css") }}' />
+<style>
+  .ql-toolbar.ql-snow {
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      border-color: #dee2e6 !important;
+      background: #f8f9fa;
+  }
+  .ql-container.ql-snow {
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+      border-color: #dee2e6 !important;
+      font-size: 0.95rem;
+      background: #ffffff;
+  }
+  .banner-row.dragging {
+      opacity: 0.5;
+      background-color: rgba(13, 110, 253, 0.08) !important;
+      outline: 2px dashed #0d6efd;
+      outline-offset: -2px;
+  }
+  .banner-row {
+      transition: background-color 0.2s ease, opacity 0.2s ease;
+  }
+  .drag-handle {
+      cursor: grab;
+      transition: color 0.15s ease;
+  }
+  .drag-handle:hover {
+      color: #0d6efd !important;
+  }
+  .drag-handle:active {
+      cursor: grabbing;
+  }
+</style>
+{% endblock %}
+
+{% block app_content %}
+<div class="container mb-4">
+    <div class="row">
+        <div class="col">
+            <a href="{{ url_for('main.index') }}" class="btn btn-sm btn-secondary mb-3">
+                <i class="fas fa-chevron-left me-1"></i> {{ _("Retour à l'accueil") }}
+            </a>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+                <h1 class="mb-0">{{ _("Gestion des bannières d'information") }}</h1>
+                <a href="{{ url_for('main.manage_presets') }}" class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }} btn-sm rounded-pill fw-semibold">
+                    <svg class="bi me-1" width="16" height="16" fill="currentColor">{{ macros.bootstrap_icon("palette2") }}</svg>
+                    {{ _("Gérer les presets") }}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Add Banner Form -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0 bg-opacity-75 backdrop-blur rounded-4 overflow-hidden">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <h5 class="card-title text-primary fw-bold mb-0 d-flex align-items-center">
+                        <svg class="bi me-2 text-primary" width="20" height="20" fill="currentColor">
+                            {{ macros.bootstrap_icon("plus-circle") }}
+                        </svg>
+                        {{ _("Ajouter une bannière") }}
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="" method="post" role="form" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        {% include "main/_banner_form_fields.html" %}
+
+                        <div class="d-grid mt-4">
+                            {{ form.submit(class="btn btn-primary btn-lg fw-bold rounded-pill") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Banners List -->
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title text-primary fw-bold mb-0 d-flex align-items-center">
+                        <svg class="bi me-2 text-primary" width="20" height="20" fill="currentColor">
+                            {{ macros.bootstrap_icon("collection-play") }}
+                        </svg>
+                        {{ _("Bannières actives") }}
+                    </h5>
+                    <span class="badge-count">
+                        {{ banners | length }} {{ _("bannière(s)") }}
+                    </span>
+                </div>
+                <div class="card-body p-0">
+                    {% if banners %}
+                        <div class="table-responsive table-responsive-clean">
+                            <table class="table table-hover align-middle mb-0 table-transparent-thead">
+                                <thead>
+                                    <tr class="border-bottom text-uppercase text-secondary small fw-bold">
+                                        <th class="ps-4 py-3" style="width: 80px;">{{ _("Ordre") }}</th>
+                                        <th class="py-3" style="width: 100px;">{{ _("Type") }}</th>
+                                        <th class="py-3">{{ _("Titre / Contenu") }}</th>
+                                        <th class="py-3">{{ _("Lien/Fichier") }}</th>
+                                        <th class="text-end pe-4 py-3" style="width: 220px;">{{ _("Actions") }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="banners-table-body">
+                                    {% for banner in banners %}
+                                    <tr class="banner-row align-middle" data-id="{{ banner.id }}" draggable="true">
+                                        <!-- Grip Handle for Drag and Drop -->
+                                        <td class="ps-4 drag-handle text-secondary" title="{{ _('Glisser pour réorganiser') }}">
+                                            <svg class="bi" width="20" height="20" fill="currentColor">
+                                                {{ macros.bootstrap_icon("grip-vertical") }}
+                                            </svg>
+                                        </td>
+                                        
+                                        <!-- Type -->
+                                        <td class="align-middle text-secondary">
+                                            {% if banner.is_text %}
+                                                <svg class="bi" width="20" height="20" fill="currentColor" data-bs-toggle="tooltip" title="{{ _('Texte') }}">
+                                                    {{ macros.bootstrap_icon("file-earmark-text") }}
+                                                </svg>
+                                            {% else %}
+                                                <svg class="bi" width="20" height="20" fill="currentColor" data-bs-toggle="tooltip" title="{{ _('Image') }}">
+                                                    {{ macros.bootstrap_icon("image") }}
+                                                </svg>
+                                            {% endif %}
+                                        </td>
+
+                                        <!-- Titre / Contenu -->
+                                        <td class="align-middle">
+                                            <div class="fw-semibold text-body">{{ banner.title }}</div>
+                                            {% if banner.is_text and banner.text_content %}
+                                                <div class="text-muted small text-truncate" style="max-width: 450px;">
+                                                    {{ banner.text_content | striptags | truncate(60) }}
+                                                </div>
+                                            {% endif %}
+                                        </td>
+
+                                        <!-- Lien / Fichier -->
+                                        <td class="align-middle">
+                                            {% if banner.link_url %}
+                                                <a href="{{ banner.link_url }}" target="_blank" rel="noopener noreferrer" class="text-success text-decoration-none fw-semibold small">
+                                                    {{ _("Lien") }}
+                                                </a>
+                                            {% elif banner.file_filename %}
+                                                <a href="{{ url_for('main.download_banner_file', banner_id=banner.id) }}" target="_blank" class="text-primary text-decoration-none fw-semibold small">
+                                                    {{ _("Fichier") }}
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted small">-</span>
+                                            {% endif %}
+                                        </td>
+                                        
+                                        <!-- Actions -->
+                                        <td class="text-end pe-4">
+                                            <div class="d-flex justify-content-end gap-1">
+                                                <a href="{{ url_for('main.edit_banner', banner_id=banner.id) }}" class="btn btn-icon-zoom text-warning p-2 shadow-none" data-bs-toggle="tooltip" title="{{ _('Modifier cette bannière') }}">
+                                                    <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+                                                        {{ macros.bootstrap_icon("pencil") }}
+                                                    </svg>
+                                                </a>
+                                                <form action="{{ url_for('main.delete_banner', banner_id=banner.id) }}" method="post" class="m-0" onsubmit="return confirm('{{ _('Êtes-vous sûr de vouloir supprimer cette bannière ?') }}');">
+                                                    <button type="submit" class="btn btn-icon-zoom text-danger p-2 shadow-none" data-bs-toggle="tooltip" title="{{ _('Supprimer cette bannière') }}">
+                                                        <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+                                                            {{ macros.bootstrap_icon("trash") }}
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-info-circle fa-2x mb-3 text-secondary"></i>
+                            <p class="mb-0">{{ _("Aucune bannière pour le moment.") }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Carousel Global Config -->
+            <div class="card shadow-sm border-0 mt-4 rounded-4 overflow-hidden">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <h5 class="card-title text-primary fw-bold mb-0 d-flex align-items-center">
+                        <svg class="bi me-2 text-primary" width="20" height="20" fill="currentColor">
+                            {{ macros.bootstrap_icon("sliders") }}
+                        </svg>
+                        {{ _("Configuration globale du carrousel") }}
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="" method="post" role="form">
+                        {{ config_form.hidden_tag() }}
+                        <div class="mb-3">
+                            <label for="autoplay_delay" class="form-label fw-semibold">{{ config_form.autoplay_delay.label.text }}</label>
+                            {% if config_form.autoplay_delay.errors %}
+                                {{ config_form.autoplay_delay(class="form-control is-invalid", id="autoplay_delay", type="number", min="2", max="60") }}
+                                <div class="invalid-feedback">
+                                    {% for error in config_form.autoplay_delay.errors %}
+                                        <p class="mb-0">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ config_form.autoplay_delay(class="form-control", id="autoplay_delay", type="number", min="2", max="60") }}
+                            {% endif %}
+                            <div class="form-text mt-2">
+                                {{ _("Détermine le temps d'attente (en secondes) avant que la bannière suivante ne s'affiche automatiquement.") }}
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            {{ config_form.submit(class="btn " ~ ("btn-outline-dark" if g.theme == "classic" else "btn-primary") ~ " fw-semibold rounded-pill") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/icon_picker.js') }}"></script>
+<script src="{{ url_for('static', filename='js/quill.js') }}"></script>
+{% include "main/_banner_scripts.html" %}
+{% endblock %}

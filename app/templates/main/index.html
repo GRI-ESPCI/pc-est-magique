@@ -2,6 +2,97 @@
 
 {% block app_content %}
 
+{% if calendar_infos and banners %}
+<div class="row mb-4">
+    <div class="col">
+        <div id="infoCarousel" class="carousel-peeking-wrapper position-relative">
+            <div class="carousel-peeking-track">
+                {% for banner in banners %}
+                {% set click_url = banner.link_url if banner.link_url else (url_for('main.download_banner_file', banner_id=banner.id) if banner.file_filename else '') %}
+                {# Resolve effective values: banner overrides preset #}
+                {% set eff_bg = (banner.preset.background_color if banner.preset else banner.background_color) or '#152f4e' %}
+                {% set eff_fg = (banner.preset.text_color if banner.preset else banner.text_color) or '#ffffff' %}
+                {% set eff_icon = banner.icon or (banner.preset.icon if banner.preset else '') %}
+                {% set align = banner.text_alignment or (banner.preset.text_alignment if banner.preset else 'center') or 'center' %}
+                {% set layout = banner.layout_style or (banner.preset.layout_style if banner.preset else 'vertical') or 'vertical' %}
+                {% set opacity_pct = (banner.overlay_opacity if banner.overlay_opacity is not none else (banner.preset.overlay_opacity if banner.preset else 70)) %}
+                {# Background image: banner takes priority, then preset #}
+                {% set bg_img = banner.image_filename or (banner.preset.image_filename if banner.preset else none) %}
+                <div class="carousel-peeking-item rounded-4 overflow-hidden shadow-sm {{ 'is-active' if loop.first else '' }}" data-index="{{ loop.index0 }}">
+                    {% if click_url %}
+                    <a href="{{ click_url }}" {% if banner.link_url %}target="_blank" rel="noopener noreferrer"{% endif %} class="d-block w-100 h-100 text-decoration-none" draggable="false">
+                    {% endif %}
+                    
+                    {% if banner.is_text %}
+                    <div class="banner-text-slide w-100 h-100 position-relative overflow-hidden"
+                         style="background: {{ eff_bg }};">
+                        {# Optional background image with color overlay #}
+                        {% if bg_img %}
+                        <img src="{{ url_for('main.serve_banner_file', filename=bg_img) }}"
+                             class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover"
+                             style="pointer-events:none; z-index:0;"
+                             alt="" draggable="false" />
+                        <div class="position-absolute top-0 start-0 w-100 h-100"
+                             style="background: {{ eff_bg }}; opacity: {{ (opacity_pct / 100)|round(2) }}; z-index:1; pointer-events:none;"></div>
+                        {% endif %}
+                        {# Content layer #}
+                        <div class="banner-content-{{ layout }} h-100 position-relative {% if align == 'left' %}text-start{% elif align == 'right' %}text-end{% else %}text-center{% endif %}"
+                             style="z-index:2; color: {{ eff_fg }};">
+                            {% if eff_icon %}
+                            <div class="banner-icon-wrap">
+                                <svg class="bi banner-icon" width="36" height="36" fill="currentColor" aria-hidden="true">{{ macros.bootstrap_icon(eff_icon) }}</svg>
+                            </div>
+                            {% endif %}
+                            <div class="banner-text-wrap flex-grow-1">
+                                <h2 class="banner-title fw-bold mb-2" style="color: {{ eff_fg }} !important;">{{ banner.title }}</h2>
+                                {% if banner.text_content %}
+                                <div class="banner-body">{{ banner.text_content | safe }}</div>
+                                {% endif %}
+                                {% if banner.file_filename %}
+                                <div class="btn btn-sm btn-light border">
+                                    <svg class="bi flex-shrink-0 me-1" width="16" height="16" fill="currentColor">{{ macros.bootstrap_icon("download") }}</svg>
+                                    {{ _("Télécharger :") }} {{ banner.file_original_name }}
+                                </div>
+                                {% elif banner.link_url %}
+                                <div class="btn btn-sm btn-light border">
+                                    <svg class="bi flex-shrink-0 me-1" width="16" height="16" fill="currentColor">{{ macros.bootstrap_icon("box-arrow-up-right") }}</svg>
+                                    {{ _("En savoir plus") }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="w-100 h-100 overflow-hidden bg-light">
+                        <img src="{{ url_for('main.serve_banner_file', filename=banner.image_filename) }}" class="d-block w-100 h-100 object-fit-cover" alt="{{ banner.title }}" title="{{ banner.title }}" draggable="false" />
+                    </div>
+                    {% endif %}
+                    
+                    {% if click_url %}
+                    </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% if banners | length > 1 %}
+            <div class="carousel-peeking-controls mt-2 d-flex align-items-center justify-content-center gap-3">
+                <button class="carousel-peeking-prev-inline btn btn-link text-muted p-0 border-0 text-decoration-none" type="button" aria-label="Previous">
+                    <svg class="bi" width="20" height="20" fill="currentColor">{{ macros.bootstrap_icon("chevron-left") }}</svg>
+                </button>
+                <div class="carousel-peeking-indicators d-flex align-items-center justify-content-center gap-2">
+                    {% for banner in banners %}
+                    <button type="button" class="peeking-indicator-dot {{ 'active' if loop.first else '' }}" data-index="{{ loop.index0 }}" aria-label="Slide {{ loop.index }}"></button>
+                    {% endfor %}
+                </div>
+                <button class="carousel-peeking-next-inline btn btn-link text-muted p-0 border-0 text-decoration-none" type="button" aria-label="Next">
+                    <svg class="bi" width="20" height="20" fill="currentColor">{{ macros.bootstrap_icon("chevron-right") }}</svg>
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% else %}
 <div class="row mb-3 text-center text-md-start">
     <div class="col">
         <h1>{{ _("Bonjour, %(name)s !", name=g.pceen.prenom) }}</h1>
@@ -23,6 +114,7 @@
         </a> !
     </p></div>
 </div>
+{% endif %}
 
 <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 gy-4 gx-1 justify-content-center">
     {% with pceen = g.pceen %}
@@ -62,10 +154,190 @@
         {% include "cards/calendar.html" %}
     </div>
     {% endif %}
+    {% if has_permission(PermissionType.write, PermissionScope.calendar) %}
+    <div class="col">
+        {% include "cards/info.html" %}
+    </div>
+    {% endif %}
     {% endwith %}
     <div class="col">
         {% include "cards/coming_soon.html" %}
     </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const track = document.querySelector('.carousel-peeking-track');
+    if (!track) return;
+    
+    const originalItems = Array.from(track.querySelectorAll('.carousel-peeking-item'));
+    const dots = document.querySelectorAll('.peeking-indicator-dot');
+    const prevBtn = document.querySelector('.carousel-peeking-prev-inline');
+    const nextBtn = document.querySelector('.carousel-peeking-next-inline');
+    
+    let isCloned = false;
+    if (originalItems.length > 1) {
+        isCloned = true;
+        // Calculate the number of clones required to maintain a buffer of 15 items per side
+        let copiesPerSide = Math.ceil(15 / originalItems.length);
+
+        for (let i = 0; i < copiesPerSide; i++) {
+            // Append clones
+            originalItems.forEach(item => {
+                const clone = item.cloneNode(true);
+                clone.classList.add('is-clone');
+                clone.classList.remove('is-active');
+                track.appendChild(clone);
+            });
+            
+            // Prepend clones while maintaining original order
+            originalItems.forEach(item => {
+                const clone = item.cloneNode(true);
+                clone.classList.add('is-clone');
+                clone.classList.remove('is-active');
+                track.insertBefore(clone, originalItems[0]);
+            });
+        }
+    }
+    
+    const allItems = Array.from(track.querySelectorAll('.carousel-peeking-item'));
+    let currentIndex = 0;
+    
+    const jumpToItem = (item, behavior = 'smooth') => {
+        if (!item) return;
+        const scrollPos = item.offsetLeft - track.offsetLeft - (track.clientWidth / 2) + (item.clientWidth / 2);
+        track.scrollTo({ left: scrollPos, behavior: behavior });
+    };
+
+    // Initialize position
+    if (isCloned) {
+        // Hide track initially to prevent flicker on load
+        track.style.opacity = '0';
+        setTimeout(() => {
+            jumpToItem(originalItems[0], 'auto');
+            setTimeout(() => { track.style.opacity = '1'; track.style.transition = 'opacity 0.2s ease'; }, 20);
+        }, 10);
+    } else {
+        updateActiveItem();
+    }
+
+    function updateActiveItem() {
+        const trackCenter = track.scrollLeft + (track.clientWidth / 2);
+        let closestIndex = 0;
+        let closestDist = Infinity;
+        
+        allItems.forEach((item, i) => {
+            const itemCenter = item.offsetLeft - track.offsetLeft + (item.clientWidth / 2);
+            const dist = Math.abs(itemCenter - trackCenter);
+            if (dist < closestDist) {
+                closestDist = dist;
+                closestIndex = i;
+            }
+        });
+        
+        if (currentIndex !== closestIndex) {
+            currentIndex = closestIndex;
+            const activeItem = allItems[currentIndex];
+            const realDataIndex = activeItem.getAttribute('data-index');
+            
+            allItems.forEach(item => item.classList.remove('is-active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            activeItem.classList.add('is-active');
+            const dot = Array.from(dots).find(d => d.getAttribute('data-index') === realDataIndex);
+            if(dot) dot.classList.add('active');
+        }
+    }
+
+    let scrollFrame;
+    let scrollEndTimeout;
+    let isJumping = false;
+
+    track.addEventListener('scroll', () => {
+        if(scrollFrame) cancelAnimationFrame(scrollFrame);
+        scrollFrame = requestAnimationFrame(updateActiveItem);
+        
+        if (isCloned) {
+            clearTimeout(scrollEndTimeout);
+            scrollEndTimeout = setTimeout(() => {
+                if (isJumping) return;
+                const activeItem = allItems[currentIndex];
+                if (activeItem && activeItem.classList.contains('is-clone')) {
+                    isJumping = true;
+                    const realDataIndex = activeItem.getAttribute('data-index');
+                    const realItem = originalItems.find(item => item.getAttribute('data-index') === realDataIndex);
+                    
+                    // Disable transitions before repositioning
+                    allItems.forEach(item => item.style.transition = 'none');
+                    
+                    // Update active state classes
+                    allItems.forEach(item => item.classList.remove('is-active'));
+                    realItem.classList.add('is-active');
+                    currentIndex = allItems.indexOf(realItem);
+                    
+                    // Update scroll position to the real item
+                    jumpToItem(realItem, 'auto');
+                    void track.offsetWidth;
+
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            allItems.forEach(item => item.style.transition = '');
+                            setTimeout(() => { isJumping = false; }, 50);
+                        });
+                    });
+                }
+            }, 150); // wait for snap to settle
+        }
+    });
+    
+    // Auto-play logic
+    let autoPlayInterval;
+    const resetAutoPlay = () => {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = setInterval(() => {
+            jumpToItem(allItems[currentIndex + 1] || allItems[allItems.length - 1]);
+        }, {{ (autoplay_delay|default(6)) * 1000 }});
+    };
+    
+    // Reset autoplay whenever a scroll happens
+    track.addEventListener('scroll', resetAutoPlay);
+    resetAutoPlay();
+    
+    // Dot clicks
+    dots.forEach((dot) => {
+        dot.addEventListener('click', () => {
+            const idx = dot.getAttribute('data-index');
+            const targetItem = originalItems.find(item => item.getAttribute('data-index') === idx);
+            jumpToItem(targetItem);
+        });
+    });
+    
+    if (prevBtn) prevBtn.addEventListener('click', () => jumpToItem(allItems[currentIndex - 1] || allItems[0]));
+    if (nextBtn) nextBtn.addEventListener('click', () => jumpToItem(allItems[currentIndex + 1] || allItems[allItems.length - 1]));
+    
+    allItems.forEach((item) => {
+        item.addEventListener('click', (e) => {
+            if (!item.classList.contains('is-active')) {
+                e.preventDefault();
+                jumpToItem(item);
+            }
+        });
+    });
+    
+    document.addEventListener('keydown', (e) => {
+        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
+        if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            jumpToItem(allItems[currentIndex - 1] || allItems[0]);
+        } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            jumpToItem(allItems[currentIndex + 1] || allItems[allItems.length - 1]);
+        }
+    });
+});
+</script>
 {% endblock %}

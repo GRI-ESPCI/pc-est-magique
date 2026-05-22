@@ -1,0 +1,262 @@
+<script>
+    const PRESETS = {
+        {% for p in presets %}
+        "{{ p.id }}": { bg: "{{ p.background_color }}", fg: "{{ p.text_color }}", icon: "{{ p.icon or '' }}", align: "{{ p.text_alignment }}", layout: "{{ p.layout_style }}", opacity: {{ p.overlay_opacity }}, img: "{{ p.image_filename or '' }}" },
+        {% endfor %}
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const isTextCheckbox = document.getElementById("is_text");
+        const textFieldsGroup = document.getElementById("text-fields-group");
+        const imageFieldsGroup = document.getElementById("image-fields-group");
+        const presetSelect = document.getElementById("preset_id");
+
+        let localPreviewSrcText = null;
+        let localPreviewSrcImg = null;
+        const bannerImgSrc = "{% if banner and banner.image_filename %}{{ url_for('main.serve_banner_file', filename=banner.image_filename) }}{% endif %}";
+        let presetImgSrc = "";
+        
+        if (presetSelect && presetSelect.value && PRESETS[presetSelect.value]) {
+            const p = PRESETS[presetSelect.value];
+            if (p.img) {
+                presetImgSrc = "{{ url_for('main.serve_banner_file', filename='__PLACEHOLDER__') }}".replace("__PLACEHOLDER__", p.img);
+            }
+        }
+
+        const textarea = document.getElementById("text_content");
+        let quill = null;
+        if (textarea) {
+            textarea.style.display = "none";
+            const editorDiv = document.createElement("div");
+            editorDiv.id = "quill-editor";
+            editorDiv.style.height = "160px";
+            textarea.parentNode.insertBefore(editorDiv, textarea.nextSibling);
+            quill = new Quill("#quill-editor", {
+                theme: "snow",
+                modules: {
+                    toolbar: [
+                        ["bold", "italic", "underline"],
+                        [{ list: "ordered" }, { list: "bullet" }],
+                        ["link"],
+                        ["clean"]
+                    ]
+                }
+            });
+            if (textarea.value) quill.root.innerHTML = textarea.value;
+            quill.on("text-change", function() {
+                textarea.value = quill.root.innerHTML;
+                updatePreview();
+            });
+        }
+        
+        const imageFileInput = document.getElementById("image_file");
+        const imageFileTextInput = document.getElementById("image_file_text");
+
+        function toggleFields() {
+            if (isTextCheckbox.checked) {
+                textFieldsGroup.style.display = "block";
+                imageFieldsGroup.style.display = "none";
+                if (imageFileInput) imageFileInput.disabled = true;
+                if (imageFileTextInput) imageFileTextInput.disabled = false;
+            } else {
+                textFieldsGroup.style.display = "none";
+                imageFieldsGroup.style.display = "block";
+                if (imageFileInput) imageFileInput.disabled = false;
+                if (imageFileTextInput) imageFileTextInput.disabled = true;
+            }
+            if (typeof updatePreview === 'function') updatePreview();
+        }
+        
+        if (isTextCheckbox) isTextCheckbox.addEventListener("change", toggleFields);
+
+        const bgPicker = document.getElementById("background_color_picker");
+        const bgInput  = document.getElementById("background_color");
+        const fgPicker = document.getElementById("text_color_picker");
+        const fgInput  = document.getElementById("text_color");
+
+        function syncColorPicker(picker, input) {
+            if (!picker || !input) return;
+            picker.addEventListener("input", () => { input.value = picker.value; updatePreview(); });
+            input.addEventListener("input", () => {
+                if (/^#[0-9a-fA-F]{6}$/.test(input.value)) picker.value = input.value;
+                updatePreview();
+            });
+            if (input.value) picker.value = input.value;
+        }
+        syncColorPicker(bgPicker, bgInput);
+        syncColorPicker(fgPicker, fgInput);
+
+        if (presetSelect) {
+            presetSelect.addEventListener("change", function() {
+                const val = this.value;
+                if (val && PRESETS[val]) {
+                    const p = PRESETS[val];
+                    if (bgInput) { bgInput.value = p.bg; if (bgPicker) bgPicker.value = p.bg; }
+                    if (fgInput) { fgInput.value = p.fg; if (fgPicker) fgPicker.value = p.fg; }
+                    const iconSel = document.getElementById("icon");
+                    if (iconSel && p.icon !== undefined) iconSel.value = p.icon;
+                    const alignSel = document.getElementById("text_alignment");
+                    if (alignSel && p.align !== undefined) alignSel.value = p.align;
+                    const layoutSel = document.getElementById("layout_style");
+                    if (layoutSel && p.layout !== undefined) layoutSel.value = p.layout;
+                    const opacityEl = document.getElementById("overlay_opacity");
+                    if (opacityEl && p.opacity !== undefined) {
+                        opacityEl.value = p.opacity;
+                        const opLbl = document.getElementById("opacity-value-label");
+                        if (opLbl) opLbl.textContent = p.opacity + "%";
+                    }
+                    if (p.img) {
+                        presetImgSrc = "{{ url_for('main.serve_banner_file', filename='__PLACEHOLDER__') }}".replace("__PLACEHOLDER__", p.img);
+                    } else {
+                        presetImgSrc = "";
+                    }
+                } else {
+                    presetImgSrc = "";
+                }
+                updatePreview();
+            });
+        }
+
+        const opacityRange = document.getElementById("overlay_opacity");
+        const opacityLabel = document.getElementById("opacity-value-label");
+        if (opacityRange && opacityLabel) {
+            opacityRange.addEventListener("input", function() {
+                opacityLabel.textContent = this.value + "%";
+                updatePreview();
+            });
+        }
+
+        const imageFileText = document.getElementById("image_file_text");
+        const imageFile     = document.getElementById("image_file");
+        const previewBgImg  = document.getElementById("preview-bg-img");
+
+        function attachImagePreview(inputEl, isTextBanner) {
+            if (!inputEl) return;
+            inputEl.addEventListener("change", function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        if (isTextBanner) localPreviewSrcText = e.target.result;
+                        else localPreviewSrcImg = e.target.result;
+                        updatePreview();
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                } else {
+                    if (isTextBanner) localPreviewSrcText = null;
+                    else localPreviewSrcImg = null;
+                    updatePreview();
+                }
+            });
+        }
+
+        attachImagePreview(imageFileText, true);
+        attachImagePreview(imageFile, false);
+
+        // --- Live preview ---
+        const titleInput     = document.getElementById("title");
+        const livePreview    = document.getElementById("live-preview");
+        const previewOverlay = document.getElementById("preview-overlay");
+        const previewTitle   = document.getElementById("preview-title");
+        const previewBody    = document.getElementById("preview-body");
+        const previewIconSvg = document.getElementById("preview-icon-svg");
+        const iconSelect     = document.getElementById("icon");
+        const textAlignSel   = document.getElementById("text_alignment");
+        const layoutSel      = document.getElementById("layout_style");
+
+        function updatePreview() {
+            if (!livePreview) return;
+            const isText = isTextCheckbox ? isTextCheckbox.checked : false;
+            const bg = (bgInput ? bgInput.value : null) || "#152f4e";
+            const fg = (fgInput ? fgInput.value : null) || "#ffffff";
+            const title = (titleInput ? titleInput.value.trim() : "") || "{{ banner.title if banner else _('Titre') }}";
+            const opacity = opacityRange ? (parseInt(opacityRange.value) / 100) : 0.7;
+            const align = textAlignSel ? textAlignSel.value : "center";
+            const layout = layoutSel ? layoutSel.value : "vertical";
+            const iconVal = iconSelect ? iconSelect.value : "";
+
+            const previewContainer = document.getElementById("live-preview-container");
+            if (previewContainer) previewContainer.style.background = isText ? bg : "#f8f9fa";
+
+            const imgSrc = isText ? (localPreviewSrcText || bannerImgSrc || presetImgSrc || null) : (localPreviewSrcImg || bannerImgSrc || null);
+            
+            if (imgSrc) {
+                previewBgImg.src = imgSrc;
+                previewBgImg.style.display = "";
+                if (previewOverlay) {
+                    previewOverlay.style.background = bg;
+                    previewOverlay.style.opacity = opacity;
+                    previewOverlay.style.display = isText ? "" : "none";
+                }
+            } else {
+                previewBgImg.style.display = "none";
+                if (previewOverlay) previewOverlay.style.display = "none";
+            }
+            
+            livePreview.style.display = isText ? "" : "none";
+            livePreview.style.color = fg;
+            if (previewTitle) previewTitle.style.color = fg;
+
+            const overlayOpacityGroup = document.getElementById("overlay-opacity-group");
+            if (overlayOpacityGroup) {
+                overlayOpacityGroup.style.display = imgSrc ? "" : "none";
+            }
+
+            const emptyImgPlaceholder = document.getElementById("empty-image-placeholder");
+            if (emptyImgPlaceholder) {
+                emptyImgPlaceholder.style.display = (!isText && !imgSrc) ? "" : "none";
+            }
+
+            livePreview.className = "position-relative h-100";
+            const layoutClass = layout === "horizontal" ? "banner-content-horizontal" : "banner-content-vertical";
+            const alignClass = align === "left" ? "text-start" : align === "right" ? "text-end" : "text-center";
+            livePreview.classList.add(layoutClass, alignClass);
+
+            livePreview.style.setProperty('color', fg, 'important');
+            if (previewTitle) previewTitle.style.setProperty('color', fg, 'important');
+
+            if (previewTitle) previewTitle.textContent = title;
+            if (previewBody && quill) previewBody.innerHTML = quill.root.innerHTML;
+
+            const previewIconWrap = document.getElementById("preview-icon-wrap");
+            if (previewIconWrap && previewIconSvg) {
+                if (iconVal) {
+                    previewIconWrap.style.display = "";
+                    previewIconSvg.innerHTML = `<use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#${iconVal}"></use>`;
+                } else {
+                    previewIconWrap.style.display = "none";
+                }
+            }
+        }
+
+        if (titleInput) titleInput.addEventListener("input", updatePreview);
+        if (iconSelect) iconSelect.addEventListener("change", updatePreview);
+        if (textAlignSel) textAlignSel.addEventListener("change", updatePreview);
+        if (layoutSel) layoutSel.addEventListener("change", updatePreview);
+        toggleFields(); 
+
+        const linkUrlInput = document.getElementById("link_url");
+        const attachedFileInput = document.getElementById("attached_file");
+        const linkUrlGroup = document.getElementById("link-url-group");
+        const attachedFileGroup = document.getElementById("attached-file-group");
+
+        function updateActionExclusivity() {
+            if (!linkUrlInput || !attachedFileInput) return;
+            const hasLink = linkUrlInput.value.trim() !== "";
+            const hasFile = (attachedFileInput.files && attachedFileInput.files.length > 0) || 
+                            attachedFileInput.value !== "" || 
+                            !!document.querySelector("#attached-file-group .bg-light.rounded.border");
+
+            if (hasLink) { attachedFileGroup.classList.add("fade-hidden"); }
+            else { attachedFileGroup.classList.remove("fade-hidden"); }
+
+            if (hasFile) { linkUrlGroup.classList.add("fade-hidden"); }
+            else { linkUrlGroup.classList.remove("fade-hidden"); }
+        }
+
+        if (linkUrlInput && attachedFileInput) {
+            linkUrlInput.addEventListener("input", updateActionExclusivity);
+            attachedFileInput.addEventListener("change", updateActionExclusivity);
+            updateActionExclusivity();
+        }
+    });
+</script>

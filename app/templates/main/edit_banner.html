@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% import "_form.html" as wtf %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href='{{url_for("static", filename="css/quill.snow.css") }}' />
+<style>
+  .ql-toolbar.ql-snow {
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      border-color: #dee2e6 !important;
+      background: #f8f9fa;
+  }
+  .ql-container.ql-snow {
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+      border-color: #dee2e6 !important;
+      font-size: 0.95rem;
+      background: #ffffff;
+  }
+</style>
+{% endblock %}
+
+{% block app_content %}
+<div class="container mb-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <a href="{{ url_for('main.manage_banners') }}" class="btn btn-sm btn-secondary mb-3">
+                <i class="fas fa-chevron-left me-1"></i> {{ _("Retour à la gestion") }}
+            </a>
+            
+            <h1 class="mb-4">{{ _("Modifier la bannière") }}</h1>
+            
+
+
+            <!-- Edit Form -->
+            <div class="card shadow-sm border-0 bg-opacity-75 backdrop-blur rounded-4 overflow-hidden">
+                <div class="card-body p-4 p-md-5">
+                    <form action="" method="post" role="form" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        {% include "main/_banner_form_fields.html" %}
+                        
+                        <div class="d-flex gap-3 justify-content-end mt-4">
+                            <a href="{{ url_for('main.manage_banners') }}" class="btn btn-outline-secondary px-4 rounded-pill">{{ _("Annuler") }}</a>
+                            {{ form.submit(class="btn btn-primary px-5 rounded-pill fw-bold") }}
+                        </div>
+                    </form>
+                    
+                    <!-- attachment deletion -->
+                    {% if banner.file_filename %}
+                        <form id="delete-file-form" action="{{ url_for('main.delete_banner_file', banner_id=banner.id) }}" method="post" style="display: none;"></form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/icon_picker.js') }}"></script>
+<script src="{{ url_for('static', filename='js/quill.js') }}"></script>
+{% include "main/_banner_scripts.html" %}
+{% endblock %}

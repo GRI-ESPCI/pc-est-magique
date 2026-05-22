@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href='{{ url_for("static", filename="css/quill.snow.css") }}' />
+<style>
+  .preset-card {
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .preset-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.18) !important;
+  }
+  .icon-preview {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+  }
+
+  .ql-toolbar.ql-snow {
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      border-color: #dee2e6 !important;
+  }
+  .ql-container.ql-snow {
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      border-color: #dee2e6 !important;
+      min-height: 80px;
+  }
+</style>
+{% endblock %}
+
+{% block app_content %}
+<div class="container mb-5">
+    <div class="row">
+        <div class="col">
+            <a href="{{ url_for('main.manage_banners') }}" class="btn btn-sm btn-secondary mb-3">
+                <i class="fas fa-chevron-left me-1"></i> {{ _("Retour à la gestion des bannières") }}
+            </a>
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+                <h1 class="mb-0">{{ _("Presets de style de bannière") }}</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Add / Edit Preset Form -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden sticky-top" style="top: 80px;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <h5 class="card-title text-primary fw-bold mb-0 d-flex align-items-center">
+                        <svg class="bi me-2 text-primary" width="20" height="20" fill="currentColor">
+                            {{ macros.bootstrap_icon("palette2") }}
+                        </svg>
+                        <span id="form-title">{{ _("Nouveau preset") }}</span>
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="" method="post" role="form" id="preset-form" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        {{ form.id() }}
+
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label for="preset-name" class="form-label fw-semibold small">{{ form.name.label.text }}</label>
+                            {% if form.name.errors %}
+                                {{ form.name(class="form-control is-invalid", id="preset-name") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.name.errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.name(class="form-control", id="preset-name") }}
+                            {% endif %}
+                        </div>
+
+                        <!-- Colors -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-semibold small">{{ form.background_color.label.text }}</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="color" class="form-control form-control-color" id="preset-bg-picker" value="#152f4e" style="width:40px;height:34px;padding:2px;">
+                                    {{ form.background_color(class="form-control form-control-sm", id="preset-bg-color") }}
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-semibold small">{{ form.text_color.label.text }}</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="color" class="form-control form-control-color" id="preset-text-picker" value="#ffffff" style="width:40px;height:34px;padding:2px;">
+                                    {{ form.text_color(class="form-control form-control-sm", id="preset-text-color") }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Icon -->
+                        <div class="mb-3">
+                            <label for="preset-icon" class="form-label fw-semibold small">{{ form.icon.label.text }}</label>
+                            {{ form.icon(class="form-select form-select-sm", id="preset-icon") }}
+                        </div>
+
+                        <!-- Text alignment & Layout -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label for="preset-alignment" class="form-label fw-semibold small">{{ form.text_alignment.label.text }}</label>
+                                {{ form.text_alignment(class="form-select form-select-sm", id="preset-alignment") }}
+                            </div>
+                            <div class="col-6">
+                                <label for="preset-layout" class="form-label fw-semibold small">{{ form.layout_style.label.text }}</label>
+                                {{ form.layout_style(class="form-select form-select-sm", id="preset-layout") }}
+                            </div>
+                        </div>
+
+                        <!-- Background image -->
+                        <div class="mb-3">
+                            <label for="preset-image" class="form-label fw-semibold small">{{ form.image_file.label.text }}</label>
+                            <div id="existing-preset-img" class="mb-2 small text-muted d-none">
+                                <i class="fas fa-image me-1"></i><span id="existing-img-name"></span>
+                            </div>
+                            {{ form.image_file(class="form-control form-control-sm", id="preset-image", accept="image/*") }}
+                            <div class="form-text small">{{ _("Image de fond sous un overlay de la couleur choisie.") }}</div>
+                        </div>
+
+                        <!-- Overlay opacity -->
+                        <div class="mb-4" id="preset-opacity-group">
+                            <label for="preset-opacity" class="form-label fw-semibold small d-flex justify-content-between">
+                                {{ form.overlay_opacity.label.text }}
+                                <span class="badge bg-secondary" id="preset-opacity-label">70%</span>
+                            </label>
+                            {{ form.overlay_opacity(class="form-range", id="preset-opacity", type="range", min="0", max="100", step="5") }}
+                        </div>
+
+                        <!-- Live Preview -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold small">{{ _("Aperçu en direct") }}</label>
+                            <div class="banner-text-slide rounded-4 overflow-hidden shadow-sm position-relative" id="preset-preview-pane">
+                                <img id="preview-bg-img" src="" alt="" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" style="display:none; pointer-events:none; z-index:0;">
+                                <div id="preview-overlay" class="position-absolute top-0 start-0 w-100 h-100" style="z-index:1; pointer-events:none; background:#152f4e; opacity:0.7; display:none;"></div>
+                                <div id="preview-content" class="position-relative h-100" style="z-index:2; color: #ffffff;">
+                                    <div id="preview-icon-wrap" class="banner-icon-wrap" style="display:none;">
+                                        <svg id="preview-icon-svg" class="bi banner-icon" width="36" height="36" fill="currentColor"></svg>
+                                    </div>
+                                    <div id="preview-text-wrap" class="banner-text-wrap flex-grow-1">
+                                        <h2 class="banner-title fw-bold mb-2" id="preview-name">{{ _("Aperçu du preset") }}</h2>
+                                        <div class="banner-body" id="preview-body">{{ _("Texte de la bannière") }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary fw-bold rounded-pill", id="preset-submit-btn") }}
+                        </div>
+                        <div class="text-center mt-2">
+                            <button type="button" id="preset-reset-btn" class="btn btn-link btn-sm text-muted text-decoration-none" style="display:none;">
+                                {{ _("Annuler la modification") }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Presets List -->
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title text-primary fw-bold mb-0 d-flex align-items-center">
+                        <svg class="bi me-2 text-primary" width="20" height="20" fill="currentColor">
+                            {{ macros.bootstrap_icon("collection") }}
+                        </svg>
+                        {{ _("Presets existants") }}
+                    </h5>
+                    <span class="badge-count">{{ presets | length }} {{ _("preset(s)") }}</span>
+                </div>
+                <div class="card-body p-4">
+                    {% if presets %}
+                    <div class="row g-3">
+                        {% for preset in presets %}
+                        <div class="col-sm-6">
+                            <div class="preset-card card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                                <!-- Preset visual preview -->
+                                <div class="position-relative overflow-hidden" style="min-height: 90px; background: {{ preset.background_color }};">
+                                    {% if preset.image_filename %}
+                                    <img src="{{ url_for('main.serve_banner_file', filename=preset.image_filename) }}"
+                                         class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover"
+                                         style="z-index:0; pointer-events:none;" alt="">
+                                    <div class="position-absolute top-0 start-0 w-100 h-100"
+                                         style="background: {{ preset.background_color }}; opacity: {{ (preset.overlay_opacity / 100)|round(2) }}; z-index:1; pointer-events:none;"></div>
+                                    {% endif %}
+                                    <div class="d-flex align-items-center gap-2 p-3 position-relative"
+                                         style="z-index:2; color: {{ preset.text_color }}; min-height: 90px;">
+                                        {% if preset.icon %}
+                                        <div class="icon-preview flex-shrink-0">
+                                            <svg class="bi" width="26" height="26" fill="currentColor" aria-hidden="true">
+                                                {{ macros.bootstrap_icon(preset.icon) }}
+                                            </svg>
+                                        </div>
+                                        {% endif %}
+                                        <div class="flex-grow-1 overflow-hidden">
+                                            <div class="fw-bold text-truncate">{{ preset.name }}</div>
+                                            <div class="small opacity-75">{{ preset.background_color }} / {{ preset.text_color }}</div>
+                                            <div class="small opacity-60 d-flex gap-2 mt-1">
+                                                <span>{{ preset.text_alignment }}</span>
+                                                <span>·</span>
+                                                <span>{{ preset.layout_style }}</span>
+                                                <span>·</span>
+                                                <span>{{ preset.overlay_opacity }}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Actions -->
+                                <div class="card-footer bg-transparent d-flex justify-content-end gap-1 py-2 px-3">
+                                    <button type="button" class="btn btn-icon-zoom text-warning p-2 shadow-none edit-preset-btn"
+                                            data-id="{{ preset.id }}"
+                                            data-name="{{ preset.name }}"
+                                            data-bg="{{ preset.background_color }}"
+                                            data-fg="{{ preset.text_color }}"
+                                            data-icon="{{ preset.icon or '' }}"
+                                            data-alignment="{{ preset.text_alignment }}"
+                                            data-layout="{{ preset.layout_style }}"
+                                            data-opacity="{{ preset.overlay_opacity }}"
+                                            data-imgname="{{ preset.image_filename or '' }}"
+                                            title="{{ _('Modifier') }}">
+                                        <svg class="bi" width="18" height="18" fill="currentColor">{{ macros.bootstrap_icon("pencil") }}</svg>
+                                    </button>
+                                    <form action="{{ url_for('main.delete_preset', preset_id=preset.id) }}" method="post" class="m-0"
+                                          onsubmit="return confirm('{{ _('Supprimer ce preset ?') }}');">
+                                        <input type="hidden" name="csrf_token" value="{{ form.csrf_token._value() }}">
+                                        <button type="submit" class="btn btn-icon-zoom text-danger p-2 shadow-none" title="{{ _('Supprimer') }}">
+                                            <svg class="bi" width="18" height="18" fill="currentColor">{{ macros.bootstrap_icon("trash") }}</svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <svg class="bi mb-3 text-secondary" width="40" height="40" fill="currentColor">{{ macros.bootstrap_icon("palette2") }}</svg>
+                        <p class="mb-0">{{ _("Aucun preset pour le moment.") }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/icon_picker.js') }}"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const bgPicker   = document.getElementById("preset-bg-picker");
+    const bgInput    = document.getElementById("preset-bg-color");
+    const fgPicker   = document.getElementById("preset-text-picker");
+    const fgInput    = document.getElementById("preset-text-color");
+    const nameInput  = document.getElementById("preset-name");
+    const iconSelect = document.getElementById("preset-icon");
+    const alignSel   = document.getElementById("preset-alignment");
+    const layoutSel  = document.getElementById("preset-layout");
+    const opacityRange = document.getElementById("preset-opacity");
+    const opacityLabel = document.getElementById("preset-opacity-label");
+    const imgInput   = document.getElementById("preset-image");
+
+    const previewPane    = document.getElementById("preset-preview-pane");
+    const previewBgImg   = document.getElementById("preview-bg-img");
+    const previewOverlay = document.getElementById("preview-overlay");
+    const previewContent = document.getElementById("preview-content");
+    const previewName    = document.getElementById("preview-name");
+    const previewIconSvg = document.getElementById("preview-icon-svg");
+
+    const resetBtn    = document.getElementById("preset-reset-btn");
+    const submitBtn   = document.getElementById("preset-submit-btn");
+    const formTitle   = document.getElementById("form-title");
+    const form        = document.getElementById("preset-form");
+    const idField     = form.querySelector("input[name='id']");
+    const existingImg = document.getElementById("existing-preset-img");
+    const existingImgName = document.getElementById("existing-img-name");
+
+    // --- Color picker sync ---
+    function syncPicker(picker, input) {
+        picker.addEventListener("input", () => { input.value = picker.value; updatePreview(); });
+        input.addEventListener("input", () => {
+            if (/^#[0-9a-fA-F]{6}$/.test(input.value)) picker.value = input.value;
+            updatePreview();
+        });
+    }
+    syncPicker(bgPicker, bgInput);
+    syncPicker(fgPicker, fgInput);
+
+    // Init pickers
+    bgPicker.value = bgInput.value || "#152f4e";
+    fgPicker.value = fgInput.value || "#ffffff";
+
+    // --- Opacity slider ---
+    if (opacityRange && opacityLabel) {
+        opacityRange.addEventListener("input", () => {
+            opacityLabel.textContent = opacityRange.value + "%";
+            updatePreview();
+        });
+        opacityLabel.textContent = (opacityRange.value || 70) + "%";
+    }
+
+    // --- Other inputs ---
+    nameInput.addEventListener("input", updatePreview);
+    if (iconSelect) iconSelect.addEventListener("change", updatePreview);
+    if (alignSel)  alignSel.addEventListener("change", updatePreview);
+    if (layoutSel) layoutSel.addEventListener("change", updatePreview);
+
+    // --- Image file input ---
+    let localPreviewSrc = null;
+    if (imgInput) {
+        imgInput.addEventListener("change", function () {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    localPreviewSrc = e.target.result;
+                    updatePreview();
+                };
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                localPreviewSrc = null;
+                updatePreview();
+            }
+        });
+    }
+
+    // --- Live preview ---
+    function updatePreview() {
+        const bg      = bgInput.value || "#152f4e";
+        const fg      = fgInput.value || "#ffffff";
+        const name    = nameInput.value.trim() || "{{ _('Aperçu du preset') }}";
+        const opacity = opacityRange ? parseInt(opacityRange.value) / 100 : 0.7;
+        const align   = alignSel ? alignSel.value : "center";
+        const layout  = layoutSel ? layoutSel.value : "vertical";
+        const iconVal = iconSelect ? iconSelect.value : "";
+
+        previewPane.style.background = bg;
+
+        // Update classes on previewContent
+        previewContent.className = "position-relative h-100";
+        const layoutClass = layout === "horizontal" ? "banner-content-horizontal" : "banner-content-vertical";
+        const alignClass = align === "left" ? "text-start" : align === "right" ? "text-end" : "text-center";
+        previewContent.classList.add(layoutClass, alignClass);
+
+        previewContent.style.setProperty('color', fg, 'important');
+        if (previewName) previewName.style.setProperty('color', fg, 'important');
+
+        // Name
+        previewName.textContent = name;
+
+        // Background image
+        const imgSrc = localPreviewSrc || (existingImg.dataset.src || null);
+        if (imgSrc) {
+            previewBgImg.src = imgSrc;
+            previewBgImg.style.display = "";
+            previewOverlay.style.background = bg;
+            previewOverlay.style.opacity = opacity;
+            previewOverlay.style.display = "";
+        } else {
+            previewBgImg.style.display = "none";
+            previewOverlay.style.display = "none";
+        }
+
+        const opacityGroup = document.getElementById("preset-opacity-group");
+        if (opacityGroup) {
+            opacityGroup.style.display = imgSrc ? "" : "none";
+        }
+
+        // Icon
+        const previewIconWrap = document.getElementById("preview-icon-wrap");
+        if (previewIconWrap && previewIconSvg) {
+            if (iconVal) {
+                previewIconWrap.style.display = "";
+                previewIconSvg.innerHTML = `<use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#${iconVal}"></use>`;
+            } else {
+                previewIconWrap.style.display = "none";
+            }
+        }
+    }
+
+    updatePreview();
+
+    // --- Edit preset: populate form ---
+    document.querySelectorAll(".edit-preset-btn").forEach(btn => {
+        btn.addEventListener("click", function () {
+            idField.value = this.dataset.id;
+            nameInput.value = this.dataset.name;
+            bgInput.value = this.dataset.bg;
+            fgInput.value = this.dataset.fg;
+            bgPicker.value = this.dataset.bg;
+            fgPicker.value = this.dataset.fg;
+            if (iconSelect) iconSelect.value = this.dataset.icon;
+            if (alignSel)   alignSel.value   = this.dataset.alignment;
+            if (layoutSel)  layoutSel.value  = this.dataset.layout;
+            if (opacityRange) {
+                opacityRange.value = this.dataset.opacity;
+                if (opacityLabel) opacityLabel.textContent = this.dataset.opacity + "%";
+            }
+
+            // Show existing image info
+            if (this.dataset.imgname) {
+                existingImg.classList.remove("d-none");
+                existingImgName.textContent = this.dataset.imgname;
+                // Store a server URL for preview
+                existingImg.dataset.src = "{{ url_for('main.serve_banner_file', filename='__PLACEHOLDER__') }}".replace("__PLACEHOLDER__", this.dataset.imgname);
+                localPreviewSrc = null; // reset local upload
+            } else {
+                existingImg.classList.add("d-none");
+                existingImg.dataset.src = "";
+                localPreviewSrc = null;
+            }
+
+            updatePreview();
+            formTitle.textContent = "{{ _('Modifier le preset') }}";
+            submitBtn.textContent = "{{ _('Mettre à jour') }}";
+            resetBtn.style.display = "";
+            form.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+    });
+
+    resetBtn.addEventListener("click", function () {
+        idField.value = "";
+        form.reset();
+        bgPicker.value = "#152f4e";
+        fgPicker.value = "#ffffff";
+        localPreviewSrc = null;
+        existingImg.classList.add("d-none");
+        existingImg.dataset.src = "";
+        if (opacityLabel) opacityLabel.textContent = "70%";
+        updatePreview();
+        formTitle.textContent = "{{ _('Nouveau preset') }}";
+        submitBtn.textContent = "{{ _('Enregistrer le preset') }}";
+        resetBtn.style.display = "none";
+    });
+});
+</script>
+{% endblock %}

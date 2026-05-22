@@ -1,0 +1,183 @@
+                        <div class="mb-3">
+                            <label for="title" class="form-label fw-semibold">{{ form.title.label.text }}</label>
+                            {% if form.title.errors %}
+                                {{ form.title(class="form-control is-invalid", id="title") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.title.errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.title(class="form-control", id="title") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-check form-switch mb-4">
+                            {{ form.is_text(class="form-check-input", role="switch") }}
+                            <label class="form-check-label fw-semibold" for="is_text">{{ form.is_text.label.text }}</label>
+                        </div>
+
+                                                
+                        <!-- Text Banner Specific Fields -->
+                        <div id="text-fields-group" style="display: none;">
+                            <!-- Preset Selector -->
+                            <div class="mb-3">
+                                <label for="preset_id" class="form-label fw-semibold">{{ form.preset_id.label.text }}</label>
+                                {{ form.preset_id(class="form-select", id="preset_id") }}
+                                <div class="form-text small">{{ _("Un preset définit les couleurs et l'icône par défaut. Vous pouvez toujours personnaliser ci-dessous.") if not banner else _("Un preset définit les couleurs et l'icône par défaut.") }}</div>
+                            </div>
+
+                            <!-- Icon Selector -->
+                            <div class="mb-3">
+                                <label for="icon" class="form-label fw-semibold">{{ form.icon.label.text }}</label>
+                                {{ form.icon(class="form-select", id="icon") }}
+                                <div class="form-text small">{{ _("Une icône personnalisée (prioritaire sur le preset).") if not banner else _("Prioritaire sur l'icône du preset.") }}</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="text_content" class="form-label fw-semibold">{{ form.text_content.label.text }}</label>
+                                {% if form.text_content.errors %}
+                                    {{ form.text_content(class="form-control lines-4 is-invalid", id="text_content", placeholder=_("Texte de l'annonce...")) }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.text_content.errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.text_content(class="form-control lines-4", id="text_content", placeholder=_("Texte de l'annonce...")) }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <label for="background_color" class="form-label fw-semibold">{{ form.background_color.label.text }}</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="color" class="form-control form-control-color" id="background_color_picker" value="{{ banner.background_color if banner else '#152f4e' }}" style="width: 48px; height: 38px; padding: 2px;">
+                                        <input type="text" class="form-control" name="background_color" id="background_color" value="{{ banner.background_color if banner else '#152f4e' }}" placeholder="#152f4e">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="text_color" class="form-label fw-semibold">{{ form.text_color.label.text }}</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="color" class="form-control form-control-color" id="text_color_picker" value="{{ banner.text_color if banner else '#ffffff' }}" style="width: 48px; height: 38px; padding: 2px;">
+                                        <input type="text" class="form-control" name="text_color" id="text_color" value="{{ banner.text_color if banner else '#ffffff' }}" placeholder="#ffffff">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Text layout and alignment -->
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <label for="text_alignment" class="form-label fw-semibold">{{ form.text_alignment.label.text }}</label>
+                                    {{ form.text_alignment(class="form-select", id="text_alignment") }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="layout_style" class="form-label fw-semibold">{{ form.layout_style.label.text }}</label>
+                                    {{ form.layout_style(class="form-select", id="layout_style") }}
+                                </div>
+                            </div>
+
+                            <!-- Background image for text banner -->
+                            <div class="mb-3">
+                                <label for="image_file_text" class="form-label fw-semibold">{{ _("Image de fond (optionnel)") }}</label>
+                                {% if banner and banner.image_filename %}
+                                <div class="d-flex align-items-center gap-3 p-2 bg-light rounded border mb-2 small">
+                                    <i class="fas fa-image text-muted"></i>
+                                    <span>{{ banner.image_filename }}</span>
+                                </div>
+                                {% endif %}
+                                <input type="file" class="form-control" name="image_file" id="image_file_text" accept="image/*">
+                                <div class="form-text small">{{ _("Laissez vide pour conserver l'image actuelle. Max 10 Mo.") if banner else _("Une image de fond sera affichée sous un overlay semi-transparent de la couleur choisie.") }}</div>
+                            </div>
+
+                            <!-- Overlay opacity -->
+                            <div class="mb-3" id="overlay-opacity-group">
+                                <label for="overlay_opacity" class="form-label fw-semibold d-flex justify-content-between">
+                                    {{ form.overlay_opacity.label.text }}
+                                    <span class="badge bg-secondary" id="opacity-value-label">{{ banner.overlay_opacity if banner else 70 }}%</span>
+                                </label>
+                                {{ form.overlay_opacity(class="form-range", id="overlay_opacity", type="range", min="0", max="100", step="5") }}
+                            </div>
+
+                        </div>
+                        
+                        <!-- Image Banner Specific Fields (only for non-text banners) -->
+                        <div id="image-fields-group">
+                            <div class="mb-3">
+                                <label for="image_file" class="form-label fw-semibold">{{ form.image_file.label.text }}</label>
+                                {{ form.image_file(class="form-control", accept="image/*") }}
+                                <div class="form-text small">{{ _("Laissez vide pour conserver l'image actuelle. Max 10 Mo.") if banner else _("Recommandé : image au format paysage (ex. 21:9). Max 10 Mo.") }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Live Preview -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">{{ _("Aperçu en direct") }}</label>
+                            <div class="banner-text-slide rounded-4 overflow-hidden shadow-sm position-relative" id="live-preview-container" style="{% if banner %}aspect-ratio: 21 / 11; background: #fff;{% endif %}">
+                                <img id="preview-bg-img" src="{% if banner and banner.image_filename %}{{ url_for('main.serve_banner_file', filename=banner.image_filename) }}{% endif %}" alt=""
+                                     class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover"
+                                     style="{{ 'display:none;' if not (banner and banner.image_filename) else '' }} pointer-events:none; z-index:0;">
+                                <div id="preview-overlay" class="position-absolute top-0 start-0 w-100 h-100"
+                                     style="z-index:1; pointer-events:none; background:{{ banner.background_color if banner else '#152f4e' }}; opacity:{{ (banner.overlay_opacity / 100) if banner else 0.7 }};{{ ' display:none;' if not (banner and banner.image_filename) else '' }}"></div>
+                                {% set init_align = (banner.text_alignment or (banner.preset.text_alignment if banner.preset else 'center') or 'center') if banner else 'center' %}
+                                {% set init_layout = (banner.layout_style or (banner.preset.layout_style if banner.preset else 'vertical') or 'vertical') if banner else 'vertical' %}
+                                <div id="live-preview" class="{% if banner %}banner-content-{{ init_layout }}{% else %}position-relative{% endif %} h-100 {% if init_align == 'left' %}text-start{% elif init_align == 'right' %}text-end{% else %}text-center{% endif %} position-relative"
+                                     style="z-index:2; color: {{ banner.text_color if banner else '#ffffff' }};">
+                                    {% set ei = (banner.icon or (banner.preset.icon if banner.preset else '')) if banner else '' %}
+                                    <div id="preview-icon-wrap" class="banner-icon-wrap" style="{{ 'display:none;' if not ei else '' }}">
+                                        <svg id="preview-icon-svg" class="bi banner-icon" width="36" height="36" fill="currentColor">
+                                            {% if ei %}<use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#{{ ei }}"></use>{% endif %}
+                                        </svg>
+                                    </div>
+                                    <div id="preview-text-wrap" class="banner-text-wrap flex-grow-1">
+                                        <h2 class="banner-title fw-bold mb-2" id="preview-title">{{ banner.title if banner else _("Titre") }}</h2>
+                                        <div class="banner-body" id="preview-body">{{ banner.text_content | safe if banner and banner.text_content else '' }}</div>
+                                    </div>
+                                </div>
+                                <div id="empty-image-placeholder" class="position-absolute top-50 start-50 translate-middle text-muted text-center" style="display:none; z-index: 1;">
+                                    <svg class="bi mb-2 text-secondary" width="48" height="48" fill="currentColor">
+                                        <use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#image"></use>
+                                    </svg>
+                                    <div class="small fw-semibold">{{ _("Aperçu de l'image") }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+                        
+                        <!-- Common Action/Click Fields -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-2">{{ _("Action au clic (optionnel)") }}</h6>
+                            <p class="text-muted small mb-3">{{ _("Configurez ce qui se passe quand on clique sur la bannière (redirection vers un lien OU téléchargement d'un fichier).") }}</p>
+                            
+                            <div class="mb-3 fade-element" id="link-url-group">
+                                <label for="link_url" class="form-label fw-semibold">{{ form.link_url.label.text }}</label>
+                                {% if form.link_url.errors %}
+                                    {{ form.link_url(class="form-control is-invalid", id="link_url", placeholder="https://example.com") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.link_url.errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.link_url(class="form-control", id="link_url", placeholder="https://example.com") }}
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Attached File Display -->
+                            <div class="mb-3 fade-element" id="attached-file-group">
+                                <label for="attached_file" class="form-label fw-semibold">{{ form.attached_file.label.text }}</label>
+                                
+                                {% if banner and banner.file_filename %}
+                                    <div class="d-flex align-items-center gap-3 p-3 bg-light rounded border mb-2">
+                                        <div class="text-primary fs-4"><i class="fas fa-file-alt"></i></div>
+                                        <div class="flex-grow-1 overflow-hidden">
+                                            <div class="fw-semibold text-truncate">{{ banner.file_original_name }}</div>
+                                            <div class="small text-muted">{{ _("Fichier joint actuellement") }}</div>
+                                        </div>
+                                        <div>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="document.getElementById('delete-file-form').submit();">
+                                                <i class="fas fa-times me-1"></i> {{ _("Supprimer") }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                
+                                {{ form.attached_file(class="form-control") }}
+                                <div class="form-text small">{{ _("Sélectionnez un nouveau fichier pour remplacer l'existant. Max 10 Mo.") if banner else _("Fichier à télécharger (PDF, image, etc.). Max 10 Mo.") }}</div>
+                            </div>
+                        </div>

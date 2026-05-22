@@ -29,3 +29,5 @@ from app.models.club_q import ClubQSeason, ClubQSalle, ClubQSpectacle, ClubQVoeu
 from app.models.bekk import Bekk
 from app.models.panier_bio import OrderPanierBio, PeriodPanierBio
 from app.models.calendar import Club, Event
+from app.models.info import InfoBanner, InfoBannerPreset
+

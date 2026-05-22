@@ -62,6 +62,8 @@ class Config:
     THEATRE_BASE_PATH = os.environ.get("THEATRE_BASE_PATH")
     BEKKS_BASE_PATH = os.environ.get("BEKKS_BASE_PATH")
     PANIER_BIO_BASE_PATH = os.environ.get("PANIER_BIO_BASE_PATH")
+    BANNERS_BASE_PATH = os.environ.get("BANNERS_BASE_PATH") or os.path.join(basedir, "app", "static", "uploads", "banners")
+
 
     PHOTOS_BASE_PATH = os.environ.get("PHOTOS_BASE_PATH")
     PHOTOS_SECRET_KEY = os.environ.get("PHOTOS_SECRET_KEY")
