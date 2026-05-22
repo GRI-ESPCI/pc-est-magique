@@ -7,8 +7,14 @@
         name (str): The name of the Bootstrap icon.
 -->
 {% macro bootstrap_icon(name) %}
+    {% set mapped_name = {
+        "cup-hot-fill": "cup-fill",
+        "ticket-perforated-fill": "receipt-cutoff",
+        "mortarboard-fill": "award-fill",
+        "wrench-adjustable": "wrench"
+    }.get(name, name) %}
     <use href="{{ url_for("static",
-                          filename="svg/bootstrap-icons.svg") }}#{{ name }}" />
+                          filename="svg/bootstrap-icons.svg") }}#{{ mapped_name }}" />
 {% endmacro %}
 
 

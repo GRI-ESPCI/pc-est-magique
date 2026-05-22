@@ -5,21 +5,30 @@ from app.models import BarItem, GlobalSetting
 
 
 class _SettingDescriptor:
-    def __init__(self, key: str) -> None:
+    def __init__(self, key: str, default_value: int = None) -> None:
         self.key = key
+        self.default_value = default_value
         self.value: int = None  # Caching: only fetch attribute value on 1st access
 
     def __get__(self, obj: None, objtype=None):
         if self.value is None:
-            self.value = GlobalSetting.query.filter_by(key=self.key).one().value
+            setting = GlobalSetting.query.filter_by(key=self.key).first()
+            if setting:
+                self.value = setting.value
+            else:
+                self.value = self.default_value
         return self.value
 
     def __set__(self, obj: None, value: int):
         if not isinstance(value, int):
             raise TypeError
         self.value = value
-        setting = GlobalSetting.query.filter_by(key=self.key).one()
-        setting.value = value
+        setting = GlobalSetting.query.filter_by(key=self.key).first()
+        if not setting:
+            setting = GlobalSetting(key=self.key, value=value, name_fr=self.key, name_en=self.key)
+            db.session.add(setting)
+        else:
+            setting.value = value
         db.session.commit()
 
 
@@ -42,6 +51,7 @@ class _SettingsMeta:
     season_number_club_q: int = _SettingDescriptor("SEASON_NUMBER_CLUB_Q")
     bar_recharge_min: int = _SettingDescriptor("BAR_RECHARGE_MIN")
     bar_recharge_max: int = _SettingDescriptor("BAR_RECHARGE_MAX")
+    carousel_autoplay_delay: int = _SettingDescriptor("CAROUSEL_AUTOPLAY_DELAY", default_value=8)
 
 
 Settings = _SettingsMeta()
