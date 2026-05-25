@@ -15,7 +15,7 @@ a[rel="external"]::after {
 .card-table-wrapper { overflow: clip !important; } /* Arrondis sans bloquer scroll H */
 .registration-steps { height: 40px !important; }
 .gri-card { width: 16rem; }
-.p-card { width: 22rem; }
+.p-card { width: 22rem; max-width: 100%; }
 .o-card { width: 19rem; }
 .lines-6 { height: 150px !important; }
 
@@ -87,7 +87,7 @@ html[data-theme="dark"] .theme-material .bg-body-tertiary { background-color: #1
 html[data-theme="dark"] :is(.theme-frost, .theme-material) :is(h1, h2, h3, h4, h5, h6, .card-title, .navbar-brand, .nav-link, .text-body, .modal-body, .text-reset) {
     color: #f8fafc !important;
 }
-html[data-theme="dark"] :is(.theme-frost, .theme-material) :is(.text-muted, .text-secondary, .link-secondary, .link-dark) {
+html[data-theme="dark"] :is(.theme-frost, .theme-material) :is(.text-muted, .text-secondary, .text-body-secondary, .link-secondary, .link-dark) {
     color: #94a3b8 !important;
 }
 html[data-theme="dark"] :is(.theme-frost, .theme-material) .border-dark-transparent { border-color: transparent !important; }

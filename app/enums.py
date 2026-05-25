@@ -74,6 +74,7 @@ class PermissionScope(enum.Enum):
     bekk = _PSParams(allow_elem=False, need_elem=False)
     theatre = _PSParams(allow_elem=False, need_elem=False)
     panier_bio = _PSParams(allow_elem=False, need_elem=False)
+    calendar = _PSParams(allow_elem=False, need_elem=False)
 
     # Elements scopes
     pceen = _PSParams(
@@ -97,6 +98,13 @@ class PermissionScope(enum.Enum):
         allow_elem=True,
         need_elem=False,
         query=lambda models: models.Role.query,
+    )
+
+
+    club = _PSParams(
+        allow_elem=True,
+        need_elem=False,
+        query=lambda models: models.Club.query,
     )
 
 

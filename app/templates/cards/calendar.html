@@ -1,0 +1,44 @@
+{% extends "cards/base.html" %}
+
+{% block card_title %}{{ _("Calendrier") }}{% endblock %}
+
+{% block card_icon %}
+  {{ macros.bootstrap_icon("calendar-event") }}
+{% endblock %}
+
+{% block card_table %}
+  {% if calendar_infos and calendar_infos.next_events %}
+    {% for event in calendar_infos.next_events %}
+    <tr>
+      <td class="ps-4 align-top pt-2">
+        <div class="fw-bold text-body">{{ event.start_time.strftime('%d/%m') }}</div>
+        {% if not event.all_day %}<div class="small text-body-secondary">{{ event.start_time.strftime('%H:%M') }}</div>{% endif %}
+      </td>
+      <td class="pt-2 pb-2 w-100" style="max-width: 0;">
+        <div class="fw-semibold text-body text-truncate" title="{{ event.title }}">{{ event.title }}</div>
+        <div class="small text-body-secondary mt-1 text-truncate" title="{{ event.club.name }}{% if event.location %} &bull; {{ event.location }}{% endif %}">
+            <span class="fw-medium">{{ event.club.name }}</span>
+            {% if event.location %}
+              &bull; {{ event.location }}
+            {% endif %}
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  {% else %}
+    <tr>
+      <td colspan="2" class="text-center text-body-secondary py-5">
+        <svg class="bi mb-2 opacity-50" width="32" height="32">
+            {{ macros.bootstrap_icon("calendar-x") }}
+        </svg>
+        <div class="small">{{ _("Aucun évènement prévu.") }}</div>
+      </td>
+    </tr>
+  {% endif %}
+{% endblock %}
+
+{% block card_footer %}
+  <a href="{{ url_for('calendar.index') }}" class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}">
+    {{ _("Voir le calendrier complet") }}
+  </a>
+{% endblock %}

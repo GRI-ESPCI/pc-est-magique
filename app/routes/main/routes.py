@@ -27,7 +27,8 @@ from app.models import (
     ClubQSpectacle,
     Bekk,
     OrderPanierBio,
-    PeriodPanierBio
+    PeriodPanierBio,
+    Event
 )
 from app.routes.main import bp, forms
 from app.utils import captcha, helpers, typing
@@ -128,13 +129,47 @@ def index() -> typing.RouteReturn:
                 visibility, next_day, reserved
             )
 
+    calendar_infos = None
+    if context.has_permission(PermissionType.read, PermissionScope.calendar):
+        next_real_events = db.session.scalars(
+            db.select(Event)
+            .where(Event.start_time >= datetime.datetime.now())
+            .order_by(Event.start_time.asc())
+            .limit(3)
+        ).all()
+    
+        class DisplayEvent:
+            def __init__(self, title, start_time, club_name, location, all_day):
+                self.title = title
+                self.start_time = start_time
+                self.club = type('obj', (object,), {'name': club_name})()
+                self.location = location
+                self.all_day = all_day
+    
+        display_events = [DisplayEvent(e.title, e.start_time, e.club.name, e.location, e.all_day) for e in next_real_events]
+    
+        next_spectacles = db.session.scalars(
+            db.select(ClubQSpectacle)
+            .where(ClubQSpectacle.date >= datetime.datetime.now())
+            .order_by(ClubQSpectacle.date.asc())
+            .limit(3)
+        ).all()
+    
+        display_events.extend([DisplayEvent(s.nom, s.date, "Club Q", s.salle.nom if s.salle else None, False) for s in next_spectacles])
+        display_events.sort(key=lambda e: e.start_time)
+        display_events = display_events[:3]
+    
+        calendar_infos = namedtuple("CalendarInfos", ["next_events"])(display_events)
+
+
     return flask.render_template(
         "main/index.html",
         title=_("Accueil"),
         photos_infos=photos_infos,
         bekk_infos=bekk_infos,
         club_q_infos=club_q_infos,
-        panier_bio_infos=panier_bio_infos
+        panier_bio_infos=panier_bio_infos,
+        calendar_infos=calendar_infos
     )
 
 
