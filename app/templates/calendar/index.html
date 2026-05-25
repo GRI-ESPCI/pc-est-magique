@@ -16,6 +16,11 @@
         --fc-neutral-bg-color: rgba(120, 130, 140, 0.05);
         --fc-border-color: rgba(120, 130, 140, 0.2);
         color: inherit;
+        
+        /* Prevent OS text selection and context menus on mobile long-press */
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
 
         --cal-accent: #0b5ed7;
         --cal-accent-bg: rgba(11, 94, 215, 0.1);
@@ -368,6 +373,9 @@
                 list: "{{ _('Liste') }}"
             },
             firstDay: 1,
+            selectLongPressDelay: 500,
+            longPressDelay: 500,
+            eventLongPressDelay: 500,
             headerToolbar: window.innerWidth < 768 ? {
                 left: 'prev,next',
                 center: 'title',
@@ -566,6 +574,32 @@
             })
             .finally(() => { btnText.classList.remove('d-none'); btnLoader.classList.add('d-none'); submitBtn.disabled = false; });
         });
+
+        // Add swipe gesture support for mobile navigation
+        let touchstartX = 0;
+        let touchstartY = 0;
+
+        calendarEl.addEventListener('touchstart', e => {
+            touchstartX = e.changedTouches[0].screenX;
+            touchstartY = e.changedTouches[0].screenY;
+        }, {passive: true});
+
+        calendarEl.addEventListener('touchend', e => {
+            let touchendX = e.changedTouches[0].screenX;
+            let touchendY = e.changedTouches[0].screenY;
+            
+            let xDiff = touchendX - touchstartX;
+            let yDiff = touchendY - touchstartY;
+            
+            // Trigger if horizontal swipe is large enough and much bigger than vertical swipe
+            if (Math.abs(xDiff) > 60 && Math.abs(xDiff) > Math.abs(yDiff) * 1.5) {
+                if (xDiff < 0) {
+                    calendar.next();
+                } else {
+                    calendar.prev();
+                }
+            }
+        }, {passive: true});
     });
 </script>
 {% endblock %}

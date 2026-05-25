@@ -39,7 +39,7 @@
                     <span>{{ _("Recharger") }}</span>
                 </button>
                 <div class="dropdown">
-                    <button class="btn btn-{{ m_btn }} btn-pill btn-header-action py-2 dropdown-toggle d-flex align-items-center px-3 shadow-sm" type="button" data-bs-toggle="dropdown" style="min-height: 42px;">
+                    <button class="btn btn-{{ m_btn }} btn-pill btn-header-action py-2 dropdown-toggle d-flex align-items-center px-3 shadow-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" style="min-height: 42px;" id="bar-payment-dropdown-btn">
                         <svg class="bi flex-shrink-0" width="18" height="18" fill="currentColor" role="img">
                             {{ macros.bootstrap_icon("cart-plus") }}
                         </svg>
@@ -50,7 +50,7 @@
                         <li{% if not can_be_bought %} data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="{{ limit_message }}"{% endif %}>
                             <a class="dropdown-item py-2 {% if not can_be_bought %} disabled{% endif %} rounded-3 mx-1" role="button"
                                 {% if can_be_bought %}
-                                onclick="post_and_reload('{{ url_for('api.bar.pay', pceen_id=pceen.id, item_id=item.id) }}');"
+                                onclick="post_and_reload('{{ url_for('api.bar.pay', pceen_id=pceen.id, item_id=item.id) }}', null, 'POST', null, ['.card-body', '.card-footer']);"
                                 {% endif %}
                             >
                                 <div class="d-flex justify-content-between align-items-center gap-4">
@@ -308,7 +308,7 @@
 
                 <div class="dropdown mx-1">
                     <button class="btn btn-{{ theme }} dropdown-toggle d-inline-block" type="button"
-                            data-bs-toggle="dropdown" {% if not pceen.bar_deposit %} disabled{% endif %}>
+                            data-bs-toggle="dropdown" data-bs-auto-close="outside" {% if not pceen.bar_deposit %} disabled{% endif %} id="bar-payment-dropdown-classic-btn">
                         <svg class="bi flex-shrink-0" width="24" height="24" role="img">
                             {{ macros.bootstrap_icon("cart-plus") }}
                         </svg>
@@ -325,7 +325,7 @@
                                 {% if can_be_bought %}
                                 onclick="post_and_reload('{{
                                     url_for('api.bar.pay', pceen_id=pceen.id, item_id=item.id)
-                                }}');"
+                                }}', null, 'POST', null, ['.card-body', '.card-footer']);"
                                 {% endif %}
                             >
                                 {{ item.name }}
