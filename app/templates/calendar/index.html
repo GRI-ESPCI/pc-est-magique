@@ -155,16 +155,27 @@
     }
 
     /* Improved responsiveness */
-    @media (max-width: 767.98px) {
+    @media (max-width: 991.98px) {
+        /* Override standard container to allow full-bleed calendar */
+        .container {
+            max-width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        .row.mb-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
         #calendar-container {
-            padding: 0.75rem;
-            margin-left: -0.5rem;
-            margin-right: -0.5rem;
+            padding: 0.75rem 0;
+            margin: 0;
             border-radius: 0;
+            box-shadow: none !important;
         }
         .fc .fc-toolbar {
             flex-direction: column;
             gap: 0.75rem;
+            padding: 0 1rem;
         }
         .fc .fc-toolbar-title {
             font-size: 1.2rem !important;
@@ -175,6 +186,14 @@
         }
         .fc .fc-header-toolbar {
             margin-bottom: 1.25rem !important;
+        }
+        .fc .fc-view {
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+        }
+        .fc .fc-view::after {
+            display: none !important;
         }
 
         .fc .fc-daygrid-event {
