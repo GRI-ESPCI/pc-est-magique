@@ -235,4 +235,70 @@
 <script src="{{ url_for('static', filename='js/icon_picker.js') }}"></script>
 <script src="{{ url_for('static', filename='js/quill.js') }}"></script>
 {% include "main/_banner_scripts.html" %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const tableBody = document.getElementById('banners-table-body');
+    if (!tableBody) return;
+    let draggedItem = null;
+
+    tableBody.addEventListener('dragstart', function(e) {
+        const row = e.target.closest('.banner-row');
+        if (row) {
+            draggedItem = row;
+            setTimeout(() => row.classList.add('dragging'), 0);
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', row.dataset.id);
+        }
+    });
+
+    tableBody.addEventListener('dragend', function(e) {
+        const row = e.target.closest('.banner-row');
+        if (row) {
+            row.classList.remove('dragging');
+            const newOrder = Array.from(tableBody.querySelectorAll('.banner-row')).map(r => r.dataset.id);
+            fetch("{{ url_for('main.reorder_banners') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ banner_ids: newOrder })
+            }).then(res => {
+                if (res.ok) {
+                    window.location.reload();
+                } else {
+                    console.error("Failed to reorder banners");
+                }
+            });  
+            draggedItem = null;
+        }
+    });
+
+    tableBody.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const afterElement = getDragAfterElement(tableBody, e.clientY);
+        if (draggedItem) {
+            if (afterElement == null) {
+                tableBody.appendChild(draggedItem);
+            } else {
+                tableBody.insertBefore(draggedItem, afterElement);
+            }
+        }
+    });
+
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.banner-row:not(.dragging)')];
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+});
+</script>
 {% endblock %}

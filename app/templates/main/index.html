@@ -63,8 +63,8 @@
                         </div>
                     </div>
                     {% else %}
-                    <div class="w-100 h-100 overflow-hidden bg-light">
-                        <img src="{{ url_for('main.serve_banner_file', filename=banner.image_filename) }}" class="d-block w-100 h-100 object-fit-cover" alt="{{ banner.title }}" title="{{ banner.title }}" draggable="false" />
+                    <div class="w-100 h-100 position-relative overflow-hidden bg-light">
+                        <img src="{{ url_for('main.serve_banner_file', filename=banner.image_filename) }}" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover" alt="{{ banner.title }}" title="{{ banner.title }}" draggable="false" />
                     </div>
                     {% endif %}
                     
