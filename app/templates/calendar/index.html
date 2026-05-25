@@ -201,6 +201,28 @@
             padding: 1px 2px !important;
         }
     }
+    .fc .fc-popover {
+        z-index: 1050 !important;
+        background-color: var(--bs-body-bg, #ffffff) !important;
+    }
+    .fc .fc-popover .fc-daygrid-event {
+        white-space: normal !important;
+        height: auto !important;
+        align-items: flex-start;
+    }
+    .fc .fc-popover .fc-daygrid-event-dot {
+        margin-top: 0.4rem;
+    }
+    .fc .fc-popover .fc-event-main,
+    .fc .fc-popover .fc-event-title {
+        white-space: normal !important;
+        word-break: break-word;
+    }
+    
+    [data-theme="dark"] .fc .fc-popover,
+    .theme-dark .fc .fc-popover {
+        background-color: #212529 !important;
+    }
 </style>
 {% endblock %}
 

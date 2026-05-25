@@ -153,7 +153,12 @@ def index() -> typing.RouteReturn:
     
         next_spectacles = db.session.scalars(
             db.select(ClubQSpectacle)
-            .where(ClubQSpectacle.date >= datetime.datetime.now())
+            .join(ClubQVoeu)
+            .where(
+                ClubQSpectacle.date >= datetime.datetime.now(),
+                ClubQVoeu._pceen_id == pceen.id,
+                ClubQVoeu.places_attribuees > 0,
+            )
             .order_by(ClubQSpectacle.date.asc())
             .limit(3)
         ).all()
