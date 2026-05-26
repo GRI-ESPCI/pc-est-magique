@@ -33,12 +33,14 @@
                 {% if g.is_gri %}{% include "gris/menu.html" %}{% endif %}
             </ul>
             <ul class="navbar-nav flex-row flex-wrap justify-content-end">
+                {% if has_permission(PermissionType.read, PermissionScope.calendar) %}
                 <li class="nav-item">
-                    {% set is_active = request.endpoint and request.endpoint.startswith('panier_bio.') %}
-                    <a class="{{ 'btn btn-outline-secondary mx-2 my-1' if g.theme == 'classic' else 'nav-link px-3 fw-medium' }} {{ 'active border-bottom border-2 border-primary' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("panier_bio.main") }}">
-                        {{ _("Panier Bio") }}
+                    {% set is_active = request.endpoint and request.endpoint.startswith('calendar.') %}
+                    <a class="{{ 'btn btn-outline-secondary mx-2 my-1' if g.theme == 'classic' else 'nav-link px-3 fw-medium' }} {{ 'active border-bottom border-2 border-primary' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("calendar.index") }}">
+                        {{ _("Calendrier") }}
                     </a>
                 </li>
+                {% endif %}
                 
                 <li class="nav-item">
                     {% set is_active = request.endpoint and request.endpoint.startswith('theatre.') %}
