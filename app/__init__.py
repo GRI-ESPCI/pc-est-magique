@@ -177,6 +177,12 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.before_request(context.create_request_context)
     app.jinja_env.globals["has_permission"] = context.has_permission
 
+    @app.url_defaults
+    def _add_static_version(endpoint, values):
+        """Append application version to static URLs to bust browser cache on updates."""
+        if endpoint == "static" and "v" not in values:
+            values["v"] = __version__
+
     # Set up custom logging
     @app.after_request
     def _log_after(response: flask.Response) -> flask.Response:
