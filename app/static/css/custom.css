@@ -7,6 +7,9 @@ a[rel="external"]::after {
     content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
     margin: 0 3px 0 5px;
 }
+html[data-theme="dark"] a[rel="external"]::after {
+    filter: invert(1) opacity(0.8);
+}
 [onclick] { cursor: pointer; }
 .bi { fill: currentColor; }
 .tracking-tight { letter-spacing: -0.04em; }
@@ -118,6 +121,40 @@ html[data-theme="dark"] :is(.theme-frost, .theme-material) .text-primary { color
 /* Menu Hamburger Mobile (Dark) */
 html[data-theme="dark"] :is(.theme-material, .theme-frost) .navbar-toggler-icon { filter: invert(1) grayscale(100%) brightness(200%); }
 html[data-theme="dark"] :is(.theme-material, .theme-frost) .navbar-toggler { border-color: rgba(255, 255, 255, 0.15) !important; }
+
+/* Active Indicator for Navbar */
+.nav-active-indicator {
+    border-left: 3px solid #0d6efd;
+}
+html[data-theme="dark"] .nav-active-indicator {
+    border-left-color: #60a5fa !important;
+}
+@media (min-width: 768px) {
+    .nav-active-indicator {
+        border-left: none;
+        border-bottom: 2px solid #0d6efd;
+    }
+    html[data-theme="dark"] .nav-active-indicator {
+        border-bottom-color: #60a5fa !important;
+    }
+}
+
+/* Menu Styling */
+@media (max-width: 767.98px) {
+    #navbar_content.offcanvas-md { width: 200px !important; }
+}
+@media (min-width: 768px) {
+    #navbar_content.offcanvas-md {
+        background-color: transparent !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        border: none !important;
+    }
+}
+.theme-frost :is(.offcanvas, .offcanvas-md) { background-color: rgba(255, 255, 255, 0.8) !important; backdrop-filter: blur(20px); border-left-color: rgba(255, 255, 255, 0.5) !important; }
+html[data-theme="dark"] .theme-material :is(.offcanvas, .offcanvas-md) { background-color: #1e2028 !important; color: #f8fafc !important; border-left-color: #2c2f3a !important; }
+html[data-theme="dark"] .theme-frost :is(.offcanvas, .offcanvas-md) { background-color: rgba(15, 23, 42, 0.9) !important; color: #f8fafc !important; backdrop-filter: blur(20px); border-left-color: rgba(255, 255, 255, 0.1) !important; }
+html[data-theme="dark"] :is(.theme-material, .theme-frost) .offcanvas-header { border-bottom-color: rgba(255, 255, 255, 0.15) !important; }
 
 /* =============================================
     COMPONENTS (CARDS, MODALS, TOASTS, BADGES)

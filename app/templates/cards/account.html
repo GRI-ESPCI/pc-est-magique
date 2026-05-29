@@ -29,14 +29,14 @@
 <tr>
     <th scope="row" class="ps-4">{{ _("Email") }}</th>
     <td class="text-break">
-        <a href="mailto:{{ pceen.email }}" class="text-dark">{{ pceen.email }}</a>
+        <a href="mailto:{{ pceen.email }}" class="text-reset">{{ pceen.email }}</a>
     </td>
 </tr>
 {% if pceen.espci_email != None %}
 <tr>
     <th scope="row" class="ps-4">{{ _("Email ESPCI") }}</th>
     <td class="text-break">
-        <a href="mailto:{{ pceen.espci_email }}" class="text-dark">{{ pceen.espci_email }}</a>
+        <a href="mailto:{{ pceen.espci_email }}" class="text-reset">{{ pceen.espci_email }}</a>
     </td>
 </tr>   
 {% else  %}
@@ -64,6 +64,10 @@
        href="{{ url_for("profile.update_password", doas=doas,
                         next=request.url_rule.endpoint) }}">
         {{ _("Changer de mot de passe") }}
+    </a>
+    <a class="btn {{ 'btn-outline-danger' if g.theme == 'classic' else 'btn-danger' }} position-relative"
+       href="{{ url_for("auth.logout") }}">
+        {{ _("Déconnexion") }}
     </a>
 </div>
 {% endblock %}

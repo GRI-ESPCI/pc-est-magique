@@ -1,36 +1,36 @@
-<li class="nav-item dropdown me-auto">
+<li class="nav-item dropdown px-2 px-md-0">
     <button type="button" data-bs-toggle="dropdown"
         class="btn {{ 'btn-outline-danger' if g.theme == 'classic' else 'btn-danger btn-sm mt-1' }} dropdown-toggle"
         id="m_gri" aria-expanded="false">
         {{ _("Menu GRI") }}
     </button>
-    <ul class="dropdown-menu" aria-labelledby="m_gri">
-        <li><a class="dropdown-item"
+    <ul class="dropdown-menu border-0 shadow-sm" aria-labelledby="m_gri">
+        <li><a class="dropdown-item text-wrap"
                href="{{ url_for("gris.pceens") }}">
             {{ _("PCéens") }}
         </a></li>
-        <li><a class="dropdown-item"
+        <li><a class="dropdown-item text-wrap"
                href="{{ url_for("gris.roles") }}">
             {{ _("Rôles") }}
         </a></li>
-        <li><a class="dropdown-item"
+        <li><a class="dropdown-item text-wrap"
                href="{{ url_for("gris.run_script") }}">
             {{ _("Exécuter un script") }}
         </a></li>
-        <li><a class="dropdown-item"
+        <li><a class="dropdown-item text-wrap"
                href="{{ url_for("gris.monitoring_ds") }}">
             {{ _("Monitoring (Darkstat)") }}
         </a></li>
-        <li><a class="dropdown-item"
+        <li><a class="dropdown-item text-wrap"
                href="{{ url_for("gris.monitoring_bw") }}">
             {{ _("Monitoring (Bandwidthd)") }}
         </a></li>
-        <li><a class="dropdown-item"
+        <li><a class="dropdown-item text-wrap"
                href="https://pgadmin.pc-est-magique.fr"
                target="_blank" rel="external">
             {{ _("pgAdmin") }}
         </a></li>
-        <li><a class="dropdown-item disabled" href="#">
+        <li><a class="dropdown-item text-end text-md-start text-wrap disabled" href="#">
             {{ _("À venir...") }}
         </a></li>
     </ul>
