@@ -404,7 +404,7 @@
         
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: window.innerWidth < 768 ? 'listMonth' : 'dayGridMonth',
-            locale: 'fr',
+            locale: '{{ babel.get_locale() }}',
             height: window.innerWidth < 768 ? 'auto' : 'calc(100vh - 100px)',
             allDayText: "{{ _('Journée ') }}",
             buttonText: {

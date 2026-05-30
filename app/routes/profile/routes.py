@@ -12,7 +12,9 @@ from app.utils import helpers, typing
 @context.logged_in_only
 def main() -> typing.RouteReturn:
     """PC est magique profile page."""
-    return flask.render_template("profile/main.html", title=_("Profil"))
+    pref_form = forms.PreferencesModificationForm()
+    pref_form.locale.data = context.g.pceen.locale
+    return flask.render_template("profile/main.html", title=_("Profil"), pref_form=pref_form)
 
 
 @bp.route("/modify_account", methods=["GET", "POST"])
@@ -32,6 +34,20 @@ def modify_account() -> typing.RouteReturn:
         return helpers.redirect_to_next()
 
     return flask.render_template("profile/modify_account.html", title=_("Mettre à jour mon compte"), form=form)
+
+
+@bp.route("/modify_preferences", methods=["POST"])
+@context.logged_in_only
+def modify_preferences() -> typing.RouteReturn:
+    """PC est magique preferences modification page."""
+    form = forms.PreferencesModificationForm()
+    if form.validate_on_submit():
+        pceen = context.g.pceen
+        pceen.locale = form.locale.data
+        db.session.commit()
+        helpers.log_action(f"Modified preferences {pceen!r} (locale={pceen.locale})")
+        flask.flash(_("Préférences modifiées avec succès !"), "success")
+    return helpers.redirect_to_next()
 
 
 @bp.route("/update_password", methods=["GET", "POST"])

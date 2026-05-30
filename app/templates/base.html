@@ -31,6 +31,12 @@
         {% block scripts_head %}
         <script>
             function applyTheme(targetMode) {
+                const currentTheme = "{{ g.get('theme', 'vibrant') }}";
+                if (currentTheme === 'classic') {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    return;
+                }
+                
                 if (targetMode === 'dark' || (targetMode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.setAttribute('data-theme', 'dark');
                 } else {

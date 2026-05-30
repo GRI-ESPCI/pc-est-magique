@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.5.0-beta.7.3\n"
 "Report-Msgid-Bugs-To: pc-est-magique@pc-est-magique.fr\n"
-"POT-Creation-Date: 2026-04-28 15:41+0200\n"
+"POT-Creation-Date: 2026-05-30 20:35+0200\n"
 "PO-Revision-Date: 2022-10-29 03:04+0100\n"
 "Last-Translator: Loïc Simon <pc-est-magique@pc-est-magique.fr>\n"
 "Language: en\n"
@@ -17,7 +17,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.18.0\n"
+"Generated-By: Babel 2.17.0\n"
 
 #: app/context.py:116
 msgid "Le site est en mode maintenance : seuls les GRI peuvent y accéder."
@@ -61,15 +61,20 @@ msgstr "Purchase validated: %(item)s (%(amount)s). Revert:"
 msgid "Permission ajoutée"
 msgstr "Permission added"
 
-#: app/routes/api/routes/photos.py:99
+#: app/routes/api/routes/photos.py:109
 msgid "Photo modifiée avec succès (recharger la page pour voir)"
 msgstr "Photo successfully edited (reload to see it)"
 
-#: app/routes/api/routes/photos.py:121
+#: app/routes/api/routes/photos.py:126
+#, fuzzy
+msgid "Cette photo est déjà la miniature de l'album."
+msgstr "This photo is now the album's thumbnail."
+
+#: app/routes/api/routes/photos.py:136
 msgid "Cette photo est maintenant la miniature de l'album."
 msgstr "This photo is now the album's thumbnail."
 
-#: app/routes/api/routes/photos.py:142
+#: app/routes/api/routes/photos.py:157
 msgid "Photo définitivement supprimée."
 msgstr "Photo deleted definitively."
 
@@ -99,18 +104,19 @@ msgstr "Remember me"
 #: app/templates/auth/register_rezident.html:41
 #: app/templates/auth/reset_password.html:29
 #: app/templates/auth/reset_password_request.html:26
-#: app/templates/bar/welcome.html:48 app/templates/navbar.html:52
+#: app/templates/bar/welcome.html:48 app/templates/navbar.html:70
 msgid "Connexion"
 msgstr "Sign in"
 
 #: app/routes/auth/forms.py:29 app/routes/bar/forms.py:35
 #: app/routes/bar/forms.py:36 app/routes/main/forms.py:14
 #: app/routes/panier_bio/forms.py:29 app/routes/profile/forms.py:13
-#: app/templates/bar/items.html:109 app/templates/cards/account.html:18
-#: app/templates/cards/device.html:87 app/templates/cards/device_modal.html:15
-#: app/templates/cards/offer.html:14 app/templates/club_q/pceens.html:43
-#: app/templates/club_q/saisons.html:55 app/templates/gris/pceens.html:79
-#: app/templates/panier_bio/admin.html:127 app/templates/theatre/admin.html:38
+#: app/templates/bar/items.html:109 app/templates/calendar/admin.html:30
+#: app/templates/cards/account.html:18 app/templates/cards/device.html:99
+#: app/templates/cards/device_modal.html:15 app/templates/cards/offer.html:14
+#: app/templates/club_q/pceens.html:43 app/templates/club_q/saisons.html:55
+#: app/templates/gris/pceens.html:79 app/templates/panier_bio/admin.html:127
+#: app/templates/theatre/admin.html:38
 #: app/templates/theatre/admin_saison.html:132
 msgid "Nom"
 msgstr "Name"
@@ -121,10 +127,10 @@ msgid "Prénom"
 msgstr "First name"
 
 #: app/routes/auth/forms.py:31 app/routes/profile/forms.py:15
-#: app/templates/bar/user.html:137 app/templates/bar/user.html:410
+#: app/templates/bar/user.html:137 app/templates/bar/user.html:414
 #: app/templates/cards/account.html:26
 msgid "Promotion"
-msgstr "Promotion"
+msgstr "Class"
 
 #: app/routes/auth/forms.py:33 app/routes/auth/forms.py:47
 #: app/routes/profile/forms.py:17 app/templates/gris/pceens.html:99
@@ -144,11 +150,11 @@ msgid "Envoyer le mail de réinitialisation"
 msgstr "Send reset mail"
 
 #: app/routes/auth/forms.py:54 app/routes/auth/routes.py:180
-#: app/routes/profile/forms.py:27
+#: app/routes/profile/forms.py:38
 msgid "Nouveau mot de passe"
 msgstr "New password"
 
-#: app/routes/auth/forms.py:56 app/routes/profile/forms.py:29
+#: app/routes/auth/forms.py:56 app/routes/profile/forms.py:40
 msgid "Nouveau mot de passe (validation)"
 msgstr "New password (validation)"
 
@@ -267,7 +273,7 @@ msgstr "Nickname"
 
 #: app/routes/bar/forms.py:26 app/templates/bar/transactions.html:37
 #: app/templates/bar/user.html:113 app/templates/bar/user.html:199
-#: app/templates/bar/user.html:395 app/templates/bar/user.html:462
+#: app/templates/bar/user.html:399 app/templates/bar/user.html:466
 msgid "Barman / barmaid"
 msgstr "Barman/barmaid"
 
@@ -316,15 +322,21 @@ msgstr "Download"
 msgid "Rechargement min (€)"
 msgstr "Min recharge (€)"
 
-#: app/routes/bar/forms.py:68
+#: app/routes/bar/forms.py:71
 msgid "Rechargement max (€)"
 msgstr "Max recharge (€)"
 
-#: app/routes/bar/forms.py:70
+#: app/routes/bar/forms.py:78
+msgid ""
+"Le rechargement maximum doit être supérieur ou égal au rechargement "
+"minimum."
+msgstr ""
+
+#: app/routes/bar/forms.py:84
 msgid "Supprimer l'image actuelle"
 msgstr "Delete current image"
 
-#: app/routes/bar/forms.py:72 app/templates/theatre/admin_saison.html:99
+#: app/routes/bar/forms.py:86 app/templates/theatre/admin_saison.html:99
 #: app/templates/theatre/admin_spectacle.html:100 app/templates/wysiwyg.html:23
 msgid "Sauvegarder"
 msgstr "Save"
@@ -389,15 +401,15 @@ msgstr "Items – Bar"
 msgid "Export de données – Bar"
 msgstr "Data export – Bar"
 
-#: app/routes/bar/routes.py:445
+#: app/routes/bar/routes.py:451
 msgid "Paramètres mis à jour."
 msgstr "Settings updated."
 
-#: app/routes/bar/routes.py:449
+#: app/routes/bar/routes.py:455
 msgid "Paramètres – Bar"
 msgstr "Settings – Bar"
 
-#: app/routes/bar/routes.py:463
+#: app/routes/bar/routes.py:469
 msgid ""
 "Bonjour, camarade ! Ton compte du Bar a été migré dans ton compte PC est "
 "magique. Profite bien !"
@@ -405,7 +417,7 @@ msgstr ""
 "Hello, comrade! Your Bar account has been migrated into your PC est "
 "magique account. Enjoy!"
 
-#: app/routes/bar/routes.py:470
+#: app/routes/bar/routes.py:476
 msgid ""
 "Les comptes du Bar ont été migrés dans PC est magique. En revanche, pas "
 "de trace du tien... Pas de panique, il n'est pas perdu ! Contacte "
@@ -414,57 +426,57 @@ msgstr ""
 "Bar accounts have been migrated into PC est magique. However, no trace of"
 " yours... No need to panic, it is not lost! Simply contact a GRI."
 
-#: app/routes/bar/routes.py:477
+#: app/routes/bar/routes.py:483
 msgid "Migration du site du Bar"
 msgstr "Bar site migration"
 
-#: app/routes/bar/routes.py:487
+#: app/routes/bar/routes.py:493
 msgid "Veuillez choisir un montant."
 msgstr "Please choose an amount."
 
-#: app/routes/bar/routes.py:493
+#: app/routes/bar/routes.py:499
 #, fuzzy
 msgid "Montant invalide."
 msgstr "Invalid Ban ID."
 
-#: app/routes/bar/routes.py:500
+#: app/routes/bar/routes.py:506
 #, fuzzy, python-format
 msgid "Le montant doit être compris entre %(min)s€ et %(max)s€."
 msgstr "The amount must be between %(min)s€ and %(max)s€."
 
-#: app/routes/bar/routes.py:521
+#: app/routes/bar/routes.py:527
 #, fuzzy, python-format
 msgid "Rechargement compte Bar de %(name)s"
 msgstr "Bar account top-up for %(name)s"
 
-#: app/routes/bar/routes.py:530
+#: app/routes/bar/routes.py:536
 msgid ""
 "Le service de paiement Lydia n'est pas encore configuré pour le Bar. "
 "Veuillez vous rendre directement au Bar pour recharger."
 msgstr ""
-"The Lydia payment service is not yet configured for the Bar. "
-"Please go directly to the Bar to top up."
+"The Lydia payment service is not yet configured for the Bar. Please go "
+"directly to the Bar to top up."
 
-#: app/routes/bar/routes.py:538 app/templates/bar/recharge.html:9
+#: app/routes/bar/routes.py:544 app/templates/bar/recharge.html:9
 msgid "Recharger mon compte Bar"
 msgstr "Top up my Bar account"
 
-#: app/routes/bar/routes.py:647 app/routes/bar/routes.py:674
+#: app/routes/bar/routes.py:650 app/routes/bar/routes.py:667
 #, python-format
 msgid "Compte bar rechargé de %(amount)s€ !"
 msgstr ""
 
-#: app/routes/bar/routes.py:649
+#: app/routes/bar/routes.py:652
 #, fuzzy
 msgid "Pas de rechargement en cours détecté."
 msgstr "No payment detected"
 
-#: app/routes/bar/routes.py:676
+#: app/routes/bar/routes.py:669
 #, fuzzy
 msgid "Paiement en attente de validation."
 msgstr "Payment pending, try again"
 
-#: app/routes/bar/routes.py:684
+#: app/routes/bar/routes.py:677
 msgid "Le rechargement a été annulé ou a échoué."
 msgstr ""
 
@@ -519,9 +531,9 @@ msgid "Promo"
 msgstr "Grad class"
 
 #: app/routes/bekk/forms.py:17 app/templates/bar/transactions.html:41
-#: app/templates/bar/user.html:198 app/templates/bar/user.html:466
-#: app/templates/club_q/id/salle.html:136 app/templates/club_q/main.html:220
-#: app/templates/club_q/spectacles.html:109
+#: app/templates/bar/user.html:198 app/templates/bar/user.html:470
+#: app/templates/calendar/index.html:381 app/templates/club_q/id/salle.html:136
+#: app/templates/club_q/main.html:220 app/templates/club_q/spectacles.html:109
 #: app/templates/panier_bio/admin.html:136
 #: app/templates/panier_bio/main.html:176
 msgid "Date"
@@ -545,9 +557,9 @@ msgstr "Add"
 #: app/routes/club_q/forms.py:95 app/routes/club_q/forms.py:102
 #: app/routes/panier_bio/forms.py:49 app/routes/panier_bio/forms.py:64
 #: app/routes/rooms/forms.py:24 app/templates/bar/items.html:114
-#: app/templates/bar/user.html:564 app/templates/photos/album.html:212
-#: app/templates/photos/collection.html:180 app/templates/photos/main.html:57
-#: app/templates/rooms/register.html:106
+#: app/templates/bar/user.html:572 app/templates/main/manage_presets.html:228
+#: app/templates/photos/album.html:213 app/templates/photos/collection.html:196
+#: app/templates/photos/main.html:57 app/templates/rooms/register.html:106
 #: app/templates/theatre/admin_saison.html:59
 #: app/templates/theatre/admin_spectacle.html:57 app/templates/wysiwyg.html:9
 msgid "Modifier"
@@ -557,7 +569,9 @@ msgstr "Edit"
 #: app/routes/club_q/forms.py:68 app/routes/club_q/forms.py:81
 #: app/routes/club_q/forms.py:96 app/routes/panier_bio/forms.py:50
 #: app/routes/panier_bio/forms.py:65 app/templates/cards/club_q.html:42
-#: app/templates/photos/album.html:226 app/templates/theatre/admin.html:91
+#: app/templates/main/_banner_form_fields.html:174
+#: app/templates/main/manage_presets.html:234
+#: app/templates/photos/album.html:229 app/templates/theatre/admin.html:91
 #: app/templates/theatre/admin_saison.html:186
 #: app/templates/theatre/admin_spectacle.html:150
 msgid "Supprimer"
@@ -592,9 +606,59 @@ msgstr "ESPCI Bekk newspaper"
 msgid "Introduction mise à jour."
 msgstr "Changelog"
 
+#: app/routes/calendar/forms.py:7
+#, fuzzy
+msgid "Nom du club"
+msgstr "Name of Bekk"
+
+#: app/routes/calendar/forms.py:8 app/templates/calendar/admin.html:31
+#, fuzzy
+msgid "Couleur"
+msgstr "Value"
+
+#: app/routes/calendar/forms.py:9 app/routes/main/forms.py:112
+#: app/routes/rooms/forms.py:16 app/templates/calendar/index.html:558
+msgid "Enregistrer"
+msgstr "Register"
+
+#: app/routes/calendar/routes.py:19
+msgid "Vous n'avez pas accès au calendrier."
+msgstr ""
+
+#: app/routes/calendar/routes.py:28 app/templates/cards/calendar.html:3
+#: app/templates/navbar.html:56
+msgid "Calendrier"
+msgstr "Calendar"
+
+#: app/routes/calendar/routes.py:145
+#, fuzzy, python-format
+msgid "Évènement '%(title)s' mis à jour !"
+msgstr "Password updated!"
+
+#: app/routes/calendar/routes.py:201
+#, fuzzy, python-format
+msgid "Évènement '%(title)s' créé avec succès !"
+msgstr "Account successfully created!"
+
+#: app/routes/calendar/routes.py:220
+#, fuzzy, python-format
+msgid "Club '%(name)s' créé avec succès."
+msgstr "Account successfully created!"
+
+#: app/routes/calendar/routes.py:236
+#, fuzzy, python-format
+msgid "Club '%(name)s' mis à jour."
+msgstr "Settings updated."
+
+#: app/routes/calendar/routes.py:249
+#, fuzzy
+msgid "Club supprimé."
+msgstr "Deleted wish."
+
 #: app/routes/club_q/forms.py:22 app/routes/club_q/forms.py:28
 #: app/routes/club_q/forms.py:36 app/routes/panier_bio/forms.py:71
-#: app/routes/profile/forms.py:20 app/routes/profile/forms.py:32
+#: app/routes/profile/forms.py:20 app/routes/profile/forms.py:31
+#: app/routes/profile/forms.py:43 app/templates/main/manage_presets.html:424
 msgid "Mettre à jour"
 msgstr "Update"
 
@@ -832,13 +896,13 @@ msgstr "MAC address*"
 msgid "Enregistrer l'appareil"
 msgstr "Register device"
 
-#: app/routes/devices/forms.py:24 app/templates/cards/device.html:131
+#: app/routes/devices/forms.py:24 app/templates/cards/device.html:143
 #: app/templates/cards/device_modal.html:62
 msgid "Modifier l'appareil"
 msgstr "Edit device"
 
-#: app/routes/devices/forms.py:32 app/templates/cards/device.html:23
-#: app/templates/cards/device.html:56 app/templates/cards/device_modal.html:25
+#: app/routes/devices/forms.py:32 app/templates/cards/device.html:24
+#: app/templates/cards/device.html:68 app/templates/cards/device_modal.html:25
 msgid "Adresse MAC"
 msgstr "MAC address"
 
@@ -965,7 +1029,7 @@ msgstr "Hours"
 msgid "Jours"
 msgstr "Days"
 
-#: app/routes/gris/forms.py:55
+#: app/routes/gris/forms.py:55 app/templates/calendar/index.html:412
 msgid "Mois"
 msgstr "Months"
 
@@ -1026,7 +1090,8 @@ msgstr "The miscreant has been banned."
 msgid "Adresse e-mail (optionnel)"
 msgstr "Mail address (optional)"
 
-#: app/routes/main/forms.py:16
+#: app/routes/main/forms.py:16 app/templates/main/_banner_form_fields.html:129
+#: app/templates/main/_banner_scripts.html:171
 msgid "Titre"
 msgstr "Title"
 
@@ -1038,22 +1103,241 @@ msgstr "Message"
 msgid "Envoyer"
 msgstr "Send"
 
-#: app/routes/main/routes.py:139 app/templates/errors/401.html:29
+#: app/routes/main/forms.py:35
+msgid "— Aucune icône —"
+msgstr "— No icon —"
+
+#: app/routes/main/forms.py:36
+msgid "Mégaphone"
+msgstr "Megaphone"
+
+#: app/routes/main/forms.py:37
+msgid "Information"
+msgstr "Information"
+
+#: app/routes/main/forms.py:38
+msgid "Avertissement"
+msgstr "Warning"
+
+#: app/routes/main/forms.py:39
+msgid "Alerte"
+msgstr "Alert"
+
+#: app/routes/main/forms.py:40
+msgid "Événement"
+msgstr "Event"
+
+#: app/routes/main/forms.py:41
+msgid "Musique"
+msgstr "Music"
+
+#: app/routes/main/forms.py:42 app/templates/cards/bar.html:5
+#: app/templates/gris/pceens.html:36 app/templates/navbar.html:116
+msgid "Bar"
+msgstr "Bar"
+
+#: app/routes/main/forms.py:43
+msgid "Ticket"
+msgstr "Ticket"
+
+#: app/routes/main/forms.py:44
+msgid "Étoile"
+msgstr "Star"
+
+#: app/routes/main/forms.py:45
+msgid "Cadeau"
+msgstr "Gift"
+
+#: app/routes/main/forms.py:46
+msgid "Personnes"
+msgstr "People"
+
+#: app/routes/main/forms.py:47
+msgid "Médaille"
+msgstr "Medal"
+
+#: app/routes/main/forms.py:48
+msgid "Maison"
+msgstr "House"
+
+#: app/routes/main/forms.py:49
+msgid "Trophée"
+msgstr "Trophy"
+
+#: app/routes/main/forms.py:50
+msgid "Appareil photo"
+msgstr "Camera"
+
+#: app/routes/main/forms.py:51
+msgid "Carte"
+msgstr "Map"
+
+#: app/routes/main/forms.py:52
+msgid "Cœur"
+msgstr "Heart"
+
+#: app/routes/main/forms.py:53
+msgid "Éclair"
+msgstr "Lightning"
+
+#: app/routes/main/forms.py:54
+msgid "Cloche"
+msgstr "Bell"
+
+#: app/routes/main/forms.py:55
+msgid "Validé"
+msgstr "Validated"
+
+#: app/routes/main/forms.py:56
+msgid "Annulé"
+msgstr "Cancelled"
+
+#: app/routes/main/forms.py:57
+msgid "Verrou"
+msgstr "Lock"
+
+#: app/routes/main/forms.py:58 app/templates/bar/user.html:126
+#: app/templates/bar/user.html:408 app/templates/cards/account.html:30
+msgid "Email"
+msgstr "Email"
+
+#: app/routes/main/forms.py:59
+msgid "Chat"
+msgstr "Chat"
+
+#: app/routes/main/forms.py:60 app/templates/bar/navbar.html:67
+#: app/templates/bar/navbar.html:144
+msgid "Outils"
+msgstr "Tools"
+
+#: app/routes/main/forms.py:61
+msgid "Diffusion"
+msgstr "Broadcast"
+
+#: app/routes/main/forms.py:62
+msgid "Document"
+msgstr "Document"
+
+#: app/routes/main/forms.py:63
+msgid "Signet"
+msgstr "Bookmark"
+
+#: app/routes/main/forms.py:64
+msgid "Étiquette"
+msgstr "Tag"
+
+#: app/routes/main/forms.py:65
+msgid "Question"
+msgstr "Question"
+
+#: app/routes/main/forms.py:71
+msgid "Couleur de fond (Hex)"
+msgstr "Background color (Hex)"
+
+#: app/routes/main/forms.py:72
+msgid "Couleur du texte (Hex)"
+msgstr "Text color (Hex)"
+
+#: app/routes/main/forms.py:73
+msgid "Icône"
+msgstr "Icon"
+
+#: app/routes/main/forms.py:75 app/templates/bar/settings.html:37
+msgid "Image de fond"
+msgstr "Background image"
+
+#: app/routes/main/forms.py:76
+msgid "Images uniquement !"
+msgstr "Images only!"
+
+#: app/routes/main/forms.py:79
+msgid "Alignement du texte"
+msgstr "Text alignment"
+
+#: app/routes/main/forms.py:80
+msgid "Centré"
+msgstr "Center"
+
+#: app/routes/main/forms.py:80
+msgid "Gauche"
+msgstr "Left"
+
+#: app/routes/main/forms.py:80
+msgid "Droite"
+msgstr "Right"
+
+#: app/routes/main/forms.py:84
+msgid "Disposition"
+msgstr "Layout"
+
+#: app/routes/main/forms.py:85
+msgid "Vertical (empilé)"
+msgstr "Vertical (stacked)"
+
+#: app/routes/main/forms.py:85
+msgid "Horizontal (côte à côte)"
+msgstr "Horizontal (side by side)"
+
+#: app/routes/main/forms.py:89
+msgid "Opacité de l'overlay couleur (%)"
+msgstr "Color overlay opacity (%)"
+
+#: app/routes/main/forms.py:99
+msgid "Nom du preset"
+msgstr "Preset name"
+
+#: app/routes/main/forms.py:100 app/templates/main/manage_presets.html:441
+msgid "Enregistrer le preset"
+msgstr "Save preset"
+
+#: app/routes/main/forms.py:106
+msgid "Titre / Label admin"
+msgstr "Title / Admin label"
+
+#: app/routes/main/forms.py:107
+msgid "Bannière Textuelle"
+msgstr "Text Banner"
+
+#: app/routes/main/forms.py:108
+msgid "Texte de l'annonce"
+msgstr "Announcement text"
+
+#: app/routes/main/forms.py:109
+msgid "Lien de redirection"
+msgstr "Redirect link"
+
+#: app/routes/main/forms.py:110
+msgid "Fichier joint"
+msgstr "Attached file"
+
+#: app/routes/main/forms.py:111
+msgid "Preset de style"
+msgstr "Style preset"
+
+#: app/routes/main/forms.py:118
+msgid "Délai de défilement (secondes)"
+msgstr "Scroll delay (seconds)"
+
+#: app/routes/main/forms.py:119
+msgid "Enregistrer les réglages"
+msgstr "Save settings"
+
+#: app/routes/main/routes.py:183 app/templates/errors/401.html:29
 #: app/templates/errors/403.html:26 app/templates/errors/404.html:23
 #: app/templates/errors/other.html:17 app/templates/footer.html:19
 #: app/templates/mails_base.html:74
 msgid "Accueil"
 msgstr "Home"
 
-#: app/routes/main/routes.py:154 app/routes/panier_bio/routes.py:155
+#: app/routes/main/routes.py:201 app/routes/panier_bio/routes.py:155
 msgid "Le captcha n'a pas pu être vérifié. Veuillez réessayer."
 msgstr "The captcha could not be verified. Please try again."
 
-#: app/routes/main/routes.py:166
+#: app/routes/main/routes.py:213
 msgid "Message transmis !"
 msgstr "Message transmitted!"
 
-#: app/routes/main/routes.py:172
+#: app/routes/main/routes.py:219
 msgid ""
 "Oh non ! Le message n'a pas pu être transmis. N'hésitez pas à contacter "
 "un GRI aux coordonnées en bas de page.<br/>(Erreur : "
@@ -1061,29 +1345,94 @@ msgstr ""
 "O no! The message could not be transmitted. Please feel free to reach GRI"
 " at the contact information below.<br/>(Error: "
 
-#: app/routes/main/routes.py:181
+#: app/routes/main/routes.py:228
 msgid "Contact"
 msgstr "Contact"
 
-#: app/routes/main/routes.py:187 app/templates/footer.html:35
+#: app/routes/main/routes.py:234 app/templates/footer.html:35
 msgid "Mentions légales"
 msgstr "Legal notice"
 
-#: app/routes/main/routes.py:193
+#: app/routes/main/routes.py:240
 msgid "Notes de mise à jour"
 msgstr "Changelog"
 
-#: app/routes/main/routes.py:200
+#: app/routes/main/routes.py:247
 msgid "Accès à Internet"
 msgstr "Internet Access"
 
-#: app/routes/main/routes.py:210
+#: app/routes/main/routes.py:257
 msgid "Accès à Internet restreint"
 msgstr "Internet access restricted"
 
-#: app/routes/main/routes.py:226
+#: app/routes/main/routes.py:273
 msgid "TEST"
 msgstr "TEST"
+
+#: app/routes/main/routes.py:440
+msgid "Une image est requise pour une bannière de type image."
+msgstr ""
+
+#: app/routes/main/routes.py:447
+msgid "L'image de la bannière dépasse la taille maximale de 10 Mo."
+msgstr ""
+
+#: app/routes/main/routes.py:455
+msgid "Le fichier joint dépasse la taille maximale de 10 Mo."
+msgstr ""
+
+#: app/routes/main/routes.py:522 app/routes/main/routes.py:564
+#, fuzzy
+msgid "— Pas de preset —"
+msgstr "No payment detected"
+
+#: app/routes/main/routes.py:534
+#, fuzzy
+msgid "Bannière ajoutée avec succès."
+msgstr "Season successfully deleted."
+
+#: app/routes/main/routes.py:539
+msgid "Configuration du carrousel mise à jour."
+msgstr ""
+
+#: app/routes/main/routes.py:569
+#, fuzzy
+msgid "Bannière mise à jour."
+msgstr "Settings updated."
+
+#: app/routes/main/routes.py:601
+#, fuzzy
+msgid "Fichier joint supprimé."
+msgstr "Item %(item)s deleted."
+
+#: app/routes/main/routes.py:631
+#, fuzzy
+msgid "Bannière supprimée."
+msgstr "Deleted location."
+
+#: app/routes/main/routes.py:654
+#, fuzzy
+msgid "Ordre des bannières mis à jour."
+msgstr "Password updated!"
+
+#: app/routes/main/routes.py:690
+msgid "L'image dépasse la taille maximale de 10 Mo."
+msgstr ""
+
+#: app/routes/main/routes.py:707
+#, fuzzy
+msgid "Preset enregistré."
+msgstr "Register"
+
+#: app/routes/main/routes.py:711
+#, fuzzy
+msgid "Gestion des presets"
+msgstr "Manage roles"
+
+#: app/routes/main/routes.py:731
+#, fuzzy
+msgid "Preset supprimé."
+msgstr "Deleted period."
 
 #: app/routes/panier_bio/forms.py:31
 msgid "Promo, labo..."
@@ -1130,13 +1479,14 @@ msgid "Commander"
 msgstr "Ordering"
 
 #: app/routes/panier_bio/forms.py:57 app/routes/theatre/forms.py:31
+#: app/templates/calendar/index.html:313 app/templates/calendar/index.html:385
 #: app/templates/panier_bio/period.html:73 app/templates/payments/main.html:197
 #: app/templates/theatre/admin.html:39
 msgid "Date de début"
 msgstr "Start date"
 
-#: app/routes/panier_bio/forms.py:58 app/templates/panier_bio/period.html:76
-#: app/templates/payments/main.html:198
+#: app/routes/panier_bio/forms.py:58 app/templates/calendar/index.html:318
+#: app/templates/panier_bio/period.html:76 app/templates/payments/main.html:198
 msgid "Date de fin"
 msgstr "End date"
 
@@ -1229,8 +1579,8 @@ msgstr "Administration Period Panier Bio"
 msgid "La date de fin ne peut être antérieure à la date de début"
 msgstr "Ending date can not be anterior to starting date!"
 
-#: app/routes/payments/email.py:21 app/routes/payments/routes.py:250
-#: app/routes/payments/routes.py:305
+#: app/routes/payments/email.py:21 app/routes/payments/routes.py:249
+#: app/routes/payments/routes.py:304
 msgid "Paiement validé !"
 msgstr "Payment validated!"
 
@@ -1291,23 +1641,23 @@ msgstr "Pay in person"
 msgid "Ajouter un paiement"
 msgstr "Add a payment"
 
-#: app/routes/payments/routes.py:256
+#: app/routes/payments/routes.py:255
 msgid "Pas de paiement détecté"
 msgstr "No payment detected"
 
-#: app/routes/payments/routes.py:274
+#: app/routes/payments/routes.py:273
 msgid "Paiement annulé"
 msgstr "Payment cancelled"
 
-#: app/routes/payments/routes.py:286
+#: app/routes/payments/routes.py:285
 msgid "Numéro de paiement invalide"
 msgstr "Invalid payment number"
 
-#: app/routes/payments/routes.py:289
+#: app/routes/payments/routes.py:288
 msgid "Paiement en attente, réessayer"
 msgstr "Payment pending, try again"
 
-#: app/routes/payments/routes.py:292
+#: app/routes/payments/routes.py:291
 msgid "Paiement invalide, réessayer"
 msgstr "Payment invalid, try again"
 
@@ -1335,7 +1685,7 @@ msgstr "Latitude (optional)"
 msgid "Longitude (optionnel)"
 msgstr "Longitude (optional)"
 
-#: app/routes/photos/forms.py:28 app/templates/photos/album.html:262
+#: app/routes/photos/forms.py:28 app/templates/photos/album.html:267
 msgid "Modifier la photo"
 msgstr "Edit photo"
 
@@ -1359,11 +1709,11 @@ msgstr "End date (optional)"
 msgid "Album visible"
 msgstr "Album visible"
 
-#: app/routes/photos/forms.py:39 app/templates/photos/album.html:99
+#: app/routes/photos/forms.py:39 app/templates/photos/album.html:104
 msgid "Modifier l'album"
 msgstr "Edit album"
 
-#: app/routes/photos/forms.py:50 app/templates/photos/collection.html:203
+#: app/routes/photos/forms.py:50 app/templates/photos/collection.html:220
 msgid "Nouvel album"
 msgstr "New album"
 
@@ -1379,68 +1729,81 @@ msgstr "Collection name"
 msgid "Collection visible"
 msgstr "Collection visible"
 
-#: app/routes/photos/forms.py:66 app/templates/photos/collection.html:49
+#: app/routes/photos/forms.py:66 app/templates/photos/collection.html:60
 msgid "Modifier la collection"
 msgstr "Edit collection"
 
-#: app/routes/photos/routes.py:24 app/templates/cards/photos.html:5
-#: app/templates/cards/photos.html:22 app/templates/navbar.html:89
-#: app/templates/photos/album.html:46 app/templates/photos/collection.html:18
+#: app/routes/photos/routes.py:25 app/templates/cards/photos.html:5
+#: app/templates/cards/photos.html:22 app/templates/navbar.html:107
+#: app/templates/photos/album.html:55 app/templates/photos/collection.html:28
 #: app/templates/photos/main.html:7
 msgid "Photos"
 msgstr "Photos"
 
-#: app/routes/photos/routes.py:76
+#: app/routes/photos/routes.py:77
 msgid ""
 "Une collection ne peut pas être rendue visible si elle ne contient aucun "
 "album visible !"
 msgstr "A collection cannot be made visible if it contains no visible album!"
 
-#: app/routes/photos/routes.py:79
+#: app/routes/photos/routes.py:80
 msgid "Collection modifiée avec succès !"
 msgstr "Collection successfully edited!"
 
-#: app/routes/photos/routes.py:95
+#: app/routes/photos/routes.py:96
 msgid "Album créé !"
 msgstr "Album created!"
 
-#: app/routes/photos/routes.py:127
+#: app/routes/photos/routes.py:128
 msgid "IP non détectable, impossible d'accéder aux photos"
 msgstr "Unable to detect your IP, photos can't be loaded"
 
-#: app/routes/photos/routes.py:144
+#: app/routes/photos/routes.py:145
+#, fuzzy
+msgid "Cet album est maintenant la miniature de la collection."
+msgstr "This photo is now the album's thumbnail."
+
+#: app/routes/photos/routes.py:154
 msgid "Un album ne peut pas être rendu visible si il ne contient aucune photo !"
 msgstr "An album cannot be made visible if it contains no photos!"
 
-#: app/routes/photos/routes.py:146
+#: app/routes/photos/routes.py:156
 msgid "Album modifié avec succès !"
 msgstr "Album successfully edited!"
 
-#: app/routes/profile/forms.py:26
+#: app/routes/profile/forms.py:27 app/templates/cards/preferences.html:14
+msgid "Langue"
+msgstr "Language"
+
+#: app/routes/profile/forms.py:37
 msgid "Mot de passe actuel"
 msgstr "Current password"
 
-#: app/routes/profile/routes.py:15 app/templates/navbar.html:105
+#: app/routes/profile/routes.py:17 app/templates/navbar.html:126
 msgid "Profil"
 msgstr "Profile"
 
-#: app/routes/profile/routes.py:31
+#: app/routes/profile/routes.py:33
 msgid "Compte modifié avec succès !"
 msgstr "Account successfully modified!"
 
-#: app/routes/profile/routes.py:34
+#: app/routes/profile/routes.py:36
 msgid "Mettre à jour mon compte"
 msgstr "Update my account"
 
-#: app/routes/profile/routes.py:48
+#: app/routes/profile/routes.py:49
+msgid "Préférences modifiées avec succès !"
+msgstr "Preferences successfully modified!"
+
+#: app/routes/profile/routes.py:64
 msgid "Mot de passe mis à jour !"
 msgstr "Password updated!"
 
-#: app/routes/profile/routes.py:51
+#: app/routes/profile/routes.py:67
 msgid "Mot de passe actuel incorrect"
 msgstr "Wrong current password"
 
-#: app/routes/profile/routes.py:53
+#: app/routes/profile/routes.py:69
 msgid "Modifier mon mot de passe"
 msgstr "Change my password"
 
@@ -1464,10 +1827,6 @@ msgstr "Rental start date"
 #: app/routes/rooms/forms.py:15 app/routes/rooms/forms.py:23
 msgid "Fin de la location (optionnel)"
 msgstr "Rental end date (optional)"
-
-#: app/routes/rooms/forms.py:16
-msgid "Enregistrer"
-msgstr "Register"
 
 #: app/routes/rooms/forms.py:30
 msgid "Fin de la location"
@@ -1574,7 +1933,9 @@ msgid "Action réalisée en tant que %(doas)s"
 msgstr "Action done as %(doas)s"
 
 #: app/templates/bar/items.html:233 app/templates/bekk/main.html:121
-#: app/templates/bekk/main.html:177 app/templates/cards/device_modal.html:10
+#: app/templates/bekk/main.html:177 app/templates/calendar/index.html:259
+#: app/templates/calendar/index.html:286 app/templates/calendar/index.html:299
+#: app/templates/cards/device_modal.html:10
 #: app/templates/cards/device_modal.html:65
 #: app/templates/club_q/brochures.html:84
 #: app/templates/club_q/modals/modals_spectacles.html:22
@@ -1588,14 +1949,14 @@ msgstr "Action done as %(doas)s"
 #: app/templates/gris/pceens.html:459 app/templates/gris/pceens.html:470
 #: app/templates/gris/pceens.html:476 app/templates/gris/pceens.html:488
 #: app/templates/gris/pceens.html:494 app/templates/gris/pceens.html:515
-#: app/templates/gris/roles.html:202 app/templates/macros.html:55
-#: app/templates/macros.html:73 app/templates/panier_bio/admin.html:354
+#: app/templates/gris/roles.html:202 app/templates/macros.html:61
+#: app/templates/macros.html:79 app/templates/panier_bio/admin.html:354
 #: app/templates/panier_bio/admin.html:460
 #: app/templates/panier_bio/period.html:193
 #: app/templates/panier_bio/period.html:263
 #: app/templates/payments/main.html:263 app/templates/payments/main.html:272
 #: app/templates/payments/main.html:289 app/templates/payments/main.html:296
-#: app/templates/photos/album.html:264 app/templates/photos/album.html:331
+#: app/templates/photos/album.html:269 app/templates/photos/album.html:336
 #: app/templates/rooms/register.html:70
 msgid "Fermer"
 msgstr "Close"
@@ -1613,46 +1974,34 @@ msgstr "Contact us"
 msgid "Code source"
 msgstr "Source code"
 
-#: app/templates/footer.html:40 app/templates/footer.html:43
-msgid "Thème M3"
-msgstr ""
-
-#: app/templates/footer.html:40 app/templates/footer.html:44
-msgid "Thème Frost"
-msgstr ""
-
-#: app/templates/footer.html:40 app/templates/footer.html:45
-msgid "Thème Classique"
-msgstr ""
-
-#: app/templates/footer.html:51 app/templates/footer.html:54
+#: app/templates/footer.html:41 app/templates/footer.html:44
 #, fuzzy
 msgid "Clair"
 msgstr "Title"
 
-#: app/templates/footer.html:51 app/templates/footer.html:55
+#: app/templates/footer.html:41 app/templates/footer.html:45
 #, fuzzy
 msgid "Sombre"
 msgstr "Room"
 
-#: app/templates/footer.html:51 app/templates/footer.html:56
+#: app/templates/footer.html:41 app/templates/footer.html:46
 #, fuzzy
 msgid "Auto"
 msgstr "Deposit"
 
-#: app/templates/macros.html:37
+#: app/templates/macros.html:43
 msgid "Information :"
 msgstr "Information:"
 
-#: app/templates/macros.html:38
+#: app/templates/macros.html:44
 msgid "Succès :"
 msgstr "Success:"
 
-#: app/templates/macros.html:39
+#: app/templates/macros.html:45
 msgid "Avertissement :"
 msgstr "Warning:"
 
-#: app/templates/macros.html:40
+#: app/templates/macros.html:46
 msgid "Attention :"
 msgstr "Caution:"
 
@@ -1670,43 +2019,37 @@ msgstr "I no longer wish to receive emails"
 msgid "Se désinscrire"
 msgstr "Unsubscribe"
 
-#: app/templates/cards/panier_bio.html:2 app/templates/navbar.html:39
-msgid "Panier Bio"
-msgstr ""
+#: app/templates/navbar.html:33
+msgid "Raccourcis"
+msgstr "Shortcuts"
 
-#: app/templates/navbar.html:46
-#, fuzzy
+#: app/templates/cards/panier_bio.html:2 app/templates/navbar.html:49
+msgid "Panier Bio"
+msgstr "Panier Bio"
+
+#: app/templates/navbar.html:64
 msgid "Théâtre"
-msgstr "Theatre Club"
+msgstr "Theatre"
 
 #: app/templates/auth/auth_needed.html:21 app/templates/auth/login.html:41
-#: app/templates/navbar.html:57
+#: app/templates/navbar.html:75
 msgid "Créer un compte"
 msgstr "Sign up"
 
 #: app/templates/devices/register.html:19
 #: app/templates/devices/transfer.html:19
-#: app/templates/main/connect_check.html:28 app/templates/navbar.html:65
+#: app/templates/main/connect_check.html:28 app/templates/navbar.html:83
 #: app/templates/rooms/register.html:25
 msgid "Internet"
 msgstr "Internet"
 
-#: app/templates/cards/bekk_accueil.html:1 app/templates/navbar.html:73
+#: app/templates/cards/bekk_accueil.html:1 app/templates/navbar.html:91
 msgid "Bekk"
 msgstr "Bekk"
 
-#: app/templates/cards/club_q_accueil.html:1 app/templates/navbar.html:81
+#: app/templates/cards/club_q_accueil.html:1 app/templates/navbar.html:99
 msgid "Club Q"
 msgstr "Q-ulture Club"
-
-#: app/templates/cards/bar.html:5 app/templates/gris/pceens.html:36
-#: app/templates/navbar.html:98
-msgid "Bar"
-msgstr "Bar"
-
-#: app/templates/devices/transfer.html:42 app/templates/navbar.html:110
-msgid "Déconnexion"
-msgstr "Sign out"
 
 #: app/templates/devices/modify.html:55 app/templates/panier_bio/admin.html:31
 #: app/templates/panier_bio/period.html:31
@@ -1933,7 +2276,7 @@ msgstr "Start"
 msgid "Fin"
 msgstr "End"
 
-#: app/templates/bar/export.html:17
+#: app/templates/bar/export.html:17 app/templates/main/manage_banners.html:154
 msgid "Fichier"
 msgstr "File"
 
@@ -1957,7 +2300,7 @@ msgid "N/A"
 msgstr "N/A"
 
 #: app/templates/bar/items.html:126 app/templates/bar/user.html:170
-#: app/templates/bar/user.html:438
+#: app/templates/bar/user.html:442
 msgid "g"
 msgstr ""
 
@@ -1981,8 +2324,8 @@ msgid "Nouvel article || Modifier : _name_"
 msgstr "New item || Edit _name_"
 
 #: app/templates/bar/items.html:296 app/templates/bar/transactions.html:42
-#: app/templates/bar/user.html:242 app/templates/bar/user.html:467
-#: app/templates/bar/user.html:565 app/templates/bar/user.html:591
+#: app/templates/bar/user.html:246 app/templates/bar/user.html:471
+#: app/templates/bar/user.html:573 app/templates/bar/user.html:599
 #: app/templates/bekk/main.html:150 app/templates/bekk/main.html:216
 #: app/templates/club_q/brochures.html:114
 #: app/templates/club_q/modals/modals_spectacles.html:87
@@ -1992,8 +2335,10 @@ msgstr "New item || Edit _name_"
 #: app/templates/club_q/pceens.html:298 app/templates/club_q/saisons.html:367
 #: app/templates/club_q/saisons.html:439 app/templates/club_q/salles.html:318
 #: app/templates/club_q/salles.html:395 app/templates/devices/modify.html:79
+#: app/templates/main/edit_banner.html:45
 #: app/templates/panier_bio/admin.html:538
-#: app/templates/panier_bio/period.html:305 app/templates/theatre/admin.html:90
+#: app/templates/panier_bio/period.html:305 app/templates/photos/album.html:351
+#: app/templates/theatre/admin.html:90
 #: app/templates/theatre/admin_saison.html:98
 #: app/templates/theatre/admin_saison.html:185
 #: app/templates/theatre/admin_spectacle.html:99
@@ -2001,52 +2346,46 @@ msgstr "New item || Edit _name_"
 msgid "Annuler"
 msgstr "Cancel"
 
-#: app/templates/bar/navbar.html:7 app/templates/bar/navbar.html:100
+#: app/templates/bar/navbar.html:8 app/templates/bar/navbar.html:105
 msgid "Menu Bar"
 msgstr "Bar Menu"
 
-#: app/templates/bar/navbar.html:18
-#, fuzzy
+#: app/templates/bar/navbar.html:20
 msgid "Rechercher un utilisateur..."
-msgstr "Search for an user"
+msgstr "Search for a user..."
 
-#: app/templates/bar/navbar.html:20 app/templates/bar/navbar.html:109
+#: app/templates/bar/navbar.html:22 app/templates/bar/navbar.html:114
 #: app/templates/bar/stats.html:124 app/templates/bar/stats.html:262
 msgid "Go"
 msgstr "Go"
 
-#: app/templates/bar/navbar.html:36 app/templates/bar/navbar.html:123
+#: app/templates/bar/navbar.html:38
+msgid "Mon Profil Bar"
+msgstr "My Bar Profile"
+
+#: app/templates/bar/navbar.html:51 app/templates/bar/navbar.html:128
 msgid "Stats"
 msgstr "Stats"
 
-#: app/templates/bar/navbar.html:41 app/templates/bar/navbar.html:128
+#: app/templates/bar/navbar.html:56 app/templates/bar/navbar.html:133
 msgid "Articles"
 msgstr "Items"
 
-#: app/templates/bar/navbar.html:46 app/templates/bar/navbar.html:133
-#: app/templates/bar/transactions.html:21 app/templates/bar/user.html:456
+#: app/templates/bar/navbar.html:61 app/templates/bar/navbar.html:138
+#: app/templates/bar/transactions.html:21 app/templates/bar/user.html:460
 msgid "Transactions"
 msgstr "Transactions"
 
-#: app/templates/bar/navbar.html:52 app/templates/bar/navbar.html:139
-msgid "Outils"
-msgstr "Tools"
-
-#: app/templates/bar/navbar.html:62 app/templates/bar/navbar.html:144
+#: app/templates/bar/navbar.html:78 app/templates/bar/navbar.html:149
 msgid "Exports"
 msgstr "Exports"
 
-#: app/templates/bar/navbar.html:72 app/templates/bar/navbar.html:149
+#: app/templates/bar/navbar.html:88 app/templates/bar/navbar.html:154
 #: app/templates/bar/settings.html:7
 msgid "Paramètres"
 msgstr "Settings"
 
-#: app/templates/bar/navbar.html:84
-#, fuzzy
-msgid "Mon Profil Bar"
-msgstr "My profile"
-
-#: app/templates/bar/navbar.html:108
+#: app/templates/bar/navbar.html:113
 msgid "Rechercher un utilisateur"
 msgstr "Search for an user"
 
@@ -2092,11 +2431,7 @@ msgstr "If empty, you will be redirected to a credit card payment page."
 msgid "Procéder au paiement"
 msgstr "Proceed to payment"
 
-#: app/templates/bar/recharge.html:70
-msgid "Vos informations bancaires ne sont jamais stockées sur nos serveurs."
-msgstr "Your banking information is never stored on our servers."
-
-#: app/templates/bar/recharge.html:78
+#: app/templates/bar/recharge.html:71
 msgid "Retour à mon profil"
 msgstr "Back to my profile"
 
@@ -2120,15 +2455,11 @@ msgstr "Parameter"
 msgid "Valeur"
 msgstr "Value"
 
-#: app/templates/bar/settings.html:38
-msgid "Image de fond"
-msgstr "Background image"
-
-#: app/templates/bar/settings.html:47
+#: app/templates/bar/settings.html:46
 msgid "Parcourir..."
 msgstr ""
 
-#: app/templates/bar/settings.html:49
+#: app/templates/bar/settings.html:48
 #, fuzzy
 msgid "Aucun fichier sélectionné"
 msgstr "No choosen file"
@@ -2142,65 +2473,56 @@ msgid "le "
 msgstr "on "
 
 #: app/templates/bar/stats.html:32
-#, fuzzy
 msgid "Clients"
-msgstr "Rezidents"
+msgstr "Customers"
 
 #: app/templates/bar/stats.html:51 app/templates/bar/stats.html:193
 msgid "Alcool vendu"
 msgstr "Alcohol sold"
 
 #: app/templates/bar/stats.html:55
-#, fuzzy
 msgid "Vendu"
-msgstr "Suspended"
+msgstr "Sold"
 
 #: app/templates/bar/stats.html:70
-#, fuzzy
 msgid "Recette"
-msgstr "Total income"
+msgstr "Income"
 
 #: app/templates/bar/stats.html:74 app/templates/club_q/id/pceen.html:307
 #: app/templates/club_q/id/salle.html:322
 #: app/templates/club_q/id/spectacle.html:264
 #: app/templates/club_q/pceens.html:233
 #: app/templates/club_q/spectacles.html:317
-#, fuzzy
 msgid "Total"
-msgstr "Total:"
+msgstr "Total"
 
 #: app/templates/bar/stats.html:89
-#, fuzzy
 msgid "Moula clients"
-msgstr "Total clients moula"
+msgstr "Total clients balances"
 
 #: app/templates/bar/stats.html:93
-#, fuzzy
 msgid "Somme totale des soldes"
-msgstr "Total clients moula"
+msgstr "Sum of all balances"
 
 #: app/templates/bar/stats.html:108
 msgid "Top client"
-msgstr ""
+msgstr "Top customer"
 
 #: app/templates/bar/stats.html:112 app/templates/bar/stats.html:244
 msgid "Meilleur client du mois"
 msgstr "Best customer of the month"
 
 #: app/templates/bar/stats.html:121
-#, fuzzy
 msgid "Changer de date"
-msgstr "Change room"
+msgstr "Change date"
 
 #: app/templates/bar/stats.html:138
-#, fuzzy
 msgid "Recettes mensuelles"
-msgstr "Total income"
+msgstr "Monthly income"
 
 #: app/templates/bar/stats.html:152
-#, fuzzy
 msgid "Transactions par jour"
-msgstr "Transactions – Bar"
+msgstr "Daily transactions"
 
 #: app/templates/bar/stats.html:210
 msgid "Recette totale"
@@ -2210,52 +2532,52 @@ msgstr "Total income"
 msgid "Moula totale des clients"
 msgstr "Total clients moula"
 
-#: app/templates/bar/transactions.html:36 app/templates/bar/user.html:399
+#: app/templates/bar/transactions.html:36 app/templates/bar/user.html:403
 msgid "Client&middot;e"
 msgstr "Client:"
 
 #: app/templates/bar/transactions.html:38 app/templates/bar/user.html:195
-#: app/templates/bar/user.html:463 app/templates/cards/device.html:19
+#: app/templates/bar/user.html:467 app/templates/cards/device.html:20
 #: app/templates/cards/device_modal.html:20
+#: app/templates/main/manage_banners.html:107
 msgid "Type"
 msgstr "Type"
 
 #: app/templates/bar/transactions.html:39 app/templates/bar/user.html:196
-#: app/templates/bar/user.html:464
+#: app/templates/bar/user.html:468
 msgid "Article"
 msgstr "Item"
 
-#: app/templates/bar/transactions.html:40 app/templates/bar/user.html:465
+#: app/templates/bar/transactions.html:40 app/templates/bar/user.html:469
 #: app/templates/gris/pceens.html:151
 msgid "Balance"
 msgstr "Funds"
 
-#: app/templates/bar/transactions.html:60 app/templates/bar/user.html:208
-#: app/templates/bar/user.html:480
+#: app/templates/bar/transactions.html:64 app/templates/bar/user.html:208
+#: app/templates/bar/user.html:488
 msgid "Conso"
 msgstr "Consumed"
 
-#: app/templates/bar/transactions.html:63 app/templates/bar/user.html:210
-#: app/templates/bar/user.html:483
+#: app/templates/bar/transactions.html:67 app/templates/bar/user.html:210
+#: app/templates/bar/user.html:491
 msgid "Recharge"
 msgstr "Top up"
 
 #: app/templates/bar/user.html:29
-#, fuzzy
 msgid "Profil Bar"
-msgstr "Bar Profile:"
+msgstr "Bar Profile"
 
-#: app/templates/bar/user.html:39 app/templates/bar/user.html:302
-#: app/templates/bar/user.html:590 app/templates/cards/bar.html:38
+#: app/templates/bar/user.html:39 app/templates/bar/user.html:306
+#: app/templates/bar/user.html:598 app/templates/cards/bar.html:38
 msgid "Recharger"
 msgstr "Top up"
 
 #: app/templates/bar/user.html:66 app/templates/bar/user.html:73
-#: app/templates/bar/user.html:337 app/templates/bar/user.html:349
+#: app/templates/bar/user.html:341 app/templates/bar/user.html:353
 msgid "Pas de favori"
 msgstr "No favorite"
 
-#: app/templates/bar/user.html:79 app/templates/bar/user.html:360
+#: app/templates/bar/user.html:79 app/templates/bar/user.html:364
 #, python-format
 msgid "Accepter la caution de %(name)s ?"
 msgstr "Accept %(name)s deposit?"
@@ -2265,7 +2587,7 @@ msgstr "Accept %(name)s deposit?"
 msgid "Valider la caution"
 msgstr "Validate deposit"
 
-#: app/templates/bar/user.html:113 app/templates/bar/user.html:393
+#: app/templates/bar/user.html:113 app/templates/bar/user.html:397
 msgid "GRI tout-puissant"
 msgstr "Almighty GRI"
 
@@ -2274,34 +2596,29 @@ msgstr "Almighty GRI"
 msgid "Client·e"
 msgstr "Client:"
 
-#: app/templates/bar/user.html:126 app/templates/bar/user.html:404
-#: app/templates/cards/account.html:30
-msgid "Email"
-msgstr "Mail"
-
-#: app/templates/bar/user.html:138 app/templates/bar/user.html:413
+#: app/templates/bar/user.html:138 app/templates/bar/user.html:417
 msgid "Externe"
 msgstr "External"
 
-#: app/templates/bar/user.html:148 app/templates/bar/user.html:416
+#: app/templates/bar/user.html:148 app/templates/bar/user.html:420
 msgid "Solde actuel"
-msgstr "Current founds"
+msgstr "Current funds"
 
 #: app/templates/bar/user.html:168
 msgid "Consommation d'alcool"
-msgstr ""
+msgstr "Alcohol consumption"
 
 #: app/templates/bar/user.html:188
-#, fuzzy
 msgid "Historique des transactions"
-msgstr "Order history"
+msgstr "Transaction history"
 
 #: app/templates/bar/user.html:197 app/templates/cards/payment.html:22
 msgid "Montant"
 msgstr "Amount"
 
-#: app/templates/bar/user.html:200 app/templates/panier_bio/main.html:178
-#: app/templates/theatre/admin.html:40
+#: app/templates/bar/user.html:200 app/templates/calendar/admin.html:32
+#: app/templates/main/manage_banners.html:110
+#: app/templates/panier_bio/main.html:178 app/templates/theatre/admin.html:40
 #: app/templates/theatre/admin_saison.html:135
 #, fuzzy
 msgid "Actions"
@@ -2317,15 +2634,15 @@ msgstr "Sign up"
 msgid "Annulée"
 msgstr "Cancel"
 
-#: app/templates/bar/user.html:244
+#: app/templates/bar/user.html:248
 msgid "Annuler cette transaction ?"
 msgstr ""
 
-#: app/templates/bar/user.html:284
+#: app/templates/bar/user.html:288
 msgid "Profil Bar :"
 msgstr "Bar Profile:"
 
-#: app/templates/bar/user.html:311 app/templates/cards/subscription.html:113
+#: app/templates/bar/user.html:315 app/templates/cards/subscription.html:113
 #: app/templates/cards/subscription.html:121
 #: app/templates/cards/subscription.html:128
 #: app/templates/payments/main.html:86 app/templates/payments/main.html:94
@@ -2333,45 +2650,45 @@ msgstr "Bar Profile:"
 msgid "Payer"
 msgstr "Pay"
 
-#: app/templates/bar/user.html:358 app/templates/gris/pceens.html:141
+#: app/templates/bar/user.html:362 app/templates/gris/pceens.html:141
 msgid "Caution"
 msgstr "Deposit"
 
-#: app/templates/bar/user.html:363
+#: app/templates/bar/user.html:367
 msgid "Valider le dépôt de caution"
 msgstr "Validate deposit"
 
-#: app/templates/bar/user.html:369
+#: app/templates/bar/user.html:373
 msgid "Modifier le surnom"
 msgstr "Edit nickname"
 
-#: app/templates/bar/user.html:388 app/templates/gris/roles.html:36
+#: app/templates/bar/user.html:392 app/templates/gris/roles.html:36
 msgid "Rôle"
 msgstr "Role"
 
-#: app/templates/bar/user.html:397
+#: app/templates/bar/user.html:401
 msgid "Observateur"
 msgstr "Observer"
 
-#: app/templates/bar/user.html:432
+#: app/templates/bar/user.html:436
 msgid "Limite d'alcool aujourd’hui"
 msgstr "Alcohol limit today"
 
-#: app/templates/bar/user.html:543
+#: app/templates/bar/user.html:551
 #, python-format
 msgid "Modifier les infos Bar de %(name)s"
 msgstr "Edit %(name)s's Bar info"
 
-#: app/templates/bar/user.html:558
+#: app/templates/bar/user.html:566
 msgid "Nouvel avatar (sera recadré en 160x200 px) :"
 msgstr "New avatar (will be cropped to 160x200px):"
 
-#: app/templates/bar/user.html:579
+#: app/templates/bar/user.html:587
 #, python-format
 msgid "Recharger le compte de %(name)s"
 msgstr "Top up %(name)s's account"
 
-#: app/templates/bar/user.html:586
+#: app/templates/bar/user.html:594
 msgid "Montant en euros"
 msgstr "Amount in euros"
 
@@ -2453,6 +2770,166 @@ msgstr "Edit bekk"
 msgid "Ajouter un bekk"
 msgstr "Add bekk"
 
+#: app/templates/calendar/admin.html:11
+#, fuzzy
+msgid "Administration du Calendrier"
+msgstr "Administration Panier Bio"
+
+#: app/templates/calendar/admin.html:18
+#: app/templates/calendar/admin_club_new.html:11
+#, fuzzy
+msgid "Nouveau Club"
+msgstr "New account"
+
+#: app/templates/calendar/admin.html:25
+#, fuzzy
+msgid "Clubs"
+msgstr "Q-ulture Club"
+
+#: app/templates/calendar/admin.html:49
+#, fuzzy
+msgid "Modifier ce club"
+msgstr "Can be modified in Items tab"
+
+#: app/templates/calendar/admin.html:54
+msgid ""
+"Voulez-vous vraiment supprimer ce club ? Cela supprimera tous ses "
+"évènements associés."
+msgstr ""
+
+#: app/templates/calendar/admin.html:55
+#, fuzzy
+msgid "Supprimer ce club"
+msgstr "Delete current image"
+
+#: app/templates/calendar/admin.html:67
+msgid "Aucun club n'a été créé."
+msgstr ""
+
+#: app/templates/calendar/admin_club_edit.html:11
+#, fuzzy
+msgid "Modifier le Club"
+msgstr "Edit nickname"
+
+#: app/templates/calendar/admin_club_edit.html:33
+#: app/templates/calendar/admin_club_new.html:33
+#, fuzzy
+msgid "Choisir une couleur"
+msgstr "Chose this offer"
+
+#: app/templates/calendar/admin_club_edit.html:34
+#: app/templates/calendar/admin_club_new.html:34
+msgid ""
+"Cette couleur sera utilisée pour afficher les évènements de ce club sur "
+"le calendrier."
+msgstr ""
+
+#: app/templates/calendar/index.html:235
+msgid "Calendrier PCéen"
+msgstr "PCéen Calendar"
+
+#: app/templates/calendar/index.html:243 app/templates/panier_bio/main.html:49
+#: app/templates/panier_bio/period.html:21
+#, fuzzy
+msgid "Administration"
+msgstr "Administration"
+
+#: app/templates/calendar/index.html:263
+#, fuzzy
+msgid "Date & Heure"
+msgstr "Date/time"
+
+#: app/templates/calendar/index.html:267
+#, fuzzy
+msgid "Localisation"
+msgstr "Deposit"
+
+#: app/templates/calendar/index.html:271
+msgid "Organisé par"
+msgstr ""
+
+#: app/templates/calendar/index.html:275
+#, fuzzy
+msgid "À propos"
+msgstr "Grad class"
+
+#: app/templates/calendar/index.html:284 app/templates/calendar/index.html:557
+#, fuzzy
+msgid "Modifier l'évènement"
+msgstr "Edit album"
+
+#: app/templates/calendar/index.html:308 app/templates/calendar/index.html:309
+#, fuzzy
+msgid "Titre de l'évènement"
+msgstr "your subscription page"
+
+#: app/templates/calendar/index.html:324
+#, fuzzy
+msgid "Toute la journée"
+msgstr "Update"
+
+#: app/templates/calendar/index.html:328 app/templates/calendar/index.html:329
+msgid "Club organisateur"
+msgstr ""
+
+#: app/templates/calendar/index.html:330
+msgid "Choisir un club..."
+msgstr ""
+
+#: app/templates/calendar/index.html:338 app/templates/calendar/index.html:339
+msgid "Lieu / Salle"
+msgstr ""
+
+#: app/templates/calendar/index.html:343 app/templates/calendar/index.html:344
+msgid "Détails supplémentaires"
+msgstr ""
+
+#: app/templates/calendar/index.html:349
+#, fuzzy
+msgid "Créer"
+msgstr "Reserve"
+
+#: app/templates/calendar/index.html:351
+#, fuzzy
+msgid "Chargement..."
+msgstr "Min recharge (€)"
+
+#: app/templates/calendar/index.html:409
+#, fuzzy
+msgid "Journée "
+msgstr "days"
+
+#: app/templates/calendar/index.html:411
+msgid "Aujourd'hui"
+msgstr "Today"
+
+#: app/templates/calendar/index.html:413
+msgid "Semaine"
+msgstr "Week"
+
+#: app/templates/calendar/index.html:414
+msgid "Liste"
+msgstr "List"
+
+#: app/templates/calendar/index.html:512
+#, fuzzy
+msgid "Nouvel Évènement"
+msgstr "Renew my subscription"
+
+#: app/templates/calendar/index.html:513
+#, fuzzy
+msgid "Créer l'évènement"
+msgstr "Edit discontent"
+
+#: app/templates/calendar/index.html:537
+msgid "Non spécifié"
+msgstr ""
+
+#: app/templates/calendar/index.html:539
+#, fuzzy
+msgid "Aucune description supplémentaire."
+msgstr "No rental at the moment. "
+
 #: app/templates/cards/account.html:5 app/templates/devices/register.html:10
 #: app/templates/devices/transfer.html:10
 #: app/templates/main/connect_check.html:18
@@ -2481,6 +2958,10 @@ msgstr "Edit an information"
 msgid "Changer de mot de passe"
 msgstr "Change password"
 
+#: app/templates/cards/account.html:70 app/templates/devices/transfer.html:42
+msgid "Déconnexion"
+msgstr "Sign out"
+
 #: app/templates/cards/bar.html:14
 msgid "Mon solde"
 msgstr "Current funds"
@@ -2499,7 +2980,7 @@ msgid "Dépensé aujourd’hui"
 msgstr "Spent today"
 
 #: app/templates/cards/bar.html:35 app/templates/cards/club_q_accueil.html:51
-#: app/templates/cards/device.html:109
+#: app/templates/cards/device.html:121
 msgid "Détails"
 msgstr "Details"
 
@@ -2526,6 +3007,14 @@ msgstr "Bekks"
 #, fuzzy
 msgid "Lire le dernier"
 msgstr "Read last"
+
+#: app/templates/cards/calendar.html:34
+msgid "Aucun évènement prévu."
+msgstr ""
+
+#: app/templates/cards/calendar.html:42
+msgid "Voir le calendrier complet"
+msgstr ""
 
 #: app/templates/cards/club_q.html:21
 #, fuzzy
@@ -2572,49 +3061,59 @@ msgstr "Coming soon"
 msgid "Appareils"
 msgstr "Devices"
 
-#: app/templates/cards/device.html:15 app/templates/cards/device.html:52
+#: app/templates/cards/device.html:16 app/templates/cards/device.html:53
+#: app/templates/cards/device.html:64
 msgid "Appareil actuel"
 msgstr "Actual device"
 
-#: app/templates/cards/device.html:27 app/templates/cards/device_modal.html:30
+#: app/templates/cards/device.html:28 app/templates/cards/device_modal.html:30
 msgid "IP attribuée"
 msgstr "Allocated IP"
 
-#: app/templates/cards/device.html:31 app/templates/cards/device_modal.html:35
+#: app/templates/cards/device.html:32 app/templates/cards/device_modal.html:35
 msgid "Enregistrement"
 msgstr "Register"
 
-#: app/templates/cards/device.html:39 app/templates/cards/device.html:88
+#: app/templates/cards/device.html:40 app/templates/cards/device.html:100
 #: app/templates/cards/device_modal.html:44 app/templates/gris/pceens.html:162
 msgid "Dernière connexion"
 msgstr "Last connection"
 
-#: app/templates/cards/device.html:46 app/templates/cards/device.html:99
+#: app/templates/cards/device.html:47 app/templates/cards/device.html:111
 #: app/templates/cards/device_modal.html:52
 msgid "Jamais"
 msgstr "Never"
 
-#: app/templates/cards/device.html:53
+#: app/templates/cards/device.html:54
+#, fuzzy
+msgid "Appareil non enregistré"
+msgstr "This device is already registered!"
+
+#: app/templates/cards/device.html:57
+msgid "IP locale"
+msgstr ""
+
+#: app/templates/cards/device.html:65
 msgid "[Connexion extérieure]"
 msgstr "[External connection]"
 
-#: app/templates/cards/device.html:57
+#: app/templates/cards/device.html:69
 msgid "(inconnue)"
 msgstr "(unknown)"
 
-#: app/templates/cards/device.html:60
+#: app/templates/cards/device.html:72
 msgid "IP distante"
 msgstr "Remote IP"
 
-#: app/templates/cards/device.html:75
+#: app/templates/cards/device.html:87
 msgid "Autres appareils :"
 msgstr "Other devices:"
 
-#: app/templates/cards/device.html:76
+#: app/templates/cards/device.html:88
 msgid "Appareils :"
 msgstr "Devices:"
 
-#: app/templates/cards/device.html:136
+#: app/templates/cards/device.html:148
 msgid "Nouvel appareil"
 msgstr "New device"
 
@@ -2625,6 +3124,35 @@ msgstr "New device"
 #: app/templates/rooms/register.html:22
 msgid "Appareil"
 msgstr "Device"
+
+#: app/templates/cards/info.html:3
+#, fuzzy
+msgid "Informations"
+msgstr "Informations: "
+
+#: app/templates/cards/info.html:15 app/templates/main/manage_banners.html:126
+#, fuzzy
+msgid "Texte"
+msgstr "TEST"
+
+#: app/templates/cards/info.html:19 app/templates/main/manage_banners.html:130
+#, fuzzy
+msgid "Image"
+msgstr "Image : "
+
+#: app/templates/cards/info.html:32
+#, fuzzy
+msgid "autre(s) bannière(s)"
+msgstr "Other devices"
+
+#: app/templates/cards/info.html:42
+msgid "Aucune bannière configurée."
+msgstr ""
+
+#: app/templates/cards/info.html:50
+#, fuzzy
+msgid "Gérer les bannières"
+msgstr "Export data"
 
 #: app/templates/cards/offer.html:5 app/templates/payments/main.html:196
 #: app/templates/payments/main.html:215 app/templates/payments/main.html:261
@@ -2683,9 +3211,29 @@ msgstr "Collections"
 msgid "Albums"
 msgstr "Albums"
 
-#: app/templates/cards/photos.html:29
+#: app/templates/cards/photos.html:29 app/templates/photos/collection.html:191
 msgid "Voir les photos"
 msgstr "View photos"
+
+#: app/templates/cards/preferences.html:5
+msgid "Préférences"
+msgstr "Preferences"
+
+#: app/templates/cards/preferences.html:23
+msgid "Thème"
+msgstr "Theme"
+
+#: app/templates/cards/preferences.html:26
+msgid "M3"
+msgstr "M3"
+
+#: app/templates/cards/preferences.html:27
+msgid "Frost"
+msgstr "Frost"
+
+#: app/templates/cards/preferences.html:28
+msgid "Classique"
+msgstr "Classic"
 
 #: app/templates/cards/profile.html:5
 msgid "Mon profil"
@@ -2812,14 +3360,12 @@ msgid "Ajouter une plaquette"
 msgstr "Add a brochure"
 
 #: app/templates/club_q/common.html:24
-#, fuzzy
 msgid "Réservations"
-msgstr "My bookings"
+msgstr "Reservations"
 
 #: app/templates/club_q/common.html:31
-#, fuzzy
 msgid "Mes réservations"
-msgstr "My bookings"
+msgstr "My reservations"
 
 #: app/templates/club_q/common.html:39 app/templates/club_q/saisons.html:149
 #: app/templates/gris/menu.html:10
@@ -2829,18 +3375,17 @@ msgstr "PCéens"
 #: app/templates/club_q/common.html:47 app/templates/club_q/saisons.html:167
 #: app/templates/theatre/admin_saison.html:116
 msgid "Spectacles"
-msgstr "Spectacles"
+msgstr "Shows"
 
 #: app/templates/club_q/common.html:54
 msgid "Salles"
-msgstr "Locations"
+msgstr "Venues"
 
 #: app/templates/club_q/common.html:62 app/templates/club_q/saisons.html:185
 msgid "Voeux"
 msgstr "Wishes"
 
 #: app/templates/club_q/common.html:70
-#, fuzzy
 msgid "Saisons"
 msgstr "Seasons"
 
@@ -2849,19 +3394,16 @@ msgid "Plaquettes"
 msgstr "Brochures"
 
 #: app/templates/club_q/common.html:85
-#, fuzzy
 msgid "Attribution"
-msgstr "Attribution"
+msgstr "Allocation"
 
 #: app/templates/club_q/common.html:92
-#, fuzzy
 msgid "Mails"
-msgstr "Mails"
+msgstr "Emails"
 
 #: app/templates/club_q/common.html:99
-#, fuzzy
 msgid "Options"
-msgstr "Settings"
+msgstr "Options"
 
 #: app/templates/club_q/mails.html:3
 msgid "Envoi des mails d'attribution : "
@@ -2876,23 +3418,20 @@ msgid " au "
 msgstr " to the "
 
 #: app/templates/club_q/main.html:62
-#, fuzzy
 msgid "Version détaillée"
-msgstr "Detailed message"
+msgstr "Detailed version"
 
 #: app/templates/club_q/main.html:69
-#, fuzzy
 msgid "Version compacte"
-msgstr "My account"
+msgstr "Compact version"
 
 #: app/templates/club_q/main.html:80
 msgid "Lire la plaquette"
 msgstr "Read brochure"
 
 #: app/templates/club_q/main.html:120
-#, fuzzy
 msgid "Nombre de places"
-msgstr "No. of wanted seats"
+msgstr "Number of seats"
 
 #: app/templates/club_q/main.html:143 app/templates/club_q/main.html:346
 #, fuzzy
@@ -3285,9 +3824,9 @@ msgstr ""
 #: app/templates/club_q/mails/reservation.html:58
 #, fuzzy
 msgid ""
-"Par chèque à l’ordre du « BDE Physique Chimie Paris Club Q » (une "
-"enveloppe dédiée est accrochée sur la porte du local BDE au foyer). Au "
-"dos mets-y <b>Prénom-Nom-Promo-Saison/spectacles</b>."
+"Par chèque à l’ordre du « BDE ESPCI Paris-PSL Club Q » (une enveloppe "
+"dédiée est accrochée sur la porte du local BDE au foyer). Au dos mets-y "
+"<b>Prénom-Nom-Promo-Saison/spectacles</b>."
 msgstr ""
 "By cheque with the order 'BDE Physique Chimie Paris Club Q'. You can "
 "deposit it in an enveloppe in the student building. On the back you "
@@ -3888,8 +4427,7 @@ msgstr "Outlaw"
 msgid "Bannir _name_ || Ban de _name_"
 msgstr "Ban _name_ || Ban of _name_"
 
-#: app/templates/gris/pceens.html:560 app/templates/photos/album.html:314
-#: app/templates/photos/album.html:350
+#: app/templates/gris/pceens.html:560 app/templates/photos/album.html:319
 msgid "En fait non"
 msgstr "Actually, no"
 
@@ -3989,6 +4527,85 @@ msgstr ""
 "<em>If you don't want to stay in touch with the ESPCI community, no "
 "problem: this is the last email we will send you if your account remains "
 "inactive.</em>"
+
+#: app/templates/main/_banner_form_fields.html:25
+msgid ""
+"Un preset définit les couleurs et l'icône par défaut. Vous pouvez "
+"toujours personnaliser ci-dessous."
+msgstr ""
+
+#: app/templates/main/_banner_form_fields.html:25
+msgid "Un preset définit les couleurs et l'icône par défaut."
+msgstr ""
+
+#: app/templates/main/_banner_form_fields.html:32
+msgid "Une icône personnalisée (prioritaire sur le preset)."
+msgstr ""
+
+#: app/templates/main/_banner_form_fields.html:32
+msgid "Prioritaire sur l'icône du preset."
+msgstr ""
+
+#: app/templates/main/_banner_form_fields.html:38
+#: app/templates/main/_banner_form_fields.html:43
+#, fuzzy
+msgid "Texte de l'annonce..."
+msgstr "Testing connection..."
+
+#: app/templates/main/_banner_form_fields.html:78
+#, fuzzy
+msgid "Image de fond (optionnel)"
+msgstr "End date (optional)"
+
+#: app/templates/main/_banner_form_fields.html:86
+#: app/templates/main/_banner_form_fields.html:105
+msgid "Laissez vide pour conserver l'image actuelle. Max 10 Mo."
+msgstr "Leave empty to keep the current image. Max 10 MB."
+
+#: app/templates/main/_banner_form_fields.html:86
+msgid ""
+"Une image de fond sera affichée sous un overlay semi-transparent de la "
+"couleur choisie."
+msgstr ""
+"A background image will be displayed under a semi-transparent overlay of "
+"the chosen color."
+
+#: app/templates/main/_banner_form_fields.html:105
+msgid "Recommandé : image au format paysage (ex. 21:9). Max 10 Mo."
+msgstr "Recommended: landscape format image (e.g. 21:9). Max 10 MB."
+
+#: app/templates/main/_banner_form_fields.html:111
+#: app/templates/main/manage_presets.html:137
+msgid "Aperçu en direct"
+msgstr "Live preview"
+
+#: app/templates/main/_banner_form_fields.html:137
+msgid "Aperçu de l'image"
+msgstr "Image preview"
+
+#: app/templates/main/_banner_form_fields.html:146
+msgid "Action au clic (optionnel)"
+msgstr "Click action (optional)"
+
+#: app/templates/main/_banner_form_fields.html:147
+msgid ""
+"Configurez ce qui se passe quand on clique sur la bannière (redirection "
+"vers un lien OU téléchargement d'un fichier)."
+msgstr ""
+"Configure what happens when the banner is clicked (redirection to a link "
+"OR downloading a file)."
+
+#: app/templates/main/_banner_form_fields.html:170
+msgid "Fichier joint actuellement"
+msgstr "Currently attached file"
+
+#: app/templates/main/_banner_form_fields.html:181
+msgid "Sélectionnez un nouveau fichier pour remplacer l'existant. Max 10 Mo."
+msgstr "Select a new file to replace the existing one. Max 10 MB."
+
+#: app/templates/main/_banner_form_fields.html:181
+msgid "Fichier à télécharger (PDF, image, etc.). Max 10 Mo."
+msgstr "File to download (PDF, image, etc.). Max 10 MB."
 
 #: app/templates/main/banned.html:18
 msgid ""
@@ -4347,12 +4964,32 @@ msgstr ""
 "Please especially feel free to contact us to remind us to update this "
 "list. We'll 100 %% forget."
 
-#: app/templates/main/index.html:7
+#: app/templates/main/edit_banner.html:29
+#, fuzzy
+msgid "Retour à la gestion"
+msgstr "Edit season"
+
+#: app/templates/main/edit_banner.html:32
+#, fuzzy
+msgid "Modifier la bannière"
+msgstr "Edit season"
+
+#: app/templates/main/index.html:54
+#, fuzzy
+msgid "Télécharger :"
+msgstr "Download"
+
+#: app/templates/main/index.html:59
+#, fuzzy
+msgid "En savoir plus"
+msgstr "For more information:"
+
+#: app/templates/main/index.html:98
 #, python-format
 msgid "Bonjour, %(name)s !"
 msgstr "Hello, %(name)s!"
 
-#: app/templates/main/index.html:12
+#: app/templates/main/index.html:103
 #, fuzzy
 msgid ""
 "Bienvenue sur PC est magique ! Ce portail a pour ambition de réunir le "
@@ -4366,11 +5003,11 @@ msgstr ""
 "Rezidence tenants, and soon PhD students): photos, Bar site, access to "
 "Internet at the Rezidence (old IntraRez), soon Club Q wishes..."
 
-#: app/templates/main/index.html:21
+#: app/templates/main/index.html:112
 msgid "Une idée, un commentaire ? N'hésitez pas à "
 msgstr "An idea, a comment? Do not hesitate to "
 
-#: app/templates/main/index.html:22
+#: app/templates/main/index.html:113
 msgid "nous en faire part"
 msgstr "tell us about it"
 
@@ -4407,6 +5044,128 @@ msgstr "Contact us"
 #: app/templates/main/legal.html:35
 msgid "pour toute question relative à la gestion de vos données."
 msgstr "for every question about the management of your data."
+
+#: app/templates/main/manage_banners.html:48
+msgid "Retour à l'accueil"
+msgstr "Back to home"
+
+#: app/templates/main/manage_banners.html:51
+msgid "Gestion des bannières d'information"
+msgstr "Information banners management"
+
+#: app/templates/main/manage_banners.html:54
+msgid "Gérer les presets"
+msgstr "Manage presets"
+
+#: app/templates/main/manage_banners.html:69
+msgid "Ajouter une bannière"
+msgstr "Add a banner"
+
+#: app/templates/main/manage_banners.html:94
+msgid "Bannières actives"
+msgstr "Active banners"
+
+#: app/templates/main/manage_banners.html:97
+msgid "bannière(s)"
+msgstr "banner(s)"
+
+#: app/templates/main/manage_banners.html:106
+msgid "Ordre"
+msgstr "Order"
+
+#: app/templates/main/manage_banners.html:108
+msgid "Titre / Contenu"
+msgstr "Title / Content"
+
+#: app/templates/main/manage_banners.html:109
+msgid "Lien/Fichier"
+msgstr "Link/File"
+
+#: app/templates/main/manage_banners.html:117
+msgid "Glisser pour réorganiser"
+msgstr "Drag to reorder"
+
+#: app/templates/main/manage_banners.html:150
+msgid "Lien"
+msgstr "Link"
+
+#: app/templates/main/manage_banners.html:164
+msgid "Modifier cette bannière"
+msgstr "Edit this banner"
+
+#: app/templates/main/manage_banners.html:169
+msgid "Êtes-vous sûr de vouloir supprimer cette bannière ?"
+msgstr "Are you sure you want to delete this banner?"
+
+#: app/templates/main/manage_banners.html:170
+msgid "Supprimer cette bannière"
+msgstr "Delete this banner"
+
+#: app/templates/main/manage_banners.html:186
+msgid "Aucune bannière pour le moment."
+msgstr "No banner at the moment."
+
+#: app/templates/main/manage_banners.html:199
+msgid "Configuration globale du carrousel"
+msgstr "Global carousel configuration"
+
+#: app/templates/main/manage_banners.html:218
+msgid ""
+"Détermine le temps d'attente (en secondes) avant que la bannière suivante"
+" ne s'affiche automatiquement."
+msgstr ""
+"Determines the wait time (in seconds) before the next banner is displayed"
+" automatically."
+
+#: app/templates/main/manage_presets.html:42
+msgid "Retour à la gestion des bannières"
+msgstr "Back to banners management"
+
+#: app/templates/main/manage_presets.html:45
+msgid "Presets de style de bannière"
+msgstr "Banner style presets"
+
+#: app/templates/main/manage_presets.html:59
+#: app/templates/main/manage_presets.html:440
+msgid "Nouveau preset"
+msgstr "New preset"
+
+#: app/templates/main/manage_presets.html:123
+msgid "Image de fond sous un overlay de la couleur choisie."
+msgstr "Background image under an overlay of the chosen color."
+
+#: app/templates/main/manage_presets.html:146
+#: app/templates/main/manage_presets.html:340
+msgid "Aperçu du preset"
+msgstr "Preset preview"
+
+#: app/templates/main/manage_presets.html:147
+msgid "Texte de la bannière"
+msgstr "Banner text"
+
+#: app/templates/main/manage_presets.html:159
+msgid "Annuler la modification"
+msgstr "Cancel edit"
+
+#: app/templates/main/manage_presets.html:175
+msgid "Presets existants"
+msgstr "Existing presets"
+
+#: app/templates/main/manage_presets.html:177
+msgid "preset(s)"
+msgstr "preset(s)"
+
+#: app/templates/main/manage_presets.html:232
+msgid "Supprimer ce preset ?"
+msgstr "Delete this preset?"
+
+#: app/templates/main/manage_presets.html:246
+msgid "Aucun preset pour le moment."
+msgstr "No preset at the moment."
+
+#: app/templates/main/manage_presets.html:423
+msgid "Modifier le preset"
+msgstr "Edit preset"
 
 #: app/templates/panier_bio/admin.html:21
 #: app/templates/panier_bio/period.html:49
@@ -4486,12 +5245,6 @@ msgstr "Add an order"
 #, fuzzy
 msgid "Editer commande"
 msgstr "Edit order"
-
-#: app/templates/panier_bio/main.html:49
-#: app/templates/panier_bio/period.html:21
-#, fuzzy
-msgid "Administration"
-msgstr "Administration"
 
 #: app/templates/panier_bio/main.html:56
 msgid ""
@@ -5165,44 +5918,44 @@ msgstr ""
 "If you stay at the Rezidence, no point in waiting: you can take your new "
 "subscription now or in a month, it will either way start on %(date)s."
 
-#: app/templates/photos/album.html:75
+#: app/templates/photos/album.html:80
 msgid "Album masqué"
 msgstr "Album hidden"
 
-#: app/templates/photos/album.html:82 app/templates/photos/album.html:217
+#: app/templates/photos/album.html:86 app/templates/photos/album.html:219
 msgid "Miniature actuelle"
 msgstr "Current thumbnail"
 
-#: app/templates/photos/album.html:83
+#: app/templates/photos/album.html:86
 msgid "Nouvelle miniature de la collection"
 msgstr "New collection's thumbnail"
 
-#: app/templates/photos/album.html:120 app/templates/photos/collection.html:175
+#: app/templates/photos/album.html:120 app/templates/photos/collection.html:186
 #: app/templates/photos/main.html:51
 msgid "photo"
 msgstr "photo"
 
-#: app/templates/photos/album.html:147 app/templates/photos/collection.html:97
+#: app/templates/photos/album.html:147 app/templates/photos/collection.html:103
 msgid "Arrêter de modifier"
 msgstr "Stop editing"
 
-#: app/templates/photos/album.html:221
+#: app/templates/photos/album.html:223
 msgid "Nouvelle miniature"
 msgstr "New thumbnail"
 
-#: app/templates/photos/album.html:238
+#: app/templates/photos/album.html:242
 msgid "Ajouter des photos"
 msgstr "Add photos"
 
-#: app/templates/photos/album.html:250
+#: app/templates/photos/album.html:254 app/templates/photos/album.html:348
 msgid "Signaler"
 msgstr "Report"
 
-#: app/templates/photos/album.html:328 app/templates/photos/album.html:347
+#: app/templates/photos/album.html:334
 msgid "Signaler un problème"
 msgstr "Report an issue"
 
-#: app/templates/photos/album.html:336
+#: app/templates/photos/album.html:341
 msgid ""
 "Un problème avec cette photo ? Elle porte atteinte à votre image et vous "
 "souhaitez la supprimer, ou simplement une information est erronnée ? "
@@ -5211,24 +5964,29 @@ msgstr ""
 "An issue with this picture? It affects your image and you want to delete "
 "it, or it simply has an erroneous info? Tell us!"
 
-#: app/templates/photos/album.html:345
+#: app/templates/photos/album.html:347
 #, python-format
 msgid "Problème avec la photo : %(path)s/__photo__"
 msgstr "Issue with photo: %(path)s/__photo__"
 
-#: app/templates/photos/collection.html:41
+#: app/templates/photos/collection.html:48
 msgid "Collection masquée"
 msgstr "Hidden collection"
 
-#: app/templates/photos/collection.html:70 app/templates/photos/main.html:50
+#: app/templates/photos/collection.html:76 app/templates/photos/main.html:50
 msgid "album"
 msgstr "album"
 
 #: app/templates/photos/collection.html:156
+#, fuzzy
+msgid "PAS DE PHOTO"
+msgstr "Add photos"
+
+#: app/templates/photos/collection.html:165
 msgid "Album non visible"
 msgstr "Album not visible"
 
-#: app/templates/photos/collection.html:207
+#: app/templates/photos/collection.html:224
 msgid ""
 "Il est maintenant possible de créer un album (puis d'y ajouter des "
 "photos) directement depuis l'app :"
@@ -5241,12 +5999,20 @@ msgid "collection"
 msgstr "collection"
 
 #: app/templates/photos/main.html:12
+msgid "visibles"
+msgstr "visible"
+
+#: app/templates/photos/main.html:12
 msgid "visible"
 msgstr "visible"
 
 #: app/templates/photos/main.html:30
 msgid "Collection non visible"
 msgstr "Collection not visible"
+
+#: app/templates/photos/main.html:54
+msgid "Voir les albums"
+msgstr "View albums"
 
 #: app/templates/rooms/register.html:37
 msgid ""
@@ -5552,7 +6318,7 @@ msgstr "Creation of a new show"
 msgid "Offre Internet à la Rez :"
 msgstr "Rezidence Internet offer:"
 
-#: app/utils/lydia.py:171
+#: app/utils/lydia.py:169
 msgid "Signature invalide, impossible de valider le paiement"
 msgstr "Invalid signature, unable to validate payment"
 
@@ -5577,73 +6343,73 @@ msgstr "The value differ from the previous field."
 msgid "Valeur incohérente avec le champ %(field)s."
 msgstr "Value inconsistent with field %(field)s."
 
-#: app/utils/validators.py:71
+#: app/utils/validators.py:74
 msgid "Adresse MAC invalide (format attendu : xx:xx:xx:xx:xx:xx)."
 msgstr "Invalid MAC address (expected format: xx:xx:xx:xx:xx:xx)."
 
-#: app/utils/validators.py:81
+#: app/utils/validators.py:84
 #, python-format
 msgid "Doit faire moins de %(max)d caractères."
 msgstr "Must be less than %(max)d characters long."
 
-#: app/utils/validators.py:83
+#: app/utils/validators.py:86
 #, python-format
 msgid "Doit faire au moins %(min)d caractères."
 msgstr "Must be at least %(min)d characters long."
 
-#: app/utils/validators.py:85
+#: app/utils/validators.py:88
 #, python-format
 msgid "Doit faire entre %(min)d et %(max)d caractères."
 msgstr "Must be between %(min)d and %(max)d characters."
 
-#: app/utils/validators.py:100
+#: app/utils/validators.py:103
 #, python-format
 msgid "Doit être inférieur à %(max)f."
 msgstr "Must be lower than %(max)f."
 
-#: app/utils/validators.py:102
+#: app/utils/validators.py:105
 #, python-format
 msgid "Doit être supérieur à %(min)f."
 msgstr "Must be higher than %(min)f."
 
-#: app/utils/validators.py:104
+#: app/utils/validators.py:107
 #, python-format
 msgid "Doit être entre %(min)f et %(max)f."
 msgstr "Must be between %(min)f and %(max)f."
 
-#: app/utils/validators.py:109
+#: app/utils/validators.py:112
 msgid "Adresse e-mail déjà liée à un autre compte."
 msgstr "Mail address already linked to an account."
 
-#: app/utils/validators.py:117
+#: app/utils/validators.py:120
 msgid "PCeen ID invalide."
 msgstr "Invalid PCéen ID."
 
-#: app/utils/validators.py:124
+#: app/utils/validators.py:127
 msgid "Numéro de chambre invalide."
 msgstr "Invalid room number."
 
-#: app/utils/validators.py:131
+#: app/utils/validators.py:134
 msgid "Ban ID invalide."
 msgstr "Invalid Ban ID."
 
-#: app/utils/validators.py:138
+#: app/utils/validators.py:141
 msgid "Cette date doit être dans le passé !"
 msgstr "This date must be in the past!"
 
-#: app/utils/validators.py:147
+#: app/utils/validators.py:150
 msgid "Cette date doit être dans le futur !"
 msgstr "This date must be in the future!"
 
-#: app/utils/validators.py:156
+#: app/utils/validators.py:159
 msgid "Numéro de téléphone invalide (il doit être français)."
 msgstr "Invalid phone number (must be a French one)."
 
-#: app/utils/validators.py:164
+#: app/utils/validators.py:167
 msgid "Il existe déjà un article avec ce nom."
 msgstr "An item with this name already exists."
 
-#: app/utils/validators.py:172
+#: app/utils/validators.py:175
 msgid "Item ID invalide."
 msgstr "Invalid item ID."
 
@@ -6110,4 +6876,13 @@ msgstr "Invalid item ID."
 
 #~ msgid "Configuration des périodes"
 #~ msgstr "Period configuration"
+
+#~ msgid "Thème M3"
+#~ msgstr ""
+
+#~ msgid "Thème Frost"
+#~ msgstr ""
+
+#~ msgid "Thème Classique"
+#~ msgstr ""
 

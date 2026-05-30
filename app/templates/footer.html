@@ -36,16 +36,6 @@
                     </a>
                 </div>
                 <div class="mx-3 mb-2 dropup">
-                    <a class="link-secondary dropdown-toggle text-decoration-none" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-palette me-1"></i> {{ _("Thème M3") if g.theme == 'material' else (_("Thème Frost") if g.theme == 'frost' else _("Thème Classique")) }}
-                    </a>
-                    <ul class="dropdown-menu shadow-sm border-0">
-                        <li><a class="dropdown-item {{ 'active' if g.theme == 'material' else '' }}" href="{{ url_for('main.set_theme', theme='material') }}">{{ _("Thème M3") }}</a></li>
-                        <li><a class="dropdown-item {{ 'active' if g.theme == 'frost' else '' }}" href="{{ url_for('main.set_theme', theme='frost') }}">{{ _("Thème Frost") }}</a></li>
-                        <li><a class="dropdown-item {{ 'active' if g.theme == 'classic' else '' }}" href="{{ url_for('main.set_theme', theme='classic') }}">{{ _("Thème Classique") }}</a></li>
-                    </ul>
-                </div>
-                <div class="mx-3 mb-2 dropup">
                     <a class="link-secondary dropdown-toggle text-decoration-none" href="#" id="modeDropdownBtn" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas {{ 'fa-sun' if g.mode == 'light' else ('fa-moon' if g.mode == 'dark' else 'fa-desktop') }} me-1"></i> 
                         {{ _("Clair") if g.mode == 'light' else (_("Sombre") if g.mode == 'dark' else _("Auto")) }}

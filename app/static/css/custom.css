@@ -31,7 +31,7 @@ html[data-theme="dark"] a[rel="external"]::after {
     --hover-shadow: 0 0.8rem 2rem rgba(0,0,0,.12);
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease-in-out;
 }
-.hover-lift:hover {
+.hover-lift:hover, .hover-lift:focus-within {
     transform: translateY(-4px) scale(1.01);
     box-shadow: var(--hover-shadow);
 }
@@ -73,9 +73,14 @@ html[data-theme="dark"] {
     content: ''; position: fixed; inset: 0; backdrop-filter: blur(60px); z-index: -1; pointer-events: none;
 }
 .theme-frost .glass-navbar {
-    background-color: rgba(255, 255, 255, 0.65) !important;
-    backdrop-filter: blur(20px) saturate(150%) !important;
+    background-color: transparent !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+}
+.theme-frost .glass-navbar::before {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background-color: rgba(255, 255, 255, 0.55);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    backdrop-filter: blur(24px) saturate(200%);
 }
 
 html[data-theme="dark"] .theme-frost {
@@ -84,7 +89,10 @@ html[data-theme="dark"] .theme-frost {
                       radial-gradient(circle at 85% 30%, rgba(180, 0, 100, 0.25), transparent 50%);
 }
 html[data-theme="dark"] .theme-frost .glass-navbar {
-    background-color: rgba(15, 20, 30, 0.5) !important; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: transparent !important; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+html[data-theme="dark"] .theme-frost .glass-navbar::before {
+    background-color: rgba(15, 20, 30, 0.45);
 }
 html[data-theme="dark"] .theme-frost .bg-body-tertiary {
     background-color: rgba(15, 23, 42, 0.8) !important; backdrop-filter: blur(8px);
@@ -151,10 +159,12 @@ html[data-theme="dark"] .nav-active-indicator {
         border: none !important;
     }
 }
-.theme-frost :is(.offcanvas, .offcanvas-md) { background-color: rgba(255, 255, 255, 0.8) !important; backdrop-filter: blur(20px); border-left-color: rgba(255, 255, 255, 0.5) !important; }
+.theme-frost :is(.offcanvas, .offcanvas-md) { background-color: rgba(255, 255, 255, 0.55) !important; -webkit-backdrop-filter: blur(24px) saturate(200%); backdrop-filter: blur(24px) saturate(200%); border-left-color: rgba(255, 255, 255, 0.5) !important; }
 html[data-theme="dark"] .theme-material :is(.offcanvas, .offcanvas-md) { background-color: #1e2028 !important; color: #f8fafc !important; border-left-color: #2c2f3a !important; }
-html[data-theme="dark"] .theme-frost :is(.offcanvas, .offcanvas-md) { background-color: rgba(15, 23, 42, 0.9) !important; color: #f8fafc !important; backdrop-filter: blur(20px); border-left-color: rgba(255, 255, 255, 0.1) !important; }
+html[data-theme="dark"] .theme-frost :is(.offcanvas, .offcanvas-md) { background-color: rgba(15, 20, 30, 0.45) !important; color: #f8fafc !important; -webkit-backdrop-filter: blur(24px) saturate(200%); backdrop-filter: blur(24px) saturate(200%); border-left-color: rgba(255, 255, 255, 0.1) !important; }
 html[data-theme="dark"] :is(.theme-material, .theme-frost) .offcanvas-header { border-bottom-color: rgba(255, 255, 255, 0.15) !important; }
+.theme-frost .offcanvas-backdrop.show { opacity: 0.2 !important; }
+html[data-theme="dark"] .theme-frost .offcanvas-backdrop.show { opacity: 0.3 !important; }
 
 /* =============================================
     COMPONENTS (CARDS, MODALS, TOASTS, BADGES)

@@ -224,17 +224,22 @@ from app import db
 
 def _get_locale() -> str | None:
     """Get the application language preferred by the remote user."""
-    locale = flask.request.accept_languages.best_match(flask.current_app.config["LANGUAGES"])
+    languages = flask.current_app.config["LANGUAGES"]
     try:
-        if flask.g.logged_in and locale != flask.g.logged_in_user.locale:
-            # Do not use flask.g.pceen here, it would override user locale
-            # by the locale of a GRI using doas
-            flask.g.logged_in_user.locale = locale
-            db.session.commit()
+        if flask.g.logged_in:
+            if flask.g.logged_in_user.locale in languages:
+                return flask.g.logged_in_user.locale
+            
+            # If no valid locale is set, populate from browser headers
+            locale = flask.request.accept_languages.best_match(languages)
+            if locale != flask.g.logged_in_user.locale:
+                flask.g.logged_in_user.locale = locale
+                db.session.commit()
+            return locale
     except AttributeError:
         pass  # g.logged_in not yet set (called before context setup)
 
-    return locale
+    return flask.request.accept_languages.best_match(languages)
 
 
 # Set up user loader

@@ -20,6 +20,17 @@ class AccountModificationForm(FlaskForm):
     submit = wtforms.SubmitField(_l("Mettre à jour"))
 
 
+class PreferencesModificationForm(FlaskForm):
+    """WTForm used to modify the preferences of a PCéen."""
+
+    locale = wtforms.SelectField(
+        _l("Langue"),
+        choices=[("fr", "Français"), ("en", "English")],
+        validators=[DataRequired()],
+    )
+    submit = wtforms.SubmitField(_l("Mettre à jour"))
+
+
 class PasswordUpdateForm(FlaskForm):
     """WTForm used to update the password of a PCéen."""
 

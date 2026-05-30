@@ -1,11 +1,11 @@
 <nav class="navbar navbar-expand-md 
 {% if g.theme == 'classic' %}
-    navbar-light mb-4 py-0 shadow bg-gradient bg-{{ 'danger' if hasattr(g, '_ban') or (hasattr(g, 'pceen') and g.pceen.is_banned) else 'primary' }}
+    navbar-light mb-4 py-2 shadow bg-gradient bg-{{ 'danger' if hasattr(g, '_ban') or (hasattr(g, 'pceen') and g.pceen.is_banned) else 'primary' }}
 {% elif g.theme == 'frost' %}
     {% if hasattr(g, '_ban') or (hasattr(g, 'pceen') and g.pceen.is_banned) %}
-        navbar-dark mb-4 py-0 shadow-sm bg-danger sticky-top
+        navbar-dark mb-4 py-2 shadow-sm bg-danger sticky-top
     {% else %}
-        navbar-light mb-4 py-0 shadow-sm glass-navbar sticky-top
+        navbar-light mb-4 py-2 shadow-sm glass-navbar sticky-top
     {% endif %}
 {% else %}
     {% if hasattr(g, '_ban') or (hasattr(g, 'pceen') and g.pceen.is_banned) %}

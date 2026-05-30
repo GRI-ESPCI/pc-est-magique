@@ -9,7 +9,7 @@
 </div>
 <div class="row">
     <div class="col"><p>
-        {{ macros.s(len(collections), _("collection")) }}, {{ macros.s(len(collections), _("visible")) }}
+        {{ macros.s(len(collections), _("collection")) }}, {{ len(collections) }} {% if len(collections) > 1 %}{{ _("visibles") }}{% else %}{{ _("visible") }}{% endif %}
     </p></div>
 </div>
 <div class="row row-cols g-2">
@@ -51,7 +51,7 @@
                         {{ macros.s(collection.nb_photos, _("photo")) }}
                     </p>
                     <div class="d-flex align-items-center">
-                        <a href="{{ url }}" class="btn btn-primary btn-sm px-4 fw-semibold rounded-pill">Voir les albums</a>
+                        <a href="{{ url }}" class="btn btn-primary btn-sm px-4 fw-semibold rounded-pill">{{ _("Voir les albums") }}</a>
                         {% if has_permission(PermissionType.write, PermissionScope.collection, elem=collection) %}
                         <a href="{{ url }}?edit" class="btn btn-pc5 ms-auto"
                            title="{{ _("Modifier") }}">

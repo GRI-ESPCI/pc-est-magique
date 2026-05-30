@@ -1,0 +1,32 @@
+{# Preferences card - used variables: pceen #}
+{% extends "cards/base.html" %}
+
+{% block card_title %}
+{{ _("Préférences") }}
+{% endblock %}
+
+{% block card_icon %}
+{{ macros.bootstrap_icon("sliders") }}
+{% endblock %}
+
+{% block card_table %}
+<tr>
+    <th scope="row" class="ps-4 align-middle">{{ _("Langue") }}</th>
+    <td>
+        <form action="{{ url_for('profile.modify_preferences', next=request.endpoint, doas=doas) }}" method="post" class="m-0">
+            {{ pref_form.hidden_tag() }}
+            {{ pref_form.locale(class="form-select form-select-sm w-auto", onchange="this.form.submit()") }}
+        </form>
+    </td>
+</tr>
+<tr>
+    <th scope="row" class="ps-4 align-middle">{{ _("Thème") }}</th>
+    <td>
+        <select class="form-select form-select-sm w-auto" onchange="window.location.href='{{ url_for('main.set_theme', theme='__THEME__', next=request.endpoint) }}'.replace('__THEME__', this.value)">
+            <option value="material" {% if g.theme == 'material' %}selected{% endif %}>{{ _("M3") }}</option>
+            <option value="frost" {% if g.theme == 'frost' %}selected{% endif %}>{{ _("Frost") }}</option>
+            <option value="classic" {% if g.theme == 'classic' %}selected{% endif %}>{{ _("Classique") }}</option>
+        </select>
+    </td>
+</tr>
+{% endblock %}
