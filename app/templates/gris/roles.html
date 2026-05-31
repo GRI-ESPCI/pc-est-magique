@@ -88,9 +88,8 @@
             <td>{{ role.id }}</td>
             <td>
                 <span class="badge rounded-pill border border-2 d-inline-flex
-                             align-items-center px-2 text-{{ "light"
-                             if role.is_dark_colored else "dark" }}"
-                      style="background-color: #{{ role.color or "ffffff" }}">
+                             align-items-center px-2"
+                      style="background-color: #{{ role.color or 'ffffff' }}; color: {{ '#ffffff' if role.is_dark_colored else '#000000' }} !important;">
                     {{ role.name }}
                 </span>
             </td>

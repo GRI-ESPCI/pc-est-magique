@@ -152,3 +152,36 @@ function update_checkbox() {
 // Ban modal checkbox
 var infiniteCheckbox = moBan.querySelector("#infinite");
 infiniteCheckbox.addEventListener("change", update_checkbox);
+
+function mo_add_role(elem, role_id) {
+    const select = document.getElementById("roles");
+    const option = select.querySelector(`option[value="${role_id}"]`);
+    if (option) {
+        option.selected = true;
+    }
+    // Create new selected role badge
+    const template = document.getElementById("mo-selected-role-template").querySelector(".badge");
+    const badge = template.cloneNode(true);
+    badge.querySelector(".role_name").textContent = elem.textContent.trim();
+    badge.style.setProperty("background-color", elem.style.backgroundColor);
+    badge.style.setProperty("color", elem.style.color, "important");
+    badge.dataset.roleId = role_id;
+    elem.style.display = "none";
+    badge.querySelector("svg").onclick = function() {
+        mo_remove_role(badge, elem, role_id);
+    };
+    const container = document.getElementById("mo-add-pceen-roles-container");
+    const addRoleDropdown = container.querySelector(".add-role");
+    container.insertBefore(badge, addRoleDropdown);
+}
+
+function mo_remove_role(badge, dropdownElem, role_id) {
+    const select = document.getElementById("roles");
+    const option = select.querySelector(`option[value="${role_id}"]`);
+    if (option) {
+        option.selected = false;
+    }
+    // Show the option in the dropdown again
+    dropdownElem.style.display = "";
+    badge.remove();
+}

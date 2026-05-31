@@ -22,6 +22,8 @@ from app.routes.gris.utils import (
 )
 from app.utils import helpers, typing
 
+from app.routes.auth import email
+from app.routes.auth.utils import new_username
 
 class PCeensViewEnum(enum.Enum):
     active = enum.auto()
@@ -42,8 +44,44 @@ def pceens(view: str = "active") -> typing.RouteReturn:
 
     roles_form = forms.AddRemoveRoleForm()
     ban_form = forms.BanForm()
+    add_pceen_form = forms.AddPCeenForm()
+    add_pceen_form.roles.choices = [(r.id, r.name) for r in db.session.scalars(db.select(Role)).all()]
 
-    if ban_form["submit"].data or ban_form["unban"].data:
+    if add_pceen_form.submit.data:
+        if add_pceen_form.validate_on_submit():
+            nom = add_pceen_form.nom.data.title()
+            prenom = add_pceen_form.prenom.data.title()
+            promo = add_pceen_form.promo.data
+            
+            existing_pceen = PCeen.find_by_fuzzy_name(nom, prenom, promo)
+            if existing_pceen:
+                flask.flash(_("Un utilisateur avec ce nom, prénom et promo existe déjà (%(nom)s, %(prenom)s, %(promo)s).", nom=existing_pceen.nom, prenom=existing_pceen.prenom, promo=existing_pceen.promo), "danger")
+            else:
+                pceen = PCeen(
+                    username=new_username(prenom, nom),
+                    nom=nom,
+                    prenom=prenom,
+                    promo=promo,
+                    email=add_pceen_form.email.data,
+                )
+                
+                # Add selected roles
+                for role_id in add_pceen_form.roles.data:
+                    role = db.session.get(Role, role_id)
+                    if role:
+                        pceen.roles.append(role)
+                        
+                db.session.add(pceen)
+                db.session.commit()
+                
+                helpers.log_action(f"Created PCéen manually: {pceen!r}")
+                flask.flash(_("PCéen %(nom)s %(prenom)s créé avec succès !", nom=pceen.nom, prenom=pceen.prenom), "success")
+                
+                # Send password setup email
+                email.send_password_reset_email(pceen)
+        return helpers.redirect_to_next()
+
+    elif ban_form["submit"].data or ban_form["unban"].data:
         if ban_form.validate_on_submit():
             add_edit_ban(
                 unban=ban_form.unban.data,
@@ -68,7 +106,22 @@ def pceens(view: str = "active") -> typing.RouteReturn:
             else:
                 return {"message": "Bad formed request", "detail": roles_form.errors}, 400
 
+    page = flask.request.args.get("page", 1, type=int)
+    q = flask.request.args.get("q", "").strip()
+    sort = flask.request.args.get("sort", "id")
+    way = flask.request.args.get("way", "desc")
+
     stmt = db.select(PCeen)
+    if q:
+        stmt = stmt.filter(
+            db.or_(
+                PCeen.nom.ilike(f"%{q}%"),
+                PCeen.prenom.ilike(f"%{q}%"),
+                PCeen.username.ilike(f"%{q}%"),
+                PCeen.email.ilike(f"%{q}%"),
+            )
+        )
+
     match view:
         case PCeensViewEnum.active:
             stmt = stmt.filter(PCeen.activated == True)
@@ -90,14 +143,37 @@ def pceens(view: str = "active") -> typing.RouteReturn:
         case PCeensViewEnum.all:
             pass
 
-    pceens = db.session.scalars(stmt).all()
+    # Sorting
+    sort_column = PCeen.id
+    if sort == "nom":
+        sort_column = PCeen.nom
+    elif sort == "prenom":
+        sort_column = PCeen.prenom
+    elif sort == "promo":
+        sort_column = PCeen.promo
+    elif sort == "email":
+        sort_column = PCeen.email
+    elif sort == "username":
+        sort_column = PCeen.username
+    
+    if way == "desc":
+        stmt = stmt.order_by(sort_column.desc())
+    else:
+        stmt = stmt.order_by(sort_column.asc())
+
+    paginator = db.paginate(stmt, page=page, per_page=150, error_out=False)
 
     return flask.render_template(
         "gris/pceens.html",
         roles_form=roles_form,
         ban_form=ban_form,
+        add_pceen_form=add_pceen_form,
         view=view.name,
-        pceens=pceens,
+        pceens=paginator.items,
+        paginator=paginator,
+        q=q,
+        sort=sort,
+        way=way,
         roles=db.session.scalars(db.select(Role)).all(),
         title=_("Gestion des PCéens"),
     )

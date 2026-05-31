@@ -57,3 +57,14 @@ class BanForm(FlaskForm):
     message = wtforms.TextAreaField(_l("Message détaillé"), validators=[Optional(), Length(max=2000)])
     submit = wtforms.SubmitField(_l("Bannez-moi ça les modos || Mettre à jour le ban"))
     unban = wtforms.SubmitField(_l("Mettre fin au ban"))
+
+
+class AddPCeenForm(FlaskForm):
+    """WTForm used to manually create a PCéen."""
+
+    nom = wtforms.StringField(_l("Nom"), validators=[DataRequired(), Length(max=64)])
+    prenom = wtforms.StringField(_l("Prénom"), validators=[DataRequired(), Length(max=64)])
+    promo = wtforms.IntegerField(_l("Promo (Optionnel)"), validators=[Optional()])
+    email = wtforms.EmailField(_l("Email"), validators=[DataRequired(), Length(max=120)])
+    roles = wtforms.SelectMultipleField(_l("Rôles"), coerce=int, validators=[Optional()])
+    submit = wtforms.SubmitField(_l("Créer le PCéen"))

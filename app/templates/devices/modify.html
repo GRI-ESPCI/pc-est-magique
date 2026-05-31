@@ -35,16 +35,10 @@
             {{ wtf.form_field(form.submit) }}
             {% if device != g.device %}
 
-            <div class="d-inline-block ms-3" data-bs-toggle="tooltip"
-                 title="{{ _("Fonctionnalité à venir") }}">
-                <button type="button" class="btn btn-outline-danger"
-                        data-bs-toggle="modal" data-bs-target="#warning"
-                        disabled>   <!-- Action non implémentée -->
-                    {{ _("Supprimer l'appareil") }}
-                </button>
-            </div>
-
-
+            <button type="button" class="btn btn-outline-danger ms-3"
+                    data-bs-toggle="modal" data-bs-target="#warning">
+                {{ _("Supprimer l'appareil") }}
+            </button>
             {% endif %}
         </div>
     </form>
