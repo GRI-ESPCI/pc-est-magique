@@ -10,6 +10,8 @@
         {% block metas %}
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+        <meta name="theme-color" content="#152f4e">
         {% endblock metas %}
 
         {% block title %}
@@ -77,6 +79,17 @@
         ] %}
         <script src="{{ url_for("static", filename=filename) }}" defer></script>
         {% endfor %}
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js').then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    }, err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+                });
+            }
+        </script>
         {% endblock scripts %}
 
         {% endblock head %}

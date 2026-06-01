@@ -730,3 +730,12 @@ def delete_preset(preset_id: int) -> typing.RouteReturn:
     db.session.commit()
     flask.flash(_("Preset supprimé."), "success")
     return flask.redirect(flask.url_for("main.manage_presets"))
+
+
+@bp.route("/sw.js")
+def service_worker() -> typing.RouteReturn:
+    """Serve the service worker with the correct MIME type and scope."""
+    response = flask.make_response(flask.send_from_directory("static", "sw.js"))
+    response.headers["Content-Type"] = "application/javascript"
+    response.headers["Service-Worker-Allowed"] = "/"
+    return response

@@ -1,0 +1,23 @@
+{
+  "name": "PC est magique",
+  "short_name": "PEM",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#152f4e",
+  "icons": [
+    {
+      "src": "/static/img/gri_192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/img/gri_512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

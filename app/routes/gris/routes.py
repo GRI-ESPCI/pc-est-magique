@@ -74,7 +74,15 @@ def pceens(view: str = "active") -> typing.RouteReturn:
                 db.session.add(pceen)
                 db.session.commit()
                 
-                helpers.log_action(f"Created PCéen manually: {pceen!r}")
+                creator = flask.g.pceen
+                role_names = [r.name for r in pceen.roles]
+                log_msg = (
+                    f"PCéen created manually by {creator.full_name} (ID: {creator.id}): "
+                    f"New PCéen ID={pceen.id}, Nom='{pceen.nom}', Prénom='{pceen.prenom}', "
+                    f"Email='{pceen.email}', Roles={role_names}"
+                )
+                helpers.log_action(log_msg)
+                
                 flask.flash(_("PCéen %(nom)s %(prenom)s créé avec succès !", nom=pceen.nom, prenom=pceen.prenom), "success")
                 
                 # Send password setup email
