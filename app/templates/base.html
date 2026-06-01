@@ -11,7 +11,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
-        <meta name="theme-color" content="#152f4e">
+        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+        <meta name="theme-color" content="#152f4e" media="(prefers-color-scheme: dark)">
         {% endblock metas %}
 
         {% block title %}
@@ -32,24 +33,114 @@
 
         {% block scripts_head %}
         <script>
-            function applyTheme(targetMode) {
-                const currentTheme = "{{ g.get('theme', 'vibrant') }}";
-                if (currentTheme === 'classic') {
-                    document.documentElement.setAttribute('data-theme', 'light');
+            function getThemeColor() {
+                const theme = "{{ g.get('theme', 'vibrant') }}";
+                const isBanned = {{ 'true' if hasattr(g, '_ban') or (hasattr(g, 'pceen') and g.pceen.is_banned) else 'false' }};
+                
+                if (isBanned) {
+                    return '#e40046'; // Base PC3 danger
+                }
+                
+                const mode = document.documentElement.getAttribute('data-theme') || 'light';
+                let hex = '#ffffff';
+                
+                if (theme === 'classic') {
+                    hex = '#64b9e9'; // Base PC2 primary
+                } else if (theme === 'material') {
+                    hex = mode === 'dark' ? '#1e2028' : '#ffffff';
+                } else if (theme === 'frost') {
+                    // Pre-calculated mixed colors for frosted glass
+                    hex = mode === 'dark' ? '#0b0e16' : '#fcfdfe';
+                }
+                return hex;
+            }
+
+            function hexToRgb(hex) {
+                let bigint = parseInt(hex.replace('#', ''), 16);
+                return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+            }
+
+            function rgbToHex(r, g, b) {
+                return "#" + (1 << 24 | Math.round(r) << 16 | Math.round(g) << 8 | Math.round(b)).toString(16).slice(1);
+            }
+
+            let themeColorAnimation = null;
+
+            function cubicBezier(x1, y1, x2, y2) {
+                return function(x) {
+                    if (x <= 0) return 0;
+                    if (x >= 1) return 1;
+                    let t = x;
+                    for (let i = 0; i < 5; i++) {
+                        let currentX = 3 * Math.pow(1 - t, 2) * t * x1 + 3 * (1 - t) * Math.pow(t, 2) * x2 + Math.pow(t, 3) - x;
+                        let currentDerivative = 3 * Math.pow(1 - t, 2) * x1 + 6 * (1 - t) * t * (x2 - x1) + 3 * Math.pow(t, 2) * (1 - x2);
+                        t -= currentX / currentDerivative;
+                    }
+                    return 3 * Math.pow(1 - t, 2) * t * y1 + 3 * (1 - t) * Math.pow(t, 2) * y2 + Math.pow(t, 3);
+                };
+            }
+            // CSS 'ease' is cubic-bezier(0.25, 0.1, 0.25, 1.0)
+            const cssEase = cubicBezier(0.25, 0.1, 0.25, 1.0);
+
+            function updateThemeColor(animate = false) {
+                let metaThemeColors = document.querySelectorAll('meta[name="theme-color"]');
+                if (metaThemeColors.length === 0) return;
+                
+                if (themeColorAnimation) cancelAnimationFrame(themeColorAnimation);
+                
+                let activeMeta = Array.from(metaThemeColors).find(m => !m.hasAttribute('media') || window.matchMedia(m.getAttribute('media')).matches) || metaThemeColors[0];
+                let startHex = activeMeta.getAttribute('content') || getThemeColor();
+                let endHex = getThemeColor();
+                
+                if (!animate || startHex === endHex) {
+                    metaThemeColors.forEach(m => m.setAttribute('content', endHex));
                     return;
                 }
                 
-                if (targetMode === 'dark' || (targetMode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                let startRgb = hexToRgb(startHex);
+                let endRgb = hexToRgb(endHex);
+                let startTime = performance.now();
+                
+                function step(currentTime) {
+                    let progress = (currentTime - startTime) / 400; // 400ms duration
+                    if (progress > 1) progress = 1;
+                    
+                    let easedProgress = cssEase(progress);
+                    
+                    const r = startRgb[0] + (endRgb[0] - startRgb[0]) * easedProgress;
+                    const g = startRgb[1] + (endRgb[1] - startRgb[1]) * easedProgress;
+                    const b = startRgb[2] + (endRgb[2] - startRgb[2]) * easedProgress;
+                    
+                    let newHex = rgbToHex(r, g, b);
+                    metaThemeColors.forEach(m => m.setAttribute('content', newHex));
+                    
+                    if (progress < 1) {
+                        themeColorAnimation = requestAnimationFrame(step);
+                    }
+                }
+                themeColorAnimation = requestAnimationFrame(step);
+            }
+
+            function applyTheme(targetMode, animate = false) {
+                const currentTheme = "{{ g.get('theme', 'vibrant') }}";
+                let isDark = false;
+                
+                if (currentTheme === 'classic') {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                } else if (targetMode === 'dark' || (targetMode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.setAttribute('data-theme', 'dark');
+                    isDark = true;
                 } else {
                     document.documentElement.setAttribute('data-theme', 'light');
                 }
+                
+                updateThemeColor(animate);
             }
-            applyTheme("{{ g.mode }}");
+            applyTheme("{{ g.mode }}", false);
 
             function setModeAJAX(mode, event) {
                 event.preventDefault();
-                applyTheme(mode);
+                applyTheme(mode, true);
                 fetch('/set_mode/' + mode);
                 document.getElementById('modeDropdownBtn').innerHTML = 
                     mode === 'light' ? '<i class="fas fa-sun me-1"></i> Clair' :
