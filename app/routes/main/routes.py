@@ -10,7 +10,7 @@ import os
 import flask
 from flask_babel import _
 from discord_webhook import DiscordWebhook
-from markupsafe import Markup
+from markupsafe import Markup, escape
 import sqlalchemy
 
 from app import context, db
@@ -282,7 +282,7 @@ def test_mail(blueprint: str, template: str) -> typing.RouteReturn:
     body = flask.render_template(f"{blueprint}/mails/{template}.html", pceen=context.g.pceen)
     body = process_html(body)
     if flask.request.args.get("txt"):
-        return f"<pre>{flask.escape(html_to_plaintext(body))}</pre>"
+        return f"<pre>{escape(html_to_plaintext(body))}</pre>"
     else:
         return body
 

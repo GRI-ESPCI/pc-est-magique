@@ -334,6 +334,29 @@ html[data-theme="dark"] :is(.theme-material, .theme-frost) .btn-outline-secondar
 html[data-theme="dark"] :is(.theme-material, .theme-frost) .btn-outline-primary { --bs-btn-color: #60a5fa !important; --bs-btn-border-color: #60a5fa !important; }
 html[data-theme="dark"] :is(.theme-material, .theme-frost) .btn-outline-primary:hover { --bs-btn-hover-bg: #60a5fa !important; --bs-btn-hover-color: #ffffff !important; }
 
+/* Custom modal cancel button */
+.btn-modal-cancel {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    color: #475569 !important;
+    transition: all 0.2s ease-in-out !important;
+}
+.btn-modal-cancel:hover {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+    border-color: rgba(0, 0, 0, 0.15) !important;
+    color: #1e293b !important;
+}
+html[data-theme="dark"] .btn-modal-cancel {
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #94a3b8 !important;
+}
+html[data-theme="dark"] .btn-modal-cancel:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
 /* Icon Buttons (Zoom & Edit) */
 :is(.btn-icon-zoom, .btn-pc5) { transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; border-radius: 50% !important; display: inline-flex !important; align-items: center; justify-content: center; }
 .btn-icon-zoom { background-color: transparent !important; border: none !important; }

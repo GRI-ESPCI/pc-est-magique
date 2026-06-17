@@ -275,7 +275,7 @@ def add_edit_ban(
         ban = db.session.get(Ban, int(ban_id))
         if unban:
             # Terminate existing ban
-            ban.end = datetime.datetime.now(datetime.UTC)
+            ban.end = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
             helpers.log_action(f"Terminated {ban!r}")
             flask.flash(_("Le ban a été terminé."), "success")
         else:
@@ -292,7 +292,7 @@ def add_edit_ban(
         if pceen.is_banned:
             flask.flash(_("Ce PCéén est déjà banni !"), "danger")
         else:
-            start = datetime.datetime.now(datetime.UTC)
+            start = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
             end = compute_ban_end(start, infinite, hours, days, months)
             ban = Ban(
                 pceen=pceen,

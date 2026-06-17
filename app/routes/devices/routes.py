@@ -66,19 +66,20 @@ def modify(device_id: str | None = None) -> typing.RouteReturn:
             # The submit button used was the form one: modify the device
             device.name = form.nom.data
             device.type = form.type.data
+            db.session.commit()
+            helpers.log_action(f"Modified {device!r} (type '{device.type}')")
             flask.flash(_("Appareil modifié avec succès !"), "success")
         else:
             # The submit button used was not the form one (so it was the
             # confirm-delete one): delete the device
+            mac_address = device.mac_address
+            name = device.name
             db.session.delete(device)
+            db.session.commit()
+            helpers.log_action(f"Deleted device {mac_address} ({name})")
+            helpers.run_script("gen_dhcp.py")  # Update DHCP rules
             flask.flash(_("Appareil supprimé avec succès !"), "success")
 
-        db.session.commit()
-        if form.submit.data:
-            helpers.log_action(f"Modified {device!r} (type '{device.type}')")
-        else:
-            helpers.log_action(f"Deleted device {device.mac_address} ({device.name})")
-            helpers.run_script("gen_dhcp.py")  # Update DHCP rules
         return helpers.redirect_to_next()
 
     return flask.render_template("devices/modify.html", title=_("Modifier un appareil"), device=device, form=form)
