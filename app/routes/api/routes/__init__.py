@@ -1,1 +1,1 @@
-from app.routes.api.routes import gris, bar, photos
+from app.routes.api.routes import bar, gris, photos, push

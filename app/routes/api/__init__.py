@@ -10,3 +10,4 @@ from app.routes.api import routes
 bp.register_blueprint(routes.bar.sbp, url_prefix="/bar")
 bp.register_blueprint(routes.gris.sbp, url_prefix="/gris")
 bp.register_blueprint(routes.photos.sbp, url_prefix="/photos")
+bp.register_blueprint(routes.push.sbp, url_prefix="/push")

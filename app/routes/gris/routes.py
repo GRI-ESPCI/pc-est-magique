@@ -267,4 +267,125 @@ def monitoring_ds() -> typing.RouteReturn:
 def monitoring_bw() -> typing.RouteReturn:
     """Integration of Bandwidthd network monitoring."""
     return flask.render_template("gris/monitoring_bw.html", title=_("Bandwidthd network monitoring"))
+
+def _send_push_notifications(app, subs_data, message, vapid_private_key, vapid_claims):
+    import json
+    from pywebpush import webpush, WebPushException
+    from app import db
+    from app.models.push import PushSubscription
+    from app.utils import helpers
+
+    with app.app_context():
+        success_count = 0
+        to_delete = []
+
+        for sub in subs_data:
+            try:
+                webpush(
+                    subscription_info={
+                        "endpoint": sub["endpoint"],
+                        "keys": {
+                            "p256dh": sub["p256dh"],
+                            "auth": sub["auth"]
+                        }
+                    },
+                    data=json.dumps(message),
+                    vapid_private_key=vapid_private_key,
+                    vapid_claims=vapid_claims,
+                    headers={"Urgency": "high"}
+                )
+                success_count += 1
+            except WebPushException as ex:
+                if ex.response and ex.response.status_code in [404, 410]:
+                    to_delete.append(sub["id"])
+                else:
+                    helpers.log_action(f"Push error: {ex}", warning=True)
+            except Exception as e:
+                helpers.log_action(f"Push error generic: {e}", warning=True)
+
+        if to_delete:
+            import sqlalchemy as sa
+            db.session.execute(sa.delete(PushSubscription).where(PushSubscription.id.in_(to_delete)))
+            db.session.commit()
+            
+        helpers.log_action(f"Fin de l'envoi de la notification push '{message['title']}'. Envoyée avec succès à {success_count} / {len(subs_data)} appareils.")
+
+@bp.route("/push_notifications", methods=["GET", "POST"])
+@context.gris_only
+def push_notifications() -> typing.RouteReturn:
+    """Send push notifications to users."""
+    import json
+    from pywebpush import webpush, WebPushException
+    from app.models.push import PushSubscription, Notification
+
+    form = forms.PushNotificationForm()
+    form.roles.choices = [(r.id, r.name) for r in db.session.scalars(db.select(Role)).all()]
+
+    if form.validate_on_submit():
+        target = form.target.data
+        
+        stmt = db.select(PushSubscription).join(PCeen)
+
+        if target == "eleves":
+            stmt = stmt.filter(PCeen.roles.any(Role.name == "Élève"))
+        elif target == "rez":
+            from app.models.auth import SubState
+            stmt = stmt.filter(PCeen.sub_state.in_([SubState.subscribed, SubState.trial]))
+        elif target == "role":
+            role_ids = form.roles.data
+            stmt = stmt.filter(PCeen.roles.any(Role.id.in_(role_ids)))
+
+        subs = db.session.scalars(stmt).all()
+
+        # Save notification to history first to get ID
+        notif = Notification(
+            title=form.title.data,
+            body=form.body.data,
+            image=form.image.data or None,
+            url=form.url.data or None,
+            target_type=target,
+            role_id=form.roles.data[0] if target == "role" and form.roles.data else None
+        )
+        db.session.add(notif)
+        db.session.commit()
+
+        message = {
+            "title": form.title.data,
+            "body": form.body.data,
+            "image": form.image.data or "",
+            "url": form.url.data or "/",
+            "quiet": form.quiet.data,
+            "id": notif.id
+        }
+        
+        vapid_private_key = flask.current_app.config.get("VAPID_PRIVATE_KEY_PATH")
+        if not vapid_private_key:
+            flask.flash(_("Erreur : la clé VAPID privée n'est pas configurée sur le serveur."), "danger")
+            return flask.redirect(flask.url_for("gris.push_notifications"))
+            
+        mail = flask.current_app.config.get("MAIL_USERNAME") or "admin@example.com"
+        vapid_claims = {"sub": f"mailto:{mail}"}
+
+        subs_data = [
+            {
+                "id": sub.id,
+                "endpoint": sub.endpoint,
+                "p256dh": sub.p256dh,
+                "auth": sub.auth
+            }
+            for sub in subs
+        ]
+
+        import threading
+        threading.Thread(
+            target=_send_push_notifications,
+            args=(flask.current_app._get_current_object(), subs_data, message, vapid_private_key, vapid_claims)
+        ).start()
+
+        helpers.log_action(f"Push notification envoyée par ID: {flask.g.pceen.id}, Nom: {flask.g.pceen.prenom} {flask.g.pceen.nom}, Promo: {flask.g.pceen.promo} | Cible: {target} | Titre: '{form.title.data}' | Message: '{form.body.data}'")
+        
+        flask.flash(_("Notification en cours d'envoi à %(count)d appareils.", count=len(subs_data)), "success")
+        return flask.redirect(flask.url_for("gris.push_notifications"))
+
+    return flask.render_template("gris/push_notifications.html", form=form, title=_("Push Notifications"), roles=db.session.scalars(db.select(Role)).all())
     

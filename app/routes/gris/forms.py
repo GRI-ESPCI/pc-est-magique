@@ -68,3 +68,25 @@ class AddPCeenForm(FlaskForm):
     email = wtforms.EmailField(_l("Email"), validators=[DataRequired(), Length(max=120)])
     roles = wtforms.SelectMultipleField(_l("Rôles"), coerce=int, validators=[Optional()])
     submit = wtforms.SubmitField(_l("Créer le PCéen"))
+
+class PushNotificationForm(FlaskForm):
+    """WTForm used to send push notifications."""
+
+    target = wtforms.SelectField(
+        _l("Cible"),
+        choices=[
+            ("all", _l("Tous les utilisateurs")),
+            ("eleves", _l("Tous les élèves")),
+            ("rez", _l("Résidents Rez (avec internet actif)")),
+            ("role", _l("Rôle spécifique")),
+        ],
+        default="eleves",
+        validators=[DataRequired()],
+    )
+    roles = wtforms.SelectMultipleField(_l("Rôles (si Cible = Rôle spécifique)"), coerce=int, validators=[Optional()])
+    title = wtforms.StringField(_l("Titre"), validators=[DataRequired(), Length(max=128)])
+    body = wtforms.TextAreaField(_l("Message"), validators=[DataRequired(), Length(max=512)])
+    image = wtforms.StringField(_l("Image URL (optionnelle)"), validators=[Optional(), Length(max=256)])
+    quiet = wtforms.BooleanField(_l("Notification silencieuse (ne pas afficher de popup)"), default=False)
+    url = wtforms.StringField(_l("URL au clic (optionnel)"), validators=[Optional(), Length(max=256)])
+    submit = wtforms.SubmitField(_l("Envoyer"))

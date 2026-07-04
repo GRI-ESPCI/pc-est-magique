@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-md 
 {% if g.theme == 'classic' %}
-    navbar-light mb-4 py-2 shadow bg-gradient bg-{{ 'danger' if hasattr(g, '_ban') or (hasattr(g, 'pceen') and g.pceen.is_banned) else 'primary' }}
+    navbar-light mb-4 py-2 shadow bg-{{ 'danger' if hasattr(g, '_ban') or (hasattr(g, 'pceen') and g.pceen.is_banned) else 'primary' }}
 {% elif g.theme == 'frost' %}
     {% if hasattr(g, '_ban') or (hasattr(g, 'pceen') and g.pceen.is_banned) %}
         navbar-dark mb-4 py-2 shadow-sm bg-danger sticky-top
@@ -20,7 +20,7 @@
                 aria-controls="navbar_content" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand p-0 d-flex align-items-center mx-auto me-md-auto ms-md-0 pe-5 pe-md-0" href="{{ url_for("main.index") }}">
+        <a class="navbar-brand p-0 d-flex align-items-center mx-auto me-md-3 ms-md-0" href="{{ url_for("main.index") }}">
             <img src="{{ url_for("static", filename="img/gri_80x80.png") }}" class="d-inline-block m-0 rounded-4 shadow-sm" alt="GRI"
                  width="48" height="48" style="object-fit: cover;" />
             <span class="ms-3 fs-4 fw-bold tracking-tight">PC est magique</span>
@@ -28,6 +28,32 @@
             <span class="badge rounded-pill bg-warning text-dark ms-2">{{ config["BRANCH"] }}</span>
             {% endif %}
         </a>
+        
+        {% if g.logged_in %}
+        <ul class="navbar-nav ms-auto me-2 me-md-auto ms-md-3 flex-row align-items-center order-md-0">
+            <li class="nav-item dropdown">
+                <a class="nav-link position-relative px-2 d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="notifDropdown">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-bell-fill notif-bell-icon" viewBox="0 0 16 16">
+                        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7 0-2.42-1.72-4.44-4.005-4.901z"/>
+                    </svg>
+                    {# Red badge on the bell icon. Hidden (d-none) if there are 0 unread notifications. #}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none d-inline-flex align-items-center justify-content-center" id="notifBadge">
+                        <span id="notifBadgeInner"></span>
+                        <span class="visually-hidden">New alerts</span>
+                    </span>
+                </a>
+                
+                {# Dropdown menu containing the list of notifications #}
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-md-start notif-dropdown-menu position-absolute" aria-labelledby="notifDropdown" id="notifDropdownMenu">
+                    <li class="py-3 text-center text-muted">
+                        <div class="spinner-border spinner-border-sm" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        {% endif %}
         <div class="offcanvas-md offcanvas-start shadow flex-grow-1" tabindex="-1" id="navbar_content" aria-labelledby="navbarOffcanvasLgLabel" data-bs-scroll="false" data-bs-backdrop="true">
             <div class="offcanvas-header d-md-none justify-content-between align-items-center px-4 py-3 border-bottom">
                 <h5 class="offcanvas-title fw-bold text-muted fs-5 mb-0" id="navbarOffcanvasLgLabel">{{ _("Raccourcis") }}</h5>
@@ -169,5 +195,96 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // Notifications handling
+    const notifBadge = document.getElementById('notifBadge');
+    const notifBadgeInner = document.getElementById('notifBadgeInner');
+    const notifDropdownMenu = document.getElementById('notifDropdownMenu');
+
+    function updateBadgeCount() {
+        if (!notifBadge || !notifBadgeInner) return;
+        const unreadItems = document.querySelectorAll('.notif-item.notif-unread');
+        const unreadCount = unreadItems.length;
+        if (unreadCount > 0) {
+            notifBadge.classList.remove('d-none');
+            notifBadgeInner.innerHTML = (unreadCount > 9 ? '9+' : unreadCount) + '<span class="visually-hidden"> alertes</span>';
+            const markAllReadBtn = document.getElementById('markAllReadBtn');
+            if (markAllReadBtn) markAllReadBtn.classList.remove('d-none');
+        } else {
+            notifBadge.classList.add('d-none');
+            const markAllReadBtn = document.getElementById('markAllReadBtn');
+            if (markAllReadBtn) markAllReadBtn.classList.add('d-none');
+        }
+    }
+
+    function bindNotifEvents() {
+        const markAllReadBtn = document.getElementById('markAllReadBtn');
+        const notifItems = document.querySelectorAll('.notif-item');
+
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const unreadIds = [];
+                notifItems.forEach(item => {
+                    if (item.classList.contains('notif-unread')) {
+                        unreadIds.push(item.dataset.id);
+                    }
+                });
+                if (unreadIds.length === 0) return;
+
+                fetch('{{ url_for("api.push.read_all_notifications") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        notifItems.forEach(item => {
+                            item.classList.remove('notif-unread');
+                        });
+                        updateBadgeCount();
+                    }
+                });
+            });
+        }
+
+        notifItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                const id = item.dataset.id;
+                if (id && item.classList.contains('notif-unread')) {
+                    fetch(`/api/push/notifications/${id}/read`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                        }
+                    }).then(response => {
+                        if (response.ok) {
+                            item.classList.remove('notif-unread');
+                            updateBadgeCount();
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    if (notifDropdownMenu) {
+        fetch('{{ url_for("api.push.navbar_notifications") }}')
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    notifDropdownMenu.innerHTML = data.html;
+                    
+                    if (data.unread_count > 0) {
+                        notifBadge.classList.remove('d-none');
+                        notifBadgeInner.innerHTML = (data.unread_count > 9 ? '9+' : data.unread_count) + '<span class="visually-hidden"> alertes</span>';
+                    }
+                    
+                    bindNotifEvents();
+                }
+            })
+            .catch(err => console.error("Error fetching notifications:", err));
+    }
 });
 </script>

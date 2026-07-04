@@ -29,4 +29,21 @@
         </select>
     </td>
 </tr>
+<tr id="push-subscribe-row">
+    <th scope="row" class="ps-4 align-middle">{{ _("Notifications Push") }}</th>
+    <td>
+        <button id="push-subscribe-btn" 
+                class="btn btn-sm btn-outline-primary"
+                data-url-unsubscribe="{{ url_for('api.push.unsubscribe') }}"
+                data-url-subscribe="{{ url_for('api.push.subscribe') }}"
+                data-url-vapid="{{ url_for('api.push.vapid_public_key') }}"
+                data-text-subscribe="{{ _("S'abonner") }}"
+                data-text-subscribed="{{ _('Abonné') }}"
+                data-text-error="{{ _('Erreur') }}">
+            {{ _("S'abonner") }}
+        </button>
+    </td>
+</tr>
+
+<script src="{{ url_for('static', filename='js/push-subscription.js') }}" defer></script>
 {% endblock %}

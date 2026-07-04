@@ -738,4 +738,5 @@ def service_worker() -> typing.RouteReturn:
     response = flask.make_response(flask.send_from_directory("static", "sw.js"))
     response.headers["Content-Type"] = "application/javascript"
     response.headers["Service-Worker-Allowed"] = "/"
+    response.headers["Cache-Control"] = "no-cache"
     return response

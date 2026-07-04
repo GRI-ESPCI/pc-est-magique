@@ -15,6 +15,7 @@ from app.utils.columns import (
     column,
     many_to_many,
     many_to_one,
+    one_to_many,
     my_enum,
     Column,
     Relationship,
@@ -48,6 +49,7 @@ class Role(Model):
 
     pceens: WriteOnlyMapped["models.PCeen"] = many_to_many("PCeen.roles", secondary=_PCeen_Role_AT, lazy="write_only")
     permissions: Mapped[list["models.Permission"]] = many_to_many("Permission.roles", secondary=_Role_Permission_AT)
+    notifications: Mapped[list["models.Notification"]] = one_to_many("Notification.role")
 
     @property
     def pceens_count(self) -> int:

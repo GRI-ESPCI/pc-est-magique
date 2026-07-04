@@ -1,0 +1,47 @@
+<li class="notif-header-li">
+    <div class="dropdown-header d-flex justify-content-between align-items-center py-3 px-3">
+        <span class="fs-6 fw-bold text-body mb-0">{{ _("Notifications") }}</span>
+        {# Only show 'Mark all as read' if there are actual unread notifications to mark #}
+        {% if unread_count > 0 %}
+        <button class="btn btn-sm btn-light text-decoration-none py-1 px-2 rounded-pill" id="markAllReadBtn">{{ _("Tout marquer comme lu") }}</button>
+        {% endif %}
+    </div>
+</li>
+<li class="notif-scroll-container">
+    {% if recent_notifications %}
+        {# Loop through and render each notification item #}
+        {% for notif in recent_notifications %}
+        <a class="dropdown-item notif-item{% if notif.id not in read_notification_ids %} notif-unread{% endif %}" href="{{ notif.url or '#' }}" data-id="{{ notif.id }}">
+            <div class="d-flex align-items-start">
+                {# Display the notification's custom image, or fallback to a default info icon #}
+                {% if notif.image %}
+                <img src="{{ notif.image }}" class="rounded me-3 notif-image-cover" width="40" height="40">
+                {% else %}
+                <div class="rounded-circle notif-fallback-icon d-flex align-items-center justify-content-center me-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                    </svg>
+                </div>
+                {% endif %}
+                <div class="flex-grow-1 pe-2">
+                    <strong class="d-block notif-title">{{ notif.title }}</strong>
+                    <small class="text-body-secondary d-block notif-body-text">{{ notif.body }}</small>
+                    <small class="text-body-tertiary notif-time-text">{{ notif.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                </div>
+                {# The little blue dot that shows a notification is unread. Styled in CSS based on 'notif-unread' parent class #}
+                <div class="d-flex align-items-center h-100 notif-indicator-wrapper">
+                    <div class="unread-indicator"></div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    {% else %}
+        <div class="py-5 text-center text-muted">
+            <!-- Bell icon (empty inbox) -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-bell mb-3 opacity-25" viewBox="0 0 16 16">
+              <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+            </svg>
+            <span class="d-block">{{ _("Aucune notification") }}</span>
+        </div>
+    {% endif %}
+</li>

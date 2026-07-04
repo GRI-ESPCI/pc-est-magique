@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% import "_form.html" as f %}
+
+{% block app_content %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <h5 class="card-title text-primary fw-bold mb-0 d-flex align-items-center">
+                        <svg class="bi me-2 text-primary" width="20" height="20" fill="currentColor">
+                            {{ macros.bootstrap_icon("bell") }}
+                        </svg>
+                        {{ _("Envoyer une notification Push") }}
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" role="form">
+                        {{ form.csrf_token }}
+                        
+                        <div class="mb-3">
+                            <label for="target" class="form-label fw-semibold">{{ form.target.label.text }}</label>
+                            {% if form.target.errors %}
+                                {{ form.target(class="form-select is-invalid", id="target") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.target.errors %}
+                                        <p class="mb-0">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.target(class="form-select", id="target") }}
+                            {% endif %}
+                        </div>
+
+                        <div id="role-select-group" class="mb-3" style="display: none;">
+                            <label class="form-label fw-semibold">{{ form.roles.label.text }}</label>
+                            <div class="d-none">{{ form.roles(class="form-select", id="roles") }}</div>
+                            <div class="d-flex flex-wrap gap-2 align-items-center" id="mo-add-pceen-roles-container">
+                                <span class="add-role badge rounded-pill d-inline-flex align-items-center px-0 text-dark">
+                                    <span>&nbsp;</span>
+                                    <span>
+                                        <svg class="bi flex-shrink-0" width="15" height="15" style="cursor: pointer;"
+                                             data-bs-toggle="dropdown" id="mo_add_pceen_role">
+                                            {{ macros.bootstrap_icon("plus-circle") }}
+                                        </svg>
+                                        <div class="dropdown-menu container px-4 shadow shadow-lg" aria-labelledby="mo_add_pceen_role" style="min-width: 350px; max-height: 250px; overflow-y: auto;">
+                                            <div class="row row-cols" id="mo-add-pceen-dropdown-items">
+                                                {% for role in roles %}
+                                                <a class="col-auto badge rounded-pill border border-2 text-decoration-none mo-role-option"
+                                                   data-role-id="{{ role.id }}"
+                                                   style="background-color: #{{ role.color or 'ffffff' }}; color: {{ '#ffffff' if role.is_dark_colored else '#000000' }} !important; cursor: pointer; margin: 2px;"
+                                                   onclick="mo_add_role(this, '{{ role.id }}')">
+                                                    {{ role.name }}
+                                                </a>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </span>
+                                </span>
+                            </div>
+                            {% if form.roles.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.roles.errors %}
+                                        <p class="mb-0">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="title" class="form-label fw-semibold">{{ form.title.label.text }}</label>
+                            {% if form.title.errors %}
+                                {{ form.title(class="form-control is-invalid", id="title") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.title.errors %}
+                                        <p class="mb-0">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.title(class="form-control", id="title") }}
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="body" class="form-label fw-semibold">{{ form.body.label.text }}</label>
+                            {% if form.body.errors %}
+                                {{ form.body(class="form-control is-invalid", id="body", rows=3) }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.body.errors %}
+                                        <p class="mb-0">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.body(class="form-control", id="body", rows=3) }}
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="image" class="form-label fw-semibold">{{ form.image.label.text }}</label>
+                            {% if form.image.errors %}
+                                {{ form.image(class="form-control is-invalid", id="image") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.image.errors %}
+                                        <p class="mb-0">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.image(class="form-control", id="image") }}
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="url" class="form-label fw-semibold">{{ form.url.label.text }}</label>
+                            {% if form.url.errors %}
+                                {{ form.url(class="form-control is-invalid", id="url") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.url.errors %}
+                                        <p class="mb-0">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.url(class="form-control", id="url") }}
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form.quiet(class="form-check-input", id="quiet") }}
+                                <label class="form-check-label fw-semibold" for="quiet">
+                                    {{ form.quiet.label.text }}
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="text-end">
+                            {{ form.submit(class="btn " ~ ("btn-outline-dark" if g.theme == "classic" else "btn-primary") ~ " fw-semibold rounded-pill") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/gris-push-notifications.js') }}" defer></script>
+
+<div hidden>
+    <div id="mo-selected-role-template">
+        <span class="badge rounded-pill border border-2 d-inline-flex align-items-center px-2 mo-selected-role">
+            <span class="role_name text-decoration-none" style="color: inherit !important;"></span>
+            <span>
+                <svg class="bi flex-shrink-0 ms-2" style="cursor: pointer; color: inherit !important;" width="15" height="15">
+                    {{ macros.bootstrap_icon("x-circle") }}
+                </svg>
+            </span>
+        </span>
+    </div>
+</div>
+{% endblock %}

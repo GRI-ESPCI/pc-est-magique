@@ -98,6 +98,10 @@ class Config:
         NETLOCS = NETLOCS.split(";")
 
     MAINTENANCE = bool(os.environ.get("MAINTENANCE"))
+
+    VAPID_PUBLIC_KEY = os.environ.get("VAPID_PUBLIC_KEY")
+    VAPID_PRIVATE_KEY_PATH = os.environ.get("VAPID_PRIVATE_KEY_PATH")
+
     
     GRI_IBAN = os.environ.get("GRI_IBAN")
     GRI_BIC = os.environ.get("GRI_BIC")

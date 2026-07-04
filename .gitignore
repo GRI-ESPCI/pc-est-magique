@@ -136,3 +136,10 @@ dmypy.json
 node_modules/
 bower_components/
 app/static/img/bar_background.png
+certs/ca/rootCA-key.pem
+certs/ca/rootCA.pem
+certs/cert.pem
+certs/key.pem
+certs/mkcert
+private_key.pem
+public_key.pem

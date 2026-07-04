@@ -166,7 +166,8 @@
             "js/moment.js",
             "js/tooltips.js",
             "js/toasts.js",
-            "js/api.js"
+            "js/api.js",
+            "js/push-utils.js"
         ] %}
         <script src="{{ url_for("static", filename=filename) }}" defer></script>
         {% endfor %}
@@ -175,6 +176,78 @@
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('/sw.js').then(registration => {
                         console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                        
+                        // Push Notification Prompt for PWA
+                        {% if config.get("VAPID_PUBLIC_KEY") %}
+                        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+                        if (isStandalone && 'Notification' in window && 'PushManager' in window) {
+                            if (Notification.permission === 'default' && !localStorage.getItem('pushPromptDismissed')) {
+                                const promptModalEl = document.getElementById('pwaPushPromptModal');
+                                if (promptModalEl) {
+                                    // Make sure bootstrap is loaded
+                                    if (typeof bootstrap !== 'undefined') {
+                                        const promptModal = new bootstrap.Modal(promptModalEl);
+                                        setTimeout(() => {
+                                            promptModal.show();
+                                        }, 1000);
+                                        
+                                        document.getElementById('pwaPushPromptDismiss').addEventListener('click', () => {
+                                            localStorage.setItem('pushPromptDismissed', 'true');
+                                        });
+                                        
+                                        document.getElementById('pwaPushPromptEnable').addEventListener('click', async () => {
+                                            const btn = document.getElementById('pwaPushPromptEnable');
+                                            btn.disabled = true;
+                                            btn.textContent = "{{ _('Activation...') }}";
+                                            try {
+                                                // Request permission first
+                                                const permission = await Notification.requestPermission();
+                                                if (permission !== 'granted') {
+                                                    throw new Error('Permission not granted');
+                                                }
+                                                
+                                                const res = await fetch('{{ url_for("api.push.vapid_public_key") }}');
+                                                const vapidData = await res.json();
+                                                
+                                                
+                                                
+                                                const subscription = await registration.pushManager.subscribe({
+                                                    userVisibleOnly: true,
+                                                    applicationServerKey: urlBase64ToUint8Array(vapidData.public_key)
+                                                });
+                                                
+                                                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                                                const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+                                                
+                                                const subRes = await fetch('{{ url_for("api.push.subscribe") }}', {
+                                                    method: 'POST',
+                                                    headers: { 
+                                                        'Content-Type': 'application/json',
+                                                        'X-CSRFToken': csrfToken
+                                                    },
+                                                    body: JSON.stringify(subscription)
+                                                });
+                                                
+                                                if (subRes.ok) {
+                                                    promptModal.hide();
+                                                    localStorage.setItem('pushPromptDismissed', 'true');
+                                                } else {
+                                                    throw new Error("Server error");
+                                                }
+                                            } catch (e) {
+                                                console.error(e);
+                                                btn.textContent = "{{ _('Erreur') }}";
+                                                setTimeout(() => {
+                                                    btn.disabled = false;
+                                                    btn.textContent = "{{ _('Activer') }}";
+                                                }, 2000);
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                        {% endif %}
                     }, err => {
                         console.log('ServiceWorker registration failed: ', err);
                     });
@@ -211,6 +284,27 @@
         {% endblock content %}
 
         {% block footer %}{% include "footer.html" %}{% endblock footer %}
+
+        <!-- Push Notification Prompt Modal -->
+        <div class="modal fade" id="pwaPushPromptModal" tabindex="-1" aria-labelledby="pwaPushPromptModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+              <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="pwaPushPromptModalLabel">
+                    <i class="fas fa-bell text-primary me-2"></i>{{ _("Activer les notifications ?") }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p class="text-body-secondary mb-0">{{ _("Souhaitez-vous activer les notifications pour être tenu au courant des nouveautés par les GRI et le BDE ? Vous pouvez modifier ce choix dans votre page profil.") }}</p>
+              </div>
+              <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-3" data-bs-dismiss="modal" id="pwaPushPromptDismiss">{{ _("Plus tard") }}</button>
+                <button type="button" class="btn btn-primary rounded-pill px-3 shadow-sm" id="pwaPushPromptEnable">{{ _("Activer") }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {% endblock body %}
     </body>

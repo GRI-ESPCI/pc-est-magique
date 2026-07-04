@@ -88,6 +88,8 @@ class PCeen(flask_login.UserMixin, Model):
     devices: Mapped[list["models.Device"]] = one_to_many("Device.pceen")
     rentals: Mapped[list["models.Rental"]] = one_to_many("Rental.pceen")
     subscriptions: Mapped[list["models.Subscription"]] = one_to_many("Subscription.pceen")
+    push_subscriptions: Mapped[list["models.PushSubscription"]] = one_to_many("PushSubscription.pceen")
+    read_notifications: Mapped[list["models.NotificationRead"]] = one_to_many("NotificationRead.pceen")
     payments: Mapped[list["models.Payment"]] = one_to_many("Payment.pceen", foreign_keys="Payment._pceen_id")
     payments_created: Mapped[list["models.Payment"]] = one_to_many("Payment.gri", foreign_keys="Payment._gri_id")
 
