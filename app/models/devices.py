@@ -32,7 +32,7 @@ class Device(Model):
     registered: Column[datetime.datetime] = column(sa.DateTime(), nullable=False)
     last_seen: Column[datetime.datetime | None] = column(sa.DateTime(), nullable=True)
 
-    allocations: Mapped[list["models.Allocation"]] = one_to_many("Allocation.device")
+    allocations: Mapped[list["models.Allocation"]] = one_to_many("Allocation.device", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
