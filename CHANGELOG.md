@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# v2.11.0
+
+### Changed
+
+- Added new notification system (with push notifications for PWA users)
+- Added PWA support
+- Added new Calendar module
+- Improved responsiveness of many pages to be more comfortable for mobile users
+- Added new banner system/module for the home page
+
 # v2.10.0
 
 ### Changed
