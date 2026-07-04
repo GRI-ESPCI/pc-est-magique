@@ -18,6 +18,12 @@ Application Flask tournant sur https://pc-est-magique.fr.
 Seules les fonctionnalités majeures sont listées ici ; voir
 [`CHANGELOG.md`](CHANGELOG.md) pour les détails.
 
+### 2.11
+
+- Nouveau système de notifications
+- Nouveau module calendrier
+- Support de l'installation en PWA
+
 ### 2.10
 
 - Nouveaux thèmes "M3" et "Frost" avec variantes clair/sombre.
