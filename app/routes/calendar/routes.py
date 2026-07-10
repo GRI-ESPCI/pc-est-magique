@@ -310,6 +310,7 @@ def export_feed(token: str):
         e.description = event.description
         if event.club:
             e.categories = {event.club.name}
+            e.description = f"[{event.club.name}]\n{e.description}" if e.description else f"[{event.club.name}]"
             if event.club.color:
                 e.extra.append(ContentLine(name="COLOR", value=event.club.color))
         cal.events.add(e)
@@ -325,6 +326,7 @@ def export_feed(token: str):
         e.description = spec.description
         if club_q:
             e.categories = {club_q.name}
+            e.description = f"[{club_q.name}]\n{e.description}" if e.description else f"[{club_q.name}]"
             if club_q.color:
                 e.extra.append(ContentLine(name="COLOR", value=club_q.color))
         cal.events.add(e)
