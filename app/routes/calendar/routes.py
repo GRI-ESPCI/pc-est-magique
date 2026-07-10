@@ -3,9 +3,10 @@
 import datetime
 import flask
 from flask_babel import _
+import ics
 
 from app import context, db
-from app.models import Club, Event, PermissionType, PermissionScope, ClubQSpectacle
+from app.models import Club, Event, PermissionType, PermissionScope, ClubQSpectacle, PCeen
 from app.routes.calendar import bp
 from app.routes.calendar.forms import EditClub
 
@@ -25,7 +26,8 @@ def index():
     """Main calendar page."""
     clubs = db.session.scalars(db.select(Club).order_by(Club.name)).all()
     can_admin = context.has_permission(PermissionType.write, PermissionScope.calendar)
-    return flask.render_template("calendar/index.html", title=_("Calendrier"), clubs=clubs, can_admin=can_admin)
+    calendar_token = context.g.pceen.get_calendar_token() if context.g.pceen else None
+    return flask.render_template("calendar/index.html", title=_("Calendrier"), clubs=clubs, can_admin=can_admin, calendar_token=calendar_token)
 
 @bp.route("/api/events")
 @context.logged_in_only
@@ -261,4 +263,71 @@ def serve_fullcalendar():
         safe_join(proj_root, "node_modules", "fullcalendar"),
         "index.global.min.js"
     )
+
+@bp.route("/feed/<token>/calendrier.ics")
+def export_feed(token: str):
+    """Export the calendar as an iCalendar feed."""
+    pceen = PCeen.verify_calendar_token(token)
+    if not pceen:
+        flask.abort(404)
+    if not pceen.has_permission(PermissionType.read, PermissionScope.calendar):
+        flask.abort(403)
+        
+    from ics.grammar.parse import ContentLine
+    cal = ics.Calendar()
+    cal.creator = "PC est magique"
+    cal.extra.append(ContentLine(name='X-WR-CALNAME', value='Calendrier PCéen'))
+    cal.extra.append(ContentLine(name='NAME', value='Calendrier PCéen'))
+    cal.extra.append(ContentLine(name='X-WR-TIMEZONE', value='Europe/Paris'))
+    cal.extra.append(ContentLine(name='X-WR-CALDESC', value='Calendrier des évènements de PC est magique'))
+    cal.extra.append(ContentLine(name='DESCRIPTION', value='Calendrier des évènements de PC est magique'))
+    
+    three_years_ago = datetime.datetime.now() - datetime.timedelta(days=3 * 365)
+    
+    events = db.session.scalars(
+        db.select(Event).filter(Event.start_time >= three_years_ago)
+    ).all()
+    spectacles = db.session.scalars(
+        db.select(ClubQSpectacle).filter(ClubQSpectacle.date >= three_years_ago)
+    ).all()
+    
+    for event in events:
+        e = ics.Event()
+        e.name = event.title
+        
+        import zoneinfo
+        tz = zoneinfo.ZoneInfo("Europe/Paris")
+        
+        if event.all_day:
+            e.begin = event.start_time.date()
+            e.end = event.end_time.date()
+            e.make_all_day()
+        else:
+            e.begin = event.start_time.replace(tzinfo=tz)
+            e.end = event.end_time.replace(tzinfo=tz)
+            
+        e.location = event.location
+        e.description = event.description
+        if event.club:
+            e.categories = {event.club.name}
+            if event.club.color:
+                e.extra.append(ContentLine(name="COLOR", value=event.club.color))
+        cal.events.add(e)
+        
+    club_q = db.session.scalars(db.select(Club).filter_by(name='Club Q')).first()
+    for spec in spectacles:
+        e = ics.Event()
+        e.name = spec.nom
+        tz = zoneinfo.ZoneInfo("Europe/Paris")
+        e.begin = spec.date.replace(tzinfo=tz)
+        e.end = (spec.date + datetime.timedelta(hours=2)).replace(tzinfo=tz)
+        e.location = spec.salle.nom if spec.salle else None
+        e.description = spec.description
+        if club_q:
+            e.categories = {club_q.name}
+            if club_q.color:
+                e.extra.append(ContentLine(name="COLOR", value=club_q.color))
+        cal.events.add(e)
+        
+    return flask.Response(cal.serialize(), mimetype="text/calendar")
 

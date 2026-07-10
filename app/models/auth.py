@@ -443,6 +443,39 @@ class PCeen(flask_login.UserMixin, Model):
             algorithm="HS256",
         )
 
+    def get_calendar_token(self) -> str:
+        """Create a JWT calendar token for the pceen.
+
+        Relies on :func:`jwt.encode`.
+
+        Returns:
+            The created JWT token.
+        """
+        return jwt.encode(
+            {"calendar_feed": self.id},
+            flask.current_app.config["SECRET_KEY"],
+            algorithm="HS256",
+        )
+
+    @classmethod
+    def verify_calendar_token(cls, token: str) -> PCeen | None:
+        """Verify a pceen calendar token.
+
+        Relies on :func:`jwt.decode`.
+
+        Args:
+            token: The JWT token to decode.
+
+        Returns:
+            The pceen to get calendar of if the token is valid and the
+            pceen exists, else ``None``.
+        """
+        try:
+            id = jwt.decode(token, flask.current_app.config["SECRET_KEY"], algorithms=["HS256"])["calendar_feed"]
+        except Exception:
+            return None
+        return db.session.get(cls, id)
+
     @classmethod
     def verify_reset_password_token(cls, token: str) -> PCeen | None:
         """Verify a pceen password reset token (class method).
@@ -459,7 +492,7 @@ class PCeen(flask_login.UserMixin, Model):
         try:
             id = jwt.decode(token, flask.current_app.config["SECRET_KEY"], algorithms=["HS256"])["reset_password"]
         except Exception:
-            return
+            return None
         return db.session.get(cls, id)
 
 

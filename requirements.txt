@@ -48,3 +48,4 @@ plum-py>=0.8,<1
 gunicorn>=23.0,<24
 psycopg2-binary>=2.9,<3
 pywebpush>=2.3,<3
+ics>=0.7,<1
