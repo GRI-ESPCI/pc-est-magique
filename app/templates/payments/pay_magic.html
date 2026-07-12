@@ -64,7 +64,7 @@
 <div class="row mt-4">
     <div class="col text-center">
         <a class="btn btn-primary btn-pill btn-lg shadow-sm ms-2"
-           href="{{ url_for("payments.add_payment", offer=offer.slug,
+           href="{{ url_for("payments.add_payment", offer=offer.id,
                              doas=request.args.get("doas")) }}">
             {{ _("Valider le paiement") }}
         </a>
