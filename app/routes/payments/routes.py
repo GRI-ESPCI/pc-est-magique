@@ -101,10 +101,10 @@ def pay_(method: str, offer: str | None = None) -> typing.RouteReturn:
     return helpers.ensure_safe_redirect("payments.pay", next=None)
 
 
-@bp.route("/add_payment/<int:offer>")
+@bp.route("/add_payment/<string:offer>")
 @context.intrarez_setup_only
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
-def add_payment(offer: int | None = None) -> typing.RouteReturn:
+def add_payment(offer: str | None = None) -> typing.RouteReturn:
     """Add an arbitrary payment by a GRI."""
     if not context.g.doas:
         flask.abort(403)
