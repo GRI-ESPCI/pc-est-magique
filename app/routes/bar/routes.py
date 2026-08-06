@@ -223,17 +223,18 @@ def user(username: str, page: int | None = None):
             db.session.commit()
             flask.flash(_("Le surnom de %(name)s a bien été modifié", name=pceen.full_name), "success")
 
-        if pceen.has_permission(PermissionType.write, PermissionScope.bar):
-            if not form.is_barman.data:
-                roles.revoke_barman_role(pceen)
+        if context.g.pceen.username != 'odubar':
+            if pceen.has_permission(PermissionType.write, PermissionScope.bar):
+                if not form.is_barman.data:
+                    roles.revoke_barman_role(pceen)
+                    db.session.commit()
+                    helpers.log_action(f"Removed Barman role from {pceen}")
+                    flask.flash(_("%(name)s n'est maintenant plus barman / barmaid", name=pceen.full_name), "warning")
+            elif form.is_barman.data:
+                roles.grant_barman_role(pceen)
                 db.session.commit()
-                helpers.log_action(f"Removed Barman role from {pceen}")
-                flask.flash(_("%(name)s n'est maintenant plus barman / barmaid", name=pceen.full_name), "warning")
-        elif form.is_barman.data:
-            roles.grant_barman_role(pceen)
-            db.session.commit()
-            helpers.log_action(f"Added Barman role to {pceen}")
-            flask.flash(_("%(name)s est maintenant barmaid / barmaid", name=pceen.full_name), "warning")
+                helpers.log_action(f"Added Barman role to {pceen}")
+                flask.flash(_("%(name)s est maintenant barmaid / barmaid", name=pceen.full_name), "warning")
 
         if form.avatar.data:
             try:

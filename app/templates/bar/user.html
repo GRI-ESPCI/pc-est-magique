@@ -556,11 +556,13 @@ aria-hidden="true">
             <div class="form-floating mb-3">
                 {{ wtf.form_field(form.nickname, value=pceen.bar_nickname or "") }}
             </div>
+            {% if g.pceen.username != 'odubar' %}
             <div class="form-check form-switch mb-3 ms-1">
                 {{ wtf.form_field(
                     form.is_barman, checked=pceen.has_permission(PermissionType.write, PermissionScope.bar),
                 ) }}
             </div>
+            {% endif %}
             <div>
                 <label for="avatar" class="form-label ms-1">
                     {{ _("Nouvel avatar (sera recadré en 160x200 px) :") }}

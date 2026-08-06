@@ -34,8 +34,10 @@
 <a href="{{ url_for("bar.me") }}" class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}">
     {{ _("Détails") }}
 </a>
-<a href="{{ url_for("bar.recharge") }}" class="ms-2 btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}">
-    {{ _("Recharger") }}
-</a>
+<span class="d-inline-block ms-2" tabindex="0" data-bs-toggle="tooltip" data-bs-title="{{ _('Recharge en ligne désactivée par le bar') }}">
+    <a href="#" class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }} disabled" tabindex="-1" role="button" aria-disabled="true" style="pointer-events: none;">
+        {{ _("Recharger") }}
+    </a>
+</span>
 
 {% endblock %}
