@@ -474,7 +474,7 @@ def salles() -> typing.RouteReturn:
             .filter(ClubQSpectacle._salle_id == ClubQSalle.id)
             .exists()
         )
-        salles = db.select(ClubQSalle).filter(subquery).order_by(ClubQSalle.nom)
+        salles = db.session.scalars(db.select(ClubQSalle).filter(subquery).order_by(ClubQSalle.nom)).all()
 
     saisons = db.session.scalars(db.select(ClubQSeason).order_by(desc(ClubQSeason.debut))).all()
 

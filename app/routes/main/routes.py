@@ -86,7 +86,7 @@ def index() -> typing.RouteReturn:
     bekk_infos = None
     if context.has_permission(PermissionType.read, PermissionScope.bekk):
 
-        bekks_stmt = db.select(Bekk).order_by(Bekk.date)
+        bekks_stmt = db.select(Bekk).order_by(Bekk.date.desc(), Bekk.id.desc())
         last_bekk = db.session.scalars(bekks_stmt).first()
 
         if last_bekk is None:
