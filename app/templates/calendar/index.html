@@ -380,11 +380,17 @@
                     </div>
 
                     <div class="d-grid mt-2">
-                        <button type="submit" class="btn btn-primary rounded-pill fw-semibold py-2 shadow-sm d-flex justify-content-center align-items-center">
+                        <button type="submit" class="btn btn-primary rounded-pill fw-semibold py-2 shadow-sm d-flex justify-content-center align-items-center mb-2">
                             <span id="btn-text">{{ _('Créer') }}</span>
                             <div id="btn-loader" class="spinner-border spinner-border-sm ms-2 d-none" role="status">
                                 <span class="visually-hidden">{{ _('Chargement...') }}</span>
                             </div>
+                        </button>
+                        <button type="button" id="deleteEventBtn" class="btn btn-outline-danger rounded-pill fw-semibold py-2 shadow-sm d-none justify-content-center align-items-center">
+                            <svg class="bi flex-shrink-0 me-2" width="16" height="16">
+                                {{ macros.bootstrap_icon("trash") }}
+                            </svg>
+                            {{ _("Supprimer l'évènement") }}
                         </button>
                     </div>
                 </form>
@@ -408,19 +414,6 @@
         function updateDateInputTypes() {
             let isAllDay = document.getElementById('all_day').checked;
             let type = isAllDay ? 'date' : 'datetime-local';
-            
-            const startLabel = document.querySelector('label[for="start"]');
-            const endContainer = document.getElementById('end').closest('.mb-3');
-            
-            if (isAllDay) {
-                startLabel.innerText = "{{ _('Date') }}";
-                endContainer.classList.add('d-none');
-                document.getElementById('end').required = false;
-            } else {
-                startLabel.innerText = "{{ _('Date de début') }}";
-                endContainer.classList.remove('d-none');
-                document.getElementById('end').required = true;
-            }
             
             ['start', 'end'].forEach(id => {
                 let input = document.getElementById(id);
@@ -546,6 +539,8 @@
                 document.getElementById('event_id').value = '';
                 document.getElementById('createEventModalLabel').innerText = "{{ _('Nouvel Évènement') }}";
                 document.getElementById('btn-text').innerText = "{{ _("Créer l'évènement") }}";
+                document.getElementById('deleteEventBtn').classList.add('d-none');
+                document.getElementById('deleteEventBtn').classList.remove('d-flex');
                 form.reset();
 
                 let end = info.end;
@@ -591,17 +586,61 @@
             document.getElementById('event_id').value = currentEvent.id;
             document.getElementById('createEventModalLabel').innerText = "{{ _("Modifier l'évènement") }}";
             document.getElementById('btn-text').innerText = "{{ _('Enregistrer') }}";
+            document.getElementById('deleteEventBtn').classList.remove('d-none');
+            document.getElementById('deleteEventBtn').classList.add('d-flex');
             document.getElementById('title').value = currentEvent.title;
             document.getElementById('start').type = 'datetime-local';
             document.getElementById('end').type = 'datetime-local';
             document.getElementById('start').value = moment(currentEvent.start).format('YYYY-MM-DDTHH:mm');
-            document.getElementById('end').value = moment(currentEvent.end).format('YYYY-MM-DDTHH:mm');
+            
+            let endDate = currentEvent.end ? new Date(currentEvent.end) : new Date(currentEvent.start);
+            if (currentEvent.allDay && currentEvent.end) {
+                endDate.setDate(endDate.getDate() - 1);
+            }
+            document.getElementById('end').value = moment(endDate).format('YYYY-MM-DDTHH:mm');
+            
             document.getElementById('all_day').checked = currentEvent.allDay;
             updateDateInputTypes();
             document.getElementById('club_id').value = currentEvent.extendedProps.club_id;
             document.getElementById('location').value = currentEvent.extendedProps.location || '';
             document.getElementById('description').value = currentEvent.extendedProps.description || '';
             createModal.show();
+        });
+
+        document.getElementById('deleteEventBtn').addEventListener('click', function() {
+            if (!confirm("{{ _('Êtes-vous sûr·e de vouloir supprimer cet évènement ?') }}")) return;
+            const eventId = document.getElementById('event_id').value;
+            if (!eventId) return;
+            
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">{{ _("Chargement...") }}</span></div>';
+            btn.disabled = true;
+            
+            fetch(`/calendar/api/events/delete/${eventId}`, { method: 'POST' })
+            .then(async response => { 
+                const data = await response.json().catch(() => null);
+                if (!response.ok) {
+                    throw new Error(data && data.message ? data.message : 'Erreur réseau');
+                }
+                return data;
+            })
+            .then(data => { 
+                createModal.hide(); 
+                calendar.refetchEvents();
+                if (data.message && typeof showToast !== 'undefined') {
+                    showToast(data.message, 'success');
+                }
+            })
+            .catch(error => { 
+                const formError = document.getElementById('formError');
+                formError.innerText = error.message;
+                formError.classList.remove('d-none');
+            })
+            .finally(() => { 
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
         });
 
         form.addEventListener('submit', function(e) {
@@ -622,11 +661,6 @@
             const formData = new FormData(form);
             const isAllDay = document.getElementById('all_day').checked;
             formData.set('all_day', isAllDay);
-            
-            if (isAllDay) {
-                // End date is the same as start date for all day events
-                formData.set('end', document.getElementById('start').value);
-            }
             
             const url = eventId ? `/calendar/api/events/edit/${eventId}` : '/calendar/api/events/create';
             fetch(url, { method: 'POST', body: formData })

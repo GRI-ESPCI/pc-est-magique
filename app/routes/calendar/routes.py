@@ -6,7 +6,7 @@ from flask_babel import _
 import ics
 
 from app import context, db
-from app.models import Club, Event, PermissionType, PermissionScope, ClubQSpectacle, PCeen
+from app.models import Club, Event, PermissionType, PermissionScope, ClubQSpectacle, PCeen, ClubQVoeu
 from app.routes.calendar import bp
 from app.routes.calendar.forms import EditClub
 
@@ -203,6 +203,25 @@ def create_event():
         "message": str(_("Évènement '%(title)s' créé avec succès !", title=title))
     }), 201
 
+@bp.route("/api/events/delete/<int:event_id>", methods=["POST", "DELETE"])
+@context.logged_in_only
+def delete_event(event_id: int):
+    """API route to delete an event."""
+    event = db.session.get(Event, event_id)
+    if not event:
+        flask.abort(404, "Event not found")
+
+    if not context.has_permission(PermissionType.write, PermissionScope.calendar):
+        flask.abort(403, "You do not have permission to delete events in the calendar.")
+
+    db.session.delete(event)
+    db.session.commit()
+    
+    return flask.jsonify({
+        "status": "success",
+        "message": str(_("Évènement supprimé avec succès."))
+    })
+
 @bp.route("/admin")
 @context.permission_only(PermissionType.write, PermissionScope.calendar)
 def admin():
@@ -288,7 +307,13 @@ def export_feed(token: str):
         db.select(Event).filter(Event.start_time >= three_years_ago)
     ).all()
     spectacles = db.session.scalars(
-        db.select(ClubQSpectacle).filter(ClubQSpectacle.date >= three_years_ago)
+        db.select(ClubQSpectacle)
+        .join(ClubQVoeu)
+        .where(
+            ClubQSpectacle.date >= three_years_ago,
+            ClubQVoeu._pceen_id == pceen.id,
+            ClubQVoeu.places_attribuees > 0,
+        )
     ).all()
     
     for event in events:
@@ -300,7 +325,7 @@ def export_feed(token: str):
         
         if event.all_day:
             e.begin = event.start_time.date()
-            e.end = event.end_time.date()
+            e.end = event.end_time.date() + datetime.timedelta(days=1)
             e.make_all_day()
         else:
             e.begin = event.start_time.replace(tzinfo=tz)

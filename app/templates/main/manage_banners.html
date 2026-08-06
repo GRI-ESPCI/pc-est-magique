@@ -166,7 +166,7 @@
                                                         {{ macros.bootstrap_icon("pencil") }}
                                                     </svg>
                                                 </a>
-                                                <form action="{{ url_for('main.delete_banner', banner_id=banner.id) }}" method="post" class="m-0" onsubmit="return confirm('{{ _('Êtes-vous sûr de vouloir supprimer cette bannière ?') }}');">
+                                                <form action="{{ url_for('main.delete_banner', banner_id=banner.id) }}" method="post" class="m-0" onsubmit="return confirm('{{ _('Êtes-vous sûr·e de vouloir supprimer cette bannière ?') }}');">
                                                     <button type="submit" class="btn btn-icon-zoom text-danger p-2 shadow-none" data-bs-toggle="tooltip" title="{{ _('Supprimer cette bannière') }}">
                                                         <svg class="bi flex-shrink-0" width="18" height="18" role="img">
                                                             {{ macros.bootstrap_icon("trash") }}

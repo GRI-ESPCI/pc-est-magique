@@ -73,11 +73,15 @@ class Event(db.Model):
             except ValueError:
                 pass
 
+        end_time = self.end_time
+        if self.all_day:
+            end_time = end_time + datetime.timedelta(days=1)
+
         return {
             "id": self.id,
             "title": self.title,
             "start": self.start_time.isoformat(),
-            "end": self.end_time.isoformat(),
+            "end": end_time.isoformat(),
             "allDay": self.all_day,
             "color": hex_color,
             "extendedProps": {

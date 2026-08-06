@@ -5206,7 +5206,7 @@ msgid "Modifier cette bannière"
 msgstr "Edit this banner"
 
 #: app/templates/main/manage_banners.html:169
-msgid "Êtes-vous sûr de vouloir supprimer cette bannière ?"
+msgid "Êtes-vous sûr·e de vouloir supprimer cette bannière ?"
 msgstr "Are you sure you want to delete this banner?"
 
 #: app/templates/main/manage_banners.html:170
@@ -5406,7 +5406,7 @@ msgstr "Edit order"
 
 #: app/templates/panier_bio/main.html:234
 msgid ""
-"Êtes-vous sûr de vouloir annuler votre commande de Panier Bio ? Cette "
+"Êtes-vous sûr·e de vouloir annuler votre commande de Panier Bio ? Cette "
 "action est irréversible."
 msgstr ""
 
