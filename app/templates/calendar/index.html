@@ -270,14 +270,16 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Fermer') }}"></button>
             </div>
             <div class="modal-body p-4">
-                <p>{{ _("Utilisez le lien suivant pour ajouter le calendrier à votre application (Google Calendar, Apple Calendar, etc.) :") }}</p>
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" id="calendarFeedUrl" readonly value="{{ url_for('calendar.export_feed', token=calendar_token, _external=True) }}">
-                    <button class="btn btn-outline-secondary" type="button" onclick="navigator.clipboard.writeText(document.getElementById('calendarFeedUrl').value); showToast('{{ _('Lien copié !') }}', 'success');">
+                <p class="text-muted mb-4">{{ _("Utilisez le lien suivant pour ajouter le calendrier à votre application (Google Calendar, Apple Calendar, etc.) :") }}</p>
+                
+                <div class="input-group mb-2 shadow-sm">
+                    <button class="btn btn-primary d-flex align-items-center gap-2 px-3 fw-semibold z-0" type="button" style="border-radius: var(--bs-border-radius) 0 0 var(--bs-border-radius) !important;" onclick="navigator.clipboard.writeText(document.getElementById('calendarFeedUrl').value); showToast('{{ _('Lien copié !') }}', 'success');">
                         <svg class="bi flex-shrink-0" width="16" height="16">
                             {{ macros.bootstrap_icon("clipboard") }}
                         </svg>
+                        <span>{{ _("Copier") }}</span>
                     </button>
+                    <input type="text" class="form-control font-monospace small text-muted bg-body-tertiary" id="calendarFeedUrl" readonly value="{{ url_for('calendar.export_feed', token=calendar_token, _external=True) }}" style="cursor: text; border-radius: 0 var(--bs-border-radius) var(--bs-border-radius) 0 !important;" onclick="this.select();">
                 </div>
             </div>
         </div>

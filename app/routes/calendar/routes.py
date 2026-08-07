@@ -302,6 +302,7 @@ def export_feed(token: str):
     cal.extra.append(ContentLine(name='DESCRIPTION', value='Calendrier des évènements de PC est magique'))
     
     three_years_ago = datetime.datetime.now() - datetime.timedelta(days=3 * 365)
+    now_utc_str = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     
     events = db.session.scalars(
         db.select(Event).filter(Event.start_time >= three_years_ago)
@@ -324,11 +325,9 @@ def export_feed(token: str):
         tz = zoneinfo.ZoneInfo("Europe/Paris")
         
         if event.all_day:
-            start_str = event.start_time.strftime("%Y%m%d")
-            end_date = event.end_time.date() + datetime.timedelta(days=1)
-            end_str = end_date.strftime("%Y%m%d")
-            e.extra.append(ContentLine(name="DTSTART", params={"VALUE": ["DATE"]}, value=start_str))
-            e.extra.append(ContentLine(name="DTEND", params={"VALUE": ["DATE"]}, value=end_str))
+            e.begin = event.start_time.date()
+            e.make_all_day()
+            e.end = event.end_time.date() + datetime.timedelta(days=1)
         else:
             e.begin = event.start_time.replace(tzinfo=tz)
             e.end = event.end_time.replace(tzinfo=tz)
@@ -340,6 +339,14 @@ def export_feed(token: str):
             e.description = f"[{event.club.name}]\n{e.description}" if e.description else f"[{event.club.name}]"
             if event.club.color:
                 e.extra.append(ContentLine(name="COLOR", value=event.club.color))
+        
+        e.extra.append(ContentLine(name="DTSTAMP", value=now_utc_str))
+        e.extra.append(ContentLine(name="CREATED", value=now_utc_str))
+        e.extra.append(ContentLine(name="LAST-MODIFIED", value=now_utc_str))
+        e.extra.append(ContentLine(name="SEQUENCE", value="0"))
+        e.extra.append(ContentLine(name="STATUS", value="CONFIRMED"))
+        e.extra.append(ContentLine(name="TRANSP", value="TRANSPARENT"))
+        
         cal.events.add(e)
         
     club_q = db.session.scalars(db.select(Club).filter_by(name='Club Q')).first()
@@ -356,6 +363,14 @@ def export_feed(token: str):
             e.description = f"[{club_q.name}]\n{e.description}" if e.description else f"[{club_q.name}]"
             if club_q.color:
                 e.extra.append(ContentLine(name="COLOR", value=club_q.color))
+        
+        e.extra.append(ContentLine(name="DTSTAMP", value=now_utc_str))
+        e.extra.append(ContentLine(name="CREATED", value=now_utc_str))
+        e.extra.append(ContentLine(name="LAST-MODIFIED", value=now_utc_str))
+        e.extra.append(ContentLine(name="SEQUENCE", value="0"))
+        e.extra.append(ContentLine(name="STATUS", value="CONFIRMED"))
+        e.extra.append(ContentLine(name="TRANSP", value="TRANSPARENT"))
+
         cal.events.add(e)
         
     return flask.Response(cal.serialize(), mimetype="text/calendar")
