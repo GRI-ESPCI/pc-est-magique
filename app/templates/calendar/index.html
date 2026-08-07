@@ -458,6 +458,33 @@
             events: '{{ url_for("calendar.get_events") }}',
             displayEventEnd: window.innerWidth >= 768,
             eventTimeFormat: { hour: '2-digit', minute: '2-digit', meridiem: false, hour12: false },
+            eventsSet: function(events) {
+                if (calendar.view.type === 'timeGridWeek' || calendar.view.type === 'timeGridDay') {
+                    if (events.length > 0) {
+                        let earliestHour = 24;
+                        let earliestMinute = 0;
+                        let hasTimeEvents = false;
+                        
+                        events.forEach(event => {
+                            if (!event.allDay && event.start) {
+                                let hour = event.start.getHours();
+                                let minute = event.start.getMinutes();
+                                if (hour < earliestHour || (hour === earliestHour && minute < earliestMinute)) {
+                                    earliestHour = hour;
+                                    earliestMinute = minute;
+                                    hasTimeEvents = true;
+                                }
+                            }
+                        });
+                        
+                        if (hasTimeEvents) {
+                            let scrollHour = Math.max(0, earliestHour - 1);
+                            let timeString = scrollHour.toString().padStart(2, '0') + ':' + earliestMinute.toString().padStart(2, '0') + ':00';
+                            calendar.scrollToTime(timeString);
+                        }
+                    }
+                }
+            },
             eventDidMount: function(info) {
                 let isMonth = info.view.type === 'dayGridMonth';
 

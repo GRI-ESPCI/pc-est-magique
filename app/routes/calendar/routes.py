@@ -324,9 +324,9 @@ def export_feed(token: str):
         tz = zoneinfo.ZoneInfo("Europe/Paris")
         
         if event.all_day:
+            e.make_all_day()
             e.begin = event.start_time.date()
             e.end = event.end_time.date() + datetime.timedelta(days=1)
-            e.make_all_day()
         else:
             e.begin = event.start_time.replace(tzinfo=tz)
             e.end = event.end_time.replace(tzinfo=tz)
