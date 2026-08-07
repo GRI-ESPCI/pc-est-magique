@@ -27,7 +27,6 @@ from app.models.rooms import Rental, Room
 from app.models.theatre import Spectacle, Representation, Saison
 from app.models.club_q import ClubQSeason, ClubQSalle, ClubQSpectacle, ClubQVoeu, ClubQBrochure
 from app.models.bekk import Bekk
-from app.models.panier_bio import OrderPanierBio, PeriodPanierBio
 from app.models.calendar import Club, Event
 from app.models.info import InfoBanner, InfoBannerPreset
 from app.models.push import PushSubscription, Notification, NotificationRead
