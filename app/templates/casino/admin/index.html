@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+
+
+{% block content %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ _("Administration du Casino") }}</h1>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('casino.index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>{{ _("Retour au Casino") }}
+            </a>
+            <a href="{{ url_for('casino.admin_create') }}" class="btn btn-primary">{{ _("Nouvelle prédiction") }}</a>
+        </div>
+    </div>
+
+    {% if predictions %}
+    <div class="row row-cols-1 g-3">
+        {% for prediction in predictions %}
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex w-100 justify-content-between align-items-center mb-2">
+                        <h5 class="card-title mb-0">{{ prediction.name }}</h5>
+                        <span class="badge {% if prediction.status.name == 'open' %}bg-success{% elif prediction.status.name == 'locked' %}bg-warning{% else %}bg-secondary{% endif %}">
+                            {% if prediction.status.name == 'open' %}
+                                {{ _("Ouvert") }}
+                            {% elif prediction.status.name == 'locked' %}
+                                {{ _("Verrouillé") }}
+                            {% else %}
+                                {{ _("Résolu") }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    <p class="card-text text-muted mb-3">{{ prediction.description or '' }}</p>
+                    
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        {% if prediction.status.name == 'open' %}
+                        <form action="{{ url_for('casino.admin_lock', id=prediction.id) }}" method="POST">
+                            {{ form.csrf_token }}
+                            <button type="submit" class="btn btn-warning btn-sm">{{ _("Verrouiller") }}</button>
+                        </form>
+                        {% elif prediction.status.name == 'locked' %}
+                        <form action="{{ url_for('casino.admin_resolve', id=prediction.id) }}" method="POST" class="d-flex align-items-center gap-2">
+                            {{ form.csrf_token }}
+                            <select name="option_id" class="form-select form-select-sm" style="width: auto;" required>
+                                <option value="">{{ _("Sélectionner le gagnant") }}</option>
+                                {% for option in prediction.options %}
+                                <option value="{{ option.id }}">{{ option.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-success btn-sm">{{ _("Résoudre") }}</button>
+                        </form>
+                        {% else %}
+                        <div><strong>{{ _("Résolu avec :") }}</strong> {{ prediction.resolved_option.name if prediction.resolved_option else '?' }}</div>
+                        <form action="{{ url_for('casino.admin_delete', id=prediction.id) }}" method="POST" onsubmit="return confirm(&quot;{{ _('Voulez-vous vraiment supprimer cette prédiction ?') }}&quot;)">
+                            {{ form.csrf_token }}
+                            <button type="submit" class="btn btn-outline-danger btn-sm ms-3">{{ _("Supprimer") }}</button>
+                        </form>
+                        {% endif %}
+                        
+                        {% if prediction.status.name != 'resolved' %}
+                        <form action="{{ url_for('casino.admin_cancel', id=prediction.id) }}" method="POST" onsubmit="return confirm('{{ _('Voulez-vous vraiment annuler et rembourser tous les paris ?') }}')">
+                            {{ form.csrf_token }}
+                            <button type="submit" class="btn btn-danger btn-sm">{{ _("Annuler") }}</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">{{ _("Aucune prédiction pour le moment.") }}</div>
+    {% endif %}
+</div>
+{% endblock %}

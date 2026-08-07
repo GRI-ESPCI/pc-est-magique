@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block styles %}
+{{ super() }}
+<link href="{{ url_for('static', filename='css/casino.css') }}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<style>
+/* Luxury Playing Card Theme */
+    .casino-card {
+        background: radial-gradient(circle at 50% 50%, #161920 0%, #0b0c10 100%) !important;
+        border: 2px solid #d4af37 !important;
+        border-radius: 12px !important;
+        color: #f1f5f9 !important;
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        will-change: transform;
+        z-index: 1;
+        position: relative;
+        overflow: hidden !important;
+        box-shadow: 
+            0 8px 25px rgba(0, 0, 0, 0.7),
+            inset 0 0 0 3px rgba(212, 175, 55, 0.2) !important;
+        padding: 6px !important;
+    }
+
+.casino-card::before {
+        content: "";
+        display: block !important;
+        position: absolute;
+        inset: 6px;
+        border: 1px solid rgba(212, 175, 55, 0.15) !important;
+        border-radius: 14px !important;
+        pointer-events: none;
+        z-index: 0;
+        box-sizing: border-box !important;
+    }
+
+.casino-card:hover {
+        transform: translateY(-6px);
+    }
+
+.casino-card-open:hover {
+        border-color: #ffd700 !important;
+        box-shadow: 
+            0 12px 35px rgba(16, 185, 129, 0.25),
+            inset 0 0 0 3px rgba(255, 215, 0, 0.4) !important;
+    }
+
+.casino-card-locked:hover {
+        border-color: #ffd700 !important;
+        box-shadow: 
+            0 12px 35px rgba(245, 158, 11, 0.25),
+            inset 0 0 0 3px rgba(255, 215, 0, 0.4) !important;
+    }
+
+.casino-card-resolved:hover {
+        border-color: #ffd700 !important;
+        box-shadow: 
+            0 12px 35px rgba(96, 165, 250, 0.25),
+            inset 0 0 0 3px rgba(255, 215, 0, 0.4) !important;
+    }
+
+/* Large Suit Watermarks in the background with Status Neon Glow */
+    .casino-card-watermark {
+        position: absolute;
+        right: 15px;
+        bottom: 10px;
+        font-size: 8rem;
+        font-family: serif;
+        line-height: 1;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 1 !important;
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), color 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), text-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        will-change: transform;
+    }
+
+.casino-card:hover .casino-card-watermark {
+        transform: scale(1.05);
+    }
+
+.casino-card-open .casino-card-watermark {
+        color: rgba(16, 185, 129, 0.08) !important;
+        text-shadow: 0 0 8px rgba(16, 185, 129, 0.35) !important;
+    }
+
+.casino-card-open:hover .casino-card-watermark {
+        color: rgba(16, 185, 129, 0.22) !important;
+        text-shadow: 
+            0 0 10px rgba(16, 185, 129, 0.8),
+            0 0 25px rgba(16, 185, 129, 0.45) !important;
+    }
+
+.casino-card-locked .casino-card-watermark {
+        color: rgba(245, 158, 11, 0.08) !important;
+        text-shadow: 0 0 8px rgba(245, 158, 11, 0.35) !important;
+    }
+
+.casino-card-locked:hover .casino-card-watermark {
+        color: rgba(245, 158, 11, 0.22) !important;
+        text-shadow: 
+            0 0 10px rgba(245, 158, 11, 0.8),
+            0 0 25px rgba(245, 158, 11, 0.45) !important;
+    }
+
+.casino-card-resolved .casino-card-watermark {
+        color: rgba(96, 165, 250, 0.08) !important;
+        text-shadow: 0 0 8px rgba(96, 165, 250, 0.35) !important;
+    }
+
+.casino-card-resolved:hover .casino-card-watermark {
+        color: rgba(96, 165, 250, 0.22) !important;
+        text-shadow: 
+            0 0 10px rgba(96, 165, 250, 0.8),
+            0 0 25px rgba(96, 165, 250, 0.45) !important;
+    }
+
+/* Playing Card Corner Indices */
+    .card-corner-index {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: 'Georgia', serif;
+        font-size: 0.85rem;
+        font-weight: bold;
+        line-height: 1;
+        color: rgba(212, 175, 55, 0.45);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+.card-corner-top {
+        top: 12px;
+        left: 12px;
+    }
+
+.card-corner-bottom {
+        bottom: 12px;
+        right: 12px;
+        transform: rotate(180deg);
+    }
+
+.card-bulbs-resolved .bulbs-on-group-odd,
+.card-bulbs-resolved .bulbs-on-group-even {
+        fill: #60a5fa;
+        filter: drop-shadow(0 0 6px #60a5fa) drop-shadow(0 0 3px #60a5fa);
+    }
+
+.casino-card .card-title {
+        color: #ffffff !important;
+        font-weight: 700;
+    }
+
+.casino-card .card-text {
+        color: #94a3b8 !important;
+    }
+
+/* VIP Gold Wallet */
+    .casino-wallet-card {
+        background: linear-gradient(135deg, #2a1b08, #0f0a03) !important;
+        border: 2px solid #d4af37 !important;
+        box-shadow: 
+            inset 0 0 15px rgba(212, 175, 55, 0.1),
+            inset 0 0 2px #ffd700,
+            0 8px 25px rgba(0,0,0,0.7),
+            0 0 15px rgba(212, 175, 55, 0.15) !important;
+        border-radius: 16px;
+        color: #f8fafc !important;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        will-change: transform;
+        position: relative;
+        overflow: hidden;
+    }
+
+.casino-wallet-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(255,215,0,0.15) 0%, transparent 60%);
+        pointer-events: none;
+    }
+
+.casino-wallet-card:hover {
+        box-shadow: 
+            inset 0 0 20px rgba(255, 215, 0, 0.2),
+            inset 0 0 2px #ffd700,
+            0 10px 30px rgba(0,0,0,0.8),
+            0 0 25px rgba(255, 215, 0, 0.4) !important;
+        transform: translateY(-3px);
+    }
+
+/* VIP claim card */
+    .casino-claim-card {
+        background: rgba(0, 0, 0, 0.6) !important;
+        border: 1px solid rgba(212, 175, 55, 0.4) !important;
+        box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
+        border-radius: 12px;
+        padding: 1.25rem;
+        color: #f8fafc !important;
+    }
+
+/* Ensure text-muted, text-secondary and general text inside casino containers remain light in light theme */
+    .casino-table :is(.text-muted, .text-secondary, .text-body-secondary),
+    .casino-claim-card :is(.text-muted, .text-secondary, .text-body-secondary),
+    .casino-card :is(.text-muted, .text-secondary, .text-body-secondary) {
+        color: rgba(248, 250, 252, 0.75) !important;
+    }
+</style>
+
+<div class="container my-4">
+    <div class="casino-table">
+        <div class="casino-table-watermark">♣&#xFE0E; ♦&#xFE0E; ♠&#xFE0E; <span style="font-size: 0.95em; transform: translateY(-0.05em); display: inline-block;">♥&#xFE0E;</span></div>
+        
+        <div class="card mb-5 casino-header-card" style="position: relative; z-index: 1;">
+            <svg class="casino-marquee-bulbs main-bulbs">
+                <g class="bulbs-off-group"></g>
+                <g class="bulbs-on-group-odd"></g>
+                <g class="bulbs-on-group-even"></g>
+            </svg>
+            <div class="card-body p-5">
+                <div class="marquee-stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star star-large"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="row align-items-center g-4">
+                    <div class="col-md-7 text-center">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <div class="casino-logo-wrapper">
+                                <!-- Unified Neon PC Casino Logo with Cards -->
+                                <img src="{{ url_for('static', filename='svg/unified_casino.svg') }}" alt="Casino PC" class="casino-logo-neon position-relative" style="z-index: 2; height: 180px;">
+                            </div>
+                        </div>
+
+                        <!-- Golden Diamond Divider Line -->
+                        <div class="casino-logo-divider">
+                            <span class="divider-line"></span>
+                            <span class="divider-diamond">♦&#xFE0E; ♠&#xFE0E; <span style="font-size: 0.95em; transform: translateY(-0.05em); display: inline-block;">♥&#xFE0E;</span> ♣&#xFE0E;</span>
+                            <span class="divider-line"></span>
+                        </div>
+
+                        <p class="text-light fs-5 mb-0" style="opacity: 0.9; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">{{ _("Faites vos jeux, pariez sur les prédictions et remportez le jackpot !") }}</p>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="card casino-wallet-card">
+                            <div class="card-body p-4 text-center">
+                                <h5 class="text-uppercase wallet-title mb-2"><i class="fas fa-credit-card me-2"></i>{{ _("Votre Portefeuille") }}</h5>
+                                <div class="wallet-amount-container">
+                                    <h2 class="wallet-amount">{{ g.logged_in_user.casino_coins }}</h2>
+                                    <i class="fas fa-coins text-warning spin-coin fs-3"></i>
+                                </div>
+                                
+                                <div class="casino-claim-card">
+                                    {% if can_claim %}
+                                    <form action="{{ url_for('casino.claim') }}" method="POST">
+                                        {{ form.csrf_token }}
+                                        <button type="submit" class="btn btn-sm casino-btn-gold w-100">{{ _("Réclamer 100 PC Coins") }}</button>
+                                    </form>
+                                    {% else %}
+                                    <span class="text-muted small"><i class="fas fa-clock me-1"></i> {{ _("Prochaine réclamation : %(date)s", date=next_claim_date_str) }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="position: relative; z-index: 1;">
+            {% if g.logged_in_user.has_permission(PermissionType.write, PermissionScope.casino) %}
+            <div class="mb-4">
+                <a href="{{ url_for('casino.admin') }}" class="btn btn-outline-warning btn-sm px-3"><i class="fas fa-cogs me-1"></i> {{ _("Administration du Casino") }}</a>
+            </div>
+            {% endif %}
+
+            <h3 class="casino-subtitle mb-4">
+                <span class="casino-subtitle-text">
+                    ♦ {{ _("Prédictions Actives") }} ♦
+                </span>
+            </h3>
+            
+            {% if predictions %}
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                {% for prediction in predictions %}
+                <div class="col">
+                    <div class="card h-100 casino-card {% if prediction.status.name == 'open' %}casino-card-open{% elif prediction.status.name == 'locked' %}casino-card-locked{% else %}casino-card-resolved{% endif %}">
+                        <!-- Corner Indices -->
+                        <div class="card-corner-index card-corner-top">
+                            <span>A</span>
+                            <span>{% if prediction.status.name == 'open' %}♠{% elif prediction.status.name == 'locked' %}♦{% else %}♣{% endif %}</span>
+                        </div>
+                        <div class="card-corner-index card-corner-bottom">
+                            <span>A</span>
+                            <span>{% if prediction.status.name == 'open' %}♠{% elif prediction.status.name == 'locked' %}♦{% else %}♣{% endif %}</span>
+                        </div>
+                        
+                        <!-- Big Suit Watermark -->
+                        <div class="casino-card-watermark">
+                            {% if prediction.status.name == 'open' %}♠{% elif prediction.status.name == 'locked' %}♦{% else %}♣{% endif %}
+                        </div>
+
+                        <div class="card-body d-flex flex-column justify-content-between p-4" style="position: relative; z-index: 1; padding-left: 2rem !important; padding-right: 2rem !important;">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title mb-0 fs-5" style="color: #ffd700 !important; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">{{ prediction.name }}</h5>
+                                    <span class="badge {% if prediction.status.name == 'open' %}casino-badge-open{% elif prediction.status.name == 'locked' %}casino-badge-locked{% else %}casino-badge-resolved{% endif %} px-2.5 py-1.5 small">
+                                        {% if prediction.status.name == 'open' %}{{ _("Ouvert") }}{% elif prediction.status.name == 'locked' %}{{ _("Verrouillé") }}{% else %}{{ _("Résolu") }}{% endif %}
+                                    </span>
+                                </div>
+                                <p class="card-text text-muted mb-4 fs-6" style="opacity: 0.95;">{{ prediction.description or '' }}</p>
+                            </div>
+                            
+                            <div>
+                                <a href="{{ url_for('casino.prediction', id=prediction.id) }}" class="btn casino-btn-gold btn-sm px-4"><i class="fas fa-play me-1"></i> {% if prediction.status.name == 'open' %}{{ _("Parier") }}{% else %}{{ _("Détails") }}{% endif %}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert bg-black bg-opacity-30 border-secondary text-center py-4">{{ _("Aucune prédiction pour le moment.") }}</div>
+            {% endif %}
+
+            <div class="vegas-leaderboard mt-5 mb-3">
+                <svg class="casino-marquee-bulbs main-bulbs">
+                    <g class="bulbs-off-group"></g>
+                    <g class="bulbs-on-group-odd"></g>
+                    <g class="bulbs-on-group-even"></g>
+                </svg>
+                
+                <div class="vegas-title-container">
+                    <h2 class="vegas-title">{{ _("Top 5 Flambeurs") }}</h2>
+                </div>
+
+                <div class="d-flex flex-column position-relative z-1">
+                    {% for user in top_users %}
+                    <div class="vegas-row {% if loop.index == 1 %}vegas-rank-1{% endif %}">
+                        <div class="vegas-badge {% if loop.index <= 3 %}vegas-badge-{{ loop.index }}{% else %}vegas-badge-other{% endif %} me-4 flex-shrink-0">
+                            {{ loop.index }}
+                        </div>
+                        
+                        <div class="vegas-name flex-grow-1 text-truncate pe-3">
+                            {{ user.full_name }}
+                        </div>
+                        
+                        <div class="vegas-score flex-shrink-0 d-flex align-items-center">
+                            {{ user.total_casino_coins }} <i class="fas fa-coins ms-2" style="font-size: 0.9em; opacity: 0.8;"></i>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="text-center mt-5 position-relative z-1">
+                    <a href="{{ url_for('casino.leaderboard') }}" class="btn-vegas">
+                        ♦ {{ _("Voir le classement") }} ♦
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/casino.js') }}"></script>
+{% endblock %}

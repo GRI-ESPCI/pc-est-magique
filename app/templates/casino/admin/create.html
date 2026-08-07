@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+
+
+{% block content %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ _("Créer une prédiction") }}</h1>
+        <a href="{{ url_for('casino.admin') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>{{ _("Retour à l'administration") }}
+        </a>
+    </div>
+    <form method="POST" action="{{ url_for('casino.admin_create') }}">
+        {{ form.csrf_token }}
+        
+        <div class="mb-3">
+            <label for="name" class="form-label">{{ _("Question / Nom de l'événement") }}</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="description" class="form-label">{{ _("Description (optionnel)") }}</label>
+            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+        </div>
+        
+        <h4>{{ _("Options de pari") }}</h4>
+        <div id="options-container">
+            <div class="row mb-2 option-row">
+                <div class="col-8">
+                    <input type="text" class="form-control" name="option_name[]" placeholder="Nom de l'option" required>
+                </div>
+                <div class="col-2">
+                    <input type="color" class="form-control form-control-color w-100" name="option_color[]" value="#007bff">
+                </div>
+            </div>
+            <div class="row mb-2 option-row">
+                <div class="col-8">
+                    <input type="text" class="form-control" name="option_name[]" placeholder="Nom de l'option" required>
+                </div>
+                <div class="col-2">
+                    <input type="color" class="form-control form-control-color w-100" name="option_color[]" value="#dc3545">
+                </div>
+            </div>
+        </div>
+        
+        <button type="button" class="btn btn-secondary btn-sm mb-4" onclick="addOption()">{{ _("+ Ajouter une option") }}</button>
+        
+        <div>
+            <button type="submit" class="btn btn-primary">{{ _("Créer") }}</button>
+            <a href="{{ url_for('casino.admin') }}" class="btn btn-link">{{ _("Annuler") }}</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function addOption() {
+    const container = document.getElementById('options-container');
+    const newRow = document.createElement('div');
+    newRow.className = 'row mb-2 option-row';
+    newRow.innerHTML = `
+        <div class="col-8">
+            <input type="text" class="form-control" name="option_name[]" placeholder="Nom de l'option" required>
+        </div>
+        <div class="col-2">
+            <input type="color" class="form-control form-control-color w-100" name="option_color[]" value="#6c757d">
+        </div>
+        <div class="col-2">
+            <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.option-row').remove()">X</button>
+        </div>
+    `;
+    container.appendChild(newRow);
+}
+</script>
+{% endblock %}

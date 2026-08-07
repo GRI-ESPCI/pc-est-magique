@@ -412,6 +412,12 @@
         const viewModal = new bootstrap.Modal(document.getElementById('viewEventModal'));
         const form = document.getElementById('createEventForm');
         let currentEvent = null;
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
         
         function updateDateInputTypes() {
             let isAllDay = document.getElementById('all_day').checked;
@@ -514,7 +520,7 @@
                     if (window.innerWidth >= 768 && details.length > 0) {
                         let titleEl = info.el.querySelector('.fc-event-title');
                         if (titleEl) {
-                            titleEl.insertAdjacentHTML('beforeend', ' <span style="font-weight: normal; opacity: 0.85;">- ' + details.join(' • ') + '</span>');
+                            titleEl.insertAdjacentHTML('beforeend', ' <span style="font-weight: normal; opacity: 0.85;">- ' + details.map(escapeHtml).join(' • ') + '</span>');
                         }
                     }
                 } else {
@@ -527,15 +533,15 @@
                     if (details.length > 0) {
                         // Make club bold in detail view
                         let richDetails = [];
-                        if (info.event.extendedProps.club) richDetails.push('<span class="fw-bold">' + info.event.extendedProps.club + '</span>');
-                        if (info.event.extendedProps.location) richDetails.push(info.event.extendedProps.location);
+                        if (info.event.extendedProps.club) richDetails.push('<span class="fw-bold">' + escapeHtml(info.event.extendedProps.club) + '</span>');
+                        if (info.event.extendedProps.location) richDetails.push(escapeHtml(info.event.extendedProps.location));
                         
                         clubLocHtml = '<div class="fc-event-details mt-1" style="line-height: 1.2; font-size: 0.85em; opacity: 0.95; white-space: normal;">' + richDetails.join(' • ') + '</div>';
                     }
                     
                     let descHtml = '';
                     if (info.event.extendedProps.description) {
-                        descHtml = '<div class="fc-event-description mt-2 fst-italic" style="font-size: 0.8em; opacity: 0.8; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">' + info.event.extendedProps.description + '</div>';
+                        descHtml = '<div class="fc-event-description mt-2 fst-italic" style="font-size: 0.8em; opacity: 0.8; white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">' + escapeHtml(info.event.extendedProps.description) + '</div>';
                     }
                     
                     // Done so that club and location are stickied with the title
@@ -590,9 +596,17 @@
                 const event = info.event;
                 currentEvent = event;
                 document.getElementById('viewEventTitle').innerText = event.title;
-                document.getElementById('viewEventTime').innerText = event.allDay 
-                    ? moment(event.start).format('LL')
-                    : moment(event.start).format('LLL') + " → " + moment(event.end).format('LT');
+                let timeText;
+                if (event.allDay) {
+                    let endDisplay = event.end ? moment(event.end).subtract(1, 'days') : null;
+                    timeText = (endDisplay && !endDisplay.isSame(event.start, 'day'))
+                        ? moment(event.start).format('LL') + ' → ' + endDisplay.format('LL')
+                        : moment(event.start).format('LL');
+                } else {
+                    let endFormat = moment(event.end).isSame(event.start, 'day') ? 'LT' : 'LLL';
+                    timeText = moment(event.start).format('LLL') + " → " + moment(event.end).format(endFormat);
+                }
+                document.getElementById('viewEventTime').innerText = timeText;
                 document.getElementById('viewEventLocation').innerText = event.extendedProps.location || "{{ _('Non spécifié') }}";
                 document.getElementById('viewEventClub').innerText = event.extendedProps.club;
                 document.getElementById('viewEventDescription').innerText = event.extendedProps.description || "{{ _('Aucune description supplémentaire.') }}";

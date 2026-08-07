@@ -7,7 +7,7 @@ from types import ModuleType
 from typing import Callable, NamedTuple
 
 
-__all__ = ["PermissionType", "PermissionScope", "SubState", "PaymentStatus", "BarTransactionType", "PaymentType"]
+__all__ = ["PermissionType", "PermissionScope", "SubState", "PaymentStatus", "BarTransactionType", "PaymentType", "PredictionStatus"]
 
 
 class PermissionType(enum.Enum):
@@ -75,6 +75,7 @@ class PermissionScope(enum.Enum):
     theatre = _PSParams(allow_elem=False, need_elem=False)
     panier_bio = _PSParams(allow_elem=False, need_elem=False)
     calendar = _PSParams(allow_elem=False, need_elem=False)
+    casino = _PSParams(allow_elem=False, need_elem=False)
 
     # Elements scopes
     pceen = _PSParams(
@@ -140,3 +141,12 @@ class PaymentType(enum.Enum):
 
     internet = enum.auto()
     bar = enum.auto()
+
+
+class PredictionStatus(enum.Enum):
+    """The status of a Casino Prediction."""
+
+    open = enum.auto()
+    locked = enum.auto()
+    resolved = enum.auto()
+

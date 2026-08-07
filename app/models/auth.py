@@ -78,6 +78,13 @@ class PCeen(flask_login.UserMixin, Model):
     # Club Q info
     discontent: Column[float] = column(sa.Numeric(precision=2, asdecimal=False), nullable=True)
 
+    # Casino info
+    casino_coins: Column[int] = column(sa.Integer(), nullable=False, default=500)
+    last_casino_claim: Column[datetime.datetime | None] = column(sa.DateTime(), nullable=True)
+
+    casino_bets: Mapped[list["models.Bet"]] = one_to_many("Bet.pceen")
+    casino_predictions: Mapped[list["models.Prediction"]] = one_to_many("Prediction.author")
+
     photos: Mapped[list["models.Photo"]] = one_to_many("Photo.author")
     roles: Mapped[list["models.Role"]] = many_to_many(
         "Role.pceens",
@@ -151,6 +158,49 @@ class PCeen(flask_login.UserMixin, Model):
             all_perms.update(perms)
             
         return all_perms
+
+    @property
+    def can_claim_casino_coins(self) -> bool:
+        """Returns whether the PCeen can claim their monthly casino coins."""
+        now = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
+        return self.last_casino_claim is None or (now.year, now.month) != (self.last_casino_claim.year, self.last_casino_claim.month)
+
+    @hybrid_property
+    def total_casino_coins(self) -> int:
+        """Total coins including unresolved bets."""
+        from app.enums import PredictionStatus
+        active_bets_amount = sum(
+            bet.amount for bet in self.casino_bets
+            if bet.option.prediction.status in (PredictionStatus.open, PredictionStatus.locked)
+        )
+        return self.casino_coins + active_bets_amount
+
+    @total_casino_coins.expression
+    def total_casino_coins(cls):
+        from sqlalchemy import select, func
+        from app.models.casino import Bet, PredictionOption, Prediction
+        from app.enums import PredictionStatus
+        
+        active_bets_query = (
+            select(func.coalesce(func.sum(Bet.amount), 0))
+            .join(PredictionOption, Bet.option)
+            .join(Prediction, PredictionOption.prediction)
+            .where(Bet._pceen_id == cls.id)
+            .where(Prediction.status.in_([PredictionStatus.open, PredictionStatus.locked]))
+            .scalar_subquery()
+            .correlate(cls)
+        )
+        return cls.casino_coins + active_bets_query
+
+    @property
+    def recent_predictions(self) -> list:
+        """Returns up to 3 most recent predictions (global, not user-specific)."""
+        from app.models.casino import Prediction
+        return Prediction.query.order_by(Prediction.id.desc()).limit(3).all()
+
+    def has_role(self, role_name: str) -> bool:
+        """Check if the PCeen has a role by name."""
+        return any(r.name == role_name for r in self.roles)
 
     @classmethod
     def _has_permission(

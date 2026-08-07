@@ -1,0 +1,540 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block styles %}
+{{ super() }}
+<link href="{{ url_for('static', filename='css/casino.css') }}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<style>
+.option-bulbs .bulbs-off-group {
+        fill: color-mix(in srgb, var(--opt-color) 15%, #111111);
+        filter: drop-shadow(0 1px 2px #000000);
+    }
+
+.option-bulbs.blinking .bulbs-on-group-odd,
+.option-bulbs.blinking .bulbs-on-group-even {
+        fill: color-mix(in srgb, var(--opt-color) 90%, #ffffff);
+        filter: drop-shadow(0 0 6px var(--opt-color)) drop-shadow(0 0 3px var(--opt-color));
+        animation: flash-opacity 1.5s infinite;
+        will-change: opacity;
+    }
+
+.option-bulbs.blinking .bulbs-on-group-even {
+        animation-delay: -0.75s;
+    }
+
+/* VIP Gold Wallet and Stats */
+    .casino-wallet-card {
+        background: linear-gradient(135deg, rgba(20, 40, 30, 0.8), rgba(5, 15, 10, 0.95)) !important;
+        border: 2px solid #10b981 !important;
+        box-shadow: 
+            0 8px 25px rgba(0,0,0,0.5),
+            0 0 12px rgba(16, 185, 129, 0.2) !important;
+        border-radius: 16px;
+        color: #f8fafc !important;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        will-change: transform;
+    }
+
+.casino-wallet-card:hover {
+        box-shadow: 
+            0 10px 30px rgba(0,0,0,0.6),
+            0 0 20px rgba(16, 185, 129, 0.4) !important;
+    }
+
+.casino-cagnotte-card {
+        background: linear-gradient(135deg, rgba(45, 30, 10, 0.8), rgba(20, 10, 5, 0.95)) !important;
+        border: 2px solid #ffd700 !important;
+        box-shadow: 
+            0 8px 25px rgba(0,0,0,0.5),
+            0 0 12px rgba(255, 215, 0, 0.2) !important;
+        border-radius: 16px;
+        color: #f8fafc !important;
+        transition: all 0.3s ease;
+    }
+
+.casino-cagnotte-card:hover {
+        box-shadow: 
+            0 10px 30px rgba(0,0,0,0.6),
+            0 0 20px rgba(255, 215, 0, 0.4) !important;
+    }
+
+/* Casino Inputs and Buttons */
+    /* Modern Glassmorphic Casino Stats Row with CRT Scanlines */
+    .casino-stats-row {
+        background: #000000 !important;
+        border: 1px solid rgba(212, 175, 55, 0.25) !important;
+        border-radius: 12px !important;
+        padding: 8px 14px !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35) !important;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4px;
+        position: relative;
+        overflow: hidden;
+    }
+
+.casino-stats-row::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        background-size: 100% 4px, 6px 100%;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+.casino-icon-svg {
+        width: 18px;
+        height: 18px;
+        color: #d4af37 !important;
+        filter: drop-shadow(0 0 3px rgba(212, 175, 55, 0.6));
+        display: inline-block;
+        margin-right: 6px;
+        flex-shrink: 0;
+    }
+
+.casino-stats-label {
+        color: rgba(255, 255, 255, 0.7) !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+.casino-stats-value {
+        color: #ff3333 !important; /* Casino Digital LED Readout */
+        font-family: 'Courier Prime', 'Courier New', Courier, monospace !important;
+        font-size: 1.35rem;
+        font-weight: 900;
+        text-shadow: 
+            0 0 5px rgba(255, 51, 51, 0.7), 
+            0 0 12px rgba(255, 51, 51, 0.4);
+    }
+
+.casino-stats-value .coin-symbol {
+        font-size: 0.8rem;
+        color: rgba(255, 51, 51, 0.8) !important;
+        margin-left: 5px;
+        text-transform: uppercase;
+        font-weight: bold;
+        font-family: 'Courier Prime', 'Courier New', Courier, monospace !important;
+        letter-spacing: 1px;
+        text-shadow: 0 0 5px rgba(255, 51, 51, 0.5);
+    }
+
+.casino-input {
+        background: transparent !important;
+        border: none !important;
+        color: #ffffff !important;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 500 !important;
+        padding: 8px 16px !important;
+        font-size: 0.9rem !important;
+        box-shadow: none !important;
+        flex-grow: 1 !important;
+        border-radius: 0 !important;
+    }
+
+.casino-input::placeholder {
+        color: rgba(255, 255, 255, 0.3) !important;
+        font-style: normal;
+    }
+
+/* Remove numeric input spinners */
+    .casino-input::-webkit-outer-spin-button,
+    .casino-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+.casino-input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+.progress {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        height: 14px !important;
+        border-radius: 8px !important;
+        border: 1px solid rgba(255,255,255,0.05);
+        overflow: hidden;
+    }
+
+.progress-bar {
+        border-radius: 8px !important;
+        box-shadow: 0 0 10px var(--opt-color);
+        transition: width 0.6s ease;
+    }
+
+/* Breadcrumbs styling on felt */
+    .casino-breadcrumb .breadcrumb-item a {
+        color: #a7f3d0 !important;
+        text-decoration: none;
+    }
+
+.casino-breadcrumb .breadcrumb-item.active {
+        color: #94a3b8 !important;
+    }
+
+.casino-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        color: rgba(212, 175, 55, 0.4) !important;
+    }
+
+/* Subtle Neon Box (No background) */
+    .casino-subtle-box {
+        background: transparent !important;
+        border: none !important;
+        border-top: 1px solid rgba(212, 175, 55, 0.3) !important;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.3) !important;
+        padding: 15px 10px !important;
+        margin-top: 15px !important;
+        text-align: center;
+        box-shadow: none !important;
+    }
+
+.casino-subtle-box h4 {
+        color: #ffd700 !important;
+        text-shadow: 0 0 12px rgba(255, 215, 0, 0.7), 0 0 25px rgba(255, 215, 0, 0.4) !important;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-family: 'Inter', sans-serif !important;
+    }
+
+.casino-subtle-box p {
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+.casino-subtle-box .casino-stats-label {
+        color: rgba(255, 255, 255, 0.9) !important;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+        font-size: 0.9rem;
+    }
+
+.casino-subtle-box .casino-stats-value {
+        color: #ffd700 !important;
+        text-shadow: 0 0 12px rgba(255, 215, 0, 0.8), 0 0 25px rgba(255, 215, 0, 0.4) !important;
+        font-size: 1.25rem !important;
+    }
+
+.casino-subtle-box .coin-symbol {
+        color: #ffd700 !important;
+        text-shadow: 0 0 8px rgba(255, 215, 0, 0.5) !important;
+    }
+
+/* Live Digital Counter Widgets inside Header */
+    .casino-stats-widget {
+        background: #000000 !important;
+        border: 1px solid rgba(212, 175, 55, 0.2) !important;
+        border-radius: 10px !important;
+        box-shadow: 
+            inset 0 0 10px rgba(0, 0, 0, 0.8),
+            0 4px 8px rgba(0, 0, 0, 0.3) !important;
+        position: relative;
+        overflow: hidden;
+    }
+
+.casino-stats-widget::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+        background-size: 100% 4px;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+.widget-label {
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: 'Inter', sans-serif;
+    }
+
+.casino-stats-value {
+        font-family: 'Courier Prime', 'Courier New', Courier, monospace !important;
+        font-weight: 900 !important;
+        letter-spacing: 1px;
+    }
+</style>
+
+<div class="container my-4">
+    <div class="casino-table">
+        <div class="casino-table-watermark">♣&#xFE0E; ♦&#xFE0E; ♠&#xFE0E; <span style="font-size: 0.95em; transform: translateY(-0.05em); display: inline-block;">♥&#xFE0E;</span></div>
+
+        <div style="position: relative; z-index: 1;">
+            <nav aria-label="breadcrumb" class="casino-breadcrumb mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('casino.index') }}"><i class="fas fa-arrow-left me-1"></i> {{ _("Retour au Casino") }}</a></li>
+                    <li class="breadcrumb-item active text-muted" aria-current="page">{{ prediction.name }}</li>
+                </ol>
+            </nav>
+
+            <div class="card mb-5 casino-header-card" style="position: relative; z-index: 1;">
+                <svg class="casino-marquee-bulbs main-bulbs">
+                    <g class="bulbs-off-group"></g>
+                    <g class="bulbs-on-group-odd"></g>
+                    <g class="bulbs-on-group-even"></g>
+                </svg>
+            <div class="card-body p-5">
+                    <div class="row align-items-center g-4">
+                        <!-- Game / Prediction Details -->
+                        <div class="col-lg-7 border-end-lg">
+                            <div class="marquee-stars mb-2 text-start">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star star-large"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            
+                            <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+                                <h1 class="card-title h2 mb-0 fw-bold gold-title">{{ prediction.name }}</h1>
+                                <span class="badge {% if prediction.status.name == 'open' %}casino-badge-open{% elif prediction.status.name == 'locked' %}casino-badge-locked{% else %}casino-badge-resolved{% endif %} px-3 py-2 fs-6">
+                                    {% if prediction.status.name == 'open' %}{{ _("Ouvert") }}{% elif prediction.status.name == 'locked' %}{{ _("Verrouillé") }}{% else %}{{ _("Résolu") }}{% endif %}
+                                </span>
+                            </div>
+                            
+                            {% if prediction.description %}
+                            <p class="card-text fs-5 text-light mb-4" style="opacity: 0.9;">{{ prediction.description }}</p>
+                            {% endif %}
+                            
+                            <div class="text-muted small">
+                                {{ _("Proposé par :") }} <span class="text-warning fw-semibold">{{ prediction.author.full_name }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Live Digital Counters -->
+                        <div class="col-lg-5">
+                            <div class="d-flex flex-column gap-3">
+                                <!-- Jackpot Display -->
+                                <div class="casino-stats-widget p-3 rounded d-flex align-items-center justify-content-between">
+                                    <div class="text-start d-flex align-items-center">
+                                        <svg class="casino-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                                            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                                            <path d="M4 22h16"></path>
+                                            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                                            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                                            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                                        </svg>
+                                        <span class="widget-label ms-1">{{ _("Cagnotte") }}</span>
+                                    </div>
+                                    <div class="widget-value text-end">
+                                        <span class="casino-stats-value" style="font-size: 1.5rem;">{{ total_pool }}<span class="coin-symbol">Coins</span></span>
+                                    </div>
+                                </div>
+
+                                <!-- Wallet Display -->
+                                <div class="casino-stats-widget p-3 rounded d-flex align-items-center justify-content-between">
+                                    <div class="text-start d-flex align-items-center">
+                                        <svg class="casino-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
+                                            <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+                                            <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
+                                        </svg>
+                                        <span class="widget-label ms-1">{{ _("Portefeuille") }}</span>
+                                    </div>
+                                    <div class="widget-value text-end">
+                                        <span class="casino-stats-value" style="font-size: 1.5rem; color: #ffd700 !important; text-shadow: 0 0 5px #ffd700, 0 0 10px rgba(255, 215, 0, 0.4);"><span style="font-family: 'Courier Prime', 'Courier New', Courier, monospace !important;">{{ g.logged_in_user.casino_coins }}</span><span class="coin-symbol" style="color: rgba(255, 215, 0, 0.8) !important; text-shadow: none; font-family: 'Courier Prime', 'Courier New', Courier, monospace !important;">Coins</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if prediction.status.name == 'resolved' %}
+                    <div class="casino-subtle-box mt-4 d-flex flex-column align-items-center justify-content-center" style="border-bottom: none !important;">
+                        <h4 class="mb-2">{{ _("Résultat !") }}</h4>
+                        <p class="mb-0 fs-5">{{ _("L'option gagnante est :") }} <strong class="gold-title ms-1" style="font-size: 1.1em;">{{ prediction.resolved_option.name }}</strong></p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-12">
+                    <h3 class="casino-subtitle mb-4">
+                        <span class="casino-subtitle-text">
+                            ♦ {{ _("Faites vos jeux !") }} ♦
+                        </span>
+                    </h3>
+                    
+                    {% set total_pool = prediction.total_pool %}
+                    
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 mb-4">
+                        {% for option in prediction.options %}
+                        {% set option_pool = option.total_pool %}
+                        {% set percent = (option_pool / total_pool * 100) if total_pool > 0 else 0 %}
+                        {% set user_bet = user_bets.get(option.id, 0) %}
+                        
+                        <div class="col">
+                            <div class="card h-100 casino-option-card" style="--opt-color: {{ option.color }};">
+                                <svg class="casino-marquee-bulbs option-bulbs {% if prediction.status.name != 'resolved' or prediction._resolved_option_id == option.id %}blinking{% endif %}">
+                                    <g class="bulbs-off-group"></g>
+                                    <g class="bulbs-on-group-odd"></g>
+                                    <g class="bulbs-on-group-even"></g>
+                                </svg>
+                                <div class="card-body d-flex flex-column justify-content-between p-4" style="position: relative; z-index: 1;">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h4 class="card-title fw-bold mb-0 d-flex align-items-center">
+                                                <span class="d-inline-block rounded-circle me-2" style="width: 12px; height: 12px; background-color: {{ option.color }}; box-shadow: 0 0 8px {{ option.color }}; flex-shrink: 0;"></span>
+                                                <span>{{ option.name }}</span>
+                                                {% if prediction.status.name == 'resolved' and prediction._resolved_option_id == option.id %}
+                                                <span class="text-warning ms-2" title="{{ _('Gagnant') }}">👑</span>
+                                                {% endif %}
+                                            </h4>
+                                            <span class="badge bg-black bg-opacity-50 text-white border border-secondary">{{ "%.1f"|format(percent) }}%</span>
+                                        </div>
+                                        
+                                        <div class="progress mb-4" style="background-color: {{ option.color }}20 !important;">
+                                            <div class="progress-bar" role="progressbar" style="width: {{ percent }}%; background-color: {{ option.color }};" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <div class="casino-stats-row d-flex justify-content-between align-items-center mb-3">
+                                            <span class="casino-stats-label d-flex align-items-center">
+                                                <svg class="casino-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                    <circle cx="12" cy="12" r="6"></circle>
+                                                    <path d="M12 2v4M12 18v4M2 12h4M18 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"></path>
+                                                </svg>
+                                                {{ _("Mises totales") }}
+                                            </span>
+                                            <span class="casino-stats-value ms-auto">{{ option_pool }}<span class="coin-symbol">Coins</span></span>
+                                        </div>
+
+                                        {% if user_bet > 0 %}
+                                        <div class="casino-stats-row mt-3 d-flex justify-content-between align-items-center">
+                                            <span class="casino-stats-label d-flex align-items-center">
+                                                <svg class="casino-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                    <circle cx="12" cy="7" r="4"></circle>
+                                                </svg>
+                                                {{ _("Votre mise :") }}
+                                            </span>
+                                            <div class="d-flex align-items-center ms-auto">
+                                                <span class="casino-stats-value">{{ user_bet }}<span class="coin-symbol">Coins</span></span>
+                                                {% if prediction.status.name == 'open' %}
+                                                {% set confirm_msg = _("Êtes-vous sûr de vouloir annuler cette mise et récupérer vos coins ?") %}
+                                                <form action="{{ url_for('casino.prediction', id=prediction.id) }}" method="POST" class="ms-2 mb-0 d-flex align-items-center" onsubmit="return confirm('{{ confirm_msg }}');">
+                                                    {{ form.csrf_token }}
+                                                    <input type="hidden" name="action" value="cancel">
+                                                    <input type="hidden" name="option_id" value="{{ option.id }}">
+                                                    <button type="submit" class="btn btn-sm text-danger p-0 ms-1 d-flex align-items-center justify-content-center" style="border: none; background: transparent; filter: drop-shadow(0 0 3px rgba(220, 53, 69, 0.6));" title="{{ _('Annuler la mise') }}">
+                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                                                            <circle cx="12" cy="12" r="10"></circle>
+                                                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                                                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+
+                                        {% if prediction.status.name == 'open' %}
+                                        <form action="{{ url_for('casino.prediction', id=prediction.id) }}" method="POST" class="mt-3">
+                                            {{ form.csrf_token }}
+                                            <input type="hidden" name="option_id" value="{{ option.id }}">
+                                            
+                                            <div class="input-group">
+                                                <input type="number" class="form-control form-control-sm casino-input" name="amount" min="1" max="{{ g.logged_in_user.casino_coins }}" placeholder="{{ _('Mise (Coins)') }}" required>
+                                                <button type="submit" class="btn btn-sm casino-btn-gold">{{ _("Parier !") }}</button>
+                                            </div>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% set user_bets_map = {} %}
+                    {% for option in prediction.options %}
+                        {% for bet in option.bets %}
+                            {% set p_id = bet.pceen.id %}
+                            {% if p_id not in user_bets_map %}
+                                {% set _ = user_bets_map.update({p_id: {
+                                    'pceen': bet.pceen,
+                                    'total_amount': 0,
+                                    'options': {}
+                                }}) %}
+                            {% endif %}
+                            {% set user_entry = user_bets_map[p_id] %}
+                            {% set _ = user_entry.update({'total_amount': user_entry.total_amount + bet.amount}) %}
+                            {% set opt_id = option.id %}
+                            {% if opt_id not in user_entry.options %}
+                                {% set _ = user_entry.options.update({opt_id: {
+                                    'option': option,
+                                    'amount': 0
+                                }}) %}
+                            {% endif %}
+                            {% set opt_entry = user_entry.options[opt_id] %}
+                            {% set _ = opt_entry.update({'amount': opt_entry.amount + bet.amount}) %}
+                        {% endfor %}
+                    {% endfor %}
+                    {% set player_summary_list = user_bets_map.values() | sort(attribute='total_amount', reverse=True) %}
+
+                    <div class="mt-5 pt-3 border-top border-warning border-opacity-25">
+                        <div class="text-center mb-4">
+                            <h4 class="fw-bold text-uppercase gold-title m-0" style="letter-spacing: 1.5px; font-family: 'Inter', sans-serif;">
+                                ♦ {{ _("QUI A PARIÉ QUOI ?") }} ♦
+                            </h4>
+                        </div>
+
+                        {% if player_summary_list %}
+                        <div class="d-flex flex-column gap-2">
+                            {% for player in player_summary_list %}
+                            <div class="p-3 rounded-3 d-flex flex-wrap align-items-center justify-content-between gap-3" style="background: #000000; border: 1px solid rgba(212, 175, 55, 0.3); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);">
+                                <!-- Player Name -->
+                                <div class="d-flex align-items-center gap-2" style="min-width: 200px;">
+                                    <span class="fw-bold text-white fs-6">
+                                        {{ player.pceen.full_name }}{% if player.pceen.promo %} <span class="text-warning small" style="opacity: 0.85; font-weight: 600;">{{ player.pceen.promo }}</span>{% endif %}
+                                    </span>
+                                </div>
+
+                                <!-- Options Bet On -->
+                                <div class="d-flex flex-wrap align-items-center gap-2 flex-grow-1">
+                                    {% for opt in player.options.values() %}
+                                    <span class="badge px-3 py-2 d-inline-flex align-items-center gap-2" style="background: color-mix(in srgb, {{ opt.option.color }} 15%, #111111); border: 1px solid {{ opt.option.color }}; border-radius: 8px;">
+                                        <span class="rounded-circle" style="width: 8px; height: 8px; background-color: {{ opt.option.color }}; display: inline-block;"></span>
+                                        <span style="color: #ffffff; font-weight: 600;">{{ opt.option.name }}</span>
+                                        <span style="color: {{ opt.option.color }}; font-weight: 700; font-family: 'Courier Prime', 'Courier New', monospace;">{{ opt.amount }} COINS</span>
+                                    </span>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Total Bet -->
+                                <div class="text-end ms-auto">
+                                    <span class="text-muted small text-uppercase me-2 d-none d-sm-inline" style="letter-spacing: 0.5px;">{{ _("TOTAL :") }}</span>
+                                    <span class="fw-bold" style="color: #ffea00; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 1.15rem; text-shadow: 0 0 6px rgba(255, 234, 0, 0.4);">
+                                        {{ player.total_amount }} <span class="small" style="font-size: 0.75rem; color: rgba(255,234,0,0.7);">COINS</span>
+                                    </span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4 text-muted fst-italic">
+                            {{ _("Aucun pari n'a encore été placé sur cette prédiction.") }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/casino.js') }}"></script>
+{% endblock %}

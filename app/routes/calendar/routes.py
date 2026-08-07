@@ -1,17 +1,26 @@
 """PC est magique - Calendar Routes"""
 
 import datetime
+import os
+import zoneinfo
+
 import flask
 from flask_babel import _
 import ics
+from ics.grammar.parse import ContentLine
+from werkzeug.utils import safe_join
 
 from app import context, db
 from app.models import Club, Event, PermissionType, PermissionScope, ClubQSpectacle, PCeen, ClubQVoeu
 from app.routes.calendar import bp
 from app.routes.calendar.forms import EditClub
 
+CLUB_Q_NAME = "Club Q"
+
 @bp.before_request
 def check_access():
+    # Skip for unauthenticated users; individual routes handle auth
+    # via @logged_in_only or token verification (e.g. export_feed)
     if not context.g.logged_in:
         return
     if not context.has_permission(PermissionType.read, PermissionScope.calendar):
@@ -57,20 +66,9 @@ def get_events():
         "can_edit": can_edit_calendar
     } for event in events]
     
-    club_q = db.session.scalars(db.select(Club).filter_by(name="Club Q")).first()
+    club_q = db.session.scalars(db.select(Club).filter_by(name=CLUB_Q_NAME)).first()
     hex_color = club_q.color if club_q else "#dc8add"
-    
-    contrast_color = "#ffffff"
-    if hex_color.startswith("#") and len(hex_color) == 7:
-        try:
-            r = int(hex_color[1:3], 16)
-            g = int(hex_color[3:5], 16)
-            b = int(hex_color[5:7], 16)
-            luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-            if luminance > 0.6:
-                contrast_color = "#152f4e"
-        except ValueError:
-            pass
+    contrast_color = club_q.get_contrast_color() if club_q else "#ffffff"
 
     for spec in spectacles:
         events_list.append({
@@ -80,13 +78,13 @@ def get_events():
             "end": (spec.date + datetime.timedelta(hours=2)).isoformat(),
             "allDay": False,
             "color": hex_color,
+            "can_edit": False,
             "extendedProps": {
                 "description": spec.description,
                 "location": spec.salle.nom if spec.salle else None,
-                "club": "Club Q",
+                "club": CLUB_Q_NAME,
                 "club_id": club_q.id if club_q else None,
                 "contrast_color": contrast_color,
-                "can_edit": False
             }
         })
 
@@ -94,7 +92,7 @@ def get_events():
 
 @bp.route("/api/events/edit/<int:event_id>", methods=["POST"])
 @context.logged_in_only
-def edit_event(event_id: str):
+def edit_event(event_id: int):
     """API route to edit an event."""
     event = db.session.get(Event, event_id)
     if not event:
@@ -124,20 +122,22 @@ def edit_event(event_id: str):
     if not new_club:
         flask.abort(404, "New club not found")
 
-    # Only allow calendar admins to add or edit clubs
-    if new_club != event.club and not context.has_permission(PermissionType.write, PermissionScope.calendar):
-        flask.abort(403, "You do not have permission to assign to the new club.")
-
     try:
-        event.title = title
-        event.club = new_club
-        event.start_time = datetime.datetime.fromisoformat(start_time_str)
-        event.end_time = datetime.datetime.fromisoformat(end_time_str)
-        event.location = location
-        event.description = description
-        event.all_day = all_day
+        start_time = datetime.datetime.fromisoformat(start_time_str)
+        end_time = datetime.datetime.fromisoformat(end_time_str)
     except ValueError:
         flask.abort(400, "Invalid date format")
+
+    if end_time <= start_time:
+        return flask.jsonify({"status": "error", "message": "La fin de l'évènement doit être après le début."}), 400
+
+    event.title = title
+    event.club = new_club
+    event.start_time = start_time
+    event.end_time = end_time
+    event.location = location
+    event.description = description
+    event.all_day = all_day
 
     db.session.commit()
     
@@ -182,6 +182,9 @@ def create_event():
         end_time = datetime.datetime.fromisoformat(end_time_str)
     except ValueError:
         flask.abort(400, "Invalid date format")
+
+    if end_time <= start_time:
+        return flask.jsonify({"status": "error", "message": "La fin de l'évènement doit être après le début."}), 400
 
     event = Event(
         title=title,
@@ -275,8 +278,6 @@ def admin_club_delete(id: int):
 @context.logged_in_only
 def serve_fullcalendar():
     """Serve FullCalendar from node_modules."""
-    import os
-    from werkzeug.utils import safe_join
     proj_root = os.path.dirname(flask.current_app.root_path)
     return flask.send_from_directory(
         safe_join(proj_root, "node_modules", "fullcalendar"),
@@ -292,7 +293,6 @@ def export_feed(token: str):
     if not pceen.has_permission(PermissionType.read, PermissionScope.calendar):
         flask.abort(403)
         
-    from ics.grammar.parse import ContentLine
     cal = ics.Calendar()
     cal.creator = "PC est magique"
     cal.extra.append(ContentLine(name='X-WR-CALNAME', value='Calendrier PCéen'))
@@ -321,16 +321,22 @@ def export_feed(token: str):
         e = ics.Event()
         e.name = event.title
         
-        import zoneinfo
         tz = zoneinfo.ZoneInfo("Europe/Paris")
         
         if event.all_day:
             e.begin = event.start_time.date()
             e.make_all_day()
-            e.end = event.end_time.date() + datetime.timedelta(days=1)
+            end_date = event.end_time.date() + datetime.timedelta(days=1)
+            if end_date <= event.start_time.date():
+                end_date = event.start_time.date() + datetime.timedelta(days=1)
+            e.end = end_date
         else:
-            e.begin = event.start_time.replace(tzinfo=tz)
-            e.end = event.end_time.replace(tzinfo=tz)
+            begin = event.start_time.replace(tzinfo=tz)
+            end = event.end_time.replace(tzinfo=tz)
+            if end <= begin:
+                end = begin + datetime.timedelta(hours=1)
+            e.begin = begin
+            e.end = end
             
         e.location = event.location
         e.description = event.description
@@ -349,7 +355,7 @@ def export_feed(token: str):
         
         cal.events.add(e)
         
-    club_q = db.session.scalars(db.select(Club).filter_by(name='Club Q')).first()
+    club_q = db.session.scalars(db.select(Club).filter_by(name=CLUB_Q_NAME)).first()
     for spec in spectacles:
         e = ics.Event()
         e.name = spec.nom

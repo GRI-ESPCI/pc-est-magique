@@ -74,6 +74,7 @@
                             {{ _("Panier Bio") }}
                         </a>
                     </li>
+
                     {% if has_permission(PermissionType.read, PermissionScope.calendar) %}
                     <li class="nav-item">
                         {% set is_active = request.endpoint and request.endpoint.startswith('calendar.') %}

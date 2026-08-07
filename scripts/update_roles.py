@@ -37,6 +37,7 @@ def permissions() -> dict[str, dict[str, typing.Any]]:
         "access_club_q": dict(type=PermissionType.read, scope=PermissionScope.club_q, ref_id=None),
         "access_bekk": dict(type=PermissionType.read, scope=PermissionScope.bekk, ref_id=None),
         "access_panier_bio": dict(type=PermissionType.read, scope=PermissionScope.panier_bio, ref_id=None),
+        "access_casino": dict(type=PermissionType.read, scope=PermissionScope.casino, ref_id=None),
         "manage_club_q": dict(type=PermissionType.all, scope=PermissionScope.club_q, ref_id=None),
         "manage_photos": dict(type=PermissionType.all, scope=PermissionScope.photos, ref_id=None),
         "manage_intrarez": dict(type=PermissionType.all, scope=PermissionScope.intrarez, ref_id=None),
@@ -49,6 +50,7 @@ def permissions() -> dict[str, dict[str, typing.Any]]:
         "manage_panier_bio": dict(type=PermissionType.all, scope=PermissionScope.panier_bio, ref_id=None),
         "access_calendar": dict(type=PermissionType.read, scope=PermissionScope.calendar, ref_id=None),
         "manage_calendar": dict(type=PermissionType.all, scope=PermissionScope.calendar, ref_id=None),
+        "manage_casino": dict(type=PermissionType.all, scope=PermissionScope.casino, ref_id=None),
     }
 
 
@@ -74,6 +76,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["manage_panier_bio"],
                 perms["access_bar_stats"],
                 perms["manage_calendar"],
+                perms["manage_casino"],
             ],
         ),
         "Rezident": dict(  # NE PAS RENOMMER - nom utilisé dans app/utils/roles.py
@@ -93,6 +96,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["access_bekk"],
                 perms["access_panier_bio"],
                 perms["access_calendar"],
+                perms["access_casino"],
             ],
         ),
         "Alumni": dict(
@@ -151,6 +155,13 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
             color="014421",
             permissions=[
                 perms["manage_panier_bio"],
+            ],
+        ),
+        "Casino": dict(
+            index=19,
+            color="d4af37",
+            permissions=[
+                perms["manage_casino"],
             ],
         ),
     }

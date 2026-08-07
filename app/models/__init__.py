@@ -30,4 +30,5 @@ from app.models.bekk import Bekk
 from app.models.calendar import Club, Event
 from app.models.info import InfoBanner, InfoBannerPreset
 from app.models.push import PushSubscription, Notification, NotificationRead
+from app.models.casino import Prediction, PredictionOption, Bet
 

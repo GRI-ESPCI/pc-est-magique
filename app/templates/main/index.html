@@ -136,6 +136,11 @@
         {% include "cards/subscription.html" %}
     </div>
     {% endif %}
+    {% if calendar_infos %}
+    <div class="col">
+        {% include "cards/calendar.html" %}
+    </div>
+    {% endif %}
     {% if has_permission(PermissionType.read, PermissionScope.club_q) %}
     <div class="col">
         {% include "cards/club_q_accueil.html" %}
@@ -149,9 +154,9 @@
     <div class="col">
         {% include "cards/panier_bio.html" %}
     </div>
-    {% if calendar_infos %}
+    {% if (g.logged_in_user and g.logged_in_user.has_role('Élève')) or has_permission(PermissionType.read, PermissionScope.casino) %}
     <div class="col">
-        {% include "cards/calendar.html" %}
+        {% include "cards/casino.html" %}
     </div>
     {% endif %}
     {% if has_permission(PermissionType.write, PermissionScope.calendar) %}

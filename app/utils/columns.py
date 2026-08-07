@@ -56,12 +56,12 @@ def column(sa_type: sqlalchemy.ForeignKey) -> Column:  # [typing.Any]:
     ...
 
 
-def column(sa_type, *, primary_key=False, nullable=False, default=None, unique=False):
+def column(sa_type, *, primary_key=False, nullable=False, default=None, unique=False, index=None):
     """Constructs a SQLAlchemy column.
 
     Args:
         sa_type: The SQLAlchemy type of the column.
-        primary_key, nullable, default, unique: Passed to
+        primary_key, nullable, default, unique, index: Passed to
             :class:`sqlalchemy.Column`.
     """
     column = Column(
@@ -70,6 +70,7 @@ def column(sa_type, *, primary_key=False, nullable=False, default=None, unique=F
         nullable=nullable,
         default=default,
         unique=unique,
+        index=index,
     )
     if isinstance(sa_type, sqlalchemy.ForeignKey):
         return typing.cast(Column, column)  # [object]

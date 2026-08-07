@@ -16,7 +16,6 @@ from app.utils.columns import (
     Column,
 )
 
-Model = typing.cast(type[type], db.Model)  # type checking hack
 
 class Club(db.Model):
     """A club that calendar events can be attributed to."""
@@ -33,6 +32,21 @@ class Club(db.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    def get_contrast_color(self) -> str:
+        """Return a text color with good contrast against this club's color."""
+        hex_color = self.color
+        if hex_color.startswith("#") and len(hex_color) == 7:
+            try:
+                r = int(hex_color[1:3], 16)
+                g = int(hex_color[3:5], 16)
+                b = int(hex_color[5:7], 16)
+                luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+                if luminance > 0.6:
+                    return "#152f4e"
+            except ValueError:
+                pass
+        return "#ffffff"
 
 
 class Event(db.Model):
@@ -59,19 +73,7 @@ class Event(db.Model):
     def to_dict(self) -> dict[str, typing.Any]:
         """Convert to dict for FullCalendar compatibility."""
         hex_color = self.club.color
-        
-        # Check if background colour is too bright to use white text
-        contrast_color = "#ffffff"
-        if hex_color.startswith("#") and len(hex_color) == 7:
-            try:
-                r = int(hex_color[1:3], 16)
-                g = int(hex_color[3:5], 16)
-                b = int(hex_color[5:7], 16)
-                luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-                if luminance > 0.6:  # Prefer using dark text with light backgrounds
-                    contrast_color = "#152f4e" 
-            except ValueError:
-                pass
+        contrast_color = self.club.get_contrast_color()
 
         end_time = self.end_time
         if self.all_day:

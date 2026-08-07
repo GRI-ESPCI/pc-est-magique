@@ -1,0 +1,45 @@
+{# Casino card #}
+{% extends "cards/base.html" %}
+
+{% block card_title %}
+{{ _("Casino") }}
+{% endblock %}
+
+{% block card_icon %}
+{{ macros.bootstrap_icon("dice-5") }}
+{% endblock %}
+
+{% block card_table %}
+<tr>
+    <th scope="row" class="ps-4 text-nowrap">{{ _("Mes PC Coins") }}</th>
+    <td>{{ pceen.casino_coins }} <i class="fas fa-coins text-warning"></i></td>
+</tr>
+{% set recent_preds = pceen.recent_predictions %}
+{% if recent_preds %}
+{% for pred in recent_preds %}
+<tr>
+    <td class="ps-4 py-2 align-middle text-truncate">
+        <a href="{{ url_for('casino.prediction', id=pred.id) }}" class="fw-bold text-decoration-none text-reset" title="{{ pred.name }}">{{ pred.name }}</a>
+    </td>
+    <td class="pe-4 py-2 text-center align-middle" style="width: 50px;">
+        {% if pred.status.name == 'locked' %}
+            <svg class="bi text-warning" width="22" height="22" role="img" title="{{ _('Verrouillé') }}">{{ macros.bootstrap_icon("lock-fill") }}</svg>
+        {% elif pred.status.name == 'resolved' %}
+            <svg class="bi text-muted" width="22" height="22" role="img" title="{{ _('Résolu') }}">{{ macros.bootstrap_icon("check-lg") }}</svg>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+{% else %}
+<tr>
+    <th scope="row" class="ps-4">{{ _("Dernières prédictions") }}</th>
+    <td><span class="text-muted small">{{ _("Aucune prédiction") }}</span></td>
+</tr>
+{% endif %}
+{% endblock %}
+
+{% block card_footer %}
+<a href="{{ url_for("casino.index") }}" class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}">
+    {{ _("Accéder au Casino") }}
+</a>
+{% endblock %}

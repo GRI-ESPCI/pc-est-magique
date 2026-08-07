@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block styles %}
+{{ super() }}
+<link href="{{ url_for('static', filename='css/casino.css') }}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div></div>
+        <a href="{{ url_for('casino.index') }}" class="btn-vegas" style="font-size: 0.9rem; padding: 8px 20px;">
+            <i class="fas fa-arrow-left me-2"></i>{{ _("Retour") }}
+        </a>
+    </div>
+
+    <div class="vegas-leaderboard">
+        <svg class="casino-marquee-bulbs main-bulbs">
+            <g class="bulbs-off-group"></g>
+            <g class="bulbs-on-group-odd"></g>
+            <g class="bulbs-on-group-even"></g>
+        </svg>
+
+        <div class="vegas-title-container">
+            <h2 class="vegas-title">{{ _("Classement") }}</h2>
+        </div>
+
+        <div class="d-flex flex-column mt-4 position-relative z-1">
+            {% for user in users %}
+            <div class="vegas-row {% if loop.index == 1 %}vegas-rank-1{% endif %}">
+                <div class="vegas-badge {% if loop.index <= 3 %}vegas-badge-{{ loop.index }}{% else %}vegas-badge-other{% endif %} me-4 flex-shrink-0">
+                    {{ loop.index }}
+                </div>
+                
+                <div class="vegas-name flex-grow-1 text-truncate pe-3">
+                    {{ user.full_name }}
+                </div>
+                
+                <div class="vegas-score flex-shrink-0 d-flex align-items-center">
+                    {{ user.total_casino_coins }} <i class="fas fa-coins ms-2" style="font-size: 0.9em; opacity: 0.8;"></i>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/casino.js') }}"></script>
+{% endblock %}
