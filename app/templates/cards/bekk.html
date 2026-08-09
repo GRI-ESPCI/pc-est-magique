@@ -2,6 +2,7 @@
 
 <canvas
   id="{{bekk.id}}"
+  class="w-100 card-img-top {{ '' if g.theme == 'classic' else 'rounded-top-4' }}"
   onclick="window.location='{{ url_for('bekk.reader', id=bekk.id) }}';"
 ></canvas>
 
