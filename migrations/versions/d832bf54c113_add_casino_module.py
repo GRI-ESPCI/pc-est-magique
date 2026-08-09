@@ -54,6 +54,7 @@ def upgrade():
         batch_op.add_column(sa.Column('last_casino_claim', sa.DateTime(), nullable=True))
 
     op.execute("ALTER TYPE permission_scope ADD VALUE 'casino'")
+    op.execute("COMMIT")
 
     # Insert new permissions if they do not exist
     # 'read' permission for casino
