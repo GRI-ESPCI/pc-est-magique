@@ -13,7 +13,9 @@ def check_casino_access():
     from app.enums import PermissionType, PermissionScope
     
     if not context.g.logged_in:
-        return context.redirect_login()
+        flask.flash(_("Veuillez vous authentifier pour accéder à cette page."), "warning")
+        from app.utils import helpers
+        return helpers.ensure_safe_redirect("auth.auth_needed")
     
     is_eleve = context.g.logged_in_user.has_role("Élève")
     is_admin = context.has_permission(PermissionType.read, PermissionScope.casino)
