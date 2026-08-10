@@ -100,7 +100,7 @@ class OpenIDCode(_OpenIDCode):
 
     def generate_user_info(self, user, scope):
         user_info = {
-            "sub": str(user.id),
+            "sub": user.username,
             "preferred_username": user.prenom,
             "email": user.email,
         }

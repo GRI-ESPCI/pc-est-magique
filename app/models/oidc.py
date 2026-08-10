@@ -19,6 +19,11 @@ class OAuth2Client(Model, OAuth2ClientMixin):
     )
     user = db.relationship("PCeen", backref=db.backref("oauth2_clients", cascade="all, delete-orphan"))
 
+    def check_endpoint_auth_method(self, method, endpoint):
+        if endpoint == "token":
+            return method in ("client_secret_basic", "client_secret_post", "none")
+        return True
+
 
 class OAuth2AuthorizationCode(Model, OAuth2AuthorizationCodeMixin):
     __tablename__ = "oauth2_code"
