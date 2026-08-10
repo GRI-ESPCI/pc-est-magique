@@ -74,6 +74,11 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app = PCEstMagiqueApp(__name__)
     app.config.from_object(config_class)
 
+    # Trust reverse proxy headers (nginx) so Flask sees the correct
+    # scheme (https) and host. Required for Authlib OAuth2 transport checks.
+    from werkzeug.middleware.proxy_fix import ProxyFix
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
