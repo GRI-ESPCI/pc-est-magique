@@ -102,6 +102,13 @@ def redirect_to_next(**params: str | bool | None) -> typing.RouteReturn:
         The redirection response.
     """
     next_endpoint = flask.request.args.get("next", "")
+    
+    # Support standard relative URLs in next parameter (e.g. from OIDC authorize)
+    if next_endpoint.startswith('/') and not next_endpoint.startswith('//'):
+        parsed = urlparse(next_endpoint)
+        if not parsed.scheme and not parsed.netloc:
+            return flask.redirect(next_endpoint)
+        
     if next_endpoint == flask.request.endpoint:
         next_endpoint = "main.index"
 

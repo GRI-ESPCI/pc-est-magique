@@ -121,12 +121,14 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
         casino,
     )
     from app.routes.auth import saml
+    from app.routes.auth import oidc
 
     app.register_blueprint(errors.bp)
     app.register_blueprint(main.bp)
     app.register_blueprint(auth.bp)
     app.register_blueprint(api.bp, url_prefix="/api")
     app.register_blueprint(saml.bp, url_prefix="/saml")
+    app.register_blueprint(oidc.bp, url_prefix="/auth/oidc")
     app.register_blueprint(devices.bp, url_prefix="/devices")
     app.register_blueprint(rooms.bp, url_prefix="/rooms")
     app.register_blueprint(gris.bp, url_prefix="/gris")
@@ -140,6 +142,9 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.register_blueprint(calendar.bp, url_prefix="/calendar")
     app.register_blueprint(casino.bp, url_prefix="/casino")
 
+
+    from app.oauth2 import config_oauth
+    config_oauth(app)
 
     # Configure logging
     loggers.configure_logging(app)

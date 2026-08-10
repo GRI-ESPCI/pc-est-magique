@@ -143,3 +143,4 @@ certs/key.pem
 certs/mkcert
 private_key.pem
 public_key.pem
+oidc_rsa.pem

@@ -31,4 +31,5 @@ from app.models.calendar import Club, Event
 from app.models.info import InfoBanner, InfoBannerPreset
 from app.models.push import PushSubscription, Notification, NotificationRead
 from app.models.casino import Prediction, PredictionOption, Bet
+from app.models.oidc import OAuth2Client, OAuth2AuthorizationCode, OAuth2Token
 

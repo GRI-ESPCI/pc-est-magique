@@ -17,6 +17,10 @@ def unauthorized_error(error: HTTPException) -> typing.RouteReturn:
     err_name = f"{error.code} {error.name}"
     err_descr = error.description
     flask.current_app.logger.warning(f"{err_name} -- {flask.request}")
+    
+    if flask.request.path.startswith('/auth/oidc/') or flask.request.path.startswith('/api/'):
+        return flask.jsonify({"error": "unauthorized", "error_description": err_descr}), 401
+        
     return (
         flask.render_template(
             "errors/401.html",

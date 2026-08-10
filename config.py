@@ -107,3 +107,7 @@ class Config:
     GRI_BIC = os.environ.get("GRI_BIC")
     CLUB_Q_IBAN = os.environ.get("CLUB_Q_IBAN")
     CLUB_Q_BIC = os.environ.get("CLUB_Q_BIC")
+
+    OIDC_PRIVATE_KEY = os.environ.get("OIDC_PRIVATE_KEY")
+    OIDC_RSA_KEY_PATH = os.environ.get("OIDC_RSA_KEY_PATH")
+    OIDC_ISSUER = os.environ.get("OIDC_ISSUER")
