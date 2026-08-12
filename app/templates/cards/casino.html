@@ -18,7 +18,7 @@
 {% if recent_preds %}
 {% for pred in recent_preds %}
 <tr>
-    <td class="ps-4 py-2 align-middle text-truncate">
+    <td class="ps-4 py-2 align-middle text-truncate" style="max-width: 1px;">
         <a href="{{ url_for('casino.prediction', id=pred.id) }}" class="fw-bold text-decoration-none text-reset" title="{{ pred.name }}">{{ pred.name }}</a>
     </td>
     <td class="pe-4 py-2 text-center align-middle" style="width: 50px;">
