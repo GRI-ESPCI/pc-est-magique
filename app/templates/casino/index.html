@@ -210,7 +210,7 @@
     }
 </style>
 
-<div class="container my-4">
+<div class="container-md my-4">
     <div class="casino-table">
         <div class="casino-table-watermark">♣&#xFE0E; ♦&#xFE0E; ♠&#xFE0E; <span style="font-size: 0.95em; transform: translateY(-0.05em); display: inline-block;">♥&#xFE0E;</span></div>
         
@@ -227,7 +227,7 @@
                     <i class="fas fa-star"></i>
                 </div>
                 <div class="row align-items-center g-4">
-                    <div class="col-md-7 text-center">
+                    <div class="col-lg-7 text-center">
                         <div class="d-flex align-items-center justify-content-center">
                             <div class="casino-logo-wrapper">
                                 <!-- Unified Neon PC Casino Logo with Cards -->
@@ -244,7 +244,7 @@
 
                         <p class="text-light fs-5 mb-0" style="opacity: 0.9; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">{{ _("Faites vos jeux, pariez sur les prédictions et remportez le jackpot !") }}</p>
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-lg-5">
                         <div class="card casino-wallet-card">
                             <div class="card-body p-4 text-center">
                                 <h5 class="text-uppercase wallet-title mb-2"><i class="fas fa-credit-card me-2"></i>{{ _("Votre Portefeuille") }}</h5>
@@ -338,10 +338,10 @@
                 </div>
 
                 <div class="d-flex flex-column position-relative z-1">
-                    {% for user in top_users %}
-                    <div class="vegas-row {% if loop.index == 1 %}vegas-rank-1{% endif %}">
-                        <div class="vegas-badge {% if loop.index <= 3 %}vegas-badge-{{ loop.index }}{% else %}vegas-badge-other{% endif %} me-4 flex-shrink-0">
-                            {{ loop.index }}
+                    {% for rank, user in top_users %}
+                    <div class="vegas-row {% if rank == 1 %}vegas-rank-1{% endif %} {% if user.id == g.logged_in_user.id %}border border-warning{% endif %}">
+                        <div class="vegas-badge {% if rank <= 3 %}vegas-badge-{{ rank }}{% else %}vegas-badge-other{% endif %} me-4 flex-shrink-0">
+                            {{ rank }}
                         </div>
                         
                         <div class="vegas-name flex-grow-1 text-truncate pe-3">
@@ -353,6 +353,37 @@
                         </div>
                     </div>
                     {% endfor %}
+
+                    {% if current_user_ranked and current_user_ranked[0] > 5 %}
+                    <div class="text-center my-2 text-warning" style="opacity: 0.8;">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </div>
+                    <div class="vegas-row border border-warning" style="background-color: rgba(255, 215, 0, 0.05);">
+                        <div class="vegas-badge vegas-badge-other me-4 flex-shrink-0">
+                            {{ current_user_ranked[0] }}
+                        </div>
+                        
+                        <div class="vegas-name flex-grow-1 text-truncate pe-3">
+                            {{ current_user_ranked[1].full_name }}
+                        </div>
+                        
+                        <div class="vegas-score flex-shrink-0 d-flex align-items-center">
+                            {{ current_user_ranked[1].total_casino_coins }} <i class="fas fa-coins ms-2" style="font-size: 0.9em; opacity: 0.8;"></i>
+                        </div>
+                    </div>
+                    {% elif not current_user_ranked %}
+                    <div class="text-center my-2 text-secondary" style="opacity: 0.8;">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </div>
+                    <div class="vegas-row border border-secondary" style="background-color: rgba(255, 255, 255, 0.02);">
+                        <div class="vegas-badge vegas-badge-other me-4 flex-shrink-0 text-muted">
+                            -
+                        </div>
+                        <div class="vegas-name flex-grow-1 text-truncate pe-3 text-muted text-center fst-italic" style="font-size: 0.9em;">
+                            {{ _("Vous n'êtes pas classé·e. Misez pour apparaître !") }}
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
                 
                 <div class="text-center mt-5 position-relative z-1">
@@ -360,6 +391,12 @@
                         ♦ {{ _("Voir le classement") }} ♦
                     </a>
                 </div>
+            </div>
+
+            <div class="text-center mt-5 mb-0 mx-auto" style="max-width: 700px;">
+                <p class="text-muted mb-0" style="font-size: 0.75rem; opacity: 0.6; line-height: 1.4;">
+                    {{ _("Le module Casino est une plateforme strictement fictive et gratuite. Les PC Coins n'ont aucune valeur monétaire et ne peuvent être ni achetés, ni échangés. N'oubliez pas que les jeux d'argent et de hasard peuvent être dangereux, même si la Roulette était au BDE.") }}
+                </p>
             </div>
         </div>
     </div>

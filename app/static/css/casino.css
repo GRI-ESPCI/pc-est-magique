@@ -22,7 +22,25 @@
         pointer-events: none;
     }
 
-/* Watermark for card suits */
+/* Casino Footer Theme - Mobile Only */
+@media (max-width: 768px) {
+    .casino-footer {
+        background: radial-gradient(circle at 50% 30%, #0d4429 0%, #062214 70%, #020c07 100%);
+        border-top: 2px solid #d4af37;
+        margin-top: 0 !important;
+        padding-bottom: 2rem !important;
+    }
+    .casino-footer,
+    .casino-footer .text-muted,
+    .casino-footer .link-secondary,
+    .casino-footer .link-dark {
+        color: rgba(248, 250, 252, 0.8) !important;
+    }
+    .casino-footer a:hover {
+        color: #ffd700 !important;
+    }
+}
+
     .casino-table-watermark {
         position: absolute;
         inset: 0;
@@ -37,7 +55,6 @@
         z-index: 0;
     }
 
-/* Gold Title text */
     .gold-title {
         background: linear-gradient(135deg, #ffe066 0%, #f5af19 50%, #e65c00 100%);
         -webkit-background-clip: text;
@@ -48,7 +65,6 @@
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
     }
 
-/* Elegant Subtitles */
     .casino-subtitle {
         text-align: center;
         font-weight: 800;
@@ -68,7 +84,6 @@
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
     }
 
-/* Imperial Casino Header Card with Outer Gold Border & Filigree Gilding */
     .casino-header-card {
         background: radial-gradient(circle at 50% 50%, #2e0808 0%, #150000 100%) !important;
         border-radius: 24px !important;
@@ -87,7 +102,6 @@
         overflow: hidden !important;
     }
 
-/* Inner Gold Filigree Frame Line */
     .casino-header-card::before {
         content: "";
         position: absolute;
@@ -130,7 +144,6 @@
         animation-delay: -0.75s;
     }
 
-/* Glowing Marquee Stars */
     .marquee-stars {
         text-align: center;
         margin-bottom: 0.5rem;
@@ -153,7 +166,6 @@
         50% { transform: scale(1.15); opacity: 1; }
     }
 
-/* Casino Badges */
     .casino-badge-open {
         background: rgba(16, 185, 129, 0.1) !important;
         border: 1.5px solid #10b981 !important;
@@ -233,7 +245,6 @@
         margin: 0;
     }
 
-/* Sleek Gold Pill Button */
     .casino-btn-gold {
         background: linear-gradient(135deg, #ffd700 0%, #d4af37 100%) !important;
         border: none !important;
@@ -263,7 +274,6 @@
         box-shadow: 0 1px 4px rgba(212, 175, 55, 0.1) !important;
     }
 
-/* Coin Rotation & Pulsing Animations */
     @keyframes spin-coin {
         0% { transform: rotateY(0deg); }
         100% { transform: rotateY(360deg); }
@@ -274,7 +284,6 @@
         animation: spin-coin 3s infinite linear;
     }
 
-/* Red Neon Logo */
     .casino-logo-neon {
         height: 150px;
         filter: 
@@ -292,7 +301,6 @@
         }
     }
 
-/* Seamless Casino Module Integration */
     .vegas-leaderboard {
         background: radial-gradient(circle at 50% 50%, #161920 0%, #0b0c10 100%);
         border: 2px solid #d4af37;
@@ -357,7 +365,6 @@
         transform: translateY(-2px);
     }
 
-/* Rank Badges using existing Gold Button style theme */
     .vegas-badge {
         width: 36px;
         height: 36px;
@@ -433,14 +440,11 @@
         box-shadow: 0 6px 15px rgba(212, 175, 55, 0.4);
     }
 
-/* Logo Wrapper with Fanned Neon Playing Cards & Divider */
     .casino-logo-wrapper {
         position: relative;
         padding: 10px 55px;
         margin-bottom: 5px;
     }
-
-/* Logo Custom Card CSS removed for unified SVG */
 
     .casino-logo-divider {
         display: flex;
@@ -466,28 +470,28 @@
         white-space: nowrap;
     }
 
-/* Mobile Responsive Scaling for Casino Table & Card Header */
-    @media (max-width: 768px) {
+/* Mobile responsive scaling for casino table & card header */
+    @media (max-width: 767.98px) {
         .casino-table {
-            padding: 0.75rem 0.5rem !important; /* Reclaim huge green margins on mobile */
+            padding: 0.75rem 0.5rem !important; /* Get rid of the huge green side margins on mobile */
             border-radius: 0 !important;
             border-width: 2px 0 !important; /* Top and bottom border only */
-            margin-left: -12px !important;
-            margin-right: -12px !important;
+            margin: -1.5rem -12px !important;
         }
 
         .casino-table::after {
             border-radius: 0 !important;
             border-width: 1px 0 !important; /* Top and bottom inner border only */
         }
+    }
 
+    @media (max-width: 991.98px) {
         .casino-header-card {
             border-radius: 20px !important;
             margin-top: 10px !important;
             margin-bottom: 15px !important;
         }
 
-        /* Restore inner gold pinstripe line nicely positioned inside bulbs */
         .casino-header-card::before {
             display: block !important;
             inset: 24px !important;
@@ -498,7 +502,6 @@
             padding: 2.2rem 2rem 2.8rem !important;
         }
 
-        /* Bigger, more prominent Casino Logo on mobile */
         .casino-logo-neon {
             height: 110px !important;
             max-width: 100%;
@@ -508,8 +511,6 @@
             padding: 2px 10px;
             margin-bottom: 2px;
         }
-
-        /* Cards now embedded in unified SVG */
 
         .casino-logo-divider {
             gap: 8px;
@@ -525,7 +526,6 @@
             font-size: 0.75rem;
         }
 
-        /* Tagline Paragraph: Slightly bigger font, wrapping earlier with generous side margins */
         .casino-header-card p.text-light {
             font-size: 0.9rem !important;
             line-height: 1.4 !important;
@@ -538,7 +538,6 @@
             padding: 0 10px !important;
         }
 
-        /* Compact Wallet Card Tile on Mobile */
         .casino-wallet-card {
             max-width: 80%;
             margin-left: auto;
@@ -607,7 +606,6 @@
     }
 
 
-/* Glowing Option Cards as Mini-Marquees with Gold Frames */
     html[data-theme] .casino-table .card.casino-option-card {
         border-radius: 20px;
         transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s;
@@ -645,7 +643,6 @@ html[data-theme] .casino-table .card.casino-option-card::after {
         border-radius: 8px;
     }
 
-/* VIP claim card */
     .casino-claim-card {
         background: rgba(0, 0, 0, 0.6) !important;
         border: 1px solid rgba(212, 175, 55, 0.4) !important;
@@ -655,14 +652,12 @@ html[data-theme] .casino-table .card.casino-option-card::after {
         color: #f8fafc !important;
     }
 
-/* Ensure text-muted, text-secondary and general text inside casino containers remain light in light theme */
     .casino-table :is(.text-muted, .text-secondary, .text-body-secondary),
     .casino-claim-card :is(.text-muted, .text-secondary, .text-body-secondary),
     .casino-card :is(.text-muted, .text-secondary, .text-body-secondary) {
         color: rgba(248, 250, 252, 0.75) !important;
     }
 
-/* Sleek Modern Input Group */
     .casino-table .input-group {
         background: rgba(0, 0, 0, 0.4) !important;
         border: 1px solid rgba(212, 175, 55, 0.25) !important;
@@ -689,7 +684,7 @@ html .casino-table .casino-input.form-control,
         outline: none !important;
     }
 
-/* Header Card Columns Divider */
+/* Header card columns divider */
     @media (min-width: 992px) {
         .casino-header-card .border-end-lg {
             border-right: 1px solid rgba(212, 175, 55, 0.15) !important;

@@ -13,6 +13,40 @@ from flask_wtf import FlaskForm
 from flask_babel import format_date
 from sqlalchemy.orm import selectinload
 
+def get_leaderboard(limit: int | None = None) -> tuple[list[tuple[int, models.PCeen]], tuple[int, models.PCeen] | None]:
+    """Get ranked casino leaderboard for users active in the last 2 years, and the current user's rank."""
+    now = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
+    two_years_ago = now - datetime.timedelta(days=365 * 2)
+    users = models.PCeen.query.options(
+        selectinload(models.PCeen.casino_bets)
+        .selectinload(models.Bet.option)
+        .selectinload(models.PredictionOption.prediction)
+    ).filter(
+        models.PCeen.casino_bets.any(models.Bet.created_at >= two_years_ago)
+    ).order_by(models.PCeen.total_casino_coins.desc()).all()
+
+    users_ranked = []
+    current_rank = 1
+    current_score = None
+    current_user_ranked = None
+    logged_in_user = context.g.logged_in_user
+    
+    for i, user in enumerate(users):
+        if current_score is None or user.total_casino_coins < current_score:
+            current_rank = i + 1
+            current_score = user.total_casino_coins
+            
+        if user.id == logged_in_user.id:
+            current_user_ranked = (current_rank, user)
+            
+        if limit is None or current_rank <= limit:
+            users_ranked.append((current_rank, user))
+            
+        if limit is not None and current_rank > limit and current_user_ranked is not None:
+            break
+    
+    return users_ranked, current_user_ranked
+
 @bp.route("/")
 @bp.route("/index")
 def index() -> typing.RouteReturn:
@@ -30,16 +64,7 @@ def index() -> typing.RouteReturn:
             next_claim_date = datetime.date(now.year, now.month + 1, 1)
         next_claim_date_str = format_date(next_claim_date, format="medium")
         
-    now = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
-    two_years_ago = now - datetime.timedelta(days=365 * 2)
-    top_users = models.PCeen.query.options(
-        selectinload(models.PCeen.casino_bets)
-        .selectinload(models.Bet.option)
-        .selectinload(models.PredictionOption.prediction)
-    ).filter(
-        models.PCeen.casino_bets.any(models.Bet.created_at >= two_years_ago)
-    ).order_by(models.PCeen.total_casino_coins.desc()).limit(5).all()
-
+    top_users, current_user_ranked = get_leaderboard(limit=5)
 
     return flask.render_template(
         "casino/index.html", 
@@ -48,6 +73,7 @@ def index() -> typing.RouteReturn:
         can_claim=can_claim,
         next_claim_date_str=next_claim_date_str,
         top_users=top_users,
+        current_user_ranked=current_user_ranked,
         form=FlaskForm()
     )
 
@@ -155,18 +181,11 @@ def prediction(id: int) -> typing.RouteReturn:
 @bp.route("/leaderboard")
 def leaderboard() -> typing.RouteReturn:
     """Casino full leaderboard."""
-    now = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
-    two_years_ago = now - datetime.timedelta(days=365 * 2)
-    users = models.PCeen.query.options(
-        selectinload(models.PCeen.casino_bets)
-        .selectinload(models.Bet.option)
-        .selectinload(models.PredictionOption.prediction)
-    ).filter(
-        models.PCeen.casino_bets.any(models.Bet.created_at >= two_years_ago)
-    ).order_by(models.PCeen.total_casino_coins.desc()).all()
+    users_ranked, current_user_ranked = get_leaderboard()
     
     return flask.render_template(
         "casino/leaderboard.html",
         title=_("Classement du Casino"),
-        users=users,
+        users=users_ranked,
+        current_user_ranked=current_user_ranked,
     )

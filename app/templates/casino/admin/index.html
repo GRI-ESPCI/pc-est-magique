@@ -4,14 +4,14 @@
 
 
 {% block content %}
-<div class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>{{ _("Administration du Casino") }}</h1>
-        <div class="d-flex gap-2">
-            <a href="{{ url_for('casino.index') }}" class="btn btn-outline-secondary">
+<div class="container-md my-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <h1 class="mb-0">{{ _("Administration du Casino") }}</h1>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ url_for('casino.index') }}" class="btn btn-outline-secondary text-nowrap">
                 <i class="fas fa-arrow-left me-1"></i>{{ _("Retour au Casino") }}
             </a>
-            <a href="{{ url_for('casino.admin_create') }}" class="btn btn-primary">{{ _("Nouvelle prédiction") }}</a>
+            <a href="{{ url_for('casino.admin_create') }}" class="btn btn-primary text-nowrap">{{ _("Nouvelle prédiction") }}</a>
         </div>
     </div>
 

@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-md 
+<nav class="navbar navbar-expand-lg 
 {% if g.theme == 'classic' %}
     navbar-light mb-4 py-2 shadow bg-{{ 'danger' if hasattr(g, '_ban') or (hasattr(g, 'pceen') and g.pceen.is_banned) else 'primary' }}
 {% elif g.theme == 'frost' %}
@@ -15,12 +15,12 @@
     {% endif %}
 {% endif %}
 ">
-    <div class="container-fluid px-2 px-md-4 px-xxl-5">
+    <div class="container-fluid px-2 px-lg-4 px-xxl-5">
         <button class="navbar-toggler p-2 m-0 border-0 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#navbar_content"
                 aria-controls="navbar_content" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand p-0 d-flex align-items-center mx-auto me-md-3 ms-md-0" href="{{ url_for("main.index") }}">
+        <a class="navbar-brand p-0 d-flex align-items-center mx-auto me-lg-3 ms-lg-0" href="{{ url_for("main.index") }}">
             <img src="{{ url_for("static", filename="img/gri_80x80.png") }}" class="d-inline-block m-0 rounded-4 shadow-sm" alt="GRI"
                  width="48" height="48" style="object-fit: cover;" />
             <span class="ms-3 fs-4 fw-bold tracking-tight">PC est magique</span>
@@ -30,7 +30,7 @@
         </a>
         
         {% if g.logged_in %}
-        <ul class="navbar-nav ms-auto me-2 me-md-auto ms-md-3 flex-row align-items-center order-md-0">
+        <ul class="navbar-nav ms-auto me-2 me-lg-auto ms-lg-3 flex-row align-items-center order-lg-0">
             <li class="nav-item dropdown">
                 <a class="nav-link position-relative px-2 d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="notifDropdown">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-bell-fill notif-bell-icon" viewBox="0 0 16 16">
@@ -44,7 +44,7 @@
                 </a>
                 
                 {# Dropdown menu containing the list of notifications #}
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-md-start notif-dropdown-menu position-absolute" aria-labelledby="notifDropdown" id="notifDropdownMenu">
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-lg-start notif-dropdown-menu position-absolute" aria-labelledby="notifDropdown" id="notifDropdownMenu">
                     <li class="py-3 text-center text-muted">
                         <div class="spinner-border spinner-border-sm" role="status">
                           <span class="visually-hidden">Loading...</span>
@@ -54,23 +54,23 @@
             </li>
         </ul>
         {% endif %}
-        <div class="offcanvas-md offcanvas-start shadow flex-grow-1" tabindex="-1" id="navbar_content" aria-labelledby="navbarOffcanvasLgLabel" data-bs-scroll="false" data-bs-backdrop="true">
-            <div class="offcanvas-header d-md-none justify-content-between align-items-center px-4 py-3 border-bottom">
+        <div class="offcanvas-lg offcanvas-start shadow flex-grow-1" tabindex="-1" id="navbar_content" aria-labelledby="navbarOffcanvasLgLabel" data-bs-scroll="false" data-bs-backdrop="true">
+            <div class="offcanvas-header d-lg-none justify-content-between align-items-center px-4 py-3 border-bottom">
                 <h5 class="offcanvas-title fw-bold text-muted fs-5 mb-0" id="navbarOffcanvasLgLabel">{{ _("Raccourcis") }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" data-bs-target="#navbar_content" style="margin-right: -2px;"></button>
             </div>
-            <div class="offcanvas-body px-4 pb-4 pt-3 p-md-0 flex-grow-1 w-100">
-                <div class="d-none d-md-block flex-grow-1"></div>
+            <div class="offcanvas-body px-4 pb-4 pt-3 p-lg-0 flex-grow-1 w-100">
+                <div class="d-none d-lg-block flex-grow-1"></div>
                 
-                <ul class="navbar-nav mb-3 mb-md-0">
+                <ul class="navbar-nav mb-3 mb-lg-0">
                     {% if g.is_gri %}{% include "gris/menu.html" %}{% endif %}
                 </ul>
 
-                <div class="d-none d-md-block flex-grow-1"></div>
+                <div class="d-none d-lg-block flex-grow-1"></div>
 
-                <ul class="navbar-nav align-items-md-center gap-2 gap-md-0 justify-content-md-end">
+                <ul class="navbar-nav align-items-lg-center gap-2 gap-lg-0 justify-content-lg-end">
                     <li class="nav-item">
-                        <a class="{{ 'btn btn-outline-secondary mx-md-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }}" href="https://www.helloasso.com/associations/pc-durable-pcd" target="_blank" rel="noopener noreferrer">
+                        <a class="{{ 'btn btn-outline-secondary mx-lg-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }}" href="https://www.helloasso.com/associations/pc-durable-pcd" target="_blank" rel="noopener noreferrer">
                             {{ _("Panier Bio") }}
                         </a>
                     </li>
@@ -78,7 +78,7 @@
                     {% if has_permission(PermissionType.read, PermissionScope.calendar) %}
                     <li class="nav-item">
                         {% set is_active = request.endpoint and request.endpoint.startswith('calendar.') %}
-                        <a class="{{ 'btn btn-outline-secondary mx-md-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("calendar.index") }}">
+                        <a class="{{ 'btn btn-outline-secondary mx-lg-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("calendar.index") }}">
                             {{ _("Calendrier") }}
                         </a>
                     </li>
@@ -86,18 +86,18 @@
                     
                     <li class="nav-item">
                         {% set is_active = request.endpoint and request.endpoint.startswith('theatre.') %}
-                        <a class="{{ 'btn btn-outline-secondary mx-md-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("theatre.main") }}">
+                        <a class="{{ 'btn btn-outline-secondary mx-lg-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("theatre.main") }}">
                             {{ _("Théâtre") }}
                         </a>
                     </li>
                     {% if not g.logged_in %}
                     <li class="nav-item">
-                        <a class="{{ 'btn btn-outline-secondary mx-md-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }}" href="{{ url_for("auth.login") }}">
+                        <a class="{{ 'btn btn-outline-secondary mx-lg-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }}" href="{{ url_for("auth.login") }}">
                             {{ _("Connexion") }}
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="{{ 'btn btn-outline-secondary mx-md-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }}" href="{{ url_for("auth.register") }}">
+                        <a class="{{ 'btn btn-outline-secondary mx-lg-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }}" href="{{ url_for("auth.register") }}">
                             {{ _("Créer un compte") }}
                         </a>
                     </li>
@@ -105,7 +105,7 @@
                     {% if has_permission(PermissionType.read, PermissionScope.intrarez) %}
                     <li class="nav-item">
                          {% set is_active = request.endpoint and (request.endpoint.startswith('payments.') or request.endpoint.startswith('devices.') or request.endpoint.startswith('rooms.')) %}
-                        <a class="{{ 'btn btn-outline-secondary mx-md-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("payments.main") }}">
+                        <a class="{{ 'btn btn-outline-secondary mx-lg-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("payments.main") }}">
                             {{ _("Internet") }}
                         </a>
                     </li>
@@ -113,7 +113,7 @@
                     {% if has_permission(PermissionType.read, PermissionScope.bekk) %}
                     <li class="nav-item">
                          {% set is_active = request.endpoint and request.endpoint.startswith('bekk.') %}
-                        <a class="{{ 'btn btn-outline-secondary mx-md-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("bekk.main") }}">
+                        <a class="{{ 'btn btn-outline-secondary mx-lg-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("bekk.main") }}">
                             {{ _("Bekk") }}
                         </a>
                     </li>
@@ -121,7 +121,7 @@
                     {% if has_permission(PermissionType.read, PermissionScope.club_q) %}
                     <li class="nav-item">
                          {% set is_active = request.endpoint and request.endpoint.startswith('club_q.') %}
-                        <a class="{{ 'btn btn-outline-secondary mx-md-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("club_q.main") }}">
+                        <a class="{{ 'btn btn-outline-secondary mx-lg-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("club_q.main") }}">
                             {{ _("Club Q") }}
                         </a>
                     </li>
@@ -129,7 +129,7 @@
                     {% if has_permission(PermissionType.read, PermissionScope.photos) %}
                     <li class="nav-item">
                          {% set is_active = request.endpoint and request.endpoint.startswith('photos.') %}
-                        <a class="{{ 'btn btn-outline-secondary mx-md-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("photos.main") }}">
+                        <a class="{{ 'btn btn-outline-secondary mx-lg-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("photos.main") }}">
                             {{ _("Photos") }}
                         </a>
                     </li>
@@ -138,17 +138,17 @@
                        or has_permission(PermissionType.read, PermissionScope.bar_stats) %}
                     <li class="nav-item">
                          {% set is_active = request.endpoint and request.endpoint.startswith('bar.') %}
-                        <a class="{{ 'btn btn-outline-secondary mx-md-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("bar.main") }}">
+                        <a class="{{ 'btn btn-outline-secondary mx-lg-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("bar.main") }}">
                             {{ _("Bar") }}
                         </a>
                     </li>
                     {% endif %}
                     
-                    <li class="d-md-none nav-item mx-3"><hr class="text-secondary my-2"></li>
+                    <li class="d-lg-none nav-item mx-3"><hr class="text-secondary my-2"></li>
 
                     <li class="nav-item">
                          {% set is_active = request.endpoint and request.endpoint.startswith('profile.') %}
-                        <a class="{{ 'btn btn-outline-secondary mx-md-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("profile.main") }}">
+                        <a class="{{ 'btn btn-outline-secondary mx-lg-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("profile.main") }}">
                             {{ _("Profil") }}
                         </a>
                     </li>

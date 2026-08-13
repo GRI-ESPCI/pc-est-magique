@@ -137,7 +137,7 @@ html[data-theme="dark"] :is(.theme-material, .theme-frost) .navbar-toggler { bor
 html[data-theme="dark"] .nav-active-indicator {
     border-left-color: #60a5fa !important;
 }
-@media (min-width: 768px) {
+@media (min-width: 992px) {
     .nav-active-indicator {
         border-left: none;
         border-bottom: 2px solid #0d6efd;
@@ -148,20 +148,20 @@ html[data-theme="dark"] .nav-active-indicator {
 }
 
 /* Menu Styling */
-@media (max-width: 767.98px) {
-    #navbar_content.offcanvas-md { width: 200px !important; }
+@media (max-width: 991.98px) {
+    #navbar_content.offcanvas-lg { width: 200px !important; }
 }
-@media (min-width: 768px) {
-    #navbar_content.offcanvas-md {
+@media (min-width: 992px) {
+    #navbar_content.offcanvas-lg {
         background-color: transparent !important;
         box-shadow: none !important;
         backdrop-filter: none !important;
         border: none !important;
     }
 }
-.theme-frost :is(.offcanvas, .offcanvas-md) { background-color: rgba(255, 255, 255, 0.55) !important; -webkit-backdrop-filter: blur(24px) saturate(200%); backdrop-filter: blur(24px) saturate(200%); border-left-color: rgba(255, 255, 255, 0.5) !important; }
-html[data-theme="dark"] .theme-material :is(.offcanvas, .offcanvas-md) { background-color: #1e2028 !important; color: #f8fafc !important; border-left-color: #2c2f3a !important; }
-html[data-theme="dark"] .theme-frost :is(.offcanvas, .offcanvas-md) { background-color: rgba(15, 20, 30, 0.45) !important; color: #f8fafc !important; -webkit-backdrop-filter: blur(24px) saturate(200%); backdrop-filter: blur(24px) saturate(200%); border-left-color: rgba(255, 255, 255, 0.1) !important; }
+.theme-frost :is(.offcanvas, .offcanvas-lg) { background-color: rgba(255, 255, 255, 0.55) !important; -webkit-backdrop-filter: blur(24px) saturate(200%); backdrop-filter: blur(24px) saturate(200%); border-left-color: rgba(255, 255, 255, 0.5) !important; }
+html[data-theme="dark"] .theme-material :is(.offcanvas, .offcanvas-lg) { background-color: #1e2028 !important; color: #f8fafc !important; border-left-color: #2c2f3a !important; }
+html[data-theme="dark"] .theme-frost :is(.offcanvas, .offcanvas-lg) { background-color: rgba(15, 20, 30, 0.45) !important; color: #f8fafc !important; -webkit-backdrop-filter: blur(24px) saturate(200%); backdrop-filter: blur(24px) saturate(200%); border-left-color: rgba(255, 255, 255, 0.1) !important; }
 html[data-theme="dark"] :is(.theme-material, .theme-frost) .offcanvas-header { border-bottom-color: rgba(255, 255, 255, 0.15) !important; }
 .theme-frost .offcanvas-backdrop.show { opacity: 0.2 !important; }
 html[data-theme="dark"] .theme-frost .offcanvas-backdrop.show { opacity: 0.3 !important; }
