@@ -1,6 +1,6 @@
 {
   "name": "pc-est-magique",
-  "version": "2.11.1",
+  "version": "2.11.2",
   "description": "PC est magique Flask Web App",
   "main": "n/a",
   "scripts": {
@@ -23,7 +23,7 @@
     "@codemirror/state": "^6.5.2",
     "@codemirror/view": "^6.36.7",
     "@rollup/plugin-node-resolve": "^16.0.1",
-    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-terser": "^1.0.0",
     "@rollup/plugin-typescript": "^12.1.2",
     "@types/node": "^22.15.3",
     "bower": "^1.8.12",

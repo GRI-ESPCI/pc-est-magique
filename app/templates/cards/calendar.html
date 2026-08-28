@@ -6,35 +6,99 @@
   {{ macros.bootstrap_icon("calendar-event") }}
 {% endblock %}
 
-{% block card_table %}
+{% block card_body %}
+  <div class="h-100 d-flex flex-column pt-0">
   {% if calendar_infos and calendar_infos.next_events %}
-    {% for event in calendar_infos.next_events %}
-    <tr>
-      <td class="ps-4 align-top pt-2">
-        <div class="fw-bold text-body">{{ event.start_time.strftime('%d/%m') }}</div>
-        {% if not event.all_day %}<div class="small text-body-secondary">{{ event.start_time.strftime('%H:%M') }}</div>{% endif %}
-      </td>
-      <td class="pt-2 pb-2 w-100" style="max-width: 0;">
-        <div class="fw-semibold text-body text-truncate" title="{{ event.title }}">{{ event.title }}</div>
-        <div class="small text-body-secondary mt-1 text-truncate" title="{{ event.club.name }}{% if event.location %} &bull; {{ event.location }}{% endif %}">
-            <span class="fw-medium">{{ event.club.name }}</span>
-            {% if event.location %}
-              &bull; {{ event.location }}
+    
+    <div class="d-md-none w-100 px-4 pb-3">
+        {% set current_date = namespace(value='') %}
+        {% for event in calendar_infos.next_events %}
+            {% set event_date = babel.format_date(event.start_time, 'full') %}
+            
+            {% if event_date != current_date.value %}
+                <div class="fw-bold text-body mt-3 mb-2 pb-1 border-bottom text-capitalize">{{ event_date }}</div>
+                {% set current_date.value = event_date %}
             {% endif %}
+            
+            <div class="d-flex align-items-start py-2 hover-bg-subtle rounded px-2 mx-n2" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#eventModal-{{ event.id }}">
+                <div class="text-body-secondary me-3 fw-medium small pt-1" style="min-width: 60px;">
+                    {% if event.all_day %}
+                        {{ _("Journée") }}
+                    {% else %}
+                        {{ event.start_time.strftime('%H:%M') }}
+                    {% endif %}
+                </div>
+                <div class="d-flex flex-column flex-grow-1 min-w-0">
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="d-inline-block rounded-circle me-2 flex-shrink-0" style="width: 10px; height: 10px; background-color: {{ event.club.color }};"></span>
+                        <span class="fw-semibold text-body text-truncate">{{ event.title }}</span>
+                    </div>
+                    <div class="small text-body-secondary text-truncate">
+                        {{ event.club.name }}{% if event.location %} &bull; {{ event.location }}{% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="d-none d-md-flex w-100 gap-3 px-4 pb-3 h-100">
+        {% set grouped_events = [] %}
+        {% set current_group = namespace(date='', events=[]) %}
+        
+        {% for event in calendar_infos.next_events %}
+            {% set e_date = babel.format_date(event.start_time, 'EEE dd/MM') %}
+            {% if e_date != current_group.date %}
+                {% if current_group.events %}
+                    {% set _ = grouped_events.append({'date': current_group.date, 'events': current_group.events}) %}
+                {% endif %}
+                {% set current_group.date = e_date %}
+                {% set current_group.events = [event] %}
+            {% else %}
+                {% set _ = current_group.events.append(event) %}
+            {% endif %}
+            {% if loop.last %}
+                {% set _ = grouped_events.append({'date': current_group.date, 'events': current_group.events}) %}
+            {% endif %}
+        {% endfor %}
+
+        {% for group in grouped_events %}
+        <div class="flex-grow-1 d-flex flex-column" style="flex-basis: 0;">
+            <div class="text-center mb-2 pb-1 border-bottom text-body-secondary small fw-bold text-capitalize">
+                {{ group.date }}
+            </div>
+            <div class="d-flex flex-column gap-2 flex-grow-1">
+                {% for event in group.events %}
+                <div class="rounded-3 p-2 event-week-block hover-lift w-100 d-flex flex-column" style="background-color: {{ event.club.color }}; color: {{ event.club.contrast_color }}; min-height: 80px; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#eventModal-{{ event.id }}">
+                    <div class="fw-bold lh-sm mb-1" style="font-size: 0.9rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="{{ event.title }}">{{ event.title }}</div>
+                    <div class="opacity-75 mb-2" style="font-size: 0.75rem; font-weight: 500;">
+                        {% if event.all_day %}
+                            {{ _("Journée") }}
+                        {% else %}
+                            {{ event.start_time.strftime('%H:%M') }}
+                        {% endif %}
+                    </div>
+                    <div class="mt-auto text-truncate opacity-75 fw-medium" style="font-size: 0.75rem;" title="{{ event.club.name }}{% if event.location %} &bull; {{ event.location }}{% endif %}">
+                        {{ event.club.name }}
+                        {% if event.location %} &bull; {{ event.location }}{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
-      </td>
-    </tr>
-    {% endfor %}
+        {% endfor %}
+    </div>
+
   {% else %}
-    <tr>
-      <td colspan="2" class="text-center text-body-secondary py-5">
+    <div class="text-center text-body-secondary py-5 w-100">
         <svg class="bi mb-2 opacity-50" width="32" height="32">
             {{ macros.bootstrap_icon("calendar-x") }}
         </svg>
         <div class="small">{{ _("Aucun évènement prévu.") }}</div>
-      </td>
-    </tr>
+    </div>
   {% endif %}
+  </div>
+
+
 {% endblock %}
 
 {% block card_footer %}

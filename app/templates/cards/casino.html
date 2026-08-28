@@ -1,45 +1,57 @@
 {# Casino card #}
 {% extends "cards/base.html" %}
 
-{% block card_title %}
-{{ _("Casino") }}
+{% block card_hover_class %}hover-lift casino-card{% endblock %}
+
+{% block card_head %}
+<link href="{{ url_for('static', filename='css/casino.css') }}" rel="stylesheet" />
+<div class="card-body d-flex align-items-center mb-2">
+    <h3 class="card-title me-auto my-0">{{ _("Casino") }}</h3>
+    <svg class="bi flex-shrink-0 casino-icon {{ '' if g.theme == 'classic' else 'casino-icon-primary' }}" width="36" height="36" role="img">
+        {{ macros.bootstrap_icon("dice-5") }}
+    </svg>
+</div>
 {% endblock %}
 
-{% block card_icon %}
-{{ macros.bootstrap_icon("dice-5") }}
-{% endblock %}
+{% block card_body %}
+<div class="d-flex flex-column h-100 px-4 pb-3 pt-2">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <span class="fw-bold fs-6">{{ _("Mes PC Coins") }}</span>
+        <span class="casino-wallet-amount" style="font-size: 1.5rem;">{{ pceen.casino_coins }}</span>
+    </div>
 
-{% block card_table %}
-<tr>
-    <th scope="row" class="ps-4 text-nowrap">{{ _("Mes PC Coins") }}</th>
-    <td>{{ pceen.casino_coins }} <i class="fas fa-coins text-warning"></i></td>
-</tr>
-{% set recent_preds = pceen.recent_predictions %}
-{% if recent_preds %}
-{% for pred in recent_preds %}
-<tr>
-    <td class="ps-4 py-2 align-middle text-truncate" style="max-width: 1px;">
-        <a href="{{ url_for('casino.prediction', id=pred.id) }}" class="fw-bold text-decoration-none text-reset" title="{{ pred.name }}">{{ pred.name }}</a>
-    </td>
-    <td class="pe-4 py-2 text-center align-middle" style="width: 50px;">
-        {% if pred.status.name == 'locked' %}
-            <svg class="bi text-warning" width="22" height="22" role="img" title="{{ _('Verrouillé') }}">{{ macros.bootstrap_icon("lock-fill") }}</svg>
-        {% elif pred.status.name == 'resolved' %}
-            <svg class="bi text-muted" width="22" height="22" role="img" title="{{ _('Résolu') }}">{{ macros.bootstrap_icon("check-lg") }}</svg>
+    <div class="d-flex flex-column gap-3">
+        {% set recent_preds = pceen.recent_predictions %}
+        {% if recent_preds %}
+            {% for pred in recent_preds %}
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ url_for('casino.prediction', id=pred.id) }}" class="fw-bold text-decoration-none text-body text-truncate me-3" style="font-size: 0.9rem;" title="{{ pred.name }}">
+                    {{ pred.name }}
+                </a>
+                <div class="flex-shrink-0">
+                    {% if pred.status.name == 'locked' %}
+                        <span class="badge casino-badge-locked px-2 py-1 small">Verrouillé</span>
+                    {% elif pred.status.name == 'resolved' %}
+                        <span class="badge casino-badge-resolved px-2 py-1 small">Résolu</span>
+                    {% else %}
+                        <span class="badge casino-badge-open px-2 py-1 small">Ouvert</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center text-muted small mt-2">
+                {{ _("Aucune prédiction") }}
+            </div>
         {% endif %}
-    </td>
-</tr>
-{% endfor %}
-{% else %}
-<tr>
-    <th scope="row" class="ps-4">{{ _("Dernières prédictions") }}</th>
-    <td><span class="text-muted small">{{ _("Aucune prédiction") }}</span></td>
-</tr>
-{% endif %}
+    </div>
+
+</div>
 {% endblock %}
 
 {% block card_footer %}
-<a href="{{ url_for("casino.index") }}" class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}">
+<a href="{{ url_for('casino.index') }}" class="btn casino-btn w-100 {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}">
     {{ _("Accéder au Casino") }}
 </a>
 {% endblock %}

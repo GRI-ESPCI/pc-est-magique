@@ -26,6 +26,7 @@ from app.models import (
     ClubQVoeu,
     ClubQSpectacle,
     Bekk,
+    Club,
     Event,
     InfoBanner,
     InfoBannerPreset,
@@ -34,6 +35,29 @@ from app.routes.main import bp, forms
 from app.utils import captcha, helpers, typing
 from app.utils.global_settings import Settings
 from app.routes.club_q.utils import pceen_prix_total
+from dataclasses import dataclass, field
+
+
+BekkInfos = namedtuple("BekkInfos", ["last_bekk", "promo", "nb_bekks", "last_bekk_id", "pdf_src_with_token", "date"])
+CalendarInfos = namedtuple("CalendarInfos", ["next_events"])
+
+
+@dataclass
+class DisplayClub:
+    name: str
+    color: str = "#3b82f6"
+    contrast_color: str = "#ffffff"
+
+
+@dataclass
+class DisplayEvent:
+    id: str
+    title: str
+    start_time: datetime.datetime
+    club: DisplayClub
+    location: str | None
+    all_day: bool
+    description: str = ""
 
 
 @bp.route("/")
@@ -87,13 +111,13 @@ def index() -> typing.RouteReturn:
         last_bekk = db.session.scalars(bekks_stmt).first()
 
         if last_bekk is None:
-            bekk_infos = namedtuple("BekkInfos", ["last_bekk", "promo", "nb_bekks", "last_bekk_id"])(
-                "Aucun", "-", 0, -1
+            bekk_infos = BekkInfos(
+                "Aucun", "-", 0, -1, "", None
             )
         else:
             nb_bekks = db.session.scalar(db.select(sqlalchemy.func.count()).select_from(Bekk))
-            bekk_infos = namedtuple("BekkInfos", ["last_bekk", "promo", "nb_bekks", "last_bekk_id"])(
-                last_bekk.name, last_bekk.promo, nb_bekks, last_bekk.id
+            bekk_infos = BekkInfos(
+                last_bekk.name, last_bekk.promo, nb_bekks, last_bekk.id, last_bekk.pdf_src_with_token, last_bekk.date
             )
 
     calendar_infos = None
@@ -105,15 +129,7 @@ def index() -> typing.RouteReturn:
             .limit(3)
         ).all()
     
-        class DisplayEvent:
-            def __init__(self, title, start_time, club_name, location, all_day):
-                self.title = title
-                self.start_time = start_time
-                self.club = type('obj', (object,), {'name': club_name})()
-                self.location = location
-                self.all_day = all_day
-    
-        display_events = [DisplayEvent(e.title, e.start_time, e.club.name, e.location, e.all_day) for e in next_real_events]
+        display_events = [DisplayEvent(f"ev-{e.id}", e.title, e.start_time, DisplayClub(e.club.name, e.club.color, e.club.get_contrast_color()), e.location, e.all_day, e.description) for e in next_real_events]
     
         next_spectacles = db.session.scalars(
             db.select(ClubQSpectacle)
@@ -127,11 +143,15 @@ def index() -> typing.RouteReturn:
             .limit(3)
         ).all()
     
-        display_events.extend([DisplayEvent(s.nom, s.date, "Club Q", s.salle.nom if s.salle else None, False) for s in next_spectacles])
+        club_q = db.session.scalars(db.select(Club).filter_by(name="Club Q")).first()
+        cq_color = club_q.color if club_q else "#0d6efd"
+        cq_contrast = club_q.get_contrast_color() if club_q else "#ffffff"
+        
+        display_events.extend([DisplayEvent(f"sp-{s.id}", s.nom, s.date, DisplayClub("Club Q", cq_color, cq_contrast), s.salle.nom if s.salle else None, False, s.description) for s in next_spectacles])
         display_events.sort(key=lambda e: e.start_time)
         display_events = display_events[:3]
     
-        calendar_infos = namedtuple("CalendarInfos", ["next_events"])(display_events)
+        calendar_infos = CalendarInfos(display_events)
 
     banners = []
     autoplay_delay = 8

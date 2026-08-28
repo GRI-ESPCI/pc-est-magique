@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 
-{% block app_content %}
-
+{% block content %}
+<div class="container-fluid px-md-4 px-lg-5 position-relative pt-4" style="max-width: 1600px;">
+    {% if g.doas %}<div class="row">{% include "doas.html" %}</div>{% endif %}
 {% if calendar_infos and banners %}
 <div class="row mb-4">
     <div class="col">
@@ -116,56 +117,106 @@
 </div>
 {% endif %}
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 gy-4 gx-1 justify-content-center">
+<div class="bento-grid">
     {% with pceen = g.pceen %}
-    <div class="col">
+    <div class="bento-item">
         {% include "cards/profile.html" %}
     </div>
     {% if has_permission(PermissionType.read, PermissionScope.bar) %}
-    <div class="col">
+    <div class="bento-item">
         {% include "cards/bar.html" %}
     </div>
     {% endif %}
     {% if has_permission(PermissionType.read, PermissionScope.photos) %}
-    <div class="col">
+    <div class="bento-item">
         {% include "cards/photos.html" %}
     </div>
     {% endif %}
     {% if has_permission(PermissionType.read, PermissionScope.intrarez) %}
-    <div class="col">
+    <div class="bento-item">
         {% include "cards/subscription.html" %}
     </div>
     {% endif %}
     {% if calendar_infos %}
-    <div class="col">
+    <div class="bento-item bento-wide">
         {% include "cards/calendar.html" %}
     </div>
     {% endif %}
     {% if has_permission(PermissionType.read, PermissionScope.club_q) %}
-    <div class="col">
+    <div class="bento-item">
         {% include "cards/club_q_accueil.html" %}
     </div>
     {% endif %}
     {% if has_permission(PermissionType.read, PermissionScope.bekk) %}
-    <div class="col">
+    <div class="bento-item bento-wide">
         {% include "cards/bekk_accueil.html" %}
     </div>
     {% endif %}
-    <div class="col">
+    <div class="bento-item">
         {% include "cards/panier_bio.html" %}
     </div>
     {% if (g.logged_in_user and g.logged_in_user.has_role('Élève')) or has_permission(PermissionType.read, PermissionScope.casino) %}
-    <div class="col">
+    <div class="bento-item">
         {% include "cards/casino.html" %}
     </div>
     {% endif %}
     {% if has_permission(PermissionType.write, PermissionScope.calendar) %}
-    <div class="col">
+    <div class="bento-item">
         {% include "cards/info.html" %}
     </div>
     {% endif %}
     {% endwith %}
 </div>
+</div>
+
+{% if calendar_infos and calendar_infos.next_events %}
+  {% for event in calendar_infos.next_events %}
+  <div class="modal fade" id="eventModal-{{ event.id }}" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content border-0 rounded-4 shadow-lg">
+              <div class="modal-header border-bottom-0 pb-0 px-4 pt-4 align-items-start">
+                  <h4 class="modal-title fw-bold me-auto">{{ event.title }}</h4>
+                  <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="{{ _('Fermer') }}"></button>
+              </div>
+              <div class="modal-body p-4 pt-3">
+                  <div class="p-3 rounded-4 mb-3 bg-body-tertiary">
+                      <span class="small text-primary fw-bold text-uppercase d-block mb-1">{{ _("Date & Heure") }}</span>
+                      <div class="fw-bold fs-5 text-body">
+                          {{ babel.format_date(event.start_time, 'full')|capitalize }}<br>
+                          {% if event.all_day %}
+                              <span class="fs-6 fw-medium text-body-secondary">{{ _("Toute la journée") }}</span>
+                          {% else %}
+                              <span class="fs-6 fw-medium text-body-secondary">{{ event.start_time.strftime('%H:%M') }}</span>
+                          {% endif %}
+                      </div>
+                  </div>
+                  {% if event.location %}
+                  <div class="p-3 rounded-4 mb-3 bg-body-tertiary">
+                      <span class="small text-primary fw-bold text-uppercase d-block mb-1">{{ _("Localisation") }}</span>
+                      <div class="fw-semibold text-body">{{ event.location }}</div>
+                  </div>
+                  {% endif %}
+                  <div class="p-3 rounded-4 mb-3 bg-body-tertiary">
+                      <span class="small text-primary fw-bold text-uppercase d-block mb-1">{{ _("Organisé par") }}</span>
+                      <div class="fw-semibold text-body">{{ event.club.name }}</div>
+                  </div>
+                  {% if event.description %}
+                  <div class="p-3 rounded-4 mb-4 bg-body-tertiary">
+                      <span class="small text-primary fw-bold text-uppercase d-block mb-1">{{ _("À propos") }}</span>
+                      <div class="text-body" style="white-space: pre-wrap;">{{ event.description }}</div>
+                  </div>
+                  {% endif %}
+                  
+                  <div class="d-flex gap-2">
+                      <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-semibold w-100" data-bs-dismiss="modal">{{ _("Fermer") }}</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  {% endfor %}
+{% endif %}
+
 {% endblock %}
 
 {% block scripts %}

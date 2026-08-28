@@ -9,25 +9,43 @@
 {{ macros.bootstrap_icon("cup") }}
 {% endblock %}
 
-{% block card_table %}
-<tr>
-    <th scope="row" class="ps-4 text-nowrap">{{ _("Mon solde") }}</th>
-    <td>{{ babel.format_currency(pceen.bar_balance or 0, "EUR") }}</td>
-</tr>
-<tr>
-    <th scope="row" class="ps-4">{{ _("Limite d'alcool") }}</th>
-    <td>
-        {{ _(
-            "%(count)s/%(limit)s aujourd’hui",
-            count=pceen.current_bar_daily_data.alcohol_bought_count,
-            limit=Settings.max_daily_alcoholic_drinks_per_user,
-        ) }}
-    </td>
-</tr>
-<tr>
-    <th scope="row" class="ps-4 text-nowrap">{{ _("Dépensé aujourd’hui") }}</th>
-    <td>{{ babel.format_currency(pceen.current_bar_daily_data.total_spent, "EUR") }}</td>
-</tr>
+{% block card_body %}
+<div class="d-flex flex-column justify-content-center gap-4 h-100 px-4 pb-3 pt-2">
+    <div>
+        <div class="d-flex justify-content-between mb-2 align-items-end">
+            <span class="fw-bold">{{ _("Mon solde") }}</span>
+            <span class="fw-bold text-body">
+                {{ babel.format_currency(pceen.bar_balance or 0, "EUR") }}
+            </span>
+        </div>
+        <div class="progress rounded-pill bg-black bg-opacity-10 shadow-sm border border-light border-opacity-10" style="height: 10px;">
+            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ pceen.bar_balance }}%; max-width: 100%"></div>
+        </div>
+    </div>
+
+    {% with alcohol_bought_count = pceen.current_bar_daily_data.alcohol_bought_count %}
+    <div>
+        <div class="d-flex justify-content-between mb-2 align-items-end">
+            <span class="fw-bold">{{ _("Limite d'alcool") }}</span>
+            <span class="fw-bold text-body">
+                {{ _("%(count)s / %(limit)s g", count=alcohol_bought_count|int, limit=Settings.max_daily_alcoholic_drinks_per_user) }}
+            </span>
+        </div>
+        <div class="progress rounded-pill bg-black bg-opacity-10 shadow-sm border border-light border-opacity-10" style="height: 10px;">
+            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ alcohol_bought_count * 100 / Settings.max_daily_alcoholic_drinks_per_user }}%; max-width: 100%"></div>
+        </div>
+    </div>
+    {% endwith %}
+
+    <div>
+        <div class="d-flex justify-content-between align-items-end">
+            <span class="fw-bold">{{ _("Dépensé aujourd’hui") }}</span>
+            <span class="fw-bold text-body">
+                {{ babel.format_currency(pceen.current_bar_daily_data.total_spent, "EUR") }}
+            </span>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block card_footer %}
@@ -39,5 +57,4 @@
         {{ _("Recharger") }}
     </a>
 </span>
-
 {% endblock %}

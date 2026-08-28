@@ -10,92 +10,73 @@
 {% endblock %}
 
 
-{% block card_table %}
-{% if pceen.sub_state == SubState.subscribed %}
+{% block card_body %}
+<div class="d-flex flex-column align-items-center justify-content-center h-100 px-3 pb-4 pt-3">
+    {% if pceen.sub_state == SubState.subscribed %}
+    
+    <h4 class="fw-bold text-body mb-1">{{ _("Abonné(e)") }}</h4>
+    <div class="text-success small fw-semibold mb-1">{{ _("Accès Internet actif") }}</div>
+    <div class="d-flex align-items-center justify-content-center gap-2 text-body-secondary small fw-medium mb-3" title="{{ _('Appareils enregistrés') }}">
+        <svg class="bi" width="14" height="14" fill="currentColor">{{ macros.bootstrap_icon("laptop") }}</svg>
+        <span>{{ pceen.devices|length }} {{ _("appareil") if pceen.devices|length <= 1 else _("appareils") }}</span>
+    </div>
 
-<tr>
-    <th scope="row" class="ps-4 text-nowrap">{{ _("État") }}</th>
-    <td>
-        <div class="m-auto position-relative pe-3">
-            {{ _("Abonné(e)") }}
-            <svg class="ms-2 bi flex-shrink-0 position-absolute
-                        top-50 translate-middle-y text-success"
-                    width="24" height="24" role="img">
-                {{ macros.bootstrap_icon("check-circle") }}
-            </svg>
+    <div class="d-flex w-100 gap-2 mt-auto">
+        <div class="flex-fill text-center d-flex flex-column justify-content-center">
+            <div class="text-body-secondary text-uppercase fw-bold mb-1 date-label">{{ _("Jusqu'au") }}</div>
+            <div class="fw-bold small">{{ moment(pceen.current_subscription.end).format("ll") }}</div>
         </div>
-    </td>
-</tr>
-<tr>
-    <th scope="row" class="ps-4 text-nowrap">{{ _("Jusqu'au") }}</th>
-    <td>{{ moment(pceen.current_subscription.end).format("LL") }}</td>
-</tr>
-<tr>
-    <th scope="row" class="ps-4 text-nowrap">{{ _("Coupure le") }}</th>
-    <td>{{ moment(pceen.current_subscription.cut_day).format("LL") }}</td>
-</tr>
-
-{% elif pceen.sub_state == SubState.trial %}
-
-<tr>
-    <th scope="row" class="ps-4 text-nowrap">{{ _("État") }}</th>
-    <td>
-        <div class="m-auto position-relative pe-3">
-            {{ _("Mois offert") }}
-            <svg class="ms-2 bi flex-shrink-0 position-absolute
-                        top-50 translate-middle-y text-warning"
-                    width="24" height="24" role="img">
-                {{ macros.bootstrap_icon("circle-fill") }}
-            </svg>
-            <svg class="ms-2 bi flex-shrink-0 position-absolute
-                        top-50 translate-middle-y text-danger"
-                    width="24" height="24" role="img">
-                {{ macros.bootstrap_icon("exclamation-circle") }}
-            </svg>
+        <div class="flex-fill text-center d-flex flex-column justify-content-center">
+            <div class="text-body-secondary text-uppercase fw-bold mb-1 date-label">{{ _("Coupure") }}</div>
+            <div class="fw-bold small text-danger">{{ moment(pceen.current_subscription.cut_day).format("ll") }}</div>
         </div>
-    </td>
-</tr>
-<tr>
-    <th scope="row" class="ps-4 text-nowrap">{{ _("Depuis le") }}</th>
-    <td>{{ moment(pceen.current_subscription.end).format("LL") }}</td>
-</tr>
-<tr>
-    <th scope="row" class="ps-4 text-nowrap">{{ _("Coupure le") }}</th>
-    <td>{{ moment(pceen.current_subscription.cut_day).format("LL") }}</td>
-</tr>
+    </div>
 
-{% else %}
+    {% elif pceen.sub_state == SubState.trial %}
+    
+    <h4 class="fw-bold text-body mb-1">{{ _("Mois offert") }}</h4>
+    <div class="text-warning small fw-semibold mb-1">{{ _("Période d'essai en cours") }}</div>
+    <div class="d-flex align-items-center justify-content-center gap-2 text-body-secondary small fw-medium mb-3" title="{{ _('Appareils enregistrés') }}">
+        <svg class="bi" width="14" height="14" fill="currentColor">{{ macros.bootstrap_icon("laptop") }}</svg>
+        <span>{{ pceen.devices|length }} {{ _("appareil") if pceen.devices|length <= 1 else _("appareils") }}</span>
+    </div>
 
-<tr>
-    <th scope="row" class="ps-4 text-nowrap">{{ _("État") }}</th>
-    <td>
-        <div class="m-auto position-relative pe-3">
-            {{ _("Paiement nécessaire") }}
-            <svg class="ms-2 bi flex-shrink-0 position-absolute
-                        top-50 translate-middle-y text-danger"
-                    width="24" height="24" role="img">
-                {{ macros.bootstrap_icon("x-circle-fill") }}
-            </svg>
+    <div class="d-flex w-100 gap-2 mt-auto">
+        <div class="flex-fill text-center d-flex flex-column justify-content-center">
+            <div class="text-body-secondary text-uppercase fw-bold mb-1 date-label">{{ _("Jusqu'au") }}</div>
+            <div class="fw-bold small">{{ moment(pceen.current_subscription.end).format("ll") }}</div>
         </div>
-    </td>
-</tr>
-{% if pceen.old_subscriptions == None %}
-<tr>
-    <th scope="row" class="ps-4 text-nowrap">{{ _("Depuis le") }}</th>
-    <td>{{ _("Big bang") }}</td>
-</tr>
-{% else %}
-<tr>
-    <th scope="row" class="ps-4 text-nowrap">{{ _("Depuis le") }}</th>
-    {#<td>{{ moment(pceen.old_subscriptions[0].cut_day).format("LL") }}</td>#}
-</tr>
-{% endif %}
-<tr>
-    <th scope="row" class="ps-4 text-nowrap">{{ _("Accès Internet") }}</th>
-    <td>{{ _("Suspendu") }}</td>
-</tr>
+        <div class="flex-fill text-center d-flex flex-column justify-content-center">
+            <div class="text-body-secondary text-uppercase fw-bold mb-1 date-label">{{ _("Coupure") }}</div>
+            <div class="fw-bold small text-danger">{{ moment(pceen.current_subscription.cut_day).format("ll") }}</div>
+        </div>
+    </div>
 
-{% endif %}
+    {% else %}
+    
+    <h4 class="fw-bold text-body mb-1">{{ _("Suspendu") }}</h4>
+    <div class="text-danger small fw-semibold mb-1">{{ _("Paiement nécessaire") }}</div>
+    <div class="d-flex align-items-center justify-content-center gap-2 text-body-secondary small fw-medium mb-3" title="{{ _('Appareils enregistrés') }}">
+        <svg class="bi" width="14" height="14" fill="currentColor">{{ macros.bootstrap_icon("laptop") }}</svg>
+        <span>{{ pceen.devices|length }} {{ _("appareil") if pceen.devices|length <= 1 else _("appareils") }}</span>
+    </div>
+
+    <div class="d-flex w-100 gap-2 mt-auto justify-content-center">
+        {% if pceen.old_subscriptions == None %}
+            <div class="flex-fill text-center d-flex flex-column justify-content-center">
+                <div class="text-body-secondary text-uppercase fw-bold mb-1 date-label">{{ _("Depuis le") }}</div>
+                <div class="fw-bold small">{{ _("Big bang") }}</div>
+            </div>
+        {% else %}
+            <div class="flex-fill text-center d-flex flex-column justify-content-center">
+                <div class="text-body-secondary text-uppercase fw-bold mb-1 date-label">{{ _("Statut") }}</div>
+                <div class="fw-bold small text-danger">{{ _("Déconnecté") }}</div>
+            </div>
+        {% endif %}
+    </div>
+
+    {% endif %}
+</div>
 {% endblock %}
 
 
