@@ -296,12 +296,12 @@ def _send_push_notifications(app, subs_data, message, vapid_private_key, vapid_c
                 )
                 success_count += 1
             except WebPushException as ex:
-                if ex.response and ex.response.status_code in [404, 410]:
+                if getattr(ex, "response", None) is not None and ex.response.status_code in [403, 404, 410]:
                     to_delete.append(sub["id"])
                 else:
-                    helpers.log_action(f"Push error: {ex}", warning=True)
+                    helpers.log_action(f"Push error: {ex}")
             except Exception as e:
-                helpers.log_action(f"Push error generic: {e}", warning=True)
+                helpers.log_action(f"Push error generic: {e}")
 
         if to_delete:
             import sqlalchemy as sa

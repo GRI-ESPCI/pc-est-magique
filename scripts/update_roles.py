@@ -164,6 +164,11 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["manage_casino"],
             ],
         ),
+        "Notifications": dict(
+            index=30,
+            color="32a852",
+            permissions=[],
+        ),
     }
 
 

@@ -59,7 +59,7 @@
             {# Use the pre-generated thumbnail; fall back to pdf placeholder if missing #}
             <img
               id="bekk-cover-img"
-              src="{{ url_for('main.bekks', filename=bekk_infos.last_bekk_id|string + '_thumb.jpg') }}"
+              src="{{ bekk_infos.thumb_src_with_token }}"
               class="bekk-cover-img d-block"
               style="max-width: 100%; height: auto; max-height: 280px; object-fit: contain;"
               alt="{{ bekk_infos.last_bekk }}"

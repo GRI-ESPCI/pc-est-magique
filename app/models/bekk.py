@@ -44,3 +44,10 @@ class Bekk(db.Model):
         ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]
         token_args = get_nginx_access_token("/bekks", ip)
         return f"{self.src}?{token_args}"
+
+    @property
+    def thumb_src_with_token(self) -> str:
+        """The online query to the cover thumbnail JPEG with md5 args."""
+        ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]
+        token_args = get_nginx_access_token("/bekks", ip)
+        return f"{self.thumb_src}?{token_args}"

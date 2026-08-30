@@ -39,7 +39,7 @@ from app.utils.bekk_thumbnails import get_or_generate_thumbnail
 from dataclasses import dataclass, field
 
 
-BekkInfos = namedtuple("BekkInfos", ["last_bekk", "promo", "nb_bekks", "last_bekk_id", "pdf_src_with_token", "date"])
+BekkInfos = namedtuple("BekkInfos", ["last_bekk", "promo", "nb_bekks", "last_bekk_id", "pdf_src_with_token", "date", "thumb_src_with_token"])
 CalendarInfos = namedtuple("CalendarInfos", ["next_events"])
 
 
@@ -113,13 +113,13 @@ def index() -> typing.RouteReturn:
 
         if last_bekk is None:
             bekk_infos = BekkInfos(
-                "Aucun", "-", 0, -1, "", None
+                "Aucun", "-", 0, -1, "", None, ""
             )
         else:
             get_or_generate_thumbnail(last_bekk.id)
             nb_bekks = db.session.scalar(db.select(sqlalchemy.func.count()).select_from(Bekk))
             bekk_infos = BekkInfos(
-                last_bekk.name, last_bekk.promo, nb_bekks, last_bekk.id, last_bekk.pdf_src_with_token, last_bekk.date
+                last_bekk.name, last_bekk.promo, nb_bekks, last_bekk.id, last_bekk.pdf_src_with_token, last_bekk.date, last_bekk.thumb_src_with_token
             )
 
     calendar_infos = None
