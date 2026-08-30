@@ -1,10 +1,24 @@
 {# Bekk card - used variable bekk (dabatase query)#} {% extends "cards/base.html" %} {% block card_head %}
 
-<canvas
-  id="{{bekk.id}}"
-  class="w-100 card-img-top {{ '' if g.theme == 'classic' else 'rounded-top-4' }}"
+<img
+  id="thumb-{{bekk.id}}"
+  src="{{ bekk.thumb_src }}"
+  class="w-100 card-img-top {{ '' if g.theme == 'classic' else 'rounded-top-4' }} bekk-thumb-img"
+  style="cursor: pointer;"
+  alt="{{ bekk.name }}"
   onclick="window.location='{{ url_for('bekk.reader', id=bekk.id) }}';"
-></canvas>
+  onerror="this.style.display='none'; document.getElementById('fallback-{{bekk.id}}').style.display='flex';"
+>
+<div
+  id="fallback-{{bekk.id}}"
+  class="w-100 card-img-top {{ '' if g.theme == 'classic' else 'rounded-top-4' }} bekk-fallback-placeholder align-items-center justify-content-center"
+  style="display: none; cursor: pointer; aspect-ratio: 1/1.414; background: var(--bs-secondary-bg);"
+  onclick="window.location='{{ url_for('bekk.reader', id=bekk.id) }}';"
+>
+  <svg class="bi" width="64" height="64" style="opacity: 0.35;" role="img" aria-label="{{ bekk.name }}">
+    {{ macros.bootstrap_icon("file-earmark-pdf") }}
+  </svg>
+</div>
 
 {% endblock %} {% block card_body %}
 <div class="card-body">

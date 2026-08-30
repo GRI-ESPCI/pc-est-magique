@@ -128,7 +128,7 @@ def edit_event(event_id: int):
     except ValueError:
         flask.abort(400, "Invalid date format")
 
-    if end_time <= start_time:
+    if (all_day and end_time < start_time) or (not all_day and end_time <= start_time):
         return flask.jsonify({"status": "error", "message": "La fin de l'évènement doit être après le début."}), 400
 
     event.title = title
@@ -183,7 +183,7 @@ def create_event():
     except ValueError:
         flask.abort(400, "Invalid date format")
 
-    if end_time <= start_time:
+    if (all_day and end_time < start_time) or (not all_day and end_time <= start_time):
         return flask.jsonify({"status": "error", "message": "La fin de l'évènement doit être après le début."}), 400
 
     event = Event(

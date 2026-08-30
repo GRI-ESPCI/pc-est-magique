@@ -35,6 +35,7 @@ from app.routes.main import bp, forms
 from app.utils import captcha, helpers, typing
 from app.utils.global_settings import Settings
 from app.routes.club_q.utils import pceen_prix_total
+from app.utils.bekk_thumbnails import get_or_generate_thumbnail
 from dataclasses import dataclass, field
 
 
@@ -115,6 +116,7 @@ def index() -> typing.RouteReturn:
                 "Aucun", "-", 0, -1, "", None
             )
         else:
+            get_or_generate_thumbnail(last_bekk.id)
             nb_bekks = db.session.scalar(db.select(sqlalchemy.func.count()).select_from(Bekk))
             bekk_infos = BekkInfos(
                 last_bekk.name, last_bekk.promo, nb_bekks, last_bekk.id, last_bekk.pdf_src_with_token, last_bekk.date

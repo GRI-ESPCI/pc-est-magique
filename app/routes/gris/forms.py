@@ -88,5 +88,6 @@ class PushNotificationForm(FlaskForm):
     body = wtforms.TextAreaField(_l("Message"), validators=[DataRequired(), Length(max=512)])
     image = wtforms.StringField(_l("Image URL (optionnelle)"), validators=[Optional(), Length(max=256)])
     quiet = wtforms.BooleanField(_l("Notification silencieuse (ne pas afficher de popup)"), default=False)
+    no_history = wtforms.BooleanField(_l("Ne pas ajouter à l'historique"), default=False)
     url = wtforms.StringField(_l("URL au clic (optionnel)"), validators=[Optional(), Length(max=256)])
     submit = wtforms.SubmitField(_l("Envoyer"))

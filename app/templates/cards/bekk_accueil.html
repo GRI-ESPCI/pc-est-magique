@@ -56,7 +56,16 @@
     <div class="d-flex align-items-center justify-content-center order-1 order-sm-2 bekk-cover-col" style="min-width: 0;">
         {% if bekk_infos.last_bekk_id != -1 %}
         <a href="{{ url_for('bekk.reader', id=bekk_infos.last_bekk_id) }}" class="overflow-hidden d-inline-block {{ '' if g.theme == 'classic' else 'rounded-4 shadow-sm hover-glow' }} my-auto text-decoration-none" style="max-width: 100%;">
-            <canvas class="bekk-cover-canvas d-block" style="max-width: 100%; height: auto !important;"></canvas>
+            {# Use the pre-generated thumbnail; fall back to pdf placeholder if missing #}
+            <img
+              id="bekk-cover-img"
+              src="{{ url_for('main.bekks', filename=bekk_infos.last_bekk_id|string + '_thumb.jpg') }}"
+              class="bekk-cover-img d-block"
+              style="max-width: 100%; height: auto; max-height: 280px; object-fit: contain;"
+              alt="{{ bekk_infos.last_bekk }}"
+              onerror="this.style.display='none'; document.getElementById('bekk-cover-canvas').style.display='block'; loadBekkCoverFallback();"
+            >
+            <canvas id="bekk-cover-canvas" class="bekk-cover-canvas d-block" style="display: none !important; max-width: 100%; height: auto;"></canvas>
         </a>
         {% else %}
         <div class="text-center text-body-secondary py-4 w-100 my-auto">
@@ -68,34 +77,30 @@
 
 {% if bekk_infos.last_bekk_id != -1 %}
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        function loadBekkCover() {
-            var url = {{ bekk_infos.pdf_src_with_token | tojson }};
-            var coverHeight = 280;
+    // Fallback: only runs if the server-side thumbnail is missing (404).
+    function loadBekkCoverFallback() {
+        var url = {{ bekk_infos.pdf_src_with_token | tojson }};
+        var coverHeight = 280;
+
+        function doRender() {
             pdfjsLib.getDocument(url).promise.then(function(pdf) {
                 return pdf.getPage(1).then(function(page) {
-                    var canvases = document.querySelectorAll('.bekk-cover-canvas');
-                    var p = Promise.resolve();
-                    canvases.forEach(function(canvas) {
-                        p = p.then(function() {
-                            var baseViewport = page.getViewport({ scale: 1.0 });
-                            var scale = coverHeight / baseViewport.height;
-                            var viewport = page.getViewport({ scale: scale });
-                            var dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-                            canvas.width = viewport.width * dpr;
-                            canvas.height = viewport.height * dpr;
-                            canvas.style.width = viewport.width + "px";
-                            canvas.style.height = viewport.height + "px";
-
-                            var context = canvas.getContext('2d');
-                            context.scale(dpr, dpr);
-                            return page.render({ canvasContext: context, viewport: viewport }).promise;
-                        });
-                    });
+                    var canvas = document.getElementById('bekk-cover-canvas');
+                    canvas.style.removeProperty('display');
+                    var baseViewport = page.getViewport({ scale: 1.0 });
+                    var scale = coverHeight / baseViewport.height;
+                    var viewport = page.getViewport({ scale: scale });
+                    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+                    canvas.width = viewport.width * dpr;
+                    canvas.height = viewport.height * dpr;
+                    canvas.style.width = viewport.width + 'px';
+                    canvas.style.height = viewport.height + 'px';
+                    var ctx = canvas.getContext('2d');
+                    ctx.scale(dpr, dpr);
+                    return page.render({ canvasContext: ctx, viewport: viewport }).promise;
                 });
             }).catch(function(err) {
-                console.error("Error loading Bekk cover:", err);
+                console.error('Bekk cover fallback failed:', err);
             });
         }
 
@@ -104,16 +109,13 @@
             script.src = "{{ url_for('static', filename='js/pdf.js') }}";
             script.onload = function() {
                 pdfjsLib.GlobalWorkerOptions.workerSrc = '/static/js/pdf.worker.js';
-                loadBekkCover();
-            };
-            script.onerror = function() {
-                console.error("Failed to load PDF.js");
+                doRender();
             };
             document.head.appendChild(script);
         } else {
-            loadBekkCover();
+            doRender();
         }
-    });
+    }
 </script>
 {% endif %}
 {% endblock %}

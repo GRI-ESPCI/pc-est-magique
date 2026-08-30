@@ -63,7 +63,9 @@
                 <div class="d-none d-lg-block flex-grow-1"></div>
                 
                 <ul class="navbar-nav mb-3 mb-lg-0">
-                    {% if g.is_gri %}{% include "gris/menu.html" %}{% endif %}
+                    {% if g.is_gri or has_permission(PermissionType.write, PermissionScope.pceen) or has_permission(PermissionType.write, PermissionScope.role) or has_permission(PermissionType.write, PermissionScope.notifications) %}
+                        {% include "gris/menu.html" %}
+                    {% endif %}
                 </ul>
 
                 <div class="d-none d-lg-block flex-grow-1"></div>

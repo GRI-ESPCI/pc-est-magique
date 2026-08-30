@@ -311,7 +311,7 @@ def _send_push_notifications(app, subs_data, message, vapid_private_key, vapid_c
         helpers.log_action(f"Fin de l'envoi de la notification push '{message['title']}'. Envoyée avec succès à {success_count} / {len(subs_data)} appareils.")
 
 @bp.route("/push_notifications", methods=["GET", "POST"])
-@context.gris_only
+@context.permission_only(PermissionType.write, PermissionScope.notifications)
 def push_notifications() -> typing.RouteReturn:
     """Send push notifications to users."""
     import json
@@ -338,16 +338,19 @@ def push_notifications() -> typing.RouteReturn:
         subs = db.session.scalars(stmt).all()
 
         # Save notification to history first to get ID
-        notif = Notification(
-            title=form.title.data,
-            body=form.body.data,
-            image=form.image.data or None,
-            url=form.url.data or None,
-            target_type=target,
-            role_id=form.roles.data[0] if target == "role" and form.roles.data else None
-        )
-        db.session.add(notif)
-        db.session.commit()
+        notif_id = None
+        if not form.no_history.data:
+            notif = Notification(
+                title=form.title.data,
+                body=form.body.data,
+                image=form.image.data or None,
+                url=form.url.data or None,
+                target_type=target,
+                role_id=form.roles.data[0] if target == "role" and form.roles.data else None
+            )
+            db.session.add(notif)
+            db.session.commit()
+            notif_id = notif.id
 
         message = {
             "title": form.title.data,
@@ -355,7 +358,7 @@ def push_notifications() -> typing.RouteReturn:
             "image": form.image.data or "",
             "url": form.url.data or "/",
             "quiet": form.quiet.data,
-            "id": notif.id
+            "id": notif_id or ""
         }
         
         vapid_private_key = flask.current_app.config.get("VAPID_PRIVATE_KEY_PATH")
@@ -387,5 +390,23 @@ def push_notifications() -> typing.RouteReturn:
         flask.flash(_("Notification en cours d'envoi à %(count)d appareils.", count=len(subs_data)), "success")
         return flask.redirect(flask.url_for("gris.push_notifications"))
 
-    return flask.render_template("gris/push_notifications.html", form=form, title=_("Push Notifications"), roles=db.session.scalars(db.select(Role)).all())
+    page = flask.request.args.get("page", 1, type=int)
+    paginator = db.paginate(db.select(Notification).order_by(Notification.created_at.desc()), page=page, per_page=20, error_out=False)
+    return flask.render_template("gris/push_notifications.html", form=form, title=_("Push Notifications"), roles=db.session.scalars(db.select(Role)).all(), paginator=paginator)
+@bp.route("/push_notifications/delete/<int:notif_id>", methods=["POST"])
+@context.permission_only(PermissionType.write, PermissionScope.notifications)
+def delete_push_notification(notif_id: int) -> typing.RouteReturn:
+    """Delete a push notification from history."""
+    from app.models.push import Notification
+    
+    notif = db.session.get(Notification, notif_id)
+    if notif:
+        db.session.delete(notif)
+        db.session.commit()
+        flask.flash(_("Notification supprimée de l'historique avec succès."), "success")
+        helpers.log_action(f"Push notification (ID: {notif_id}) supprimée de l'historique par {flask.g.pceen.full_name}.")
+    else:
+        flask.flash(_("Notification introuvable."), "danger")
+        
+    return flask.redirect(flask.url_for("gris.push_notifications"))
     

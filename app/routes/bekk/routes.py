@@ -16,6 +16,8 @@ from app.models import (
 import PyPDF2
 import os
 
+from app.utils.bekk_thumbnails import generate_bekk_thumbnail, get_or_generate_thumbnail
+
 
 @bp.route("", methods=["GET", "POST"])
 @bp.route("/", methods=["GET", "POST"])
@@ -62,6 +64,8 @@ def main() -> typing.RouteReturn:
                 bekk_path = os.path.join(flask.current_app.config["BEKKS_BASE_PATH"], str(bekk.id) + ".pdf")
                 form["pdf_file"].data.save(bekk_path)
 
+                generate_bekk_thumbnail(bekk.id)
+
                 flask.flash(_("Bekk ajouté."))
                 return flask.redirect(flask.url_for("bekk.main", promo=promo))
 
@@ -89,7 +93,10 @@ def main() -> typing.RouteReturn:
                 flask.flash(_("Bekk édité."))
                 return flask.redirect(flask.url_for("bekk.main", promo=promo))
 
-    bekk_id_list = [bekk.id for bekk in bekks]
+    # Lazily generate server-side thumbnails for any bekk that doesn't have one yet.
+    # In case of failure, a generic PDF icon is shown instead.
+    for bekk in bekks:
+        get_or_generate_thumbnail(bekk.id)
 
     can_edit = context.has_permission(PermissionType.write, PermissionScope.bekk)
 
@@ -108,7 +115,6 @@ def main() -> typing.RouteReturn:
         view_promo=promo,
         promos=promos,
         form=form,
-        bekk_id_list=bekk_id_list,
         can_edit=can_edit,
         folder=folder,
         html_file=html_file,

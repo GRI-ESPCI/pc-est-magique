@@ -34,6 +34,11 @@ class Bekk(db.Model):
         return f"/bekks/{self.id}.pdf"
 
     @property
+    def thumb_src(self) -> str:
+        """The online path to the cover thumbnail JPEG."""
+        return f"/bekks/{self.id}_thumb.jpg"
+
+    @property
     def pdf_src_with_token(self) -> str:
         """The online query to the pdf with md5 args."""
         ip = flask.request.headers.get("X-Real-Ip") or flask.current_app.config["FORCE_IP"]

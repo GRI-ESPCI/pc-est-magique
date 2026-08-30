@@ -14,19 +14,8 @@ super() }}
 />
 {% endif %} {% endblock %}{% block scripts %} {{ super() }}
 
-<script defer>
-  var pdf_id_list = {{ bekk_id_list|tojson }}
-
-  var url_list = [];
-  {% for bekk in bekks %}
-    url_list.push({{ bekk.pdf_src_with_token |tojson }})
-  {% endfor %}
-  {% if can_edit %}
-    var folder = {{folder |tojson}}
-  {% endif %}
-</script>
-<script src="{{url_for('static', filename='js/pdf.js') }}" defer></script>
 {% if can_edit %}
+<script defer>var folder = {{ folder|tojson }};</script>
 <script
   src="{{url_for('static', filename='js/bekk/bekks.js') }}"
   defer
@@ -37,10 +26,6 @@ super() }}
   defer
 ></script>
 {% endif %}
-<script
-  src="{{url_for('static', filename='js/pdf_reader/first_page.js') }}"
-  defer
-></script>
 
 {% endblock %} {% block app_content %}
 
@@ -92,7 +77,7 @@ super() }}
 </div>
 <div class="row">
   {% for bekk in bekks %}
-  <div class="col-sm-8 col-md-6 col-lg-4 bottom-margin">
+  <div class="col-12 col-sm-6 col-lg-4 bottom-margin">
     {% include "cards/bekk.html" %}
   </div>
   {% endfor %}

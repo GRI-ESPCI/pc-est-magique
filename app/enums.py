@@ -76,6 +76,7 @@ class PermissionScope(enum.Enum):
     panier_bio = _PSParams(allow_elem=False, need_elem=False)
     calendar = _PSParams(allow_elem=False, need_elem=False)
     casino = _PSParams(allow_elem=False, need_elem=False)
+    notifications = _PSParams(allow_elem=False, need_elem=False)
 
     # Elements scopes
     pceen = _PSParams(

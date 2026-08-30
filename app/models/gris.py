@@ -150,7 +150,7 @@ class Permission(Model):
         if not perm:
             perm = cls(scope=scope, type=type_, ref_id=ref_id)
             db.session.add(perm)
-            db.session.commit
+            db.session.commit()
         return perm
 
 

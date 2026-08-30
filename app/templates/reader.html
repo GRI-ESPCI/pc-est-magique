@@ -21,10 +21,12 @@
 {% endblock %} {% block app_content %}
 
 <body style="background-color: #6b6868">
-  <div id="magazine">
-    {% for i in range(1, nb_pages+1) %}
-    <canvas id="page-{{i}}"></canvas>
-    {% endfor %}
+  <div id="magazine-wrapper">
+    <div id="magazine">
+      {% for i in range(1, nb_pages+1) %}
+      <canvas id="page-{{i}}"></canvas>
+      {% endfor %}
+    </div>
   </div>
 
   <div id="page-navigation">
@@ -54,6 +56,7 @@
         {{ macros.bootstrap_icon("caret-left-fill") }}
       </svg>
     </button>
+    <span id="page-indicator" class="btn btn-secondary disabled px-3"></span>
     <button
       class="btn btn-secondary"
       type="button"

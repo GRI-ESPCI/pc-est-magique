@@ -4,8 +4,16 @@
   margin-bottom: 30px;
 }
 
-#magazine{
-  margin: 0 auto
+#magazine-wrapper {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+#magazine {
+  flex-shrink: 0;
 }
 
 #magazine .turn-page {
@@ -13,10 +21,19 @@
 }
 
 #page-navigation {
-  text-align: center; /* Center-align the button container */
-  margin-top: 10px; /* Add some spacing between the magazine and buttons */
+  text-align: center;
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
-#page-navigation button {
-  margin: 5px; /* Add margin around each button */
+#page-indicator {
+  font-variant-numeric: tabular-nums;
+  min-width: 5ch;
+  cursor: default;
+  pointer-events: none;
 }
