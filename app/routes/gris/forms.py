@@ -80,7 +80,7 @@ class PushNotificationForm(FlaskForm):
             ("rez", _l("Résidents Rez (avec internet actif)")),
             ("role", _l("Rôle spécifique")),
         ],
-        default="eleves",
+        default="role",
         validators=[DataRequired()],
     )
     roles = wtforms.SelectMultipleField(_l("Rôles (si Cible = Rôle spécifique)"), coerce=int, validators=[Optional()])
@@ -91,3 +91,7 @@ class PushNotificationForm(FlaskForm):
     no_history = wtforms.BooleanField(_l("Ne pas ajouter à l'historique"), default=False)
     url = wtforms.StringField(_l("URL au clic (optionnel)"), validators=[Optional(), Length(max=256)])
     submit = wtforms.SubmitField(_l("Envoyer"))
+
+    def validate_roles(self, field):
+        if self.target.data == "role" and not field.data:
+            raise wtforms.ValidationError(_l("Vous devez sélectionner au moins un rôle."))

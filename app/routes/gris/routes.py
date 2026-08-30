@@ -296,7 +296,7 @@ def _send_push_notifications(app, subs_data, message, vapid_private_key, vapid_c
                 )
                 success_count += 1
             except WebPushException as ex:
-                if getattr(ex, "response", None) is not None and ex.response.status_code in [403, 404, 410]:
+                if getattr(ex, "response", None) is not None and ex.response.status_code in [401, 403, 404, 410]:
                     to_delete.append(sub["id"])
                 else:
                     helpers.log_action(f"Push error: {ex}")
