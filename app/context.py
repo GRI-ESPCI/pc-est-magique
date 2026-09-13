@@ -107,9 +107,10 @@ def create_request_context() -> typing.RouteReturn | None:
             g.doas = True
         else:
             # Not authorized to do things as other pceens!
-            new_args = flask.request.args.copy()
-            del new_args["doas"]
-            return flask.redirect(flask.url_for(flask.request.endpoint or "main.index", **new_args))
+            kwargs = dict(flask.request.view_args or {})
+            kwargs.update(flask.request.args)
+            kwargs.pop("doas", None)
+            return flask.redirect(flask.url_for(flask.request.endpoint or "main.index", **kwargs))
 
     # Check maintenance
     if flask.current_app.config["MAINTENANCE"]:
