@@ -111,6 +111,9 @@ class OpenIDCode(_OpenIDCode):
         if hasattr(user, 'promo') and user.promo:
             groups.append(str(user.promo))
             
+        if user.has_role("OPC") or user.has_role("Admin"):
+            groups.append("GRI/OPC")
+            
         user_info["groups"] = groups
         return user_info
 

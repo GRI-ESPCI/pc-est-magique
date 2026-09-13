@@ -131,7 +131,7 @@
                     {% if has_permission(PermissionType.read, PermissionScope.photos) %}
                     <li class="nav-item">
                          {% set is_active = request.endpoint and request.endpoint.startswith('photos.') %}
-                        <a class="{{ 'btn btn-outline-secondary mx-lg-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("photos.main") }}">
+                        <a class="{{ 'btn btn-outline-secondary mx-lg-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="https://opc.pc-est-magique.fr">
                             {{ _("Photos") }}
                         </a>
                     </li>

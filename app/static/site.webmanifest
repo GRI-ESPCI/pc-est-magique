@@ -4,6 +4,11 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "scope_extensions": [
+    {
+      "origin": "*.pc-est-magique.fr"
+    }
+  ],
   "background_color": "#ffffff",
   "theme_color": "#152f4e",
   "icons": [
