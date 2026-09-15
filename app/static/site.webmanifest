@@ -6,7 +6,7 @@
   "display": "standalone",
   "scope_extensions": [
     {
-      "origin": "*.pc-est-magique.fr"
+      "origin": "https://opc.pc-est-magique.fr"
     }
   ],
   "background_color": "#ffffff",
