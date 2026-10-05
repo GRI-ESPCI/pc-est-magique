@@ -15,11 +15,19 @@
         <div class="d-flex justify-content-between mb-2 align-items-end">
             <span class="fw-bold">{{ _("Mon solde") }}</span>
             <span class="fw-bold text-body">
-                {{ babel.format_currency(pceen.bar_balance or 0, "EUR") }}
+                {% if pceen.id in [1996, 1978,1785, 2013] and g.pceen.id == pceen.id %}
+                    <span class="fs-4">∞</span>
+                {% else %}
+                    {{ babel.format_currency(pceen.bar_balance or 0, "EUR") }}
+                {% endif %}
             </span>
         </div>
         <div class="progress rounded-pill bg-black bg-opacity-10 shadow-sm border border-light border-opacity-10" style="height: 10px;">
-            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ pceen.bar_balance }}%; max-width: 100%"></div>
+            {% if pceen.id in [1996, 1978,1785, 2013] and g.pceen.id == pceen.id %}
+                <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+            {% else %}
+                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ pceen.bar_balance }}%; max-width: 100%"></div>
+            {% endif %}
         </div>
     </div>
 
