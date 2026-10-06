@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block app_content %}
+
+{# En-tête #}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="fw-bold mb-1">{{ _("BD – Administration") }}</h1>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0" style="font-size:.85rem;">
+        <li class="breadcrumb-item"><a href="{{ url_for('bd.main') }}">{{ _("Catalogue BD") }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ _("Administration") }}</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+{# Statistiques #}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center p-3" style="border-radius:12px;">
+      <p class="display-6 fw-bold mb-0 text-primary">{{ total_bds }}</p>
+      <p class="text-body-secondary mb-0" style="font-size:.85rem;">{{ _("Bandes dessinées") }}</p>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center p-3" style="border-radius:12px;">
+      <p class="display-6 fw-bold mb-0 text-secondary">{{ total_livres }}</p>
+      <p class="text-body-secondary mb-0" style="font-size:.85rem;">{{ _("Livres") }}</p>
+    </div>
+  </div>
+  <div class="col-12 col-md-6">
+    <div class="card border-0 shadow-sm p-3 h-100 d-flex justify-content-center" style="border-radius:12px;">
+      <p class="fw-semibold mb-1">{{ _("Total du catalogue") }}</p>
+      <p class="display-6 fw-bold mb-0">{{ total_bds + total_livres }}</p>
+      <p class="text-body-secondary mb-0" style="font-size:.85rem;">{{ _("entrée(s)") }}</p>
+    </div>
+  </div>
+</div>
+
+<hr class="my-4">
+
+{# Mise à jour des résumés / couvertures #}
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm" style="border-radius:14px;">
+      <div class="card-body p-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+        <div>
+          <h2 class="h5 fw-bold mb-1">
+            <svg class="bi me-2 text-primary" width="20" height="20"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#cloud-download"/></svg>
+            {{ _("Récupérer les données manquantes") }}
+          </h2>
+          <p class="text-body-secondary mb-0" style="font-size:.85rem;">
+            {{ _("Tente de récupérer les couvertures et résumés manquants via Google Books (par lot de 15 sinon Google est pas content).") }}
+          </p>
+        </div>
+        <form method="post" action="{{ url_for('bd.admin_fetch_missing') }}">
+          <button type="submit" class="btn btn-primary fw-bold px-4 text-nowrap">
+            {{ _("Lancer la recherche") }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Import XLSX (Format dicté par le logiciel de PC BD) #}
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm" style="border-radius:14px;">
+      <div class="card-body p-4">
+        <h2 class="h5 fw-bold mb-1">
+          <svg class="bi me-2 text-success" width="20" height="20"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#cloud-arrow-up-fill"/></svg>
+          {{ _("Importer le catalogue") }}
+        </h2>
+        <p class="text-body-secondary mb-3" style="font-size:.85rem;">
+          {{ _("Importez le fichier .xlsx du catalogue. Les feuilles «\u00a0Livres\u00a0» et «\u00a0Bandes Dessinées\u00a0» seront traitées. Les entrées existantes seront mises à jour, les absentes supprimées.") }}
+        </p>
+
+        <form method="post" action="{{ url_for('bd.admin_upload') }}" enctype="multipart/form-data" id="upload-form">
+          {{ form.hidden_tag() }}
+
+          {# Drag and drop #}
+          <div class="bd-drop-zone border rounded-3 p-4 text-center mb-3 bg-body-tertiary position-relative"
+               id="bd-drop-zone" style="cursor:pointer;border-style:dashed !important;transition:background .15s;">
+            <svg class="bi text-body-secondary mb-2" width="36" height="36"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#file-earmark-spreadsheet"/></svg>
+            <p class="mb-1 fw-medium">{{ _("Glissez votre fichier ici") }}</p>
+            <p class="text-body-secondary mb-2" style="font-size:.8rem;">{{ _("ou cliquez pour sélectionner") }}</p>
+            <span class="badge bg-secondary" id="file-name-badge" style="display:none;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+            {{ form.fichier(class="position-absolute top-0 start-0 w-100 h-100 opacity-0", style="cursor:pointer;", id="file-input") }}
+          </div>
+
+          {{ form.submit(class="btn btn-success fw-bold px-4 w-100", id="submit-btn") }}
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100" style="border-radius:14px;">
+      <div class="card-body p-4">
+        <h2 class="h5 fw-bold mb-3">
+          <svg class="bi me-2 text-body-secondary" width="20" height="20"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#info-circle"/></svg>
+          {{ _("Format attendu du fichier") }}
+        </h2>
+        <p class="text-body-secondary mb-2" style="font-size:.85rem;">{{ _("Colonnes prises en compte (par position) :") }}</p>
+        <table class="table table-sm table-borderless mb-0" style="font-size:.8rem;">
+          <tbody>
+            <tr><td class="text-body-secondary pe-3">A</td><td>{{ _("Auteurs") }}</td></tr>
+            <tr><td class="text-body-secondary pe-3">B</td><td>{{ _("Titre") }}</td></tr>
+            <tr><td class="text-body-secondary pe-3">C–D</td><td class="text-body-secondary fst-italic">{{ _("(ignorées)") }}</td></tr>
+            <tr><td class="text-body-secondary pe-3">E</td><td>{{ _("Date de publication") }}</td></tr>
+            <tr><td class="text-body-secondary pe-3">F</td><td>{{ _("Éditeur") }}</td></tr>
+            <tr><td class="text-body-secondary pe-3">G</td><td>{{ _("Pages") }}</td></tr>
+            <tr><td class="text-body-secondary pe-3">H</td><td>{{ _("ISBN") }}</td></tr>
+          </tbody>
+        </table>
+        <hr class="my-3">
+        <p class="text-body-secondary mb-0" style="font-size:.8rem;">
+          <svg class="bi me-1" width="14" height="14"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#bookmark-check"/></svg>
+          {{ _("Feuilles traitées : «\u00a0Livres\u00a0» et «\u00a0Bandes Dessinées\u00a0»") }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Dernières entrées #}
+{% if recent %}
+<hr class="my-4">
+<h2 class="h5 fw-bold mb-3">{{ _("Dernières entrées enregistrées") }}</h2>
+<div class="table-responsive bg-body-tertiary rounded-4 shadow-sm border">
+  <table class="table table-hover table-borderless align-middle mb-0" style="font-size:.85rem;">
+    <thead class="border-bottom">
+      <tr>
+        <th class="ps-3">{{ _("Titre") }}</th>
+        <th>{{ _("Auteurs") }}</th>
+        <th>{{ _("Éditeur") }}</th>
+        <th>{{ _("ISBN") }}</th>
+        <th class="pe-3">{{ _("Catégorie") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in recent %}
+      <tr>
+        <td class="ps-3 fw-medium">{{ item.titre[:60] }}{% if item.titre|length > 60 %}…{% endif %}</td>
+        <td class="text-body-secondary">{{ item.auteurs[:40] }}{% if item.auteurs|length > 40 %}…{% endif %}</td>
+        <td class="text-body-secondary">{{ item.editeur or "—" }}</td>
+        <td class="text-body-secondary font-monospace" style="font-size:.75rem;">{{ item.isbn or "—" }}</td>
+        <td class="pe-3">
+          <span class="badge rounded-pill {{ 'bg-primary' if item.categorie == 'bd' else 'bg-secondary' }}">
+            {{ _("BD") if item.categorie == "bd" else _("Livre") }}
+          </span>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<script>
+(function () {
+  const dropZone = document.getElementById('bd-drop-zone');
+  const fileInput = document.getElementById('file-input');
+  const badge = document.getElementById('file-name-badge');
+  const submitBtn = document.getElementById('submit-btn');
+
+  function setFile(name) {
+    badge.textContent = name;
+    badge.style.display = 'inline-block';
+    dropZone.style.background = '';
+  }
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) setFile(fileInput.files[0].name);
+  });
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.style.background = 'var(--bs-primary-bg-subtle)';
+  });
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.style.background = '';
+  });
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.style.background = '';
+    if (e.dataTransfer.files[0]) {
+      // Create a DataTransfer to assign to the input
+      const dt = new DataTransfer();
+      dt.items.add(e.dataTransfer.files[0]);
+      fileInput.files = dt.files;
+      setFile(e.dataTransfer.files[0].name);
+    }
+  });
+
+  // Disable submit button after click to prevent double submit
+  document.getElementById('upload-form').addEventListener('submit', () => {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>{{ _("Import en cours…") }}';
+  });
+})();
+</script>
+
+{% endblock %}

@@ -78,6 +78,7 @@ class Config:
 
     GOOGLE_RECAPTCHA_SITEKEY = os.environ.get("GOOGLE_RECAPTCHA_SITEKEY")
     GOOGLE_RECAPTCHA_SECRET = os.environ.get("GOOGLE_RECAPTCHA_SECRET")
+    GOOGLE_BOOKS_API_KEY = os.environ.get("GOOGLE_BOOKS_API_KEY")
 
     BAR_USERS_PER_PAGE = int(os.environ.get("BAR_USERS_PER_PAGE"))
     BAR_ITEMS_PER_PAGE = int(os.environ.get("BAR_ITEMS_PER_PAGE"))

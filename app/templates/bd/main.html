@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block app_content %}
+
+{# En-tête #}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="mb-1 fw-bold">{{ _("Catalogue BD") }}</h1>
+    <p class="text-body-secondary mb-0">
+      {{ total_bds }} {{ _("bande(s) dessinée(s)") }} &middot; {{ total_livres }} {{ _("livre(s)") }}
+    </p>
+  </div>
+  {% if can_admin %}
+  <a href="{{ url_for('bd.admin') }}" class="btn btn-danger d-flex align-items-center justify-content-center gap-2 fw-bold shadow-sm px-4 py-2">
+    <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+      <use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#gear-fill"/>
+    </svg>
+    <span>{{ _("Administration") }}</span>
+  </a>
+  {% endif %}
+</div>
+
+{# Barre de recherche #}
+<form method="get" action="{{ url_for('bd.main') }}" class="mb-5 mt-3" id="bd-search-form">
+  <div class="m3-search-bar d-flex align-items-center px-3 mx-auto mx-md-0" style="max-width: 600px; height: 56px; border-radius: 28px; background-color: var(--bs-secondary-bg); transition: box-shadow 0.2s ease, background-color 0.2s ease;">
+    <svg class="bi text-body-secondary ms-2 flex-shrink-0" width="20" height="20"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#search"/></svg>
+    <input
+      type="text"
+      name="q"
+      id="bd-search-input"
+      class="border-0 shadow-none px-3 w-100 m3-input"
+      style="font-size: 1.05rem; background-color: transparent; outline: none; color: inherit;"
+      placeholder="{{ _('Rechercher un titre, un auteur, un éditeur…') }}"
+      value="{{ search }}"
+      autocomplete="off"
+    >
+    {% if search %}
+    <a href="{{ url_for('bd.main') }}" class="btn btn-link text-body-secondary p-1 me-1 text-decoration-none d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle m3-clear-btn" title="{{ _('Effacer la recherche') }}">
+      <svg class="bi" width="24" height="24"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#x"/></svg>
+    </a>
+    {% endif %}
+  </div>
+</form>
+
+{# Résultats #}
+{% if not items %}
+<div class="text-center py-5 text-body-secondary">
+  <svg class="bi mb-3 opacity-50" width="48" height="48"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#book"/></svg>
+  <p class="mb-0 fs-5">{{ _("Aucun résultat pour cette recherche.") }}</p>
+</div>
+{% else %}
+
+{# Groupe alphabétique #}
+{% set ns = namespace(current_letter="") %}
+
+{# Tri par catégorie, puis alphabétique par titre (déjà trié côté serveur) #}
+{# On regroupe visuellement par lettre initiale du titre #}
+
+<div class="bd-catalogue" id="bd-catalogue">
+  {% for item in items %}
+    {% set letter = (item.titre | upper)[0] if item.titre else "#" %}
+    {% if letter != ns.current_letter %}
+      {% if not loop.first %}</div>{% endif %}
+      {% set ns.current_letter = letter %}
+      <h2 class="bd-letter-heading fw-bold text-body-secondary mb-3 {% if not loop.first %}mt-5{% else %}mt-2{% endif %}" style="font-size:1.1rem;letter-spacing:.05em;border-bottom:1px solid var(--bs-border-color);padding-bottom:.4rem;">{{ letter }}</h2>
+      <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">
+    {% endif %}
+
+    <div class="col">
+      <div class="bd-card card h-100 border-0 shadow-sm" 
+           style="border-radius:12px;overflow:hidden;cursor:pointer;"
+           data-bs-toggle="modal" 
+           data-bs-target="#bdModal"
+           data-titre="{{ item.titre }}"
+           data-auteurs="{{ item.auteurs }}"
+           data-editeur="{{ item.editeur or '' }}"
+           data-date="{{ item.date_publication or '' }}"
+           data-pages="{{ item.pages or '' }}"
+           data-isbn="{{ item.isbn or '' }}"
+           data-resume="{{ item.resume or '' }}"
+           data-categorie="{{ _('BD') if item.categorie == 'bd' else _('Livre') }}"
+           data-cover="{{ item.cover_url or '' }}">
+        {# Couverture #}
+        <div class="bd-cover-wrapper position-relative bg-body-tertiary" style="aspect-ratio:2/3;overflow:hidden;">
+          {% if item.cover_url %}
+          <img
+            class="bd-cover w-100 h-100"
+            src="{{ item.cover_url }}"
+            alt="{{ item.titre }}"
+            style="object-fit:cover;"
+            loading="lazy"
+            onerror="this.style.display='none'; this.nextElementSibling.classList.remove('d-none'); this.nextElementSibling.style.position='relative';"
+          >
+          {% endif %}
+          <div class="bd-cover-placeholder d-flex flex-column align-items-center justify-content-center w-100 h-100 text-body-secondary p-2 {% if item.cover_url %}d-none{% endif %}" style="position:{% if item.cover_url %}absolute{% else %}relative{% endif %};top:0;left:0;">
+            <svg class="bi opacity-50" width="32" height="32"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#book-half"/></svg>
+          </div>
+        </div>
+        {# Infos #}
+        <div class="card-body p-2">
+          <p class="card-title fw-semibold mb-1 lh-sm" style="font-size:.8rem;" title="{{ item.titre }}">{{ item.titre[:60] }}{% if item.titre|length > 60 %}…{% endif %}</p>
+          <p class="card-text text-body-secondary mb-0" style="font-size:.7rem;">{{ item.auteurs[:50] }}{% if item.auteurs|length > 50 %}…{% endif %}</p>
+          {% if item.editeur %}
+          <p class="card-text text-body-secondary mb-0" style="font-size:.65rem;opacity:.7;">{{ item.editeur }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>{# close last letter group #}
+</div>
+
+<p class="text-body-secondary text-end mt-4" style="font-size:.8rem;">
+  {{ items|length }} {{ _("résultat(s)") }}{% if search %} {{ _("pour «\u00a0%(q)s\u00a0»", q=search) }}{% endif %}
+</p>
+{% endif %}
+
+<style>
+.bd-card { transition: transform .15s ease, box-shadow .15s ease; cursor: default; }
+.bd-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.12) !important; }
+
+/* Styles pour la barre de recherche M3 */
+.m3-search-bar:focus-within {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 0 0 2px var(--bs-primary) !important;
+}
+[data-bs-theme="dark"] .m3-search-bar:focus-within {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 0 2px var(--bs-primary) !important;
+}
+.m3-input:focus {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  color: var(--bs-body-color) !important;
+  outline: none !important;
+}
+.m3-clear-btn:hover {
+  background-color: var(--bs-tertiary-bg);
+}
+</style>
+
+{# Modal details #}
+<div class="modal fade" id="bdModal" tabindex="-1" aria-labelledby="bdModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow" style="border-radius:16px;overflow:hidden;">
+      <div class="modal-body pt-4 px-4 pb-4 position-relative">
+        <button type="button" class="btn btn-outline-secondary position-absolute top-0 end-0 m-3 rounded-circle d-flex align-items-center justify-content-center p-2" data-bs-dismiss="modal" aria-label="Close" style="width:36px;height:36px;z-index:10;">
+          <svg class="bi" width="16" height="16"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#x-lg"/></svg>
+        </button>
+
+        <div class="row g-4">
+          <div class="col-sm-4 col-md-3 text-center text-sm-start">
+            <div class="bg-body-tertiary rounded-3 shadow-sm mx-auto" style="aspect-ratio:2/3; overflow:hidden; max-width:200px;">
+              <img id="modalCover" src="" class="w-100 h-100 d-none" style="object-fit:cover;" alt="Couverture" onerror="this.classList.add('d-none'); this.nextElementSibling.classList.remove('d-none');">
+              <div id="modalCoverPlaceholder" class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-body-secondary p-3">
+                <svg class="bi mb-2 opacity-50" width="48" height="48"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#book-half"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-8 col-md-9">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span id="modalDate" class="text-body-secondary" style="font-size:0.85rem;"></span>
+            </div>
+            <h2 id="modalTitre" class="h4 fw-bold mb-1"></h2>
+            <h3 id="modalAuteurs" class="h6 text-body-secondary mb-3"></h3>
+            
+            <div class="d-flex flex-wrap gap-3 mb-4" style="font-size:0.85rem;">
+              <div class="d-none" id="modalEditeurBox">
+                <strong>{{ _("Éditeur :") }}</strong> <span id="modalEditeur"></span>
+              </div>
+              <div class="d-none" id="modalPagesBox">
+                <strong>{{ _("Pages :") }}</strong> <span id="modalPages"></span>
+              </div>
+              <div class="d-none" id="modalIsbnBox">
+                <strong>{{ _("ISBN :") }}</strong> <span id="modalIsbn" class="font-monospace"></span>
+              </div>
+            </div>
+            
+            <h4 class="h6 fw-bold mb-2">{{ _("Résumé") }}</h4>
+            <div id="modalSummary" class="text-body" style="font-size:0.9rem; line-height:1.5;">
+              <div id="modalSummaryText" class="d-none"></div>
+              <div id="modalSummaryNone" class="d-none text-body-secondary fst-italic">
+                {{ _("Aucun résumé disponible.") }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const bdModal = document.getElementById('bdModal');
+  bdModal.addEventListener('show.bs.modal', function (event) {
+    const card = event.relatedTarget;
+    
+    // Récupération des données
+    const titre = card.getAttribute('data-titre');
+    const auteurs = card.getAttribute('data-auteurs');
+    const editeur = card.getAttribute('data-editeur');
+    const date = card.getAttribute('data-date');
+    const pages = card.getAttribute('data-pages');
+    const isbn = card.getAttribute('data-isbn');
+    const coverUrl = card.getAttribute('data-cover');
+    const resume = card.getAttribute('data-resume');
+    
+    // Remplissage de la modale
+    document.getElementById('modalTitre').textContent = titre;
+    document.getElementById('modalAuteurs').textContent = auteurs;
+
+    if (date) { document.getElementById('modalDate').textContent = date; }
+    else { document.getElementById('modalDate').textContent = ""; }
+
+    const editeurBox = document.getElementById('modalEditeurBox');
+    if (editeur) { editeurBox.classList.remove('d-none'); document.getElementById('modalEditeur').textContent = editeur; }
+    else { editeurBox.classList.add('d-none'); }
+    
+    const pagesBox = document.getElementById('modalPagesBox');
+    if (pages) { pagesBox.classList.remove('d-none'); document.getElementById('modalPages').textContent = pages; }
+    else { pagesBox.classList.add('d-none'); }
+    
+    const isbnBox = document.getElementById('modalIsbnBox');
+    if (isbn) { isbnBox.classList.remove('d-none'); document.getElementById('modalIsbn').textContent = isbn; }
+    else { isbnBox.classList.add('d-none'); }
+
+    const cover = document.getElementById('modalCover');
+    const placeholder = document.getElementById('modalCoverPlaceholder');
+    if (coverUrl) {
+      cover.src = coverUrl;
+      cover.classList.remove('d-none');
+      placeholder.classList.add('d-none');
+    } else {
+      cover.src = "";
+      cover.classList.add('d-none');
+      placeholder.classList.remove('d-none');
+    }
+
+    // Gestion du résumé via la BDD
+    const summaryText = document.getElementById('modalSummaryText');
+    const summaryNone = document.getElementById('modalSummaryNone');
+    
+    if (resume) {
+      summaryText.textContent = resume;
+      summaryText.classList.remove('d-none');
+      summaryNone.classList.add('d-none');
+    } else {
+      summaryText.textContent = "";
+      summaryText.classList.add('d-none');
+      summaryNone.classList.remove('d-none');
+    }
+  });
+});
+</script>
+
+{% endblock %}

@@ -14,6 +14,7 @@ from markupsafe import Markup, escape
 import sqlalchemy
 
 from app import context, db
+from app.models.bd import BDItem
 from app.models import (
     Ban,
     PermissionScope,
@@ -74,6 +75,14 @@ def index() -> typing.RouteReturn:
             db.session.scalar(db.select(sqlalchemy.func.count()).select_from(Album)),
             db.session.scalar(db.select(sqlalchemy.func.count()).select_from(Photo)),
         )
+
+    # Get latest BD with cover for the card
+    latest_bd = db.session.scalars(
+        db.select(BDItem)
+        .where(BDItem.image_url.is_not(None))
+        .order_by(BDItem.id.desc())
+        .limit(1)
+    ).first()
 
     club_q_infos = None
     if context.has_permission(PermissionType.read, PermissionScope.club_q):
@@ -172,7 +181,8 @@ def index() -> typing.RouteReturn:
         club_q_infos=club_q_infos,
         calendar_infos=calendar_infos,
         banners=banners,
-        autoplay_delay=autoplay_delay
+        autoplay_delay=autoplay_delay,
+        latest_bd=latest_bd,
     )
 
 

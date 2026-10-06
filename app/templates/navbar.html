@@ -92,6 +92,12 @@
                             {{ _("Théâtre") }}
                         </a>
                     </li>
+                    <li class="nav-item">
+                        {% set is_active = request.endpoint and request.endpoint.startswith('bd.') %}
+                        <a class="{{ 'btn btn-outline-secondary mx-lg-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }} {{ 'active nav-active-indicator' if is_active and g.theme != 'classic' else '' }}" href="{{ url_for("bd.main") }}">
+                            {{ _("BD") }}
+                        </a>
+                    </li>
                     {% if not g.logged_in %}
                     <li class="nav-item">
                         <a class="{{ 'btn btn-outline-secondary mx-lg-2 my-1' if g.theme == 'classic' else 'nav-link px-3 py-2 fw-medium' }}" href="{{ url_for("auth.login") }}">

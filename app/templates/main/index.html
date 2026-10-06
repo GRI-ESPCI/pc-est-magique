@@ -122,6 +122,9 @@
     <div class="bento-item">
         {% include "cards/profile.html" %}
     </div>
+    <div class="bento-item">
+        {% include "cards/bd.html" %}
+    </div>
     {% if has_permission(PermissionType.read, PermissionScope.bar) %}
     <div class="bento-item">
         {% include "cards/bar.html" %}
