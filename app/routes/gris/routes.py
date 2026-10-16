@@ -47,7 +47,7 @@ def pceens(view: str = "active") -> typing.RouteReturn:
     add_pceen_form = forms.AddPCeenForm()
     add_pceen_form.roles.choices = [(r.id, r.name) for r in db.session.scalars(db.select(Role)).all()]
 
-    if add_pceen_form.submit.data:
+    if add_pceen_form.submit_add.data:
         if add_pceen_form.validate_on_submit():
             nom = add_pceen_form.nom.data.title()
             prenom = add_pceen_form.prenom.data.title()
@@ -87,6 +87,10 @@ def pceens(view: str = "active") -> typing.RouteReturn:
                 
                 # Send password setup email
                 email.send_password_reset_email(pceen)
+        else:
+            for field, errors in add_pceen_form.errors.items():
+                for error in errors:
+                    flask.flash(f"{getattr(add_pceen_form, field).label.text}: {error}", "danger")
         return helpers.redirect_to_next()
 
     elif ban_form["submit"].data or ban_form["unban"].data:

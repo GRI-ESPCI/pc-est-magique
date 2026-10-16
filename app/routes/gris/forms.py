@@ -67,7 +67,7 @@ class AddPCeenForm(FlaskForm):
     promo = wtforms.IntegerField(_l("Promo (Optionnel)"), validators=[Optional()])
     email = wtforms.EmailField(_l("Email"), validators=[DataRequired(), Length(max=120)])
     roles = wtforms.SelectMultipleField(_l("Rôles"), coerce=int, validators=[Optional()])
-    submit = wtforms.SubmitField(_l("Créer le PCéen"))
+    submit_add = wtforms.SubmitField(_l("Ajouter"))
 
 class PushNotificationForm(FlaskForm):
     """WTForm used to send push notifications."""
