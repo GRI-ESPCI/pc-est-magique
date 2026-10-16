@@ -75,7 +75,7 @@
           {{ _("Importer le catalogue") }}
         </h2>
         <p class="text-body-secondary mb-3" style="font-size:.85rem;">
-          {{ _("Importez le fichier .xlsx du catalogue. Les feuilles «\u00a0Livres\u00a0» et «\u00a0Bandes Dessinées\u00a0» seront traitées. Les entrées existantes seront mises à jour, les absentes supprimées.") }}
+          {{ _("Importez le fichier .xlsx du catalogue. Les feuilles «\u00a0Livres\u00a0» et «\u00a0Bandes Dessinées\u00a0» seront traitées. Seules les nouvelles entrées seront ajoutées, les entrées existantes sont conservées.") }}
         </p>
 
         <form method="post" action="{{ url_for('bd.admin_upload') }}" enctype="multipart/form-data" id="upload-form">

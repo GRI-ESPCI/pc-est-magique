@@ -166,7 +166,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["manage_casino"],
             ],
         ),
-        "Club BD": dict(
+        "BD": dict(
             index=19,
             color="3c78d8",
             permissions=[

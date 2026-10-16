@@ -79,7 +79,7 @@ def index() -> typing.RouteReturn:
     # Get latest BD with cover for the card
     latest_bd = db.session.scalars(
         db.select(BDItem)
-        .where(BDItem.image_url.is_not(None))
+        .where(BDItem.image_url.is_not(None), BDItem.image_url != "")
         .order_by(BDItem.id.desc())
         .limit(1)
     ).first()

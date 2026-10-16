@@ -93,11 +93,11 @@ def _clean_date(raw) -> str | None:
     return s if s else None
 
 
-def _import_xlsx(file_stream) -> tuple[int, int, int]:
-    """Parse the XLSX catalogue and insert items into the database.
+def _import_xlsx(file_stream) -> int:
+    """Parse the XLSX catalogue and insert new items into the database.
 
     Returns:
-        Tuple (added, updated, deleted) counts.
+        Number of added items.
     """
     wb = openpyxl.load_workbook(file_stream, read_only=True, data_only=True)
 
@@ -137,8 +137,6 @@ def _import_xlsx(file_stream) -> tuple[int, int, int]:
     wb.close()
 
     added = 0
-    updated = 0
-    deleted = 0
 
     for categorie, rows in incoming.items():
         if not rows:
@@ -153,36 +151,18 @@ def _import_xlsx(file_stream) -> tuple[int, int, int]:
             key = (_normalize(item.titre), _normalize(item.auteurs))
             existing[key] = item
 
-        seen_keys: set[tuple] = set()
         for row in rows:
             key = (_normalize(row["titre"]), _normalize(row["auteurs"]))
 
-            if key in existing:
-                # Update existing item
-                item = existing[key]
-                item.date_publication = row["date_publication"]
-                item.editeur = row["editeur"]
-                item.pages = row["pages"]
-                item.isbn = row["isbn"]
-
-                updated += 1
-            else:
+            if key not in existing:
                 # New item
-
                 item = BDItem(**row)
                 db.session.add(item)
+                existing[key] = item
                 added += 1
 
-            seen_keys.add(key)
-
-        # Delete items that are no longer in the file
-        for key, item in existing.items():
-            if key not in seen_keys:
-                db.session.delete(item)
-                deleted += 1
-
     db.session.commit()
-    return added, updated, deleted
+    return added
 
 
 
@@ -193,18 +173,18 @@ def _background_sync_task(app):
         missing_items = db.session.scalars(
             sa.select(BDItem).where(
                 sa.or_(
-                    BDItem.resume.is_(None), 
-                    BDItem.resume == "",
+                    BDItem.resume.is_(None),
                     BDItem.image_url.is_(None),
-                    BDItem.image_url == ""
                 )
             )
         ).all()
         for item in missing_items:
             try:
                 info = fetch_info_from_google_books(item.isbn, item.titre, item.auteurs)
-                item.resume = info.get("resume") or ""
-                item.image_url = info.get("image_url") or ""
+                if not item.resume:
+                    item.resume = info.get("resume") or ""
+                if not item.image_url:
+                    item.image_url = info.get("image_url") or ""
                 if info.get("isbn") and not item.isbn: 
                     item.isbn = info["isbn"]
                 db.session.commit()
@@ -305,7 +285,7 @@ def admin_upload() -> typing.RouteReturn:
     stream = io.BytesIO(file_data.read())
 
     try:
-        added, updated, deleted = _import_xlsx(stream)
+        added = _import_xlsx(stream)
         
         # Start background sync
         import threading
@@ -320,10 +300,8 @@ def admin_upload() -> typing.RouteReturn:
 
     flask.flash(
         _(
-            "Import rapide réussi : %(a)d ajouté(s), %(u)d mis à jour, %(d)d supprimé(s). La récupération des résumés manquants via Google Books continue en arrière-plan (cela peut prendre quelques minutes).",
+            "Import réussi : %(a)d nouvelle(s) entrée(s) ajoutée(s). La récupération des résumés manquants via Google Books continue en arrière-plan (cela peut prendre quelques minutes).",
             a=added,
-            u=updated,
-            d=deleted,
         ),
         "success",
     )
@@ -337,10 +315,8 @@ def admin_fetch_missing() -> typing.RouteReturn:
     missing_items = db.session.scalars(
         sa.select(BDItem).where(
             sa.or_(
-                BDItem.resume.is_(None), 
-                BDItem.resume == "",
+                BDItem.resume.is_(None),
                 BDItem.image_url.is_(None),
-                BDItem.image_url == ""
             )
         ).limit(15)
     ).all()
@@ -357,8 +333,10 @@ def admin_fetch_missing() -> typing.RouteReturn:
             info = fetch_info_from_google_books(item.isbn, item.titre, item.auteurs)
             
             # Update fields. If none found, we set to "" so we don't query again
-            item.resume = info.get("resume") or ""
-            item.image_url = info.get("image_url") or ""
+            if not item.resume:
+                item.resume = info.get("resume") or ""
+            if not item.image_url:
+                item.image_url = info.get("image_url") or ""
             if info.get("isbn") and not item.isbn: 
                 item.isbn = info["isbn"]
                 
@@ -375,3 +353,66 @@ def admin_fetch_missing() -> typing.RouteReturn:
     db.session.commit()
     flask.flash(_("%(c)d fiches ont été analysées.", c=count), "success")
     return flask.redirect(flask.url_for("bd.admin"))
+
+
+@bp.route("/edit/<int:item_id>", methods=["POST"])
+@context.permission_only(PermissionType.write, PermissionScope.bd)
+def edit_item(item_id: int) -> typing.RouteReturn:
+    """Update BD item details (image_url, resume, nota_bene)."""
+    item = db.session.get(BDItem, item_id)
+    if not item:
+        flask.flash(_("Entrée introuvable."), "danger")
+        return flask.redirect(flask.url_for("bd.main"))
+
+    image_url = flask.request.form.get("image_url", "").strip()
+    resume = flask.request.form.get("resume", "").strip()
+    nota_bene = flask.request.form.get("nota_bene", "").strip()
+    search_q = flask.request.form.get("q", "").strip()
+
+    if image_url:
+        item.image_url = image_url[:500]
+    elif item.image_url is not None:
+        item.image_url = ""
+
+    if resume:
+        item.resume = resume
+    elif item.resume is not None:
+        item.resume = ""
+
+    item.nota_bene = nota_bene or None
+
+    db.session.commit()
+
+    flask.flash(
+        _("La fiche « %(titre)s » a été mise à jour.", titre=item.titre),
+        "success",
+    )
+
+    if search_q:
+        return flask.redirect(flask.url_for("bd.main", q=search_q))
+    return flask.redirect(flask.url_for("bd.main"))
+
+
+@bp.route("/delete/<int:item_id>", methods=["POST"])
+@context.permission_only(PermissionType.write, PermissionScope.bd)
+def delete_item(item_id: int) -> typing.RouteReturn:
+    """Delete a BD item."""
+    item = db.session.get(BDItem, item_id)
+    if not item:
+        flask.flash(_("Entrée introuvable."), "danger")
+        return flask.redirect(flask.url_for("bd.main"))
+
+    titre = item.titre
+    search_q = flask.request.form.get("q", "").strip()
+
+    db.session.delete(item)
+    db.session.commit()
+
+    flask.flash(
+        _("La fiche « %(titre)s » a été supprimée.", titre=titre),
+        "success",
+    )
+
+    if search_q:
+        return flask.redirect(flask.url_for("bd.main", q=search_q))
+    return flask.redirect(flask.url_for("bd.main"))

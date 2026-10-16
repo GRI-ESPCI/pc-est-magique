@@ -72,6 +72,7 @@
            style="border-radius:12px;overflow:hidden;cursor:pointer;"
            data-bs-toggle="modal" 
            data-bs-target="#bdModal"
+           data-id="{{ item.id }}"
            data-titre="{{ item.titre }}"
            data-auteurs="{{ item.auteurs }}"
            data-editeur="{{ item.editeur or '' }}"
@@ -79,6 +80,8 @@
            data-pages="{{ item.pages or '' }}"
            data-isbn="{{ item.isbn or '' }}"
            data-resume="{{ item.resume or '' }}"
+           data-nota-bene="{{ item.nota_bene or '' }}"
+           data-image-url="{{ item.image_url or '' }}"
            data-categorie="{{ _('BD') if item.categorie == 'bd' else _('Livre') }}"
            data-cover="{{ item.cover_url or '' }}">
         {# Couverture #}
@@ -143,9 +146,16 @@
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow" style="border-radius:16px;overflow:hidden;">
       <div class="modal-body pt-4 px-4 pb-4 position-relative">
-        <button type="button" class="btn btn-outline-secondary position-absolute top-0 end-0 m-3 rounded-circle d-flex align-items-center justify-content-center p-2" data-bs-dismiss="modal" aria-label="Close" style="width:36px;height:36px;z-index:10;">
-          <svg class="bi" width="16" height="16"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#x-lg"/></svg>
-        </button>
+        <div class="position-absolute top-0 end-0 m-3 d-flex align-items-center gap-2" style="z-index:10;">
+          {% if can_admin %}
+          <button type="button" class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center p-2" id="bdEditToggleBtn" title="{{ _('Modifier') }}" aria-label="{{ _('Modifier') }}" style="width:36px;height:36px;">
+            <svg class="bi" width="16" height="16"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#pencil"/></svg>
+          </button>
+          {% endif %}
+          <button type="button" class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center p-2" data-bs-dismiss="modal" aria-label="Close" style="width:36px;height:36px;">
+            <svg class="bi" width="16" height="16"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#x-lg"/></svg>
+          </button>
+        </div>
 
         <div class="row g-4">
           <div class="col-sm-4 col-md-3 text-center text-sm-start">
@@ -174,14 +184,71 @@
                 <strong>{{ _("ISBN :") }}</strong> <span id="modalIsbn" class="font-monospace"></span>
               </div>
             </div>
-            
-            <h4 class="h6 fw-bold mb-2">{{ _("Résumé") }}</h4>
-            <div id="modalSummary" class="text-body" style="font-size:0.9rem; line-height:1.5;">
-              <div id="modalSummaryText" class="d-none"></div>
-              <div id="modalSummaryNone" class="d-none text-body-secondary fst-italic">
-                {{ _("Aucun résumé disponible.") }}
+
+            <div id="modalReadContent">
+              <div id="modalNotaBeneBox" class="ps-3 py-1 mb-3 border-start border-2 text-body-secondary d-none" style="font-size:0.85rem;">
+                <span class="fw-semibold">{{ _("N.B. :") }}</span>
+                <span id="modalNotaBeneText" class="fst-italic" style="white-space: pre-line;"></span>
+              </div>
+
+              <h4 class="h6 fw-bold mb-2">{{ _("Résumé") }}</h4>
+              <div id="modalSummary" class="text-body" style="font-size:0.9rem; line-height:1.5;">
+                <div id="modalSummaryText" class="d-none" style="white-space: pre-line;"></div>
+                <div id="modalSummaryNone" class="d-none text-body-secondary fst-italic">
+                  {{ _("Aucun résumé disponible.") }}
+                </div>
               </div>
             </div>
+
+            {% if can_admin %}
+            <div id="modalEditSection" class="d-none">
+              <hr class="my-3">
+              <form id="bdEditForm" method="post" action="" data-edit-url-template="{{ url_for('bd.edit_item', item_id=0) }}">
+                <input type="hidden" name="q" value="{{ search }}">
+                
+                <div class="mb-3">
+                  <label for="editImageUrl" class="form-label fw-semibold small mb-1">{{ _("Lien de la couverture") }}</label>
+                  <input type="text" name="image_url" id="editImageUrl" class="form-control form-control-sm" maxlength="500" placeholder="https://...">
+                </div>
+
+                <div class="mb-3">
+                  <label for="editNotaBene" class="form-label fw-semibold small mb-1">{{ _("Nota Bene") }}</label>
+                  <textarea name="nota_bene" id="editNotaBene" class="form-control form-control-sm" rows="2" placeholder="{{ _('Remarque affichée avant le résumé...') }}"></textarea>
+                </div>
+
+                <div class="mb-3">
+                  <label for="editResume" class="form-label fw-semibold small mb-1">{{ _("Résumé / Description") }}</label>
+                  <textarea name="resume" id="editResume" class="form-control form-control-sm" rows="5" placeholder="{{ _('Résumé ou description de l’ouvrage...') }}"></textarea>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between pt-2">
+                  <div>
+                    <button type="button" id="bdDeleteAskBtn" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1">
+                      <svg class="bi flex-shrink-0" width="14" height="14"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#trash"/></svg>
+                      <span>{{ _("Supprimer") }}</span>
+                    </button>
+                    <div id="bdDeleteConfirmGroup" class="d-none d-inline-flex align-items-center gap-2">
+                      <span class="small text-danger fw-semibold">{{ _("Confirmer ?") }}</span>
+                      <button type="submit" id="bdDeleteBtn" formaction="" data-delete-url-template="{{ url_for('bd.delete_item', item_id=0) }}" class="btn btn-sm btn-danger fw-bold">
+                        {{ _("Oui, supprimer") }}
+                      </button>
+                      <button type="button" id="bdDeleteCancelBtn" class="btn btn-sm btn-outline-secondary">
+                        {{ _("Non") }}
+                      </button>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <button type="button" id="bdEditCancelBtn" class="btn btn-sm btn-outline-secondary">
+                      {{ _("Annuler") }}
+                    </button>
+                    <button type="submit" class="btn btn-sm btn-primary fw-bold">
+                      {{ _("Enregistrer") }}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -190,66 +257,88 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
   const bdModal = document.getElementById('bdModal');
-  bdModal.addEventListener('show.bs.modal', function (event) {
+  if (!bdModal) return;
+
+  const modalNotaBeneBox = document.getElementById('modalNotaBeneBox');
+  const modalNotaBeneText = document.getElementById('modalNotaBeneText');
+  const modalSummaryText = document.getElementById('modalSummaryText');
+  const modalSummaryNone = document.getElementById('modalSummaryNone');
+  const modalReadContent = document.getElementById('modalReadContent');
+  const modalEditSection = document.getElementById('modalEditSection');
+  const bdEditForm = document.getElementById('bdEditForm');
+  const bdEditToggleBtn = document.getElementById('bdEditToggleBtn');
+  const bdEditCancelBtn = document.getElementById('bdEditCancelBtn');
+  const bdDeleteAskBtn = document.getElementById('bdDeleteAskBtn');
+  const bdDeleteConfirmGroup = document.getElementById('bdDeleteConfirmGroup');
+  const bdDeleteBtn = document.getElementById('bdDeleteBtn');
+  const bdDeleteCancelBtn = document.getElementById('bdDeleteCancelBtn');
+  const editImageUrl = document.getElementById('editImageUrl');
+  const editNotaBene = document.getElementById('editNotaBene');
+  const editResume = document.getElementById('editResume');
+
+  const setDeleteConfirm = (confirming) => {
+    bdDeleteAskBtn?.classList.toggle('d-none', confirming);
+    bdDeleteConfirmGroup?.classList.toggle('d-none', !confirming);
+  };
+
+  const setEditMode = (editing) => {
+    modalEditSection?.classList.toggle('d-none', !editing);
+    modalReadContent.classList.toggle('d-none', editing);
+    bdEditToggleBtn?.classList.toggle('d-none', editing);
+    if (!editing) setDeleteConfirm(false);
+  };
+
+  const setOptionalField = (boxId, valueId, val) => {
+    const box = document.getElementById(boxId);
+    box.classList.toggle('d-none', !val);
+    if (val) document.getElementById(valueId).textContent = val;
+  };
+
+  bdModal.addEventListener('show.bs.modal', (event) => {
     const card = event.relatedTarget;
-    
-    // Récupération des données
-    const titre = card.getAttribute('data-titre');
-    const auteurs = card.getAttribute('data-auteurs');
-    const editeur = card.getAttribute('data-editeur');
-    const date = card.getAttribute('data-date');
-    const pages = card.getAttribute('data-pages');
-    const isbn = card.getAttribute('data-isbn');
-    const coverUrl = card.getAttribute('data-cover');
-    const resume = card.getAttribute('data-resume');
-    
-    // Remplissage de la modale
-    document.getElementById('modalTitre').textContent = titre;
-    document.getElementById('modalAuteurs').textContent = auteurs;
+    if (!card) return;
+    const d = card.dataset;
 
-    if (date) { document.getElementById('modalDate').textContent = date; }
-    else { document.getElementById('modalDate').textContent = ""; }
+    document.getElementById('modalTitre').textContent = d.titre || '';
+    document.getElementById('modalAuteurs').textContent = d.auteurs || '';
+    document.getElementById('modalDate').textContent = d.date || '';
 
-    const editeurBox = document.getElementById('modalEditeurBox');
-    if (editeur) { editeurBox.classList.remove('d-none'); document.getElementById('modalEditeur').textContent = editeur; }
-    else { editeurBox.classList.add('d-none'); }
-    
-    const pagesBox = document.getElementById('modalPagesBox');
-    if (pages) { pagesBox.classList.remove('d-none'); document.getElementById('modalPages').textContent = pages; }
-    else { pagesBox.classList.add('d-none'); }
-    
-    const isbnBox = document.getElementById('modalIsbnBox');
-    if (isbn) { isbnBox.classList.remove('d-none'); document.getElementById('modalIsbn').textContent = isbn; }
-    else { isbnBox.classList.add('d-none'); }
+    setOptionalField('modalEditeurBox', 'modalEditeur', d.editeur);
+    setOptionalField('modalPagesBox', 'modalPages', d.pages);
+    setOptionalField('modalIsbnBox', 'modalIsbn', d.isbn);
 
     const cover = document.getElementById('modalCover');
     const placeholder = document.getElementById('modalCoverPlaceholder');
-    if (coverUrl) {
-      cover.src = coverUrl;
-      cover.classList.remove('d-none');
-      placeholder.classList.add('d-none');
-    } else {
-      cover.src = "";
-      cover.classList.add('d-none');
-      placeholder.classList.remove('d-none');
-    }
+    cover.src = d.cover || '';
+    cover.classList.toggle('d-none', !d.cover);
+    placeholder.classList.toggle('d-none', Boolean(d.cover));
 
-    // Gestion du résumé via la BDD
-    const summaryText = document.getElementById('modalSummaryText');
-    const summaryNone = document.getElementById('modalSummaryNone');
-    
-    if (resume) {
-      summaryText.textContent = resume;
-      summaryText.classList.remove('d-none');
-      summaryNone.classList.add('d-none');
-    } else {
-      summaryText.textContent = "";
-      summaryText.classList.add('d-none');
-      summaryNone.classList.remove('d-none');
+    const hasNotaBene = Boolean(d.notaBene?.trim());
+    modalNotaBeneText.textContent = hasNotaBene ? d.notaBene : '';
+    modalNotaBeneBox.classList.toggle('d-none', !hasNotaBene);
+
+    const hasResume = Boolean(d.resume?.trim());
+    modalSummaryText.textContent = hasResume ? d.resume : '';
+    modalSummaryText.classList.toggle('d-none', !hasResume);
+    modalSummaryNone.classList.toggle('d-none', hasResume);
+
+    setEditMode(false);
+
+    if (bdEditForm && d.id) {
+      bdEditForm.action = bdEditForm.dataset.editUrlTemplate.replace('/0', '/' + d.id);
+      bdDeleteBtn?.setAttribute('formaction', bdDeleteBtn.dataset.deleteUrlTemplate.replace('/0', '/' + d.id));
+      editImageUrl.value = d.imageUrl || '';
+      editNotaBene.value = d.notaBene || '';
+      editResume.value = d.resume || '';
     }
   });
+
+  bdEditToggleBtn?.addEventListener('click', () => setEditMode(true));
+  bdEditCancelBtn?.addEventListener('click', () => setEditMode(false));
+  bdDeleteAskBtn?.addEventListener('click', () => setDeleteConfirm(true));
+  bdDeleteCancelBtn?.addEventListener('click', () => setDeleteConfirm(false));
 });
 </script>
 

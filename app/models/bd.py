@@ -29,6 +29,7 @@ class BDItem(db.Model):
     categorie: Column[str] = column(sa.String(20), nullable=False, default="bd")
     resume: Column[str | None] = column(sa.Text, nullable=True)
     image_url: Column[str | None] = column(sa.String(500), nullable=True)
+    nota_bene: Column[str | None] = column(sa.Text, nullable=True)
 
     def __repr__(self) -> str:
         """Returns repr(self)."""
