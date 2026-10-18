@@ -1,6 +1,7 @@
 """PC est magique - Gris Pages Routes"""
 
 import contextlib
+import datetime
 import enum
 import io
 import traceback
@@ -12,7 +13,7 @@ from markupsafe import Markup, escape
 
 from app import context, db
 from app.routes.gris import bp, forms
-from app.models import PCeen, Role, Permission, PermissionScope, PermissionType
+from app.models import Device, PCeen, Permission, PermissionScope, PermissionType, Rental, Role
 from app.routes.gris.utils import (
     add_perm,
     add_remove_role,
@@ -125,14 +126,24 @@ def pceens(view: str = "active") -> typing.RouteReturn:
 
     stmt = db.select(PCeen)
     if q:
-        stmt = stmt.filter(
-            db.or_(
-                PCeen.nom.ilike(f"%{q}%"),
-                PCeen.prenom.ilike(f"%{q}%"),
-                PCeen.username.ilike(f"%{q}%"),
-                PCeen.email.ilike(f"%{q}%"),
+        search_filters = [
+            PCeen.nom.ilike(f"%{q}%"),
+            PCeen.prenom.ilike(f"%{q}%"),
+            PCeen.username.ilike(f"%{q}%"),
+            PCeen.email.ilike(f"%{q}%"),
+            PCeen.devices.any(Device.mac_address.ilike(f"%{q}%")),
+        ]
+        if view == PCeensViewEnum.rez and q.isdigit():
+            today = datetime.date.today()
+            search_filters.append(
+                PCeen.rentals.any(
+                    db.and_(
+                        Rental._room_num == int(q),
+                        db.or_(Rental.end.is_(None), Rental.end > today),
+                    )
+                )
             )
-        )
+        stmt = stmt.filter(db.or_(*search_filters))
 
     match view:
         case PCeensViewEnum.active:

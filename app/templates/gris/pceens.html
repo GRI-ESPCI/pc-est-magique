@@ -29,11 +29,11 @@
 </div>
 
 <!-- Items sorting -->
-<div class="container mb-3">
-    <div class="btn-toolbar justify-content-between" role="toolbar">
-        <div class=" d-flex align-items-center">
-            <span class="me-2">{{ _("Vue :") }}</span>
-                    <div class="d-flex flex-wrap gap-2" role="group" name="slt">
+<div class="container mb-3 px-0">
+    <div class="btn-toolbar justify-content-between align-items-center gap-3" role="toolbar">
+        <div class="d-flex flex-wrap align-items-center gap-3 flex-grow-1">
+            <div class="d-flex flex-wrap align-items-center gap-2" role="group" name="slt">
+                <span class="me-1 text-nowrap">{{ _("Vue :") }}</span>
                 <a role="button" href="{{ url_for('gris.pceens', view='active') }}"
                    class="btn {{ 'btn-primary' if view == 'active' else 'btn-outline-primary' }}">
                     {{ _("Actifs") }}
@@ -52,17 +52,17 @@
                 </a>
             </div>
             
-            <form action="{{ url_for('gris.pceens', view=view) }}" method="get" class="d-flex ms-auto ms-md-4 position-relative" role="search">
+            <form action="{{ url_for('gris.pceens', view=view) }}" method="get" class="d-flex position-relative flex-grow-1 flex-md-grow-0" role="search">
                 {% if sort %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
                 {% if way %}<input type="hidden" name="way" value="{{ way }}">{% endif %}
                 <button type="submit" class="btn position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-muted px-3 shadow-none" style="z-index: 5;">
                     <svg class="bi" width="16" height="16">{{ macros.bootstrap_icon("search") }}</svg>
                 </button>
-                <input class="form-control rounded-pill bg-body-tertiary border-0 shadow-sm" type="text" placeholder="Recherche..." aria-label="Search" name="q" value="{{ q or '' }}" style="padding-left: 2.5rem; min-width: 220px;">
+                <input class="form-control rounded-pill bg-body-tertiary border-0 shadow-sm w-100" type="text" placeholder="Recherche..." aria-label="Search" name="q" value="{{ q or '' }}" style="padding-left: 2.5rem; min-width: 220px;">
             </form>
         </div>
 
-        <div class="d-flex gap-2" role="group" aria-label="Results">
+        <div class="d-flex gap-2 align-items-center ms-auto" role="group" aria-label="Results">
             <button type="button" class="btn btn-primary pe-none">
                 {{ _("Total :") }}
                 <span class="badge bg-secondary badge-light">{{ paginator.total }}</span>
@@ -355,31 +355,38 @@
                 </span>
             </td>
 
-            <td>
+            <td class="text-nowrap">
+                <div class="d-inline-flex align-items-center gap-2">
                 {% if pceen.is_banned %}
                 {% with ban = pceen.current_ban %}
-                <button class="btn btn-danger p-1 pt-0"
-                        data-bs-target="#mo-ban" data-bs-toggle="modal"
-                        data-pceen-id="{{ pceen.id }}"
-                        data-pceen-name="{{ pceen.full_name }}"
-                        data-ban-id="{{ ban.id }}"
-                        data-ban-end="{{ ban.end.timestamp() if ban.end else "" }}"
-                        data-ban-reason="{{ ban.reason }}"
-                        data-ban-message="{{ ban.message }}">
-                    <svg class="bi flex-shrink-0" width="18" height="18">
-                        {{ macros.bootstrap_icon("hammer") }}
-                    </svg>
-                </button>
-                &nbsp;{{ moment(ban.end).fromNow(no_suffix=True) if ban.end else "&infin;" }}
+                    <span data-bs-toggle="tooltip" title="{{ _('Modifier le ban') }}">
+                        <button type="button" class="btn btn-icon-zoom text-danger p-2 shadow-none active"
+                                data-bs-target="#mo-ban" data-bs-toggle="modal"
+                                data-pceen-id="{{ pceen.id }}"
+                                data-pceen-name="{{ pceen.full_name }}"
+                                data-ban-id="{{ ban.id }}"
+                                data-ban-end="{{ ban.end.timestamp() if ban.end else "" }}"
+                                data-ban-reason="{{ ban.reason }}"
+                                data-ban-message="{{ ban.message }}">
+                            <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+                                {{ macros.bootstrap_icon("hammer") }}
+                            </svg>
+                        </button>
+                    </span>
+                    <span class="text-danger fw-semibold">{{ moment(ban.end).fromNow(no_suffix=True) if ban.end else "∞" }}</span>
                 {% endwith %}
                 {% else %}
-                <button class="btn btn-outline-danger p-1 pt-0" data-bs-target="#mo-ban" data-bs-toggle="modal"
-                        data-pceen-id="{{ pceen.id }}" data-pceen-name="{{ pceen.full_name }}">
-                    <svg class="bi flex-shrink-0" width="18" height="18">
-                        {{ macros.bootstrap_icon("hammer") }}
-                    </svg>
-                </button>
+                    <span data-bs-toggle="tooltip" title="{{ _('Bannir ce PCéen') }}">
+                        <button type="button" class="btn btn-icon-zoom text-danger p-2 shadow-none"
+                                data-bs-target="#mo-ban" data-bs-toggle="modal"
+                                data-pceen-id="{{ pceen.id }}" data-pceen-name="{{ pceen.full_name }}">
+                            <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+                                {{ macros.bootstrap_icon("hammer") }}
+                            </svg>
+                        </button>
+                    </span>
                 {% endif %}
+                </div>
             </td>
 
             <td>
