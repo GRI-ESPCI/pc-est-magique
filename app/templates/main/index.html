@@ -145,6 +145,11 @@
     <div class="bento-item">
         {% include "cards/bd.html" %}
     </div>
+    {% if (g.logged_in_user and g.logged_in_user.has_role('Élève')) or has_permission(PermissionType.read, PermissionScope.jeux) %}
+    <div class="bento-item">
+        {% include "cards/jeux.html" %}
+    </div>
+    {% endif %}
 
     {% if has_permission(PermissionType.read, PermissionScope.club_q) %}
     <div class="bento-item">

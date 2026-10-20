@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block app_content %}
+
+{# En-tête #}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="fw-bold mb-1">{{ _("Jeux – Administration") }}</h1>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0" style="font-size:.85rem;">
+        <li class="breadcrumb-item"><a href="{{ url_for('jeux.main') }}">{{ _("Catalogue Jeux") }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ _("Administration") }}</li>
+      </ol>
+    </nav>
+  </div>
+  <a href="{{ url_for('jeux.reservations') }}" class="btn btn-primary d-flex align-items-center justify-content-center gap-2 fw-bold shadow-sm px-4 py-2">
+    <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+      <use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#clock-history"/>
+    </svg>
+    <span>{{ _("Historique des réservations") }}</span>
+  </a>
+</div>
+
+{# Statistiques (un peu plus utiles que celles du module BD) #}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center p-3 h-100 d-flex justify-content-center" style="border-radius:12px;">
+      <p class="display-6 fw-bold mb-0 text-primary">{{ total_jeux }}</p>
+      <p class="text-body-secondary mb-0" style="font-size:.85rem;">{{ _("Jeux au catalogue") }}</p>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card border-0 shadow-sm text-center p-3 h-100 d-flex justify-content-center" style="border-radius:12px;">
+      <p class="display-6 fw-bold mb-0 text-warning">{{ active_reservations|length }}</p>
+      <p class="text-body-secondary mb-0" style="font-size:.85rem;">{{ _("Réservation(s) en cours") }}</p>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="card border-0 shadow-sm text-center p-3 h-100 d-flex justify-content-center" style="border-radius:12px;">
+      <p class="display-6 fw-bold mb-0 text-secondary">{{ categories|length }}</p>
+      <p class="text-body-secondary mb-0" style="font-size:.85rem;">{{ _("Catégories") }}</p>
+    </div>
+  </div>
+  <div class="col-6 col-md-4">
+    <div class="card border-0 shadow-sm p-3 h-100 d-flex justify-content-center" style="border-radius:12px;">
+      <p class="fw-semibold mb-2" style="font-size:.85rem;">{{ _("Répartition par catégorie") }}</p>
+      {% if categories %}
+      <div class="d-flex flex-wrap gap-1">
+        {% for cat_name, cat_count in categories %}
+        <span class="badge rounded-pill bg-secondary">{{ cat_name }} : {{ cat_count }}</span>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-body-secondary mb-0 small fst-italic">{{ _("Aucune catégorie") }}</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{# Réservations en cours #}
+<hr class="my-4">
+<h2 class="h5 fw-bold mb-3">
+  <svg class="bi me-2 text-warning" width="20" height="20"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#calendar-check"/></svg>
+  {{ _("Réservations en cours") }}
+</h2>
+{% if active_reservations %}
+<div class="table-responsive bg-body-tertiary rounded-4 shadow-sm border mb-4">
+  <table class="table table-hover table-borderless align-middle mb-0" style="font-size:.85rem;">
+    <thead class="border-bottom">
+      <tr>
+        <th class="ps-3">{{ _("Jeu") }}</th>
+        <th>{{ _("PCéen") }}</th>
+        <th>{{ _("Début") }}</th>
+        <th>{{ _("Fin") }}</th>
+        <th class="pe-3 text-end">{{ _("Action") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for res in active_reservations %}
+      <tr>
+        <td class="ps-3 fw-semibold">
+          {% if res.jeu %}
+            <a href="{{ url_for('jeux.reservations', q=res.jeu.nom) }}" class="text-body text-decoration-none">{{ res.jeu.nom }}</a>
+          {% else %}
+            —
+          {% endif %}
+        </td>
+        <td>
+          {% if res.pceen %}
+            <a href="{{ url_for('jeux.reservations', q=res.pceen.username) }}" class="text-body text-decoration-none">
+              {{ res.pceen.full_name }}
+              {% if res.pceen.promo %}<span class="text-body-secondary">({{ res.pceen.promo }})</span>{% endif %}
+            </a>
+          {% else %}
+            —
+          {% endif %}
+        </td>
+        <td class="text-body-secondary">{{ res.start_date.strftime('%d/%m/%Y') }}</td>
+        <td class="fw-medium">{{ res.end_date.strftime('%d/%m/%Y') }}</td>
+        <td class="pe-3 text-end">
+          <form method="post" action="{{ url_for('jeux.cancel_reservation', res_id=res.id) }}" class="d-inline"
+                onsubmit="return confirm({{ _('Annuler cette réservation ?')|tojson }});">
+            <input type="hidden" name="from_admin" value="1">
+            <button type="submit"
+                    class="btn btn-icon-zoom text-danger p-2 shadow-none"
+                    title="{{ _('Annuler la réservation') }}"
+                    data-bs-toggle="tooltip"
+                    aria-label="{{ _('Annuler la réservation') }}">
+              <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+                {{ macros.bootstrap_icon("trash") }}
+              </svg>
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card border-0 shadow-sm mb-4" style="border-radius:14px;">
+  <div class="card-body p-4 text-center text-body-secondary">
+    <p class="mb-0">{{ _("Aucun jeu n'est actuellement réservé.") }}</p>
+  </div>
+</div>
+{% endif %}
+
+<hr class="my-4">
+
+{# Ajouter un jeu manuellement #}
+<div class="card border-0 shadow-sm mb-4" style="border-radius:14px;">
+  <div class="card-body p-4">
+    <h2 class="h5 fw-bold mb-3">
+      <svg class="bi me-2 text-primary" width="20" height="20"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#plus-circle-fill"/></svg>
+      {{ _("Ajouter un jeu manuellement") }}
+    </h2>
+    <form method="post" action="{{ url_for('jeux.admin_add') }}" enctype="multipart/form-data">
+      {{ add_form.hidden_tag() }}
+      <div class="row g-3">
+        <div class="col-md-5">
+          <label class="form-label fw-semibold small mb-1" for="add-nom">{{ _("Nom du jeu") }} *</label>
+          {{ add_form.nom(class="form-control form-control-sm", id="add-nom", placeholder=_("Ex : Catan, Donjon de Naheulbeuk…")) }}
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold small mb-1" for="add-cat">{{ _("Catégorie") }} *</label>
+          {{ add_form.categorie(class="form-control form-control-sm", id="add-cat", list="adminCategoriesList", placeholder=_("Ex : Jeu de stratégie")) }}
+          <datalist id="adminCategoriesList">
+            {% for cat_name, _ in categories %}
+            <option value="{{ cat_name }}">
+            {% endfor %}
+          </datalist>
+        </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label fw-semibold small mb-1" for="add-temps">{{ _("Temps de jeu") }}</label>
+          {{ add_form.temps_de_jeu(class="form-control form-control-sm", id="add-temps", placeholder=_("Ex : 1h30")) }}
+        </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label fw-semibold small mb-1" for="add-joueurs">{{ _("Nb. de joueurs") }}</label>
+          {{ add_form.nb_joueurs(class="form-control form-control-sm", id="add-joueurs", placeholder=_("Ex : 2 à 4")) }}
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label fw-semibold small mb-1" for="add-cover-file">{{ _("Image de couverture (fichier)") }}</label>
+          {{ add_form.cover_file(class="form-control form-control-sm", id="add-cover-file", accept=".jpg,.jpeg,.png,.webp,.gif") }}
+        </div>
+        <div class="col-md-5">
+          <label class="form-label fw-semibold small mb-1" for="add-image-url">{{ _("Ou lien externe de couverture") }}</label>
+          {{ add_form.image_url(class="form-control form-control-sm", id="add-image-url", placeholder="https://...") }}
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold small mb-1" for="add-popularite">{{ _("Popularité") }}</label>
+          {{ add_form.popularite(class="form-control form-control-sm", id="add-popularite") }}
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold small mb-1" for="add-nb">{{ _("Nota Bene / Commentaires") }}</label>
+          {{ add_form.nota_bene(class="form-control form-control-sm", id="add-nb", rows="2", placeholder=_("Ex : Manque 2 jetons, extension…")) }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold small mb-1" for="add-resume">{{ _("Résumé / Description") }}</label>
+          {{ add_form.resume(class="form-control form-control-sm", id="add-resume", rows="2", placeholder=_("Description ou règles rapides du jeu…")) }}
+        </div>
+
+        <div class="col-12 text-end">
+          {{ add_form.submit_add(class="btn btn-primary fw-bold px-4") }}
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+{# Import ODS / XLSX #}
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm" style="border-radius:14px;">
+      <div class="card-body p-4">
+        <h2 class="h5 fw-bold mb-1">
+          <svg class="bi me-2 text-success" width="20" height="20"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#cloud-arrow-up-fill"/></svg>
+          {{ _("Importer le catalogue") }}
+        </h2>
+        <p class="text-body-secondary mb-3" style="font-size:.85rem;">
+          {{ _("Importez le fichier .ods ou .xlsx de l'inventaire de l'armoire à jeux. Les nouveaux jeux seront ajoutés et les métadonnées des jeux existants seront mises à jour sans écraser vos résumés ni vos couvertures.") }}
+        </p>
+
+        {{ macros.catalogue_upload_form(form, url_for('jeux.admin_upload'), _("Glissez votre fichier .ods ou .xlsx ici")) }}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm h-100" style="border-radius:14px;">
+      <div class="card-body p-4">
+        <h2 class="h5 fw-bold mb-3">
+          <svg class="bi me-2 text-body-secondary" width="20" height="20"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#info-circle"/></svg>
+          {{ _("Format attendu du fichier") }}
+        </h2>
+        <p class="text-body-secondary mb-2" style="font-size:.85rem;">{{ _("Colonnes prises en compte (par position, à partir de la ligne 2) :") }}</p>
+        <table class="table table-sm table-borderless mb-0" style="font-size:.8rem;">
+          <tbody>
+            <tr><td class="text-body-secondary pe-3">A</td><td>{{ _("Nom") }}</td></tr>
+            <tr><td class="text-body-secondary pe-3">B</td><td>{{ _("Catégorie (ex: Jeu de rôles, Jeu de stratégie, Autres…)") }}</td></tr>
+            <tr><td class="text-body-secondary pe-3">C</td><td>{{ _("Temps de jeu (ex: 1h30, 2h +…)") }}</td></tr>
+            <tr><td class="text-body-secondary pe-3">D</td><td>{{ _("Nombre de joueurs (ex: 2 à 4, bcp…)") }}</td></tr>
+            <tr><td class="text-body-secondary pe-3">E</td><td>{{ _("Popularité") }}</td></tr>
+            <tr><td class="text-body-secondary pe-3">F</td><td>{{ _("Commentaires (pré-remplit le N.B.)") }}</td></tr>
+          </tbody>
+        </table>
+        <hr class="my-3">
+        <p class="text-body-secondary mb-0" style="font-size:.8rem;">
+          <svg class="bi me-1" width="14" height="14"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#bookmark-check"/></svg>
+          {{ _("Formats acceptés : OpenDocument Spreadsheet (.ods) et Excel (.xlsx)") }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Dernières entrées #}
+{% if recent %}
+<hr class="my-4">
+<h2 class="h5 fw-bold mb-3">{{ _("Dernières entrées enregistrées") }}</h2>
+<div class="table-responsive bg-body-tertiary rounded-4 shadow-sm border">
+  <table class="table table-hover table-borderless align-middle mb-0" style="font-size:.85rem;">
+    <thead class="border-bottom">
+      <tr>
+        <th class="ps-3">{{ _("Nom") }}</th>
+        <th>{{ _("Catégorie") }}</th>
+        <th>{{ _("Temps de jeu") }}</th>
+        <th>{{ _("Joueurs") }}</th>
+        <th class="pe-3">{{ _("Commentaires / N.B.") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in recent %}
+      <tr>
+        <td class="ps-3 fw-medium">{{ item.nom[:60] }}{% if item.nom|length > 60 %}…{% endif %}</td>
+        <td>
+          <span class="badge rounded-pill bg-primary">
+            {{ item.categorie }}
+          </span>
+        </td>
+        <td class="text-body-secondary">{{ item.temps_de_jeu or "—" }}</td>
+        <td class="text-body-secondary">{{ item.nb_joueurs or "—" }}</td>
+        <td class="pe-3 text-body-secondary">{{ (item.nota_bene or item.commentaires or "—")[:50] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% endblock %}

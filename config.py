@@ -63,6 +63,7 @@ class Config:
     BEKKS_BASE_PATH = os.environ.get("BEKKS_BASE_PATH")
     PANIER_BIO_BASE_PATH = os.environ.get("PANIER_BIO_BASE_PATH")
     BANNERS_BASE_PATH = os.environ.get("BANNERS_BASE_PATH") or os.path.join(basedir, "app", "static", "uploads", "banners")
+    JEUX_BASE_PATH = os.environ.get("JEUX_BASE_PATH") or os.path.join(basedir, "app", "static", "uploads", "jeux")
 
 
     PHOTOS_BASE_PATH = os.environ.get("PHOTOS_BASE_PATH")

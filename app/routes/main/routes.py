@@ -15,6 +15,7 @@ import sqlalchemy
 
 from app import context, db
 from app.models.bd import BDItem
+from app.models.jeux import JeuReservation
 from app.models import (
     Ban,
     PermissionScope,
@@ -83,6 +84,25 @@ def index() -> typing.RouteReturn:
         .order_by(BDItem.id.desc())
         .limit(1)
     ).first()
+
+    # Get user's active Jeux reservations for the Club Jeux card
+    jeu_reservations = []
+    if pceen.has_role("Élève") or context.has_permission(PermissionType.read, PermissionScope.jeux):
+        today = datetime.date.today()
+        jeu_reservations = [
+            res
+            for res in db.session.scalars(
+                db.select(JeuReservation)
+                .options(sqlalchemy.orm.selectinload(JeuReservation.jeu))
+                .where(
+                    JeuReservation._pceen_id == pceen.id,
+                    JeuReservation.cancelled.is_(False),
+                    JeuReservation.end_date >= today,
+                )
+                .order_by(JeuReservation.end_date.asc(), JeuReservation.id.asc())
+            ).all()
+            if res.jeu is not None
+        ]
 
     club_q_infos = None
     if context.has_permission(PermissionType.read, PermissionScope.club_q):
@@ -159,6 +179,23 @@ def index() -> typing.RouteReturn:
         cq_contrast = club_q.get_contrast_color() if club_q else "#ffffff"
         
         display_events.extend([DisplayEvent(f"sp-{s.id}", s.nom, s.date, DisplayClub("Club Q", cq_color, cq_contrast), s.salle.nom if s.salle else None, False, s.description) for s in next_spectacles])
+
+        next_jeu_res = jeu_reservations[:3]
+        _cj_id, cj_name, cj_color, cj_contrast = JeuReservation.get_club_display_info()
+        cj_club = DisplayClub(cj_name, cj_color, cj_contrast)
+        for res in next_jeu_res:
+            display_events.append(
+                DisplayEvent(
+                    f"jres-{res.id}",
+                    res.calendar_title,
+                    datetime.datetime.combine(res.end_date, datetime.time.min),
+                    cj_club,
+                    res.calendar_location,
+                    True,
+                    res.calendar_description,
+                )
+            )
+
         display_events.sort(key=lambda e: e.start_time)
         display_events = display_events[:3]
     
@@ -183,6 +220,7 @@ def index() -> typing.RouteReturn:
         banners=banners,
         autoplay_delay=autoplay_delay,
         latest_bd=latest_bd,
+        jeu_reservations=jeu_reservations,
     )
 
 

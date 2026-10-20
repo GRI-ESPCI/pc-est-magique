@@ -97,3 +97,61 @@
 {% macro s(elem, name, include_elem=True) %}
 {% if include_elem %}{{ elem }} {% endif %}{{ name }}{% if elem != 1 %}s{% endif %}
 {% endmacro %}
+
+
+<!-- Renders the shared drag-and-drop catalogue upload form used by BD and Jeux admin pages. -->
+{% macro catalogue_upload_form(form, action_url, drop_label) %}
+<form method="post" action="{{ action_url }}" enctype="multipart/form-data" id="upload-form">
+    {{ form.hidden_tag() }}
+    <div class="catalogue-drop-zone border rounded-3 p-4 text-center mb-3 bg-body-tertiary position-relative" id="catalogue-drop-zone">
+        <svg class="bi text-body-secondary mb-2" width="36" height="36">{{ bootstrap_icon("file-earmark-spreadsheet") }}</svg>
+        <p class="mb-1 fw-medium">{{ drop_label }}</p>
+        <p class="text-body-secondary mb-2" style="font-size:.8rem;">{{ _("ou cliquez pour sélectionner") }}</p>
+        <span class="badge bg-secondary" id="file-name-badge" style="display:none;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+        {{ form.fichier(class="position-absolute top-0 start-0 w-100 h-100 opacity-0", style="cursor:pointer;", id="file-input") }}
+    </div>
+    {{ form.submit(class="btn btn-success fw-bold px-4 w-100", id="submit-btn") }}
+</form>
+<script>
+(function () {
+    const dropZone = document.getElementById('catalogue-drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const badge = document.getElementById('file-name-badge');
+    const submitBtn = document.getElementById('submit-btn');
+    if (!dropZone || !fileInput) return;
+
+    function setFile(name) {
+        badge.textContent = name;
+        badge.style.display = 'inline-block';
+        dropZone.style.background = '';
+    }
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files[0]) setFile(fileInput.files[0].name);
+    });
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.style.background = 'var(--bs-primary-bg-subtle)';
+    });
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.style.background = '';
+    });
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.style.background = '';
+        if (e.dataTransfer.files[0]) {
+            const dt = new DataTransfer();
+            dt.items.add(e.dataTransfer.files[0]);
+            fileInput.files = dt.files;
+            setFile(e.dataTransfer.files[0].name);
+        }
+    });
+
+    document.getElementById('upload-form').addEventListener('submit', () => {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>{{ _("Import en cours…") }}';
+    });
+})();
+</script>
+{% endmacro %}

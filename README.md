@@ -18,6 +18,12 @@ Application Flask tournant sur https://pc-est-magique.fr.
 Seules les fonctionnalités majeures sont listées ici ; voir
 [`CHANGELOG.md`](CHANGELOG.md) pour les détails.
 
+### 2.12
+
+- Nouveau module BD
+- Nouveau module Jeux avec système de réservations
+- Ajout des vacances scolaires dans le module Calendrier
+
 ### 2.11
 
 - Nouveau système de notifications

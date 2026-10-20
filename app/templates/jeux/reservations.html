@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block app_content %}
+
+{% macro sort_link(col_id, col_name) %}
+<a href="{{ url_for('jeux.reservations', q=q or None, status=status if status != 'all' else None, sort=col_id, way='desc' if sort == col_id and way == 'asc' else 'asc') }}"
+   class="text-decoration-none text-body d-inline-flex align-items-center gap-1 user-select-none">
+  <span>{{ col_name }}</span>
+  {% if sort == col_id %}
+  <svg class="bi flex-shrink-0" width="14" height="14">
+    {{ macros.bootstrap_icon("sort-down" if way == "desc" else "sort-up") }}
+  </svg>
+  {% endif %}
+</a>
+{% endmacro %}
+
+{# En-tête #}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="fw-bold mb-1" id="reservations-table-caption">{{ _("Historique des réservations") }}</h1>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0" style="font-size:.85rem;">
+        <li class="breadcrumb-item"><a href="{{ url_for('jeux.main') }}">{{ _("Catalogue Jeux") }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('jeux.admin') }}">{{ _("Administration") }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ _("Historique des réservations") }}</li>
+      </ol>
+    </nav>
+  </div>
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    <a href="{{ url_for('jeux.admin') }}" class="btn btn-outline-secondary d-flex align-items-center gap-2 fw-semibold">
+      <svg class="bi flex-shrink-0" width="16" height="16" role="img">
+        {{ macros.bootstrap_icon("gear-fill") }}
+      </svg>
+      <span>{{ _("Administration") }}</span>
+    </a>
+    <button type="button" class="btn btn-primary pe-none">
+      {{ _("Total :") }}
+      <span class="badge bg-secondary badge-light">{{ paginator.total }}</span>
+    </button>
+  </div>
+</div>
+
+{# Barre d'outils : tri rapide, filtres de statut et recherche #}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    {# Boutons de tri par date (style Bar transactions) #}
+    <div class="d-flex gap-2 me-2" role="group" aria-label="{{ _('Tri par date') }}">
+      <a class="btn border-0 shadow-sm rounded-pill fw-bold {{ 'btn-primary' if sort == 'date' and way == 'desc' else 'btn-light text-primary' }}"
+         href="{{ url_for('jeux.reservations', sort='date', way='desc', q=q or None, status=status if status != 'all' else None) }}"
+         role="button"
+         title="{{ _('Plus récentes d\'abord') }}">
+        <svg class="bi flex-shrink-0" width="20" height="20" role="img">
+          {{ macros.bootstrap_icon("sort-down") }}
+        </svg>
+      </a>
+      <a class="btn border-0 shadow-sm rounded-pill fw-bold {{ 'btn-primary' if sort == 'date' and way == 'asc' else 'btn-light text-primary' }}"
+         href="{{ url_for('jeux.reservations', sort='date', way='asc', q=q or None, status=status if status != 'all' else None) }}"
+         role="button"
+         title="{{ _('Plus anciennes d\'abord') }}">
+        <svg class="bi flex-shrink-0" width="20" height="20" role="img">
+          {{ macros.bootstrap_icon("sort-up") }}
+        </svg>
+      </a>
+    </div>
+
+    {# Filtres de statut #}
+    <div class="d-flex flex-wrap gap-1" role="group" aria-label="{{ _('Filtrer par statut') }}">
+      <a href="{{ url_for('jeux.reservations', status=None, q=q or None, sort=sort, way=way) }}"
+         class="btn btn-sm rounded-pill px-3 {{ 'btn-primary fw-semibold' if status == 'all' else 'btn-outline-secondary' }}">
+        {{ _("Toutes") }}
+      </a>
+      <a href="{{ url_for('jeux.reservations', status='active', q=q or None, sort=sort, way=way) }}"
+         class="btn btn-sm rounded-pill px-3 {{ 'btn-warning fw-semibold text-dark' if status == 'active' else 'btn-outline-secondary' }}">
+        {{ _("En cours") }}
+      </a>
+      <a href="{{ url_for('jeux.reservations', status='completed', q=q or None, sort=sort, way=way) }}"
+         class="btn btn-sm rounded-pill px-3 {{ 'btn-secondary fw-semibold' if status == 'completed' else 'btn-outline-secondary' }}">
+        {{ _("Terminées") }}
+      </a>
+      <a href="{{ url_for('jeux.reservations', status='cancelled', q=q or None, sort=sort, way=way) }}"
+         class="btn btn-sm rounded-pill px-3 {{ 'btn-danger fw-semibold' if status == 'cancelled' else 'btn-outline-secondary' }}">
+        {{ _("Annulées") }}
+      </a>
+    </div>
+  </div>
+
+  {# Recherche par PCéen ou par jeu #}
+  <form method="get" action="{{ url_for('jeux.reservations') }}" class="flex-grow-1 flex-md-grow-0" style="min-width: 280px;">
+    {% if status and status != 'all' %}
+    <input type="hidden" name="status" value="{{ status }}">
+    {% endif %}
+    {% if sort %}
+    <input type="hidden" name="sort" value="{{ sort }}">
+    {% endif %}
+    {% if way %}
+    <input type="hidden" name="way" value="{{ way }}">
+    {% endif %}
+    <div class="m3-search-bar d-flex align-items-center px-3">
+      <svg class="bi text-body-secondary ms-1 flex-shrink-0" width="18" height="18">
+        {{ macros.bootstrap_icon("search") }}
+      </svg>
+      <input
+        type="text"
+        name="q"
+        class="border-0 shadow-none px-2 w-100 m3-input"
+        placeholder="{{ _('Rechercher un PCéen, une promo, un jeu…') }}"
+        value="{{ q }}"
+        autocomplete="off"
+      >
+      {% if q %}
+      <a href="{{ url_for('jeux.reservations', status=status if status != 'all' else None, sort=sort, way=way) }}"
+         class="btn btn-link text-body-secondary p-1 text-decoration-none d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle m3-clear-btn"
+         title="{{ _('Effacer la recherche') }}">
+        <svg class="bi" width="20" height="20">{{ macros.bootstrap_icon("x") }}</svg>
+      </a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+{# Tableau des réservations #}
+{% if paginator.items %}
+<div tabindex="0" role="region" aria-labelledby="reservations-table-caption" class="table-responsive bg-body-tertiary rounded-4 shadow-sm border">
+  <table class="table table-hover table-borderless align-middle mb-0" style="font-size:.875rem;">
+    <thead class="border-bottom">
+      <tr>
+        <th class="ps-3">#</th>
+        <th>{{ sort_link('pceen', _("PCéen·ne")) }}</th>
+        <th>{{ sort_link('jeu', _("Jeu")) }}</th>
+        <th>{{ sort_link('start', _("Début")) }}</th>
+        <th>{{ sort_link('end', _("Fin prévue")) }}</th>
+        <th>{{ sort_link('date', _("Réservé le")) }}</th>
+        <th>{{ _("Statut") }}</th>
+        <th class="pe-3 text-end">{{ _("Action") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for res in paginator.items %}
+      {% set is_active = not res.cancelled and res.end_date >= today %}
+      <tr {% if res.cancelled %}class="table-danger text-decoration-line-through"{% endif %}>
+        <th class="ps-3 align-middle">{{ res.id }}</th>
+        <td class="align-middle text-nowrap">
+          {% if res.pceen %}
+            <div class="d-flex flex-column">
+              <div>
+                <a href="{{ url_for('jeux.reservations', q=res.pceen.username, status=status if status != 'all' else None, sort=sort, way=way) }}"
+                   class="fw-semibold text-body text-decoration-none"
+                   title="{{ _('Filtrer les réservations de %(name)s', name=res.pceen.full_name) }}">
+                  {{ res.pceen.full_name }}
+                </a>
+                {% if res.pceen.promo %}
+                  <span class="text-body-secondary">({{ res.pceen.promo }})</span>
+                {% endif %}
+              </div>
+              <small class="text-body-secondary" style="font-size:.75rem;">
+                <a href="mailto:{{ res.pceen.email }}" class="text-body-secondary text-decoration-none">{{ res.pceen.email }}</a>
+              </small>
+            </div>
+          {% else %}
+            <span class="text-body-secondary">—</span>
+          {% endif %}
+        </td>
+        <td class="align-middle">
+          {% if res.jeu %}
+            <a href="{{ url_for('jeux.reservations', q=res.jeu.nom, status=status if status != 'all' else None, sort=sort, way=way) }}"
+               class="fw-semibold text-body text-decoration-none"
+               title="{{ _('Filtrer l\'historique de « %(nom)s »', nom=res.jeu.nom) }}">
+              {{ res.jeu.nom }}
+            </a>
+            <div class="text-body-secondary" style="font-size:.75rem;">{{ res.jeu.categorie }}</div>
+          {% else %}
+            <span class="text-body-secondary">—</span>
+          {% endif %}
+        </td>
+        <td class="align-middle text-nowrap text-body-secondary">
+          {{ res.start_date.strftime('%d/%m/%Y') }}
+        </td>
+        <td class="align-middle text-nowrap fw-medium">
+          {{ res.end_date.strftime('%d/%m/%Y') }}
+        </td>
+        <td class="align-middle text-nowrap text-body-secondary">
+          {{ moment(res.created_at).format('lll') if res.created_at else "—" }}
+        </td>
+        <td class="align-middle text-nowrap">
+          {% if res.cancelled %}
+            <span class="badge rounded-pill bg-danger">{{ _("Annulée") }}</span>
+          {% elif is_active %}
+            <span class="badge rounded-pill text-bg-warning fw-semibold" style="color:#000 !important;">{{ _("En cours") }}</span>
+          {% else %}
+            <span class="badge rounded-pill bg-secondary">{{ _("Terminée") }}</span>
+          {% endif %}
+        </td>
+        <td class="pe-3 align-middle text-end">
+          {% if is_active %}
+          <form method="post" action="{{ url_for('jeux.cancel_reservation', res_id=res.id) }}" class="d-inline"
+                onsubmit="return confirm({{ _('Annuler cette réservation ?')|tojson }});">
+            <input type="hidden" name="from_reservations" value="1">
+            <input type="hidden" name="page" value="{{ paginator.page }}">
+            <input type="hidden" name="sort" value="{{ sort }}">
+            <input type="hidden" name="way" value="{{ way }}">
+            <input type="hidden" name="q" value="{{ q }}">
+            <input type="hidden" name="status" value="{{ status }}">
+            <button type="submit"
+                    class="btn btn-icon-zoom text-danger p-2 shadow-none"
+                    title="{{ _('Annuler la réservation') }}"
+                    data-bs-toggle="tooltip"
+                    aria-label="{{ _('Annuler la réservation') }}">
+              <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+                {{ macros.bootstrap_icon("trash") }}
+              </svg>
+            </button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{# Pagination #}
+{% if paginator.pages > 1 %}
+<nav class="mt-4" aria-label="Page navigation">
+  <ul class="pagination pagination-sm justify-content-center gap-1 border-0">
+    {% for page in paginator.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
+    <li class="page-item {{ 'active' if page == paginator.page }} {{ 'disabled' if not page }}">
+      {% if page %}
+      <a class="page-link rounded-pill px-3 border-0 shadow-sm {{ 'text-bg-primary fw-bold' if page == paginator.page else 'bg-body-tertiary text-body hover-lift' }}"
+         href="{{ url_for('jeux.reservations', page=page, sort=sort, way=way, q=q or None, status=status if status != 'all' else None) }}">
+        {{ page }}
+      </a>
+      {% else %}
+      <span class="page-link bg-transparent border-0 pe-none text-muted">…</span>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="card border-0 shadow-sm" style="border-radius:14px;">
+  <div class="card-body p-5 text-center text-body-secondary">
+    <svg class="bi mb-3 opacity-50" width="48" height="48">
+      {{ macros.bootstrap_icon("clock-history") }}
+    </svg>
+    <p class="mb-0 fs-5">{{ _("Aucune réservation trouvée.") }}</p>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

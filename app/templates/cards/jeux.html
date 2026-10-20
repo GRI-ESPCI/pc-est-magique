@@ -1,0 +1,95 @@
+{% extends "cards/base.html" %}
+
+{% block card_title %}
+{{ _("Club Jeux") }}
+{% endblock %}
+
+{% block card_icon %}
+{{ macros.bootstrap_icon("puzzle-fill") }}
+{% endblock %}
+
+{% block card_body %}
+<div class="d-flex flex-column h-100 px-3 pb-3 pt-2">
+    {% if jeu_reservations %}
+        <span class="text-body-secondary fw-semibold small text-uppercase mb-3" style="letter-spacing: 0.5px;">
+            {% if jeu_reservations|length == 1 %}
+                {{ _("Réservation en cours") }}
+            {% else %}
+                {{ _("Réservations en cours") }} ({{ jeu_reservations|length }})
+            {% endif %}
+        </span>
+
+        {% if jeu_reservations|length == 1 %}
+            {% set res = jeu_reservations[0] %}
+            {% set jeu = res.jeu %}
+            <div class="d-flex gap-3 align-items-start">
+                {% if jeu.cover_url %}
+                <img src="{{ jeu.cover_url }}" alt="Couverture" class="rounded shadow-sm flex-shrink-0" style="width: 90px; height: auto; max-height: 135px; object-fit: contain;">
+                {% else %}
+                <div class="rounded shadow-sm bg-secondary bg-opacity-25 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 90px; aspect-ratio: 1/1;">
+                    <svg class="bi text-secondary" width="28" height="28"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#puzzle-fill"/></svg>
+                </div>
+                {% endif %}
+
+                <div class="flex-grow-1 overflow-hidden">
+                    <p class="fw-bold mb-1 text-truncate" title="{{ jeu.nom }}">{{ jeu.nom }}</p>
+                    <p class="small text-body-secondary mb-2 text-truncate">
+                        {{ jeu.categorie }}
+                        {% if jeu.nb_joueurs %} &middot; {{ jeu.nb_joueurs }} {{ _("j.") }}{% endif %}
+                        {% if jeu.temps_de_jeu %} &middot; {{ jeu.temps_de_jeu }}{% endif %}
+                    </p>
+                    <p class="small text-body mb-2">
+                        <span class="text-body-secondary">{{ _("Du") }}</span>
+                        <span class="fw-semibold">{{ res.start_date.strftime('%d/%m/%Y') }}</span>
+                        <span class="text-body-secondary">{{ _("au") }}</span>
+                        <span class="fw-semibold">{{ res.end_date.strftime('%d/%m/%Y') }}</span>
+                    </p>
+                    <span class="badge rounded-pill text-bg-warning fw-semibold" style="color: #000 !important;">
+                        {{ _("Jusqu'au %(date)s", date=res.end_date.strftime('%d/%m')) }}
+                    </span>
+                </div>
+            </div>
+        {% else %}
+            <div class="d-flex flex-column gap-2">
+                {% for res in jeu_reservations[:3] %}
+                {% set jeu = res.jeu %}
+                <div class="d-flex align-items-center gap-2 p-2 rounded-3 bg-body">
+                    {% if jeu.cover_url %}
+                    <img src="{{ jeu.cover_url }}" alt="Couverture" class="rounded flex-shrink-0" style="width: 40px; height: 40px; object-fit: cover;">
+                    {% else %}
+                    <div class="rounded bg-secondary bg-opacity-25 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
+                        <svg class="bi text-secondary" width="18" height="18"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#puzzle-fill"/></svg>
+                    </div>
+                    {% endif %}
+                    <div class="flex-grow-1 min-w-0 overflow-hidden">
+                        <div class="fw-bold small text-truncate" title="{{ jeu.nom }}">{{ jeu.nom }}</div>
+                        <div class="text-body-secondary text-truncate" style="font-size: 0.75rem;">{{ jeu.categorie }}</div>
+                    </div>
+                    <span class="badge rounded-pill text-bg-warning fw-semibold flex-shrink-0" style="font-size: 0.7rem; color: #000 !important;">
+                        {{ _("Jusqu'au %(date)s", date=res.end_date.strftime('%d/%m')) }}
+                    </span>
+                </div>
+                {% endfor %}
+                {% if jeu_reservations|length > 3 %}
+                <div class="small text-body-secondary text-center mt-1">
+                    + {{ jeu_reservations|length - 3 }} {{ _("autre(s) réservation(s)") }}
+                </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <span class="text-body-secondary fw-semibold small text-uppercase mb-2" style="letter-spacing: 0.5px;">
+            {{ _("Mes réservations") }}
+        </span>
+        <p class="small text-body-secondary mb-0">
+            {{ _("Vous n'avez aucune réservation en cours.") }}
+        </p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block card_footer %}
+<a href="{{ url_for('jeux.main') }}" class="btn {{ 'btn-outline-dark' if g.theme == 'classic' else 'btn-primary' }}">
+    {{ _("Consulter le catalogue") }}
+</a>
+{% endblock %}

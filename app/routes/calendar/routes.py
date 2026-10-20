@@ -11,9 +11,11 @@ from ics.grammar.parse import ContentLine
 from werkzeug.utils import safe_join
 
 from app import context, db
-from app.models import Club, Event, PermissionType, PermissionScope, ClubQSpectacle, PCeen, ClubQVoeu
+from app.models import Club, Event, PermissionType, PermissionScope, ClubQSpectacle, PCeen, ClubQVoeu, JeuReservation
 from app.routes.calendar import bp
 from app.routes.calendar.forms import EditClub
+from app.utils.holidays import get_espci_vacations
+from sqlalchemy.orm import selectinload
 
 CLUB_Q_NAME = "Club Q"
 
@@ -86,6 +88,74 @@ def get_events():
                 "club_id": club_q.id if club_q else None,
                 "contrast_color": contrast_color,
             }
+        })
+
+    if context.g.pceen:
+        jeu_res_query = (
+            db.select(JeuReservation)
+            .options(selectinload(JeuReservation.jeu))
+            .where(
+                JeuReservation._pceen_id == context.g.pceen.id,
+                JeuReservation.cancelled.is_(False),
+            )
+        )
+        if start_str:
+            jeu_res_query = jeu_res_query.where(JeuReservation.end_date >= start.date())
+        if end_str:
+            jeu_res_query = jeu_res_query.where(JeuReservation.end_date <= end.date())
+
+        jeu_reservations = db.session.scalars(jeu_res_query).all()
+        cj_id, cj_name, jeux_color, jeux_contrast = JeuReservation.get_club_display_info()
+
+        for res in jeu_reservations:
+            if not res.jeu:
+                continue
+            end_dt = datetime.datetime.combine(res.end_date, datetime.time.min)
+            events_list.append({
+                "id": f"jeu_res_{res.id}",
+                "title": res.calendar_title,
+                "start": end_dt.isoformat(),
+                "end": (end_dt + datetime.timedelta(days=1)).isoformat(),
+                "allDay": True,
+                "color": jeux_color,
+                "can_edit": False,
+                "extendedProps": {
+                    "description": res.calendar_description,
+                    "location": res.calendar_location,
+                    "club": cj_name,
+                    "club_id": cj_id,
+                    "contrast_color": jeux_contrast,
+                }
+            })
+
+    min_vac_year = start.year if start_str else datetime.date.today().year - 1
+    for idx, vac in enumerate(get_espci_vacations(min_year=min_vac_year)):
+        if start_str and vac.end_date < start.date():
+            continue
+        if end_str and vac.start_date > end.date():
+            continue
+        vac_start_dt = datetime.datetime.combine(vac.start_date, datetime.time.min)
+        vac_end_dt = datetime.datetime.combine(vac.end_date, datetime.time.min)
+        events_list.append({
+            "id": f"vac_{vac.start_date.isoformat()}_{idx}",
+            "title": vac.title,
+            "start": vac_start_dt.isoformat(),
+            "end": vac_end_dt.isoformat(),
+            "allDay": True,
+            "color": "#198754",
+            "can_edit": False,
+            "extendedProps": {
+                "description": _(
+                    "%(title)s (du %(start)s au %(end)s).",
+                    title=vac.title,
+                    start=vac.start_date.strftime("%d/%m/%Y"),
+                    end=vac.end_date.strftime("%d/%m/%Y"),
+                ),
+                "location": None,
+                "club": _("Vacances scolaires"),
+                "club_id": None,
+                "contrast_color": "#ffffff",
+            },
         })
 
     return flask.jsonify(events_list)
@@ -284,6 +354,29 @@ def serve_fullcalendar():
         "index.global.min.js"
     )
 
+def _finalize_ics_event(
+    e: ics.Event,
+    club_name: str | None,
+    club_color: str | None,
+    now_utc_str: str,
+) -> None:
+    """Attach club metadata and standard iCalendar headers to an ics.Event."""
+    if club_name:
+        e.categories = {club_name}
+        e.description = f"[{club_name}]\n{e.description}" if e.description else f"[{club_name}]"
+    if club_color:
+        e.extra.append(ContentLine(name="COLOR", value=club_color))
+    for name, value in (
+        ("DTSTAMP", now_utc_str),
+        ("CREATED", now_utc_str),
+        ("LAST-MODIFIED", now_utc_str),
+        ("SEQUENCE", "0"),
+        ("STATUS", "CONFIRMED"),
+        ("TRANSP", "TRANSPARENT"),
+    ):
+        e.extra.append(ContentLine(name=name, value=value))
+
+
 @bp.route("/feed/<token>/calendrier.ics")
 def export_feed(token: str):
     """Export the calendar as an iCalendar feed."""
@@ -303,6 +396,7 @@ def export_feed(token: str):
     
     three_years_ago = datetime.datetime.now() - datetime.timedelta(days=3 * 365)
     now_utc_str = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    tz = zoneinfo.ZoneInfo("Europe/Paris")
     
     events = db.session.scalars(
         db.select(Event).filter(Event.start_time >= three_years_ago)
@@ -321,8 +415,6 @@ def export_feed(token: str):
         e = ics.Event()
         e.name = event.title
         
-        tz = zoneinfo.ZoneInfo("Europe/Paris")
-        
         if event.all_day:
             e.begin = event.start_time.date()
             e.make_all_day()
@@ -340,44 +432,70 @@ def export_feed(token: str):
             
         e.location = event.location
         e.description = event.description
-        if event.club:
-            e.categories = {event.club.name}
-            e.description = f"[{event.club.name}]\n{e.description}" if e.description else f"[{event.club.name}]"
-            if event.club.color:
-                e.extra.append(ContentLine(name="COLOR", value=event.club.color))
-        
-        e.extra.append(ContentLine(name="DTSTAMP", value=now_utc_str))
-        e.extra.append(ContentLine(name="CREATED", value=now_utc_str))
-        e.extra.append(ContentLine(name="LAST-MODIFIED", value=now_utc_str))
-        e.extra.append(ContentLine(name="SEQUENCE", value="0"))
-        e.extra.append(ContentLine(name="STATUS", value="CONFIRMED"))
-        e.extra.append(ContentLine(name="TRANSP", value="TRANSPARENT"))
-        
+        _finalize_ics_event(
+            e,
+            event.club.name if event.club else None,
+            event.club.color if event.club else None,
+            now_utc_str,
+        )
         cal.events.add(e)
         
     club_q = db.session.scalars(db.select(Club).filter_by(name=CLUB_Q_NAME)).first()
     for spec in spectacles:
         e = ics.Event()
         e.name = spec.nom
-        tz = zoneinfo.ZoneInfo("Europe/Paris")
         e.begin = spec.date.replace(tzinfo=tz)
         e.end = (spec.date + datetime.timedelta(hours=2)).replace(tzinfo=tz)
         e.location = spec.salle.nom if spec.salle else None
         e.description = spec.description
-        if club_q:
-            e.categories = {club_q.name}
-            e.description = f"[{club_q.name}]\n{e.description}" if e.description else f"[{club_q.name}]"
-            if club_q.color:
-                e.extra.append(ContentLine(name="COLOR", value=club_q.color))
-        
-        e.extra.append(ContentLine(name="DTSTAMP", value=now_utc_str))
-        e.extra.append(ContentLine(name="CREATED", value=now_utc_str))
-        e.extra.append(ContentLine(name="LAST-MODIFIED", value=now_utc_str))
-        e.extra.append(ContentLine(name="SEQUENCE", value="0"))
-        e.extra.append(ContentLine(name="STATUS", value="CONFIRMED"))
-        e.extra.append(ContentLine(name="TRANSP", value="TRANSPARENT"))
-
+        _finalize_ics_event(
+            e,
+            club_q.name if club_q else None,
+            club_q.color if club_q else None,
+            now_utc_str,
+        )
         cal.events.add(e)
-        
+
+    jeu_reservations = db.session.scalars(
+        db.select(JeuReservation)
+        .options(selectinload(JeuReservation.jeu))
+        .where(
+            JeuReservation._pceen_id == pceen.id,
+            JeuReservation.cancelled.is_(False),
+            JeuReservation.end_date >= three_years_ago.date(),
+        )
+    ).all()
+    _cj_id, cj_name, cj_color, _cj_contrast = JeuReservation.get_club_display_info()
+    for res in jeu_reservations:
+        if not res.jeu:
+            continue
+        e = ics.Event()
+        e.name = res.calendar_title
+        e.begin = res.end_date
+        e.make_all_day()
+        e.end = res.end_date + datetime.timedelta(days=1)
+        e.location = res.calendar_location
+        e.description = res.calendar_description
+        _finalize_ics_event(e, cj_name, cj_color, now_utc_str)
+        cal.events.add(e)
+
+    if flask.request.args.get("vacances") == "1":
+        for vac in get_espci_vacations(min_year=three_years_ago.year):
+            e = ics.Event()
+            e.name = vac.title
+            e.begin = vac.start_date
+            e.make_all_day()
+            e.end = vac.end_date
+            e.description = str(
+                _(
+                    "%(title)s (du %(start)s au %(end)s).",
+                    title=vac.title,
+                    start=vac.start_date.strftime("%d/%m/%Y"),
+                    end=vac.end_date.strftime("%d/%m/%Y"),
+                )
+            )
+            _finalize_ics_event(e, str(_("Vacances scolaires")), "#198754", now_utc_str)
+            cal.events.add(e)
+
     return flask.Response(cal.serialize(), mimetype="text/calendar")
 

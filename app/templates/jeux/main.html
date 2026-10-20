@@ -1,0 +1,521 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block app_content %}
+
+{# En-tête #}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="mb-1 fw-bold">{{ _("Catalogue Jeux") }}</h1>
+    <p class="text-body-secondary mb-0">
+      {{ total_jeux }} {{ _("jeu(x)") }}
+      {% if categories %}
+        &middot; {{ categories|length }} {{ _("catégorie(s)") }}
+      {% endif %}
+    </p>
+  </div>
+  {% if can_admin %}
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    <a href="{{ url_for('jeux.reservations') }}" class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2 fw-bold shadow-sm px-3 py-2">
+      <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+        <use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#clock-history"/>
+      </svg>
+      <span>{{ _("Historique des réservations") }}</span>
+    </a>
+    <a href="{{ url_for('jeux.admin') }}" class="btn btn-danger d-flex align-items-center justify-content-center gap-2 fw-bold shadow-sm px-4 py-2">
+      <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+        <use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#gear-fill"/>
+      </svg>
+      <span>{{ _("Administration") }}</span>
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+{# Barre de recherche #}
+<form method="get" action="{{ url_for('jeux.main') }}" class="mb-3 mt-3" id="jeux-search-form">
+  {% if selected_cat %}
+  <input type="hidden" name="cat" value="{{ selected_cat }}">
+  {% endif %}
+  <div class="m3-search-bar d-flex align-items-center px-3 mx-auto mx-md-0">
+    <svg class="bi text-body-secondary ms-2 flex-shrink-0" width="20" height="20"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#search"/></svg>
+    <input
+      type="text"
+      name="q"
+      id="jeux-search-input"
+      class="border-0 shadow-none px-3 w-100 m3-input"
+      placeholder="{{ _('Rechercher un jeu, une catégorie, un nombre de joueurs…') }}"
+      value="{{ search }}"
+      autocomplete="off"
+    >
+    {% if search %}
+    <a href="{{ url_for('jeux.main', cat=selected_cat or None) }}" class="btn btn-link text-body-secondary p-1 me-1 text-decoration-none d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle m3-clear-btn" title="{{ _('Effacer la recherche') }}">
+      <svg class="bi" width="24" height="24"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#x"/></svg>
+    </a>
+    {% endif %}
+  </div>
+</form>
+
+{# Filtres de catégories #}
+{% if categories|length > 1 %}
+<div class="d-flex flex-wrap gap-2 mb-4">
+  <a href="{{ url_for('jeux.main', q=search or None) }}"
+     class="btn btn-sm rounded-pill px-3 {{ 'btn-primary fw-semibold' if not selected_cat else 'btn-outline-secondary' }}">
+    {{ _("Toutes") }} ({{ total_jeux }})
+  </a>
+  {% for cat_name, cat_count in categories %}
+  <a href="{{ url_for('jeux.main', cat=cat_name, q=search or None) }}"
+     class="btn btn-sm rounded-pill px-3 {{ 'btn-primary fw-semibold' if selected_cat == cat_name else 'btn-outline-secondary' }}">
+    {{ cat_name }} ({{ cat_count }})
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{# Résultats #}
+{% if not items %}
+<div class="text-center py-5 text-body-secondary">
+  <svg class="bi mb-3 opacity-50" width="48" height="48"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#puzzle-fill"/></svg>
+  <p class="mb-0 fs-5">{{ _("Aucun résultat pour cette recherche.") }}</p>
+</div>
+{% else %}
+
+{# Groupe par catégorie #}
+{% set ns = namespace(current_cat="") %}
+
+<div class="jeux-catalogue" id="jeux-catalogue">
+  {% for item in items %}
+    {% set cat = item.categorie or _("Autres") %}
+    {% if cat != ns.current_cat %}
+      {% if not loop.first %}</div>{% endif %}
+      {% set ns.current_cat = cat %}
+      <h2 class="jeux-cat-heading fw-bold text-body-secondary mb-3 {% if not loop.first %}mt-5{% else %}mt-2{% endif %}">{{ cat }}</h2>
+      <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3 align-items-start">
+    {% endif %}
+
+    {% set active_res = item.active_reservation %}
+    <div class="col">
+      <div class="jeux-card card border-0 shadow-sm"
+           data-bs-toggle="modal"
+           data-bs-target="#jeuModal"
+           data-id="{{ item.id }}"
+           data-nom="{{ item.nom }}"
+           data-categorie="{{ item.categorie }}"
+           data-temps="{{ item.temps_de_jeu or '' }}"
+           data-joueurs="{{ item.nb_joueurs or '' }}"
+           data-popularite="{{ item.popularite or '' }}"
+           data-commentaires="{{ item.commentaires or '' }}"
+           data-resume="{{ item.resume or '' }}"
+           data-nota-bene="{{ item.nota_bene or '' }}"
+           data-image-url="{{ item.image_url or '' }}"
+           data-image-filename="{{ item.image_filename or '' }}"
+           data-cover="{{ item.cover_url or '' }}"
+           data-res-id="{{ active_res.id if active_res else '' }}"
+           data-res-pceen="{{ active_res.pceen.full_name if active_res and active_res.pceen else '' }}"
+           data-res-end="{{ active_res.end_date.strftime('%d/%m/%Y') if active_res else '' }}">
+        {# Couverture #}
+        <div class="jeux-cover-wrapper position-relative bg-body-tertiary" style="overflow:hidden;">
+          {% if active_res %}
+          <span class="badge rounded-pill text-bg-warning position-absolute top-0 end-0 m-2 shadow-sm fw-semibold" style="z-index:2;font-size:.7rem;color:#000 !important;">
+            {{ _("Réservé") }}
+          </span>
+          {% endif %}
+          {% if item.cover_url %}
+          <img
+            class="jeux-cover w-100 h-auto d-block"
+            src="{{ item.cover_url }}"
+            alt="{{ item.nom }}"
+            loading="lazy"
+            onerror="this.classList.add('d-none'); this.nextElementSibling.classList.remove('d-none');"
+          >
+          {% endif %}
+          <div class="jeux-cover-placeholder d-flex flex-column align-items-center justify-content-center w-100 text-body-secondary p-2 {% if item.cover_url %}d-none{% endif %}" style="aspect-ratio:1/1;">
+            <svg class="bi opacity-50" width="32" height="32"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#puzzle-fill"/></svg>
+          </div>
+        </div>
+        {# Infos #}
+        <div class="card-body p-2">
+          <p class="card-title fw-semibold mb-1 lh-sm" style="font-size:.8rem;" title="{{ item.nom }}">{{ item.nom[:60] }}{% if item.nom|length > 60 %}…{% endif %}</p>
+          <p class="card-text text-body-secondary mb-0" style="font-size:.7rem;">{{ item.categorie }}</p>
+          {% if item.nb_joueurs or item.temps_de_jeu %}
+          <p class="card-text text-body-secondary mb-0" style="font-size:.65rem;opacity:.75;">
+            {% if item.nb_joueurs %}{{ item.nb_joueurs }} {{ _("j.") }}{% endif %}
+            {% if item.nb_joueurs and item.temps_de_jeu %} &middot; {% endif %}
+            {% if item.temps_de_jeu %}{{ item.temps_de_jeu }}{% endif %}
+          </p>
+          {% endif %}
+          {% if active_res %}
+          <p class="card-text text-warning mb-0 mt-1 fw-semibold" style="font-size:.65rem;">
+            {{ _("Jusqu'au %(d)s", d=active_res.end_date.strftime('%d/%m')) }}
+          </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>{# close last category group #}
+</div>
+
+<p class="text-body-secondary text-end mt-4" style="font-size:.8rem;">
+  {{ items|length }} {{ _("résultat(s)") }}{% if search %} {{ _("pour «\u00a0%(q)s\u00a0»", q=search) }}{% endif %}
+</p>
+{% endif %}
+
+{# Modal details #}
+<div class="modal fade" id="jeuModal" tabindex="-1" aria-labelledby="jeuModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow" style="border-radius:16px;overflow:hidden;">
+      <div class="modal-body pt-4 px-4 pb-4 position-relative">
+        <div class="position-absolute top-0 end-0 m-3 d-flex align-items-center gap-2" style="z-index:10;">
+          {% if can_admin %}
+          <button type="button" class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center p-2" id="jeuEditToggleBtn" title="{{ _('Modifier') }}" aria-label="{{ _('Modifier') }}" style="width:36px;height:36px;">
+            <svg class="bi" width="16" height="16"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#pencil"/></svg>
+          </button>
+          {% endif %}
+          <button type="button" class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center p-2" data-bs-dismiss="modal" aria-label="Close" style="width:36px;height:36px;">
+            <svg class="bi" width="16" height="16"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#x-lg"/></svg>
+          </button>
+        </div>
+
+        <div class="row g-4 mt-4 pt-2 mt-sm-0 pt-sm-0">
+          <div class="col-sm-4 col-md-3 text-center text-sm-start">
+            <div class="bg-body-tertiary rounded-3 shadow-sm mx-auto" style="overflow:hidden; max-width:220px;">
+              <img id="modalCover" src="" class="w-100 h-auto d-none" alt="Couverture" onerror="this.classList.add('d-none'); this.nextElementSibling.classList.remove('d-none');">
+              <div id="modalCoverPlaceholder" class="w-100 d-flex flex-column align-items-center justify-content-center text-body-secondary p-3" style="aspect-ratio:1/1;">
+                <svg class="bi mb-2 opacity-50" width="48" height="48"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#puzzle-fill"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-8 col-md-9">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2 pe-sm-5 me-sm-4">
+              <span id="modalCategorie" class="badge rounded-pill bg-primary" style="font-size:0.75rem;"></span>
+              <span id="modalAvailableBadge" class="badge rounded-pill bg-success" style="font-size:0.75rem;">{{ _("Disponible") }}</span>
+              <span id="modalReservedBadge" class="badge rounded-pill text-bg-warning d-none" style="font-size:0.75rem; color:#000 !important;">{{ _("Réservé") }}</span>
+            </div>
+            <h2 id="modalNom" class="h4 fw-bold mb-3 pe-sm-5 me-sm-4"></h2>
+
+            <div class="d-flex flex-wrap gap-3 mb-3" style="font-size:0.85rem;">
+              <div class="d-none" id="modalTempsBox">
+                <strong>{{ _("Temps de jeu :") }}</strong> <span id="modalTemps"></span>
+              </div>
+              <div class="d-none" id="modalJoueursBox">
+                <strong>{{ _("Joueurs :") }}</strong> <span id="modalJoueurs"></span>
+              </div>
+              <div class="d-none" id="modalPopulariteBox">
+                <strong>{{ _("Popularité :") }}</strong> <span id="modalPopularite"></span>
+              </div>
+            </div>
+
+            {# Section Réservation #}
+            <div id="modalReservationSection" class="mb-4">
+              {# Bandeau quand le jeu est actuellement réservé #}
+              <div id="modalReservedAlert" class="p-3 rounded-3 bg-body-tertiary border border-warning border-opacity-50 d-none d-flex flex-wrap align-items-center justify-content-between gap-2" style="font-size:0.85rem;">
+                <div>
+                  <svg class="bi me-1 text-warning" width="16" height="16"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#calendar-check"/></svg>
+                  {{ _("Réservé par") }} <strong id="modalReservedPceen"></strong>
+                  {{ _("jusqu'au") }} <strong id="modalReservedEnd"></strong>
+                </div>
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                  {% if can_admin %}
+                  <a id="modalHistoryBtn" href="" data-history-url="{{ url_for('jeux.reservations') }}" class="btn btn-sm btn-outline-secondary fw-semibold">
+                    {{ _("Historique") }}
+                  </a>
+                  <form id="jeuCancelResForm" method="post" action="" data-cancel-url-template="{{ url_for('jeux.cancel_reservation', res_id=0) }}" class="m-0"
+                        onsubmit="return confirm({{ _('Annuler cette réservation ?')|tojson }});">
+                    <input type="hidden" name="q" value="{{ search }}">
+                    <input type="hidden" name="cat" value="{{ selected_cat }}">
+                    <button type="submit"
+                            class="btn btn-icon-zoom text-danger p-2 shadow-none"
+                            title="{{ _('Annuler la réservation') }}"
+                            data-bs-toggle="tooltip"
+                            aria-label="{{ _('Annuler la réservation') }}">
+                      <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+                        {{ macros.bootstrap_icon("trash") }}
+                      </svg>
+                    </button>
+                  </form>
+                  {% endif %}
+                </div>
+              </div>
+
+              {# Formulaire de réservation quand le jeu est disponible #}
+              <div id="modalReserveActionBox">
+                {% if g.logged_in %}
+                <form id="jeuReserveForm" method="post" action="" data-reserve-url-template="{{ url_for('jeux.reserve_item', item_id=0) }}" class="p-3 rounded-3 bg-body-tertiary d-flex flex-wrap align-items-center justify-content-between gap-2">
+                  <input type="hidden" name="q" value="{{ search }}">
+                  <input type="hidden" name="cat" value="{{ selected_cat }}">
+                  <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <svg class="bi text-primary flex-shrink-0" width="18" height="18"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#calendar-event"/></svg>
+                    <span class="small">
+                      {{ _("Réserver jusqu'au") }}
+                      <strong class="text-body">{{ next_return_date.strftime('%d/%m/%Y') }}</strong>
+                    </span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    {% if can_admin %}
+                    <a id="modalHistoryAvailBtn" href="" data-history-url="{{ url_for('jeux.reservations') }}" class="btn btn-sm btn-outline-secondary fw-semibold">
+                      {{ _("Historique") }}
+                    </a>
+                    {% endif %}
+                    <button type="submit" class="btn btn-sm btn-primary fw-bold px-3">
+                      {{ _("Réserver") }}
+                    </button>
+                  </div>
+                </form>
+                {% else %}
+                <div class="p-2 px-3 rounded-3 bg-body-tertiary text-body-secondary small">
+                  <a href="{{ url_for('auth.login') }}" class="fw-semibold text-decoration-none">{{ _("Connectez-vous") }}</a> {{ _("pour réserver ce jeu.") }}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div id="modalReadContent">
+              <div id="modalNotaBeneBox" class="ps-3 py-1 mb-3 border-start border-2 text-body-secondary d-none" style="font-size:0.85rem;">
+                <span class="fw-semibold">{{ _("N.B. :") }}</span>
+                <span id="modalNotaBeneText" class="fst-italic" style="white-space: pre-line;"></span>
+              </div>
+
+              <h4 class="h6 fw-bold mb-2">{{ _("Résumé") }}</h4>
+              <div id="modalSummary" class="text-body" style="font-size:0.9rem; line-height:1.5;">
+                <div id="modalSummaryText" class="d-none" style="white-space: pre-line;"></div>
+                <div id="modalSummaryNone" class="d-none text-body-secondary fst-italic">
+                  {{ _("Aucun résumé disponible.") }}
+                </div>
+              </div>
+            </div>
+
+            {% if can_admin %}
+            <div id="modalEditSection" class="d-none">
+              <hr class="my-3">
+              <form id="jeuEditForm" method="post" action="" enctype="multipart/form-data" data-edit-url-template="{{ url_for('jeux.edit_item', item_id=0) }}">
+                <input type="hidden" name="q" value="{{ search }}">
+                <input type="hidden" name="cat" value="{{ selected_cat }}">
+
+                <div class="row g-2 mb-3">
+                  <div class="col-sm-7">
+                    <label for="editNom" class="form-label fw-semibold small mb-1">{{ _("Nom du jeu") }}</label>
+                    <input type="text" name="nom" id="editNom" class="form-control form-control-sm" maxlength="500" required>
+                  </div>
+                  <div class="col-sm-5">
+                    <label for="editCategorie" class="form-label fw-semibold small mb-1">{{ _("Catégorie") }}</label>
+                    <input type="text" name="categorie" id="editCategorie" class="form-control form-control-sm" maxlength="100" list="categoriesList" required>
+                    <datalist id="categoriesList">
+                      {% for cat_name, _ in categories %}
+                      <option value="{{ cat_name }}">
+                      {% endfor %}
+                    </datalist>
+                  </div>
+                </div>
+
+                <div class="row g-2 mb-3">
+                  <div class="col-sm-4">
+                    <label for="editTemps" class="form-label fw-semibold small mb-1">{{ _("Temps de jeu") }}</label>
+                    <input type="text" name="temps_de_jeu" id="editTemps" class="form-control form-control-sm" maxlength="100" placeholder="ex: 1h30">
+                  </div>
+                  <div class="col-sm-4">
+                    <label for="editJoueurs" class="form-label fw-semibold small mb-1">{{ _("Nombre de joueurs") }}</label>
+                    <input type="text" name="nb_joueurs" id="editJoueurs" class="form-control form-control-sm" maxlength="100" placeholder="ex: 2 à 4">
+                  </div>
+                  <div class="col-sm-4">
+                    <label for="editPopularite" class="form-label fw-semibold small mb-1">{{ _("Popularité") }}</label>
+                    <input type="text" name="popularite" id="editPopularite" class="form-control form-control-sm" maxlength="100">
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="editCoverFile" class="form-label fw-semibold small mb-1">{{ _("Importer une image de couverture") }}</label>
+                  <input type="file" name="cover_file" id="editCoverFile" class="form-control form-control-sm" accept=".jpg,.jpeg,.png,.webp,.gif">
+                  <div id="editRemoveCoverWrapper" class="form-check mt-1 d-none">
+                    <input class="form-check-input" type="checkbox" name="remove_cover" value="1" id="editRemoveCover">
+                    <label class="form-check-label small text-body-secondary" for="editRemoveCover">
+                      {{ _("Supprimer l'image téléversée actuelle") }}
+                    </label>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="editImageUrl" class="form-label fw-semibold small mb-1">{{ _("Ou lien externe de la couverture") }}</label>
+                  <input type="text" name="image_url" id="editImageUrl" class="form-control form-control-sm" maxlength="500" placeholder="https://...">
+                </div>
+
+                <div class="mb-3">
+                  <label for="editNotaBene" class="form-label fw-semibold small mb-1">{{ _("Nota Bene / Commentaires") }}</label>
+                  <textarea name="nota_bene" id="editNotaBene" class="form-control form-control-sm" rows="2" placeholder="{{ _('Remarque affichée avant le résumé (ex: matériel manquant, extension...)') }}"></textarea>
+                </div>
+
+                <div class="mb-3">
+                  <label for="editResume" class="form-label fw-semibold small mb-1">{{ _("Résumé / Description") }}</label>
+                  <textarea name="resume" id="editResume" class="form-control form-control-sm" rows="5" placeholder="{{ _('Résumé ou règles du jeu...') }}"></textarea>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between pt-2">
+                  <div>
+                    <button type="button" id="jeuDeleteAskBtn" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1">
+                      <svg class="bi flex-shrink-0" width="14" height="14"><use href="{{ url_for('static', filename='svg/bootstrap-icons.svg') }}#trash"/></svg>
+                      <span>{{ _("Supprimer") }}</span>
+                    </button>
+                    <div id="jeuDeleteConfirmGroup" class="d-none d-inline-flex align-items-center gap-2">
+                      <span class="small text-danger fw-semibold">{{ _("Confirmer ?") }}</span>
+                      <button type="submit" id="jeuDeleteBtn" formaction="" data-delete-url-template="{{ url_for('jeux.delete_item', item_id=0) }}" class="btn btn-sm btn-danger fw-bold">
+                        {{ _("Oui, supprimer") }}
+                      </button>
+                      <button type="button" id="jeuDeleteCancelBtn" class="btn btn-sm btn-outline-secondary">
+                        {{ _("Non") }}
+                      </button>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <button type="button" id="jeuEditCancelBtn" class="btn btn-sm btn-outline-secondary">
+                      {{ _("Annuler") }}
+                    </button>
+                    <button type="submit" class="btn btn-sm btn-primary fw-bold">
+                      {{ _("Enregistrer") }}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const jeuModal = document.getElementById('jeuModal');
+  if (!jeuModal) return;
+
+  const modalNotaBeneBox = document.getElementById('modalNotaBeneBox');
+  const modalNotaBeneText = document.getElementById('modalNotaBeneText');
+  const modalSummaryText = document.getElementById('modalSummaryText');
+  const modalSummaryNone = document.getElementById('modalSummaryNone');
+  const modalReadContent = document.getElementById('modalReadContent');
+  const modalEditSection = document.getElementById('modalEditSection');
+  const modalReservationSection = document.getElementById('modalReservationSection');
+  const modalAvailableBadge = document.getElementById('modalAvailableBadge');
+  const modalReservedBadge = document.getElementById('modalReservedBadge');
+  const modalReservedAlert = document.getElementById('modalReservedAlert');
+  const modalReservedPceen = document.getElementById('modalReservedPceen');
+  const modalReservedEnd = document.getElementById('modalReservedEnd');
+  const modalReserveActionBox = document.getElementById('modalReserveActionBox');
+  const jeuReserveForm = document.getElementById('jeuReserveForm');
+  const jeuCancelResForm = document.getElementById('jeuCancelResForm');
+  const jeuEditForm = document.getElementById('jeuEditForm');
+  const jeuEditToggleBtn = document.getElementById('jeuEditToggleBtn');
+  const jeuEditCancelBtn = document.getElementById('jeuEditCancelBtn');
+  const jeuDeleteAskBtn = document.getElementById('jeuDeleteAskBtn');
+  const jeuDeleteConfirmGroup = document.getElementById('jeuDeleteConfirmGroup');
+  const jeuDeleteBtn = document.getElementById('jeuDeleteBtn');
+  const jeuDeleteCancelBtn = document.getElementById('jeuDeleteCancelBtn');
+  const editNom = document.getElementById('editNom');
+  const editCategorie = document.getElementById('editCategorie');
+  const editTemps = document.getElementById('editTemps');
+  const editJoueurs = document.getElementById('editJoueurs');
+  const editPopularite = document.getElementById('editPopularite');
+  const editCoverFile = document.getElementById('editCoverFile');
+  const editRemoveCoverWrapper = document.getElementById('editRemoveCoverWrapper');
+  const editRemoveCover = document.getElementById('editRemoveCover');
+  const editImageUrl = document.getElementById('editImageUrl');
+  const editNotaBene = document.getElementById('editNotaBene');
+  const editResume = document.getElementById('editResume');
+
+  const setDeleteConfirm = (confirming) => {
+    jeuDeleteAskBtn?.classList.toggle('d-none', confirming);
+    jeuDeleteConfirmGroup?.classList.toggle('d-none', !confirming);
+  };
+
+  const setEditMode = (editing) => {
+    modalEditSection?.classList.toggle('d-none', !editing);
+    modalReadContent.classList.toggle('d-none', editing);
+    modalReservationSection?.classList.toggle('d-none', editing);
+    jeuEditToggleBtn?.classList.toggle('d-none', editing);
+    if (!editing) setDeleteConfirm(false);
+  };
+
+  const setOptionalField = (boxId, valueId, val) => {
+    const box = document.getElementById(boxId);
+    box.classList.toggle('d-none', !val);
+    if (val) document.getElementById(valueId).textContent = val;
+  };
+
+  jeuModal.addEventListener('show.bs.modal', (event) => {
+    const card = event.relatedTarget;
+    if (!card) return;
+    const d = card.dataset;
+
+    document.getElementById('modalNom').textContent = d.nom || '';
+    document.getElementById('modalCategorie').textContent = d.categorie || '';
+
+    setOptionalField('modalTempsBox', 'modalTemps', d.temps);
+    setOptionalField('modalJoueursBox', 'modalJoueurs', d.joueurs);
+    setOptionalField('modalPopulariteBox', 'modalPopularite', d.popularite);
+
+    const cover = document.getElementById('modalCover');
+    const placeholder = document.getElementById('modalCoverPlaceholder');
+    cover.src = d.cover || '';
+    cover.classList.toggle('d-none', !d.cover);
+    placeholder.classList.toggle('d-none', Boolean(d.cover));
+
+    const isReserved = Boolean(d.resId);
+    modalAvailableBadge?.classList.toggle('d-none', isReserved);
+    modalReservedBadge?.classList.toggle('d-none', !isReserved);
+    modalReservedAlert?.classList.toggle('d-none', !isReserved);
+    modalReserveActionBox?.classList.toggle('d-none', isReserved);
+
+    if (isReserved) {
+      if (modalReservedPceen) modalReservedPceen.textContent = d.resPceen || '';
+      if (modalReservedEnd) modalReservedEnd.textContent = d.resEnd || '';
+      if (jeuCancelResForm) {
+        jeuCancelResForm.action = jeuCancelResForm.dataset.cancelUrlTemplate.replace('/0/', '/' + d.resId + '/');
+      }
+    } else if (jeuReserveForm && d.id) {
+      jeuReserveForm.action = jeuReserveForm.dataset.reserveUrlTemplate.replace('/0', '/' + d.id);
+    }
+
+    const historyQuery = d.nom ? ('?q=' + encodeURIComponent(d.nom)) : '';
+    const modalHistoryBtn = document.getElementById('modalHistoryBtn');
+    const modalHistoryAvailBtn = document.getElementById('modalHistoryAvailBtn');
+    if (modalHistoryBtn) modalHistoryBtn.href = modalHistoryBtn.dataset.historyUrl + historyQuery;
+    if (modalHistoryAvailBtn) modalHistoryAvailBtn.href = modalHistoryAvailBtn.dataset.historyUrl + historyQuery;
+
+    const nbText = (d.notaBene || d.commentaires || '').trim();
+    const hasNotaBene = Boolean(nbText);
+    modalNotaBeneText.textContent = hasNotaBene ? nbText : '';
+    modalNotaBeneBox.classList.toggle('d-none', !hasNotaBene);
+
+    const hasResume = Boolean(d.resume?.trim());
+    modalSummaryText.textContent = hasResume ? d.resume : '';
+    modalSummaryText.classList.toggle('d-none', !hasResume);
+    modalSummaryNone.classList.toggle('d-none', hasResume);
+
+    setEditMode(false);
+
+    if (jeuEditForm && d.id) {
+      jeuEditForm.action = jeuEditForm.dataset.editUrlTemplate.replace('/0', '/' + d.id);
+      jeuDeleteBtn?.setAttribute('formaction', jeuDeleteBtn.dataset.deleteUrlTemplate.replace('/0', '/' + d.id));
+      if (editNom) editNom.value = d.nom || '';
+      if (editCategorie) editCategorie.value = d.categorie || '';
+      if (editTemps) editTemps.value = d.temps || '';
+      if (editJoueurs) editJoueurs.value = d.joueurs || '';
+      if (editPopularite) editPopularite.value = d.popularite || '';
+      if (editCoverFile) editCoverFile.value = '';
+      if (editRemoveCover) editRemoveCover.checked = false;
+      editRemoveCoverWrapper?.classList.toggle('d-none', !d.imageFilename);
+      editImageUrl.value = d.imageUrl || '';
+      editNotaBene.value = d.notaBene || d.commentaires || '';
+      editResume.value = d.resume || '';
+    }
+  });
+
+  jeuEditToggleBtn?.addEventListener('click', () => setEditMode(true));
+  jeuEditCancelBtn?.addEventListener('click', () => setEditMode(false));
+  jeuDeleteAskBtn?.addEventListener('click', () => setDeleteConfirm(true));
+  jeuDeleteCancelBtn?.addEventListener('click', () => setDeleteConfirm(false));
+});
+</script>
+
+{% endblock %}

@@ -198,6 +198,17 @@ def _normalize(s: str) -> str:
     """Lowercase and collapse whitespace for comparison."""
     return re.sub(r"\s+", " ", s.lower()).strip()
 
+
+def _get_bd_counts() -> tuple[int, int]:
+    """Return (total_livres, total_bds) in a single grouped query."""
+    counts = dict(
+        db.session.execute(
+            sa.select(BDItem.categorie, sa.func.count(BDItem.id)).group_by(BDItem.categorie)
+        ).all()
+    )
+    return counts.get("livre", 0), counts.get("bd", 0)
+
+
 @bp.route("")
 @bp.route("/")
 def main() -> typing.RouteReturn:
@@ -217,14 +228,7 @@ def main() -> typing.RouteReturn:
         )
 
     items = db.session.scalars(query).all()
-
-    # Stats for display
-    total_livres = db.session.scalar(
-        sa.select(sa.func.count()).where(BDItem.categorie == "livre")
-    ) or 0
-    total_bds = db.session.scalar(
-        sa.select(sa.func.count()).where(BDItem.categorie == "bd")
-    ) or 0
+    total_livres, total_bds = _get_bd_counts()
 
     can_admin = context.g.is_gri or (
         context.g.logged_in
@@ -247,13 +251,7 @@ def main() -> typing.RouteReturn:
 def admin() -> typing.RouteReturn:
     """BD admin dashboard."""
     form = UploadCatalogueForm()
-
-    total_livres = db.session.scalar(
-        sa.select(sa.func.count()).where(BDItem.categorie == "livre")
-    ) or 0
-    total_bds = db.session.scalar(
-        sa.select(sa.func.count()).where(BDItem.categorie == "bd")
-    ) or 0
+    total_livres, total_bds = _get_bd_counts()
 
     # Last 10 items added (highest IDs)
     recent = db.session.scalars(

@@ -125,6 +125,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
         calendar,
         casino,
         bd,
+        jeux,
     )
     from app.routes.auth import saml
     from app.routes.auth import oidc
@@ -148,6 +149,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.register_blueprint(calendar.bp, url_prefix="/calendar")
     app.register_blueprint(casino.bp, url_prefix="/casino")
     app.register_blueprint(bd.bp, url_prefix="/bd")
+    app.register_blueprint(jeux.bp, url_prefix="/jeux")
 
 
     from app.oauth2 import config_oauth

@@ -120,6 +120,7 @@ class PCeen(flask_login.UserMixin, Model):
     clubq_voeux: Mapped[list["models.ClubQVoeu"]] = one_to_many("ClubQVoeu.pceen")
 
     events_created: Mapped[list["models.Event"]] = one_to_many("Event.author")
+    jeu_reservations: Mapped[list["models.JeuReservation"]] = one_to_many("JeuReservation.pceen")
 
 
     def __repr__(self) -> str:

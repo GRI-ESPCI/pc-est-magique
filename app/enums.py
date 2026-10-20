@@ -78,6 +78,7 @@ class PermissionScope(enum.Enum):
     casino = _PSParams(allow_elem=False, need_elem=False)
     notifications = _PSParams(allow_elem=False, need_elem=False)
     bd = _PSParams(allow_elem=False, need_elem=False)
+    jeux = _PSParams(allow_elem=False, need_elem=False)
 
     # Elements scopes
     pceen = _PSParams(

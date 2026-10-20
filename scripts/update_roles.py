@@ -38,6 +38,7 @@ def permissions() -> dict[str, dict[str, typing.Any]]:
         "access_bekk": dict(type=PermissionType.read, scope=PermissionScope.bekk, ref_id=None),
         "access_panier_bio": dict(type=PermissionType.read, scope=PermissionScope.panier_bio, ref_id=None),
         "access_casino": dict(type=PermissionType.read, scope=PermissionScope.casino, ref_id=None),
+        "access_jeux": dict(type=PermissionType.read, scope=PermissionScope.jeux, ref_id=None),
         "manage_club_q": dict(type=PermissionType.all, scope=PermissionScope.club_q, ref_id=None),
         "manage_photos": dict(type=PermissionType.all, scope=PermissionScope.photos, ref_id=None),
         "manage_intrarez": dict(type=PermissionType.all, scope=PermissionScope.intrarez, ref_id=None),
@@ -52,6 +53,7 @@ def permissions() -> dict[str, dict[str, typing.Any]]:
         "manage_calendar": dict(type=PermissionType.all, scope=PermissionScope.calendar, ref_id=None),
         "manage_casino": dict(type=PermissionType.all, scope=PermissionScope.casino, ref_id=None),
         "manage_bd": dict(type=PermissionType.all, scope=PermissionScope.bd, ref_id=None),
+        "manage_jeux": dict(type=PermissionType.all, scope=PermissionScope.jeux, ref_id=None),
     }
 
 
@@ -79,6 +81,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["manage_calendar"],
                 perms["manage_casino"],
                 perms["manage_bd"],
+                perms["manage_jeux"],
             ],
         ),
         "Rezident": dict(  # NE PAS RENOMMER - nom utilisé dans app/utils/roles.py
@@ -99,6 +102,7 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
                 perms["access_panier_bio"],
                 perms["access_calendar"],
                 perms["access_casino"],
+                perms["access_jeux"],
             ],
         ),
         "Alumni": dict(
@@ -171,6 +175,13 @@ def roles(perms: dict[str, Permission]) -> dict[str, dict[str, typing.Any]]:
             color="3c78d8",
             permissions=[
                 perms["manage_bd"],
+            ],
+        ),
+        "Jeux": dict(
+            index=19,
+            color="e67e22",
+            permissions=[
+                perms["manage_jeux"],
             ],
         ),
         "Notifications": dict(

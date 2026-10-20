@@ -35,8 +35,9 @@ class Notification(Model):
     body: Column[str] = column(sa.String(512), nullable=False)
     image: Column[str | None] = column(sa.String(256), nullable=True)
     url: Column[str | None] = column(sa.String(256), nullable=True)
-    target_type: Column[str] = column(sa.String(32), nullable=False)  # 'all', 'eleves', 'rez', 'role'
+    target_type: Column[str] = column(sa.String(32), nullable=False)  # 'all', 'eleves', 'rez', 'role', 'pceen'
     role_id: Column[int | None] = column(sa.ForeignKey("role.id", ondelete="SET NULL"), nullable=True)
+    pceen_id: Column[int | None] = column(sa.ForeignKey("pceen.id", ondelete="CASCADE"), nullable=True, index=True)
     created_at: Column[datetime.datetime] = column(sa.DateTime(), nullable=False, default=datetime.datetime.utcnow)
 
     role: Mapped[typing.Optional["models.Role"]] = many_to_one("Role.notifications")
@@ -60,7 +61,11 @@ class Notification(Model):
                 sa.and_(
                     cls.target_type == "role",
                     cls.role_id.in_(role_ids) if role_ids else sa.false()
-                )
+                ),
+                sa.and_(
+                    cls.target_type == "pceen",
+                    cls.pceen_id == pceen.id
+                ),
             )
         )
 

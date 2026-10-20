@@ -45,6 +45,3 @@ class BDItem(db.Model):
             if clean:
                 return f"https://covers.openlibrary.org/b/isbn/{clean}-M.jpg?default=false"
         return None
-
-
-from app import models  # noqa: E402, F401
