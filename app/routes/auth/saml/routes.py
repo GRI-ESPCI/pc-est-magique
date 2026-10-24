@@ -143,7 +143,7 @@ def login() -> typing.RouteReturn:
     if _saml_client is None:
         flask.flash(_("L'authentification SSO est actuellement indisponible."), "danger")
         return helpers.ensure_safe_redirect("auth.auth_needed", next=None)
-    _, info = _saml_client.prepare_for_authenticate()
+    _req_id, info = _saml_client.prepare_for_authenticate()
     headers = dict(info["headers"])
     response = flask.redirect(headers.pop("Location"), code=302)
     response.headers.extend(headers)
