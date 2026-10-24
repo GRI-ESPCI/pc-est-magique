@@ -75,7 +75,7 @@
         {{ _("En cours") }}
       </a>
       <a href="{{ url_for('jeux.reservations', status='completed', q=q or None, sort=sort, way=way) }}"
-         class="btn btn-sm rounded-pill px-3 {{ 'btn-secondary fw-semibold' if status == 'completed' else 'btn-outline-secondary' }}">
+         class="btn btn-sm rounded-pill px-3 {{ 'btn-success fw-semibold' if status == 'completed' else 'btn-outline-secondary' }}">
         {{ _("Terminées") }}
       </a>
       <a href="{{ url_for('jeux.reservations', status='cancelled', q=q or None, sort=sort, way=way) }}"
@@ -142,21 +142,14 @@
         <th class="ps-3 align-middle">{{ res.id }}</th>
         <td class="align-middle text-nowrap">
           {% if res.pceen %}
-            <div class="d-flex flex-column">
-              <div>
-                <a href="{{ url_for('jeux.reservations', q=res.pceen.username, status=status if status != 'all' else None, sort=sort, way=way) }}"
-                   class="fw-semibold text-body text-decoration-none"
-                   title="{{ _('Filtrer les réservations de %(name)s', name=res.pceen.full_name) }}">
-                  {{ res.pceen.full_name }}
-                </a>
-                {% if res.pceen.promo %}
-                  <span class="text-body-secondary">({{ res.pceen.promo }})</span>
-                {% endif %}
-              </div>
-              <small class="text-body-secondary" style="font-size:.75rem;">
-                <a href="mailto:{{ res.pceen.email }}" class="text-body-secondary text-decoration-none">{{ res.pceen.email }}</a>
-              </small>
-            </div>
+            <a href="{{ url_for('jeux.reservations', q=res.pceen.username, status=status if status != 'all' else None, sort=sort, way=way) }}"
+               class="fw-semibold text-body text-decoration-none"
+               title="{{ _('Filtrer les réservations de %(name)s', name=res.pceen.full_name) }}">
+              {{ res.pceen.full_name }}
+            </a>
+            {% if res.pceen.promo %}
+              <span class="text-body-secondary">({{ res.pceen.promo }})</span>
+            {% endif %}
           {% else %}
             <span class="text-body-secondary">—</span>
           {% endif %}

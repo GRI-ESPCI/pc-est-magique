@@ -541,7 +541,6 @@ def reservations() -> typing.RouteReturn:
             (PCeen.prenom + " " + PCeen.nom).ilike(pattern),
             (PCeen.nom + " " + PCeen.prenom).ilike(pattern),
             PCeen.username.ilike(pattern),
-            PCeen.email.ilike(pattern),
         ]
         if q.isdigit():
             search_filters.append(PCeen.promo == int(q))
