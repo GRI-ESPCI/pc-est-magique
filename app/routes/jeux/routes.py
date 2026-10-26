@@ -7,6 +7,7 @@ import os
 import re
 import threading
 import time
+import xml.sax.saxutils as saxutils
 import zipfile
 
 import defusedxml.ElementTree as ET
@@ -184,6 +185,82 @@ def _parse_xlsx_rows(file_stream) -> list[list[str]]:
     return rows
 
 
+def _export_catalogue_ods(items: list[JeuItem]) -> io.BytesIO:
+    """Generate an ODS file in memory containing the Jeux catalogue."""
+    headers = [
+        "Nom",
+        "Catégorie",
+        "Temps de jeu",
+        "Nombre de joueurs",
+        "Popularité",
+        "Commentaires",
+        "Image URL",
+    ]
+
+    def _cell_xml(val: str | None) -> str:
+        if not val:
+            return "<table:table-cell/>"
+        lines = str(val).splitlines() or [""]
+        paragraphs = "".join(f"<text:p>{saxutils.escape(line)}</text:p>" for line in lines)
+        return f'<table:table-cell office:value-type="string">{paragraphs}</table:table-cell>'
+
+    row_xmls: list[str] = []
+    # Header row
+    header_cells = "".join(_cell_xml(h) for h in headers)
+    row_xmls.append(f"<table:table-row>{header_cells}</table:table-row>")
+
+    for item in items:
+        comment = item.nota_bene if item.nota_bene is not None else item.commentaires
+        row_vals = [
+            item.nom,
+            item.categorie,
+            item.temps_de_jeu,
+            item.nb_joueurs,
+            item.popularite,
+            comment,
+            item.image_url,
+        ]
+        cells_xml = "".join(_cell_xml(v) for v in row_vals)
+        row_xmls.append(f"<table:table-row>{cells_xml}</table:table-row>")
+
+    rows_str = "".join(row_xmls)
+    content_xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<office:document-content'
+        ' xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"'
+        ' xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"'
+        ' xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"'
+        ' office:version="1.2">'
+        "<office:body>"
+        "<office:spreadsheet>"
+        '<table:table table:name="Catalogue Jeux">'
+        f"{rows_str}"
+        "</table:table>"
+        "</office:spreadsheet>"
+        "</office:body>"
+        "</office:document-content>"
+    )
+
+    manifest_xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2">'
+        '<manifest:file-entry manifest:full-path="/" manifest:version="1.2" manifest:media-type="application/vnd.oasis.opendocument.spreadsheet"/>'
+        '<manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>'
+        "</manifest:manifest>"
+    )
+
+    mimetype = "application/vnd.oasis.opendocument.spreadsheet"
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("mimetype", mimetype, compress_type=zipfile.ZIP_STORED)
+        zf.writestr("META-INF/manifest.xml", manifest_xml.encode("utf-8"))
+        zf.writestr("content.xml", content_xml.encode("utf-8"))
+
+    buf.seek(0)
+    return buf
+
+
 def _import_catalogue(file_stream, filename: str) -> tuple[int, int]:
     """Parse an ODS or XLSX catalogue and upsert games into the database.
 
@@ -194,6 +271,7 @@ def _import_catalogue(file_stream, filename: str) -> tuple[int, int]:
         D (3): Nbre de joueurs
         E (4): Popularité
         F (5): Commentaires
+        G (6): URL de l'image
 
     Returns:
         Tuple of (added_count, updated_count).
@@ -221,6 +299,7 @@ def _import_catalogue(file_stream, filename: str) -> tuple[int, int]:
         nb_joueurs = _clean_str(row[3], 100) if len(row) > 3 else None
         popularite = _clean_str(row[4], 100) if len(row) > 4 else None
         commentaires = _clean_str(row[5]) if len(row) > 5 else None
+        image_url = _clean_str(row[6], 500) if len(row) > 6 else None
 
         key = _normalize(nom)
         if key not in existing:
@@ -232,6 +311,7 @@ def _import_catalogue(file_stream, filename: str) -> tuple[int, int]:
                 popularite=popularite,
                 commentaires=commentaires,
                 nota_bene=commentaires,
+                image_url=image_url,
             )
             db.session.add(item)
             existing[key] = item
@@ -244,6 +324,7 @@ def _import_catalogue(file_stream, filename: str) -> tuple[int, int]:
                 ("temps_de_jeu", temps_de_jeu),
                 ("nb_joueurs", nb_joueurs),
                 ("popularite", popularite),
+                ("image_url", image_url),
             ):
                 if val is not None and getattr(item, attr) != val:
                     setattr(item, attr, val)
@@ -696,6 +777,26 @@ def admin_upload() -> typing.RouteReturn:
         "success",
     )
     return flask.redirect(flask.url_for("jeux.admin"))
+
+
+@bp.route("/admin/export", methods=["GET"])
+@context.permission_only(PermissionType.write, PermissionScope.jeux)
+def admin_export() -> typing.RouteReturn:
+    """Export the current Jeux database as an ODS file."""
+    items = db.session.scalars(
+        sa.select(JeuItem).order_by(
+            sa.func.lower(JeuItem.categorie),
+            sa.func.lower(JeuItem.nom),
+        )
+    ).all()
+    ods_stream = _export_catalogue_ods(list(items))
+    today_str = datetime.date.today().strftime("%Y-%m-%d")
+    return flask.send_file(
+        ods_stream,
+        mimetype="application/vnd.oasis.opendocument.spreadsheet",
+        as_attachment=True,
+        download_name=f"catalogue_jeux_{today_str}.ods",
+    )
 
 
 @bp.route("/edit/<int:item_id>", methods=["POST"])
