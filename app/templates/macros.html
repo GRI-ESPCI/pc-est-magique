@@ -9,7 +9,6 @@
 {% macro bootstrap_icon(name) %}
     {% set mapped_name = {
         "cup-hot-fill": "cup-fill",
-        "ticket-perforated-fill": "receipt-cutoff",
         "mortarboard-fill": "award-fill",
         "wrench-adjustable": "wrench"
     }.get(name, name) %}
@@ -39,12 +38,13 @@
             (default), "success", "danger" or "warning")
 -->
 {% macro flashed_message(message, category="info", extra_div_args="") %}
+    {% set category = "info" if not category or category == "message" else category %}
     {% with alert_label, alert_icon = {
             "info":     (_("Information :"),    "info-circle-fill"),
             "success":  (_("Succès :"),         "check-circle-fill"),
             "warning":  (_("Avertissement :"),  "exclamation-triangle-fill"),
             "danger":   (_("Attention :"),      "exclamation-triangle-fill"),
-        }.get(category, ("",                    ""))
+        }.get(category, (_("Information :"),    "info-circle-fill"))
     %}
     <div class="toast {{ 'glass-toast' if g.theme != 'classic' else '' }}{{ ' show-toast' if message else '' }}" role="alert" aria-live="assertive" aria-atomic="true"
          {{ extra_div_args }}>
@@ -96,6 +96,53 @@
 -->
 {% macro s(elem, name, include_elem=True) %}
 {% if include_elem %}{{ elem }} {% endif %}{{ name }}{% if elem != 1 %}s{% endif %}
+{% endmacro %}
+
+
+<!-- Outputs a table row edit button (pencil icon) with a tooltip and either a modal trigger or a link.
+     Can be used directly (`macros.edit_row_btn(title, href=...)`) or with `call` to pass extra data-* attributes.
+-->
+{% macro edit_row_btn(title, target=None, href=None, extra_class="") %}
+{% set extra_attrs = caller() if caller is defined else "" %}
+{% if href %}
+<a
+  href="{{ href }}"
+  class="btn btn-icon-zoom text-warning p-2 shadow-none {{ extra_class }}"
+  data-bs-toggle="tooltip"
+  title="{{ title }}"
+  {{ extra_attrs }}
+>
+  <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+    {{ bootstrap_icon("pencil") }}
+  </svg>
+</a>
+{% elif target %}
+<span class="d-inline-block" data-bs-toggle="tooltip" title="{{ title }}">
+  <button
+    type="button"
+    class="btn btn-icon-zoom text-warning p-2 shadow-none {{ extra_class }}"
+    data-bs-target="{{ target }}"
+    data-bs-toggle="modal"
+    {{ extra_attrs }}
+  >
+    <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+      {{ bootstrap_icon("pencil") }}
+    </svg>
+  </button>
+</span>
+{% else %}
+<button
+  type="button"
+  class="btn btn-icon-zoom text-warning p-2 shadow-none {{ extra_class }}"
+  data-bs-toggle="tooltip"
+  title="{{ title }}"
+  {{ extra_attrs }}
+>
+  <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+    {{ bootstrap_icon("pencil") }}
+  </svg>
+</button>
+{% endif %}
 {% endmacro %}
 
 

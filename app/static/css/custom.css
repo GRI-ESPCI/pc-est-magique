@@ -1236,3 +1236,23 @@ html[data-theme="dark"] .m3-search-bar:focus-within,
     border-style: dashed !important;
     transition: background 0.15s ease;
 }
+
+html[data-theme="dark"] body :is(.badge.bg-primary, .badge.text-bg-primary, .badge-primary, .page-link.text-bg-primary, .nav-pills .nav-link.active) {
+    background-color: #1e3754 !important;
+    color: #9ecbff !important;
+    border: 1px solid rgba(158, 203, 255, 0.18) !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] body .btn.btn-outline-primary:is(:hover, :active, :focus-visible, .active),
+html[data-theme="dark"] body .btn-check:checked + .btn.btn-outline-primary {
+    --bs-btn-hover-bg: #1e3754;
+    --bs-btn-hover-color: #9ecbff;
+    --bs-btn-hover-border-color: #9ecbff;
+    --bs-btn-active-bg: #1e3754;
+    --bs-btn-active-color: #9ecbff;
+    --bs-btn-active-border-color: #9ecbff;
+    background-color: #1e3754 !important;
+    color: #9ecbff !important;
+    border-color: #9ecbff !important;
+}

@@ -158,16 +158,16 @@
           </th>
           <th
             scope="col"
-            onclick="sort('lontitude');"
+            onclick="sort('longitude');"
           >
             <span class="d-flex user-select-none">
-              <span>{{ _("Latitude") }}</span>
+              <span>{{ _("Longitude") }}</span>
               <span class="mx-auto">
                 <svg
                   class="bi flex-shrink-0"
                   width="16"
                   height="16"
-                  id="sort-svg-lontitude"
+                  id="sort-svg-longitude"
                 >
                   <!-- Sort button inserted through JS -->
                 </svg>
@@ -217,26 +217,15 @@
           <td>{{ salles[i].longitude }}</td>
           {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
           <td>
-            <button
-              class="btn btn-outline-danger p-1 pt-0"
-              data-bs-target="#mo-salle-edit"
-              data-bs-toggle="modal"
+            {% call macros.edit_row_btn(_('Éditer la salle'), '#mo-salle-edit') %}
               data-salle-id="{{ salles[i].id }}"
               data-salle-nom="{{ salles[i].nom }}"
               data-salle-description="{{ salles[i].description }}"
               data-salle-url="{{ salles[i].url }}"
               data-salle-adresse="{{ salles[i].adresse }}"
               data-salle-latitude="{{ salles[i].latitude }}"
-              data-salle-longitude=" {{ salles[i].longitude }}"
-            >
-              <svg
-                class="bi flex-shrink-0"
-                width="18"
-                height="18"
-              >
-                {{ macros.bootstrap_icon("pen") }}
-              </svg>
-            </button>
+              data-salle-longitude="{{ salles[i].longitude }}"
+            {% endcall %}
           </td>
           {% endif %}
         </tr>

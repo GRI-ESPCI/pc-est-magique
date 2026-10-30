@@ -109,28 +109,41 @@ def index() -> typing.RouteReturn:
 
         season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value
         season = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id)).first()
+        attributions_visible = bool(season and season.attributions_visible)
 
         next_voeu = db.session.scalars(
-            db.select(ClubQVoeu).filter(
+            db.select(ClubQVoeu)
+            .join(ClubQVoeu.spectacle)
+            .join(ClubQVoeu.season)
+            .filter(
                 ClubQVoeu._pceen_id == pceen.id,
                 ClubQVoeu.places_attribuees > 0,
-                ClubQVoeu.spectacle.has(ClubQSpectacle.date > datetime.date.today()),
+                ClubQSeason.attributions_visible == True,
+                ClubQSpectacle.date >= datetime.datetime.now(),
             )
+            .order_by(ClubQSpectacle.date.asc())
         ).first()
 
         voeux = db.select(ClubQVoeu).filter_by(_pceen_id=pceen.id, _season_id=season_id)
-        if db.session.scalars(voeux).first() is not None:
+        nb_voeux = db.session.scalar(db.select(sqlalchemy.func.count()).select_from(voeux.subquery())) or 0
+
+        if attributions_visible and nb_voeux > 0:
             to_pay = pceen_prix_total(pceen, voeux)
         else:
             to_pay = 0
 
-        visibility = db.session.scalars(db.select(GlobalSetting).filter_by(key="ACCESS_CLUB_Q")).one().value
+        visibility = int(db.session.scalars(db.select(GlobalSetting).filter_by(key="ACCESS_CLUB_Q")).one().value or 0)
 
-        club_q_infos = namedtuple("ClubQInfos", ["season", "next_voeu", "to_pay", "booking_open", "pceen"])(
+        club_q_infos = namedtuple(
+            "ClubQInfos",
+            ["season", "next_voeu", "to_pay", "booking_open", "attributions_visible", "nb_voeux", "pceen"],
+        )(
             season,
             next_voeu,
             to_pay,
-            visibility,
+            visibility == 1,
+            attributions_visible,
+            nb_voeux,
             pceen,
         )
 

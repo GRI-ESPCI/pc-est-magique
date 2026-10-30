@@ -102,11 +102,6 @@ class ClubQSpectacle(db.Model):
         )
         return db.session.scalar(stmt) or 0
 
-    @property
-    def src(self) -> int:
-        """Image path for club q images"""
-        return f"/club_q_images/{self.season.id}/{self.id}.jpg"
-
 
 class ClubQVoeu(db.Model):
     """Client wish for a spectacle"""

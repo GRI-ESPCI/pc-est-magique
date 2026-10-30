@@ -151,13 +151,7 @@
                 {{ macros.bootstrap_icon("eye") }}
               </svg>
             </a>
-            <a href="{{ url_for('theatre.admin_spectacle_edit', id=s.id) }}"
-               class="btn btn-icon-zoom text-warning p-2 shadow-none"
-               data-bs-toggle="tooltip" title="{{ _('Modifier le spectacle') }}">
-              <svg class="bi flex-shrink-0" width="18" height="18">
-                {{ macros.bootstrap_icon("pencil") }}
-              </svg>
-            </a>
+            {{ macros.edit_row_btn(_('Modifier le spectacle'), href=url_for('theatre.admin_spectacle_edit', id=s.id)) }}
             <button type="button"
                     class="btn btn-icon-zoom text-danger p-2 shadow-none"
                     data-bs-toggle="modal" data-bs-target="#spec-del-modal-{{ s.id }}"

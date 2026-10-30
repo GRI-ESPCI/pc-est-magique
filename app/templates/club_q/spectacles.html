@@ -279,32 +279,21 @@
           <td>{{ spectacles[i].sum_places_attribuees}}</td>
           <td>{{ spectacles[i].nb_tickets - spectacles[i].sum_places_attribuees}}</td>
           <td>
-            <button
-              class="btn btn-outline-danger p-1 pt-0"
-              data-bs-target="#mo-spectacle-edit"
-              data-bs-toggle="modal"
+            {% call macros.edit_row_btn(_('Éditer le spectacle'), '#mo-spectacle-edit') %}
               data-spectacle-id="{{ spectacles[i].id }}"
-              data-spectacle-nom="{{ spectacles[i].nom}}"
-              data-salle-id="{{ spectacles[i]._salle_id}}"
+              data-spectacle-nom="{{ spectacles[i].nom }}"
+              data-salle-id="{{ spectacles[i]._salle_id }}"
               data-salle-nom="{{ spectacles[i].salle.nom }}"
               data-saison-id="{{ spectacles[i]._season_id }}"
-              data-saison-nom="{{ spectacles[i].season.nom}}"
+              data-saison-nom="{{ spectacles[i].season.nom }}"
               data-spectacle-name="{{ spectacles[i].nom }}"
               data-spectacle-categorie="{{ spectacles[i].categorie }}"
               data-spectacle-description="{{ spectacles[i].description }}"
               data-spectacle-date="{{ spectacles[i].date }}"
               data-spectacle-time="{{ spectacles[i].time }}"
               data-spectacle-nb-tickets="{{ spectacles[i].nb_tickets }}"
-              data-spectacle-price="{{ spectacles[i].unit_price}}"
-            >
-              <svg
-                class="bi flex-shrink-0"
-                width="18"
-                height="18"
-              >
-                {{ macros.bootstrap_icon("pen") }}
-              </svg>
-            </button>
+              data-spectacle-price="{{ spectacles[i].unit_price }}"
+            {% endcall %}
           </td>
           {% endif %}
         </tr>

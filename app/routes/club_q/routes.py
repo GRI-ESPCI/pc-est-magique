@@ -77,6 +77,9 @@ def main() -> typing.RouteReturn:
     saison = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id)).first()
     brochure = db.session.scalars(db.select(ClubQBrochure).filter_by(_season_id=season_id)).one_or_none()
 
+    class DynamicClubQForm(forms.ClubQForm):
+        pass
+
     for spect in spectacles:
         voeu = db.session.scalars(db.select(ClubQVoeu).filter_by(
             _spectacle_id=spect.id,
@@ -85,7 +88,7 @@ def main() -> typing.RouteReturn:
         )).first()
 
         setattr(
-            forms.ClubQForm,
+            DynamicClubQForm,
             f"priorite_{spect.id}",
             wtforms.IntegerField(
                 (_("Priorité")),
@@ -95,7 +98,7 @@ def main() -> typing.RouteReturn:
             ),
         )
         setattr(
-            forms.ClubQForm,
+            DynamicClubQForm,
             f"nb_places_{spect.id}",
             wtforms.IntegerField(
                 (_("Nombre places demandées")),
@@ -105,7 +108,7 @@ def main() -> typing.RouteReturn:
             ),
         )
         setattr(
-            forms.ClubQForm,
+            DynamicClubQForm,
             f"nb_places_minimum_{spect.id}",
             wtforms.IntegerField(
                 (_("Nombre places minimum demandées")),
@@ -114,11 +117,6 @@ def main() -> typing.RouteReturn:
                 default=voeu.places_minimum if voeu else None,
             ),
         )
-
-    compact = flask.request.args.get("compact")
-    if compact is None:
-        compact = 0
-    compact = int(compact)
 
     folder = "club_q"
     filename = "introduction.html"
@@ -129,7 +127,7 @@ def main() -> typing.RouteReturn:
         html_file = f.read()
 
     # Gestion des requêtes
-    form = forms.ClubQForm()
+    form = DynamicClubQForm()
 
     if form.validate_on_submit():
         flag = False  # Flag to say if the form results are not following the rules
@@ -209,19 +207,18 @@ def main() -> typing.RouteReturn:
                         db.session.delete(voeu)
 
             db.session.commit()
-            flask.flash(_("Vos choix ont été enregistrés."))
+            flask.flash(_("Vos choix ont été enregistrés."), "success")
 
     return flask.render_template(
         "club_q/main.html",
         view="reservations",
-        title=_(f"Page de réservation pour le Club Q"),
+        title=_("Page de réservation pour le Club Q"),
         form=form,
         spectacles=spectacles,
         season_id=season_id,
         user=context.g.pceen,
         visibility=visibility,
         saison=saison,
-        compact=compact,
         brochure=brochure,
         can_edit=can_edit,
         folder=folder,
@@ -267,7 +264,7 @@ def pceens() -> typing.RouteReturn:
         pceen.discontent = form_discontent["discontent"].data
 
         db.session.commit()
-        flask.flash(_("Mécontentement édité."))
+        flask.flash(_("Mécontentement édité."), "success")
         return flask.redirect(flask.url_for("club_q.pceens", season_id=season_id))
 
     return flask.render_template(
@@ -507,7 +504,7 @@ def salles() -> typing.RouteReturn:
             salle.longitude = form_salle["longitude"].data
 
             db.session.commit()
-            flask.flash(_("Salle ajoutée."))
+            flask.flash(_("Salle ajoutée."), "success")
             return flask.redirect(flask.url_for("club_q.salles"))
 
         delete = form_salle["delete"].data
@@ -516,7 +513,7 @@ def salles() -> typing.RouteReturn:
         if delete:
             db.session.delete(salle)
             db.session.commit()
-            flask.flash(_("Salle supprimée."))
+            flask.flash(_("Salle supprimée."), "success")
             return flask.redirect(flask.url_for("club_q.salles"))
 
         else:
@@ -528,7 +525,7 @@ def salles() -> typing.RouteReturn:
             salle.longitude = form_salle["longitude"].data
 
             db.session.commit()
-            flask.flash(_("Salle éditée."))
+            flask.flash(_("Salle éditée."), "success")
             return flask.redirect(flask.url_for("club_q.salles"))
 
     return flask.render_template(
@@ -632,7 +629,7 @@ def saisons() -> typing.RouteReturn:
 
             db.session.add(saison)
             db.session.commit()
-            flask.flash(_("Saison ajoutée."))
+            flask.flash(_("Saison ajoutée."), "success")
             return flask.redirect(flask.url_for("club_q.saisons"))
 
         delete = form_saison["delete"].data
@@ -642,10 +639,11 @@ def saisons() -> typing.RouteReturn:
             db.session.delete(saison)
 
             path = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], str(saison.id))
-            os.rmdir(path)
+            if os.path.exists(path):
+                os.rmdir(path)
 
             db.session.commit()
-            flask.flash(_("Saison supprimée."))
+            flask.flash(_("Saison supprimée."), "success")
             return flask.redirect(flask.url_for("club_q.saisons"))
 
         else:
@@ -657,7 +655,7 @@ def saisons() -> typing.RouteReturn:
             saison.attributions_visible = form_saison["attributions_visible"].data
 
             db.session.commit()
-            flask.flash(_("Saison éditée."))
+            flask.flash(_("Saison éditée."), "success")
             return flask.redirect(flask.url_for("club_q.saisons"))
 
     return flask.render_template(
@@ -726,7 +724,7 @@ def attribution_manager() -> typing.RouteReturn:
             db.session.scalars(db.select(GlobalSetting).filter_by(key="PROMO_1A")).one().value = form_algo_setting.promo.data
 
             db.session.commit()
-            flask.flash(_("Mis à jour."))
+            flask.flash(_("Mis à jour."), "success")
 
         launch = form_algo_setting["launch_algorithm"].data
         if launch:
@@ -760,11 +758,11 @@ def attribution_manager() -> typing.RouteReturn:
                 """
                 # Commit the changes to the database
                 db.session.commit()
-                flask.flash(_("Algorithme exécuté et résultats sauvegardés."))
+                flask.flash(_("Algorithme exécuté et résultats sauvegardés."), "success")
             else:
                 # Rollback any changes proposed to the database
                 db.session.rollback()
-                flask.flash(_("Algorithme exécuté."))
+                flask.flash(_("Algorithme exécuté."), "success")
 
             try:
                 # Get the last log file of algorithm attribution
@@ -890,7 +888,7 @@ def options() -> typing.RouteReturn:
         db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value = form_setting.saison.data
 
         db.session.commit()
-        flask.flash(_("Mis à jour."))
+        flask.flash(_("Mis à jour."), "success")
 
     return flask.render_template("club_q/options.html", view="options", form_setting=form_setting, user=context.g.pceen)
 
@@ -1219,7 +1217,7 @@ def brochures() -> typing.RouteReturn:
                 )
                 form["pdf_file"].data.save(path)
 
-                flask.flash(_("Plaquette ajoutée."))
+                flask.flash(_("Plaquette ajoutée."), "success")
                 return flask.redirect(flask.url_for("club_q.brochures"))
 
     brochure_id_list = [brochure.id for brochure in brochures]
@@ -1286,7 +1284,7 @@ def brochure_delete(id: int) -> typing.RouteReturn:
 
     os.remove(path)
 
-    flask.flash(_("Plaquette supprimée."))
+    flask.flash(_("Plaquette supprimée."), "success")
     return flask.redirect(flask.url_for("club_q.brochures"))
 
 
@@ -1299,7 +1297,7 @@ def edit_text():
     with open(path, "w") as file:
         file.write(content)
 
-    flask.flash(_("Introduction mise à jour."))
+    flask.flash(_("Introduction mise à jour."), "success")
     return flask.redirect(flask.url_for("club_q.main"))
 
 

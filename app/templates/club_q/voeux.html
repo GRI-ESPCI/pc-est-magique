@@ -217,31 +217,15 @@
           <td>{{ voeu.places_attribuees }}</td>
           <td>{{ babel.format_currency(voeu.spectacle.unit_price * voeu.places_attribuees, "EUR") }}</td>
           <td>
-            <div
-              data-bs-toggle="tooltip"
-              title="{{ _('Éditer le voeu') }}"
-            >
-              <button
-                class="btn btn-outline-danger p-1 pt-0"
-                data-bs-target="#mo-voeu-edit"
-                data-bs-toggle="modal"
-                data-voeu-id="{{ voeu.id }}"
-                data-voeu-spectacle="{{ voeu.spectacle.nom }}"
-                data-voeu-pceen="{{ voeu.pceen.full_name }}"
-                data-voeu-priorite="{{ voeu.priorite }}"
-                data-voeu-places-demandees="{{ voeu.places_demandees }}"
-                data-voeu-places-minimum="{{ voeu.places_minimum }}"
-                data-voeu-places-attribuees="{{ voeu.places_attribuees }}"
-              >
-                <svg
-                  class="bi flex-shrink-0"
-                  width="18"
-                  height="18"
-                >
-                  {{ macros.bootstrap_icon("pen") }}
-                </svg>
-              </button>
-            </div>
+            {% call macros.edit_row_btn(_('Éditer le voeu'), '#mo-voeu-edit') %}
+              data-voeu-id="{{ voeu.id }}"
+              data-voeu-spectacle="{{ voeu.spectacle.nom }}"
+              data-voeu-pceen="{{ voeu.pceen.full_name }}"
+              data-voeu-priorite="{{ voeu.priorite }}"
+              data-voeu-places-demandees="{{ voeu.places_demandees }}"
+              data-voeu-places-minimum="{{ voeu.places_minimum }}"
+              data-voeu-places-attribuees="{{ voeu.places_attribuees }}"
+            {% endcall %}
           </td>
         </tr>
         {% endfor %}

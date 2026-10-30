@@ -575,7 +575,7 @@ def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect, can_edi
 
                 db.session.add(voeu)
                 db.session.commit()
-                flask.flash(_("Voeu ajouté."))
+                flask.flash(_("Voeu ajouté."), "success")
                 return flask.redirect(redirect)
 
     if form_edit_voeu.is_submitted() and can_edit:
@@ -585,7 +585,7 @@ def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect, can_edi
             db.session.delete(voeu)
 
             db.session.commit()
-            flask.flash(_("Voeu supprimé."))
+            flask.flash(_("Voeu supprimé."), "success")
             return flask.redirect(redirect)
 
         if form_edit_voeu.validate():
@@ -597,7 +597,7 @@ def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect, can_edi
             voeu.places_attribuees = form_edit_voeu["places_attribuees_edit"].data
 
             db.session.commit()
-            flask.flash(_("Voeu édité."))
+            flask.flash(_("Voeu édité."), "success")
             return flask.redirect(redirect)
 
 
@@ -644,34 +644,17 @@ def spectacle_form(salles, salle, season_id, redirect, can_edit):
 
             db.session.commit()
 
-            if form_spectacle["image"].data is not None:
-                path = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], str(spectacle.season.id))
-                save_path = os.path.join(path, str(spectacle.id) + ".jpg")
-                if not os.path.exists(path):
-                    os.makedirs(path)
-                if os.path.exists(save_path):
-                    os.remove(save_path)
-                form_spectacle["image"].data.save(save_path)
-
-            flask.flash(_("Spectacle ajouté."))
+            flask.flash(_("Spectacle ajouté."), "success")
             return flask.redirect(redirect)
 
         delete = form_spectacle["delete"].data
         spectacle = db.session.scalars(db.select(ClubQSpectacle).filter_by(id=form_spectacle["id"].data)).one()
 
-        path = os.path.join(flask.current_app.config["CLUB_Q_BASE_PATH"], str(spectacle.season.id))
-        save_path = os.path.join(path, str(spectacle.id) + ".jpg")
-
         if delete:
-            try:
-                os.remove(save_path)
-            except FileNotFoundError:
-                pass
-
             db.session.delete(spectacle)
             db.session.commit()
 
-            flask.flash(_("Spectacle supprimé."))
+            flask.flash(_("Spectacle supprimé."), "success")
             return flask.redirect(redirect)
 
         else:
@@ -683,13 +666,6 @@ def spectacle_form(salles, salle, season_id, redirect, can_edit):
             spectacle.nb_tickets = form_spectacle["nb_tickets"].data
             spectacle.unit_price = form_spectacle["price"].data
 
-            if form_spectacle["image"].data is not None:
-                if not os.path.exists(path):
-                    os.makedirs(path)
-                if os.path.exists(save_path):
-                    os.remove(save_path)
-                form_spectacle["image"].data.save(save_path)
-
             db.session.commit()
-            flask.flash(_("Spectacle édité."))
+            flask.flash(_("Spectacle édité."), "success")
             return flask.redirect(redirect)

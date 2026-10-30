@@ -76,7 +76,9 @@ class PCeen(flask_login.UserMixin, Model):
     bar_deposit: Column[bool | None] = column(sa.Boolean(), default=False, nullable=True)
 
     # Club Q info
-    discontent: Column[float] = column(sa.Numeric(precision=2, asdecimal=False), nullable=True)
+    discontent: Column[float | None] = column(
+        sa.Numeric(precision=6, scale=2, asdecimal=False), nullable=True
+    )
 
     # Casino info
     casino_coins: Column[int] = column(sa.Integer(), nullable=False, default=500)

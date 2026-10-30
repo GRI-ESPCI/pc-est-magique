@@ -1,357 +1,423 @@
-{% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} {{ super() }}
+{% extends "base.html" %}
+{% import "_form.html" as wtf %}
 
+{% block scripts %}
+{{ super() }}
 
 {% if can_edit %}
 <script defer>
-  var folder = {{folder|tojson}}
+  var folder = {{ folder|tojson }}
 </script>
-<script
-  src='{{url_for("static", filename="js/quill.js") }}'
-  defer
-></script>
-<script
-  src='{{url_for("static", filename="js/wysiwyg_editor.js") }}'
-  defer
-></script>
+<script src='{{ url_for("static", filename="js/quill.js") }}' defer></script>
+<script src='{{ url_for("static", filename="js/wysiwyg_editor.js") }}' defer></script>
 {% endif %}
 
-{% if compact == 1 %}
-<script
-  src='{{url_for("static", filename="js/sort-table.js") }}'
-  defer
-></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', function () {
+  const searchInput = document.getElementById('spectacle-search');
+  const cards = document.querySelectorAll('.clubq-spectacle-card');
+  const emptySearch = document.getElementById('spectacle-search-empty');
+  const prioInputs = document.querySelectorAll('.voeu-input-priorite');
+  const placesInputs = document.querySelectorAll('.voeu-input-places');
+  const minInputs = document.querySelectorAll('.voeu-input-places-min');
+  const submitBtn = document.getElementById('btn-submit-wishes');
+  const validationErrorMsg = document.getElementById('validation-error-msg');
+  const summaryCount = document.getElementById('summary-wishes-count');
+  const summaryLabel = document.getElementById('summary-wishes-label');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', function (e) {
+      const q = e.target.value.trim().toLowerCase();
+      let visibleCount = 0;
+      cards.forEach(card => {
+        const name = card.dataset.name || '';
+        const salle = card.dataset.salle || '';
+        const cat = card.dataset.category || '';
+        const match = !q || name.includes(q) || salle.includes(q) || cat.includes(q);
+        card.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+      if (emptySearch) {
+        emptySearch.style.display = (visibleCount === 0 && q) ? '' : 'none';
+      }
+    });
+  }
+
+  function getDuplicates() {
+    const counts = {};
+    const dupes = new Set();
+    prioInputs.forEach(input => {
+      const v = parseInt(input.value.trim(), 10);
+      if (!isNaN(v) && v > 0) {
+        counts[v] = (counts[v] || 0) + 1;
+        if (counts[v] > 1) dupes.add(v);
+      }
+    });
+    return dupes;
+  }
+
+  function updateCardState(card, dupes) {
+    const prioInput = card.querySelector('.voeu-input-priorite');
+    const placesInput = card.querySelector('.voeu-input-places');
+    const minInput = card.querySelector('.voeu-input-places-min');
+    const badge = card.querySelector('.voeu-badge');
+    const prioTile = card.querySelector('.clubq-prio-tile');
+    const minTile = minInput ? minInput.closest('.clubq-input-tile') : null;
+    const val = prioInput ? parseInt(prioInput.value.trim(), 10) : 0;
+    const placesVal = placesInput ? parseInt(placesInput.value.trim(), 10) : 0;
+    const minVal = minInput ? parseInt(minInput.value.trim(), 10) : 0;
+    const hasMinError = !isNaN(minVal) && minVal > 0 && !isNaN(placesVal) && placesVal > 0 && minVal > placesVal;
+
+    if (minTile) {
+      minTile.classList.toggle('has-duplicate', hasMinError);
+    }
+
+    if (!isNaN(val) && val > 0) {
+      if (prioTile) {
+        prioTile.classList.add('is-active');
+        prioTile.classList.toggle('has-duplicate', dupes.has(val));
+      }
+      if (badge) {
+        if (dupes.has(val)) {
+          badge.textContent = '{{ _("Doublon #") }}' + val;
+          badge.className = 'badge bg-danger text-white rounded-pill px-2 py-1 voeu-badge';
+        } else {
+          badge.textContent = '{{ _("Vœu #") }}' + val;
+          badge.className = 'badge bg-primary rounded-pill px-2 py-1 voeu-badge';
+        }
+      }
+    } else {
+      if (prioTile) {
+        prioTile.classList.remove('is-active', 'has-duplicate');
+      }
+      if (badge) {
+        badge.textContent = '';
+        badge.className = 'badge bg-primary rounded-pill px-2 py-1 voeu-badge d-none';
+      }
+    }
+    return hasMinError;
+  }
+
+  function updateValidationAndSummary() {
+    const dupes = getDuplicates();
+    let totalWishes = 0;
+    prioInputs.forEach(input => {
+      const v = parseInt(input.value.trim(), 10);
+      if (!isNaN(v) && v > 0) totalWishes++;
+    });
+
+    if (summaryCount) summaryCount.textContent = totalWishes;
+    if (summaryLabel) {
+      summaryLabel.textContent = totalWishes >= 2 ? '{{ _("vœux sélectionnés") }}' : '{{ _("vœu sélectionné") }}';
+    }
+
+    let anyMinError = false;
+    cards.forEach(card => {
+      if (updateCardState(card, dupes)) anyMinError = true;
+    });
+
+    let errorMessage = '';
+    if (dupes.size > 0) {
+      errorMessage = '{{ _("Deux vœux ont la même priorité !") }}';
+    } else if (anyMinError) {
+      errorMessage = '{{ _("Le minimum dépasse le nombre de places demandées !") }}';
+    }
+
+    if (errorMessage) {
+      if (validationErrorMsg) {
+        validationErrorMsg.textContent = errorMessage;
+        validationErrorMsg.classList.remove('d-none');
+      }
+      if (submitBtn) submitBtn.disabled = true;
+    } else {
+      if (validationErrorMsg) {
+        validationErrorMsg.textContent = '';
+        validationErrorMsg.classList.add('d-none');
+      }
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  }
+
+  // Validate and update summary on priority/places/min input/change
+  [...prioInputs, ...placesInputs, ...minInputs].forEach(input => {
+    input.addEventListener('change', function () {
+      const val = parseInt(input.value.trim(), 10);
+      if (isNaN(val) || val <= 0) {
+        input.value = '';
+      }
+      updateValidationAndSummary();
+    });
+    input.addEventListener('input', updateValidationAndSummary);
+  });
+
+  // Focus input when clicking anywhere on a tile
+  document.querySelectorAll('.clubq-input-tile').forEach(tile => {
+    tile.addEventListener('click', function (e) {
+      if (e.target.tagName !== 'INPUT') {
+        const input = tile.querySelector('input');
+        if (input) input.focus();
+      }
+    });
+  });
+
+  updateValidationAndSummary();
+});
+</script>
+{% endblock %}
+
+{% if can_edit %}
+{% block styles %}
+{{ super() }}
+<link defer href='{{ url_for("static", filename="css/quill.snow.css") }}' rel="stylesheet">
+{% endblock %}
 {% endif %}
 
-{% endblock %} {% if can_edit %}{% block styles %}{{ super() }}
-
-<link defer href='{{url_for("static", filename="css/quill.snow.css") }}' rel="stylesheet">
-{% endblock %} {% endif %}{% block app_content %} {% include 'club_q/common.html' %}
-
-
-<div class="row mb-3">
-  <div class="col">
-    <h1>{{ title }}</h1>
-  </div>
-</div>
+{% block app_content %}
+{% include 'club_q/common.html' %}
 
 {% include 'wysiwyg.html' %}
 
-<br />
-{% if visibility == 1 %}
-<h1>{{saison.nom}}</h1>
-<em>{{ _("Du ")}} {{ saison.debut }} {{ _(" au ")}} {{ saison.fin }}</em>
-
-<br />
-<br />
-<div class="d-flex justify-content-between align-items-center">
-  <div
-    class="btn-toolbar"
-    role="toolbar"
-  >
-    <div class="d-flex align-items-center">
-      <div
-        class="d-flex flex-wrap gap-2"
-        role="group"
-        name="clubq_navbar"
-      >
-        <a
-          role="button"
-          href="{{ url_for('club_q.main', compact=0) }}"
-          class="btn {{ 'btn-primary' if compact == 0 else 'btn-outline-primary' }}"
-        >
-          {{ _("Version détaillée") }}
-        </a>
-        <a
-          role="button"
-          href="{{ url_for('club_q.main', compact=1) }}"
-          class="btn {{ 'btn-primary' if compact == 1 else 'btn-outline-primary' }}"
-        >
-          {{ _("Version compacte") }}
-        </a>
-      </div>
-    </div>
+{% if visibility == 1 and saison %}
+{# En-tête de la saison #}
+<div class="clubq-season-header d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div>
+    <h2 class="fw-bold mb-1">{{ saison.nom }}</h2>
+    <p class="text-body-secondary mb-0">
+      <svg class="bi me-1" width="16" height="16" role="img">{{ macros.bootstrap_icon("calendar3") }}</svg>
+      {{ _("Du") }} {{ saison.debut.strftime('%d/%m/%Y') if saison.debut and saison.debut.strftime is defined else saison.debut }}
+      {{ _("au") }} {{ saison.fin.strftime('%d/%m/%Y') if saison.fin and saison.fin.strftime is defined else saison.fin }}
+      {% if spectacles %}
+        &middot; <span class="fw-semibold text-body">{{ spectacles|length }}</span> {{ _("spectacles proposés") }}
+      {% endif %}
+    </p>
   </div>
   {% if brochure != None %}
   <a
     role="button"
     href="{{ url_for('club_q.brochure_reader', id=brochure.id) }}"
-    class="btn btn-primary"
+    class="btn btn-outline-primary d-flex align-items-center gap-2 fw-bold shadow-sm px-3 py-2 rounded-pill"
   >
-    {{_("Lire la plaquette")}}
+    <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+      {{ macros.bootstrap_icon("book") }}
+    </svg>
+    <span>{{ _("Lire la plaquette") }}</span>
   </a>
   {% endif %}
 </div>
-<br />
-{% if compact == 0 %}
-<form
-  action=""
-  method="post"
-  role="form"
->
-  {{ form.hidden_tag() }} {% for spect in spectacles %}
-  <div class="row">
-    <div class="col-3 d-flex align-items-center justify-content-center">
-      <img
-        src="{{spect.src}}"
-        alt="{{ spect.nom }}"
-        class="img-thumbnail"
-      />
-    </div>
-    <div class="col-9">
-      <h3 onclick="window.location='{{ url_for('club_q.spectacle_id', id=spect.id) }}';"><b>{{ spect.nom }}</b></h3>
-      <h5> <span onclick="window.location='{{ url_for('club_q.salle_id', id=spect.salle.id) }}';">{{ spect.salle.nom }} </span>- <em>{{spect.date}}</em> - {{ babel.format_currency(spect.unit_price, "EUR") }}
-        <br />
-        <h7>
-        {{ spect.categorie }}
-      </h7>
 
-      <p>{{ spect.description }}</p>
+{# Barre de recherche rapide #}
+{% if spectacles %}
+<div class="mb-4 pb-1">
+  <div class="m3-search-bar d-flex align-items-center px-3 w-100" style="max-width: 480px;">
+    <svg class="bi text-body-secondary ms-2 flex-shrink-0" width="18" height="18">
+      {{ macros.bootstrap_icon("search") }}
+    </svg>
+    <input
+      type="text"
+      id="spectacle-search"
+      class="border-0 shadow-none px-3 w-100 m3-input"
+      placeholder="{{ _('Rechercher un spectacle, une salle, un genre…') }}"
+      autocomplete="off"
+    >
+  </div>
+</div>
 
-      <div class="row mb-5">
-        <div class="col-sm-4">
-          <p>
-            <b>{{ _("Priorité") }}</b>
-            {{ getattr(form, "priorite_" + str(spect.id))() }}
-          </p>
+<form action="" method="post" role="form" id="clubq-reservations-form">
+  {{ form.hidden_tag() }}
+
+  <div id="spectacles-list" class="d-flex flex-column gap-3 mb-4">
+    {% for spect in spectacles %}
+    {% set prio_field = getattr(form, 'priorite_' + str(spect.id)) %}
+    {% set places_field = getattr(form, 'nb_places_' + str(spect.id)) %}
+    {% set min_field = getattr(form, 'nb_places_minimum_' + str(spect.id)) %}
+    {% set prio_val = prio_field.data %}
+    {% set has_voeu = prio_val is not none and prio_val != '' and prio_val > 0 %}
+
+    <div
+      class="card border-0 shadow-sm rounded-4 p-3 bg-body-tertiary clubq-spectacle-card position-relative"
+      data-id="{{ spect.id }}"
+      data-name="{{ spect.nom|lower }}"
+      data-salle="{{ spect.salle.nom|lower if spect.salle else '' }}"
+      data-category="{{ (spect.categorie or '')|lower }}"
+    >
+      <div class="row align-items-center g-3">
+        {# Colonne Détails #}
+        <div class="col-12 col-lg-7">
+          <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+            <h5 class="fw-bold mb-0 text-break">
+              {{ spect.nom }}
+            </h5>
+            <span class="badge bg-primary rounded-pill px-2 py-1 voeu-badge {{ '' if has_voeu else 'd-none' }}">
+              {% if has_voeu %}{{ _("Vœu #%(p)s", p=prio_val) }}{% endif %}
+            </span>
+          </div>
+
+          <div class="d-flex flex-wrap align-items-center gap-2 mb-2 pt-1">
+            {% if spect.salle %}
+            <button
+              type="button"
+              data-bs-toggle="modal"
+              data-bs-target="#mo-salle-{{ spect._salle_id }}"
+              class="clubq-chip clubq-chip-venue border-0"
+              title="{{ _('Salle') }}"
+            >
+              <svg class="bi opacity-75 flex-shrink-0" width="13" height="13" role="img">
+                {{ macros.bootstrap_icon("building") }}
+              </svg>
+              <span>{{ spect.salle.nom }}</span>
+            </button>
+            {% endif %}
+
+            <span
+              class="clubq-chip clubq-chip-date"
+              title="{{ _('Date et heure') }}"
+            >
+              <svg class="bi opacity-75 flex-shrink-0" width="13" height="13" role="img">
+                {{ macros.bootstrap_icon("calendar3") }}
+              </svg>
+              <span>{{ spect.date.strftime('%d/%m/%Y à %H:%M') if spect.date and spect.date.strftime is defined else spect.date }}</span>
+            </span>
+
+            {% if spect.categorie %}
+            <span
+              class="clubq-chip clubq-chip-category"
+              title="{{ _('Catégorie') }}"
+            >
+              <svg class="bi flex-shrink-0" width="12" height="12" role="img">
+                {{ macros.bootstrap_icon("tag") }}
+              </svg>
+              <span>{{ spect.categorie }}</span>
+            </span>
+            {% endif %}
+
+            <span
+              class="clubq-chip clubq-chip-price"
+              title="{{ _('Prix unitaire') }}"
+            >
+              <span>{{ babel.format_currency(spect.unit_price, "EUR") }}</span>
+            </span>
+          </div>
+
+          {% if spect.description %}
+          <div class="text-body-secondary small text-break line-clamp-2 mt-1">
+            {{ spect.description }}
+          </div>
+          {% endif %}
         </div>
 
-        <div class="col-sm-4">
-          <p>
-            <b>{{ _("Nombre de places") }}</b>
-            {{ getattr(form, "nb_places_" + str(spect.id))() }}
-          </p>
-        </div>
+        {# Colonne Formulaire (Voeu) #}
+        <div class="col-12 col-lg-5 d-flex justify-content-lg-end">
+          <div class="clubq-inputs-cluster d-flex align-items-center gap-2 w-100 justify-content-center justify-content-lg-end">
+            <div class="clubq-input-tile clubq-prio-tile {{ 'is-active' if has_voeu }}">
+              <label class="clubq-input-label" for="{{ prio_field.id }}">
+                {{ _("Priorité") }}
+              </label>
+              {{ prio_field(class_="clubq-number-input voeu-input-priorite", placeholder="—", type="number", min="1") }}
+            </div>
 
-        <div class="col-sm-4">
-          <p>
-            <b>{{ _("Places minimum") }}</b>
-            {{ getattr(form, "nb_places_minimum_" + str(spect.id))() }}
-          </p>
+            <div class="clubq-input-tile">
+              <label class="clubq-input-label" for="{{ places_field.id }}">
+                {{ _("Places") }}
+              </label>
+              {{ places_field(class_="clubq-number-input voeu-input-places", placeholder="0", type="number", min="1") }}
+            </div>
+
+            <div class="clubq-input-tile">
+              <label class="clubq-input-label" for="{{ min_field.id }}">
+                {{ _("Min.") }}
+              </label>
+              {{ min_field(class_="clubq-number-input voeu-input-places-min", placeholder="0", type="number", min="1") }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <hr align="CENTER" />
-  {% endfor %}
+    {% endfor %}
 
-  <div class="row mt-3">
-    <div class="col text-center">
-      <button
-        type="submit"
-        class="btn btn-lg btn-primary"
-      >
-        {{ _("Mise à jour") }}
-      </button>
+    <div id="spectacle-search-empty" class="text-center text-body-secondary py-5" style="display: none;">
+      <p class="mb-0 fs-5">{{ _("Aucun spectacle ne correspond à votre recherche.") }}</p>
     </div>
   </div>
-</form>
 
-{% elif compact == 1 %}
-<form
-  action=""
-  method="post"
-  role="form"
->
-  {{ form.hidden_tag() }} 
-<div class="row mb-3">
-  <div class="col px-0"><div class="table-responsive rounded-4 shadow-sm bg-body-tertiary mb-4">
-    <table class="table table-hover table-bordered">
-      <thead>
-        <tr>
-          <th
-            scope="col"
-            onclick="sort('name');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Spectacle") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-name"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('salle');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Salle") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-salle"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('category');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Catégorie") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-category"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('date');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Date") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-date"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('price');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Prix") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-price"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('priority');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Priorité") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-priority"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('asked');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Places voulues") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-asked"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('min');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Places minimum") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-min"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-        </tr>
-      </thead>
-      <tbody id="sort-table">
-        {% for spect in spectacles %}
-        <tr
-          data-name="{{ spect.nom }}"
-          data-salle="{{ spect.salle.nom }}"
-          data-category="{{ spect.categorie }}"
-          data-date="{{ spect.date }}"
-          data-price="{{ str(spect.unit_price).rjust(5, '0') }}"
-          data-priority="{{ str(getattr(form, 'priorite_' + str(spect.id)).data).rjust(5, '0') }}"
-          data-asked="{{ str(getattr(form, 'nb_places_' + str(spect.id)).data).rjust(5, '0') }}"
-          data-min="{{ str(getattr(form, 'nb_places_minimum_' + str(spect.id)).data).rjust(5, '0') }}"
-
-        >
-          <td onclick="window.location='{{ url_for('club_q.spectacle_id', id=spect.id) }}';">
-            <p class="overflow no_extra">{{ spect.nom }}</p>
-          </td>
-          <td onclick="window.location='{{ url_for('club_q.salle_id', id=spect._salle_id) }}';">
-            <p class="overflow no_extra">{{ spect.salle.nom }}</p>
-          </td>
-          <td>{{ spect.categorie }}</td>
-          <td>{{ spect.date}}</td>
-          <td>{{ babel.format_currency(spect.unit_price, "EUR") }}</td>
-
-          <td>{{ getattr(form, "priorite_" + str(spect.id))() }}</td>
-          <td>{{ getattr(form, "nb_places_" + str(spect.id))()}}</td>
-          <td>{{ getattr(form, "nb_places_minimum_" + str(spect.id))()}}</td>
-        </tr>
-
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-<div class="row mt-3">
-  <div class="col text-center">
+  {# Barre fixe / soumission #}
+  <div class="sticky-bottom bg-body-tertiary p-3 rounded-4 shadow-lg border d-flex flex-wrap align-items-center justify-content-between gap-3 mb-5" style="z-index: 100;">
+    <div class="d-flex align-items-center flex-wrap gap-3">
+      <div class="text-body-secondary">
+        <span class="fw-bold text-body fs-5" id="summary-wishes-count">0</span>
+        <span class="ms-1" id="summary-wishes-label">{{ _("vœu sélectionné") }}</span>
+      </div>
+      <div id="validation-error-msg" class="clubq-validation-error d-none"></div>
+    </div>
     <button
       type="submit"
-      class="btn btn-lg btn-primary"
+      id="btn-submit-wishes"
+      class="btn btn-primary d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2 rounded-pill"
     >
-      {{ _("Mise à jour") }}
+      <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+        {{ macros.bootstrap_icon("check2-circle") }}
+      </svg>
+      <span>{{ _("Enregistrer mes choix") }}</span>
     </button>
   </div>
-</div>
 </form>
 
+{% macro clean_val(val) -%}
+  {{- val if val and (val|string|trim|lower) not in ['', 'null', 'none', 'nan'] else '' -}}
+{%- endmacro %}
+{% set ns = namespace(seen=[]) %}
+{% for spect in spectacles %}
+{% if spect.salle and spect._salle_id not in ns.seen %}
+{% set ns.seen = ns.seen + [spect._salle_id] %}
+{% set s_adresse = clean_val(spect.salle.adresse) %}
+{% set s_url = clean_val(spect.salle.url) %}
+{% set s_desc = clean_val(spect.salle.description) %}
+<div class="modal fade" id="mo-salle-{{ spect._salle_id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4 shadow-lg">
+      <div class="modal-header border-bottom-0 pb-0 px-4 pt-4">
+        <h4 class="modal-title fw-bold">{{ spect.salle.nom }}</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Fermer') }}"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="p-3 rounded-4 mb-3 bg-body-tertiary">
+          <span class="small text-primary fw-bold text-uppercase d-block mb-1">{{ _("Adresse") }}</span>
+          <div class="fw-semibold text-body">
+            {% if s_adresse %}
+            <a href="https://www.openstreetmap.org/search?query={{ s_adresse | urlencode }}" target="_blank" rel="noopener">{{ s_adresse }}</a>
+            {% else %}{{ _("Non spécifié") }}{% endif %}
+          </div>
+        </div>
+        <div class="p-3 rounded-4 mb-3 bg-body-tertiary">
+          <span class="small text-primary fw-bold text-uppercase d-block mb-1">{{ _("Site internet") }}</span>
+          <div class="fw-semibold text-body text-break">
+            {% if s_url %}
+            {% set s_href = s_url if s_url.startswith(('http://', 'https://')) else 'https://' ~ s_url %}
+            <a href="{{ s_href }}" target="_blank" rel="noopener">{{ s_url }}</a>
+            {% else %}{{ _("Non spécifié") }}{% endif %}
+          </div>
+        </div>
+        <div class="p-3 rounded-4 mb-4 bg-body-tertiary">
+          <span class="small text-primary fw-bold text-uppercase d-block mb-1">{{ _("À propos") }}</span>
+          <div class="text-body" style="white-space: pre-wrap;">{{ s_desc or _("Non spécifié") }}</div>
+        </div>
+        <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-semibold" data-bs-dismiss="modal">{{ _("Fermer") }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endfor %}
+{% else %}
+<div class="alert alert-info rounded-4 border-0 shadow-sm p-4 text-center my-4">
+  {{ _("Aucun spectacle n'est proposé pour cette saison pour le moment.") }}
+</div>
+{% endif %}
+
+{% else %}
+<div class="alert alert-warning rounded-4 border-0 shadow-sm p-4 text-center my-4">
+  <h5 class="fw-bold mb-0">{{ _("Les réservations ne sont pas ouvertes en ce moment.") }}</h5>
+</div>
 {% endif %}
 
 
-{% else %}
-<h4>{{_("Les réservations ne sont pas ouvertes en ce moment.")}}</h4>
-{% endif %} {% endblock %}
+{% endblock %}

@@ -10,7 +10,21 @@
 
 {% endblock %} {% block app_content %} {% include 'club_q/common.html' %}
 
-<h4>{{ _("PCéens : ")}}</h4>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+  <h4 class="mb-0">{{ _("PCéens : ")}}</h4>
+  <div class="m3-search-bar d-flex align-items-center px-3 w-100" style="max-width: 380px;">
+    <svg class="bi text-body-secondary ms-2 flex-shrink-0" width="18" height="18">
+      {{ macros.bootstrap_icon("search") }}
+    </svg>
+    <input
+      type="text"
+      id="pceen-search"
+      class="border-0 shadow-none px-3 w-100 m3-input"
+      placeholder="{{ _('Rechercher un PCéen, une promo…') }}"
+      autocomplete="off"
+    >
+  </div>
+</div>
 
 <div class="row mb-3">
   <div class="col px-0"><div class="table-responsive rounded-4 shadow-sm bg-body-tertiary mb-4">
@@ -203,27 +217,11 @@
           <td>{{ pceens[i].discontent }}</td>
           <td>{{ babel.format_currency(pceens_a_payer[i], "EUR")}}</td>
           <td>
-            <div
-              data-bs-toggle="tooltip"
-              title="{{ _('Éditer le mécontement') }}"
-            >
-              <button
-                class="btn btn-outline-danger p-1 pt-0"
-                data-bs-target="#mo-pceen-edit"
-                data-bs-toggle="modal"
-                data-pceen-id="{{ pceens[i].id }}"
-                data-pceen-nom="{{ pceens[i].full_name}}"
-                data-pceen-discontent="{{ pceens[i].discontent }}"
-              >
-                <svg
-                  class="bi flex-shrink-0"
-                  width="18"
-                  height="18"
-                >
-                  {{ macros.bootstrap_icon("pen") }}
-                </svg>
-              </button>
-            </div>
+            {% call macros.edit_row_btn(_('Éditer le mécontentement'), '#mo-pceen-edit') %}
+              data-pceen-id="{{ pceens[i].id }}"
+              data-pceen-nom="{{ pceens[i].full_name }}"
+              data-pceen-discontent="{{ pceens[i].discontent }}"
+            {% endcall %}
           </td>
         </tr>
         {% endfor %}

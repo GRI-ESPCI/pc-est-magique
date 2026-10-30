@@ -139,7 +139,7 @@
         </th>
         {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
         <th>
-            <span>{{ _("Attribution visible") }}</span>
+            <span>{{ _("Visible") }}</span>
         </th>
         <th
           scope="col"
@@ -267,31 +267,15 @@
         <td>{{ saison_nb_spectacles[i]}}</td>
         <td>{{ saison_nb_voeux[i] }}</td>
         <td>
-          <div
-            data-bs-toggle="tooltip"
-            title="{{ _('Éditer la saison') }}"
-          >
-            <button
-              class="btn btn-outline-danger p-1 pt-0"
-              data-bs-target="#mo-saison-edit"
-              data-bs-toggle="modal"
-              data-saison-id="{{ saisons[i].id }}"
-              data-saison-nom="{{ saisons[i].nom }}"
-              data-saison-promo="{{ saisons[i].promo_orga }}"
-              data-saison-debut="{{ saisons[i].debut }}"
-              data-saison-fin="{{ saisons[i].fin }}"
-              data-saison-fin-inscription="{{ saisons[i].fin_inscription }}"
-              data-saison-attributions-visible="{{ saisons[i].attributions_visible }}"
-            >
-              <svg
-                class="bi flex-shrink-0"
-                width="18"
-                height="18"
-              >
-                {{ macros.bootstrap_icon("pen") }}
-              </svg>
-            </button>
-          </div>
+          {% call macros.edit_row_btn(_('Éditer la saison'), '#mo-saison-edit') %}
+            data-saison-id="{{ saisons[i].id }}"
+            data-saison-nom="{{ saisons[i].nom }}"
+            data-saison-promo="{{ saisons[i].promo_orga }}"
+            data-saison-debut="{{ saisons[i].debut }}"
+            data-saison-fin="{{ saisons[i].fin }}"
+            data-saison-fin-inscription="{{ saisons[i].fin_inscription }}"
+            data-saison-attributions-visible="{{ saisons[i].attributions_visible }}"
+          {% endcall %}
         </td>
         {% endif %}
       </tr>

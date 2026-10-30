@@ -7,15 +7,11 @@ moSpectacleAdd.addEventListener("show.bs.modal", function (event) {
   document.getElementsByName("salle_id")[1].value = null;
   document.getElementsByName("nom")[1].value = null;
   document.getElementsByName("categorie")[1].value = null;
-  document.getElementsByName("image")[1].value = null;
   document.getElementsByName("description")[1].value = null;
   document.getElementsByName("date")[1].value = null;
   document.getElementsByName("time")[1].value = null;
   document.getElementsByName("nb_tickets")[1].value = null;
   document.getElementsByName("price")[1].value = null;
-
-
-
 });
 
 
@@ -47,7 +43,6 @@ moSpectacleEdit.addEventListener("show.bs.modal", function (event) {
   document.getElementsByName("salle_id")[0].value = salleId;
   document.getElementsByName("nom")[0].value = spectacleNom;
   document.getElementsByName("categorie")[0].value = spectacleCategorie;
-  document.getElementsByName("image")[0].value = null;
   document.getElementsByName("description")[0].value = spectacleDescription;
   document.getElementsByName("date")[0].value = spectacleDate;
   document.getElementsByName("time")[0].value = spectacleTime;
