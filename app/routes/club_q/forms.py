@@ -62,7 +62,6 @@ class EditSaison(FlaskForm):
     debut = wtforms.DateField("Date de début de la saison", validators=[Optional()])
     fin = wtforms.DateField("Date de fin de la saison", validators=[Optional()])
     fin_inscription = wtforms.DateField("Date de fin d'inscription", validators=[Optional()])
-    attributions_visible = wtforms.IntegerField("Attributions visibles", validators=[Optional()])
     add = wtforms.SubmitField(_l("Ajouter"))
     modify = wtforms.SubmitField(_l("Modifier"))
     delete = wtforms.SubmitField(_l("Supprimer"))

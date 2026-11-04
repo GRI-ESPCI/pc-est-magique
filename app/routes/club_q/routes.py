@@ -624,8 +624,7 @@ def saisons() -> typing.RouteReturn:
             saison.debut = form_saison["debut"].data
             saison.fin = form_saison["fin"].data
             saison.fin_inscription = form_saison["fin_inscription"].data
-            saison.attributions_visible = form_saison["attributions_visible"].data
-
+            saison.attributions_visible = False
 
             db.session.add(saison)
             db.session.commit()
@@ -652,7 +651,6 @@ def saisons() -> typing.RouteReturn:
             saison.debut = form_saison["debut"].data
             saison.fin = form_saison["fin"].data
             saison.fin_inscription = form_saison["fin_inscription"].data
-            saison.attributions_visible = form_saison["attributions_visible"].data
 
             db.session.commit()
             flask.flash(_("Saison éditée."), "success")
