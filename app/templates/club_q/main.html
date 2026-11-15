@@ -165,12 +165,10 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 {% endblock %}
 
-{% if can_edit %}
 {% block styles %}
 {{ super() }}
-<link defer href='{{ url_for("static", filename="css/quill.snow.css") }}' rel="stylesheet">
+<link href='{{ url_for("static", filename="css/quill.snow.css") }}' rel="stylesheet">
 {% endblock %}
-{% endif %}
 
 {% block app_content %}
 {% include 'club_q/common.html' %}

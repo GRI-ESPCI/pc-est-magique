@@ -5,14 +5,12 @@ super() }}
   type="text/css"
   href="{{ url_for('static', filename='css/magazine.css') }}"
 />
-{% if can_edit %}
 <link
   rel="stylesheet"
   type="text/css"
   href='{{url_for("static", filename="css/quill.snow.css") }}'
-  rel="stylesheet"
 />
-{% endif %} {% endblock %}{% block scripts %} {{ super() }}
+{% endblock %}{% block scripts %} {{ super() }}
 
 {% if can_edit %}
 <script defer>var folder = {{ folder|tojson }};</script>

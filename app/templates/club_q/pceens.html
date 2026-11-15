@@ -7,6 +7,41 @@
   src='{{url_for("static", filename="js/club_q/pceens.js") }}'
   defer
 ></script>
+<script defer>
+document.addEventListener("DOMContentLoaded", function () {
+  const searchInput = document.getElementById("pceen-search");
+  const emptyRow = document.getElementById("pceen-search-empty");
+  if (!searchInput) return;
+
+  const normalize = (str) =>
+    (str || "")
+      .toString()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+
+  function filterRows() {
+    const q = normalize(searchInput.value.trim());
+    const rows = document.querySelectorAll("#sort-table tr");
+    let visibleCount = 0;
+    rows.forEach((row) => {
+      const name = normalize(row.dataset.name);
+      const promo = normalize(row.dataset.promo);
+      const id = normalize(row.cells[0] ? row.cells[0].textContent.trim() : "");
+      const match = !q || name.includes(q) || promo.includes(q) || id === q;
+      row.style.display = match ? "" : "none";
+      if (match) visibleCount++;
+    });
+    if (emptyRow) {
+      emptyRow.style.display = visibleCount === 0 && q ? "" : "none";
+    }
+  }
+
+  searchInput.addEventListener("input", filterRows);
+  window.addEventListener("pageshow", filterRows);
+  filterRows();
+});
+</script>
 
 {% endblock %} {% block app_content %} {% include 'club_q/common.html' %}
 
@@ -168,7 +203,7 @@
                   class="bi flex-shrink-0"
                   width="16"
                   height="16"
-                  id="sort-svg-discontent"
+                  id="sort-svg-cost"
                 >
                   <!-- Sort button inserted through JS -->
                 </svg>
@@ -227,6 +262,11 @@
         {% endfor %}
       </tbody>
       <tbody>
+        <tr id="pceen-search-empty" style="display: none;">
+          <td colspan="9" class="text-center text-body-secondary py-4">
+            {{ _("Aucun résultat correspondant à votre recherche.") }}
+          </td>
+        </tr>
         <tr>
           <td><b>{{ _("Total") }}</b></td>
           <td><b>{{ _("Nb de PCéens : ") }}{{nb_pceens}}</b></td>
@@ -240,7 +280,7 @@
         </tr>
       </tbody>
     </table>
-  </div>
+  </div></div>
 </div>
 
 <a
@@ -258,7 +298,7 @@
   class="modal fade"
   id="mo-pceen-edit"
   tabindex="-1"
-  aria-labelledby="mo-pceen-edit"
+  aria-labelledby="mo-pceen-edit-label"
   aria-hidden="true"
 >
   <div class="modal-dialog">
@@ -266,7 +306,7 @@
       <div class="modal-header">
         <h5
           class="modal-title"
-          id="mo-pceen-edit"
+          id="mo-pceen-edit-label"
         ></h5>
         <button
           type="button"

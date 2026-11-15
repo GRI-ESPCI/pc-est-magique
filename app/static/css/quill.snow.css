@@ -954,11 +954,16 @@
     font-family: inherit !important; font-size: 1rem !important;
 }
 .ql-editor { min-height: 200px; }
+.ql-editor.ql-readonly { min-height: 0; height: auto; padding: 0; overflow-y: visible; }
+.ql-editor.ql-readonly > * { cursor: auto; }
 .ql-editor.ql-blank::before { color: var(--bs-secondary-color) !important; font-style: italic !important; }
 
 
 html[data-theme="dark"] .ql-toolbar.ql-snow, html[data-theme="dark"] .ql-toolbar.ql-snow + .ql-container.ql-snow, html[data-theme="dark"] .ql-editor {
     background-color: #1a1d24 !important; border-color: #3f3f46 !important; color: #f8fafc !important;
+}
+html[data-theme="dark"] .ql-editor.ql-readonly {
+    background-color: transparent !important; border-color: transparent !important; color: inherit !important;
 }
 html[data-theme="dark"] .ql-snow .ql-stroke { stroke: #e2e8f0 !important; }
 html[data-theme="dark"] .ql-snow .ql-fill { fill: #e2e8f0 !important; }

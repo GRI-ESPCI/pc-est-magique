@@ -594,11 +594,11 @@ html[data-theme="dark"] .card-accent-success::before { background-color: #4ade80
 .multiple_checkbox input[type="checkbox"] { margin-right: 1rem !important; width: 1.25rem !important; height: 1.25rem !important; cursor: pointer; }
 
 /* Alerte Premium Gold */
-html[data-theme="dark"] .alert.alert-warning.shadow-sm.p-4.mb-5 {
+html[data-theme="dark"] .alert.alert-warning.shadow-sm.p-4 {
     background-color: rgba(255, 193, 7, 0.1) !important; border: 1px solid rgba(255, 193, 7, 0.3) !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important; color: #ffe082 !important;
 }
-html[data-theme="dark"] .alert.alert-warning.shadow-sm.p-4.mb-5 h5 { color: #ffca28 !important; font-weight: 800 !important; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+html[data-theme="dark"] .alert.alert-warning.shadow-sm.p-4 h5 { color: #ffca28 !important; font-weight: 800 !important; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
 /* --- HISTORIQUE & TRANSACTIONS ANNULÉES --- */
 html:not([data-theme="dark"]) tr.table-danger.text-decoration-line-through, html:not([data-theme="dark"]) tr.table-danger.text-decoration-line-through * { color: #64748b !important; }
