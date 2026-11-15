@@ -47,7 +47,7 @@ function add_role(elem, pceen_id, role_id) {
         name.textContent = data["name"];
         name.href = name.href + "#" + data["id"];
         badge.style.setProperty("background-color", "#" + data["color"]);
-        name.classList.add(data["dark"] ? "text-light" : "text-dark");
+        badge.style.setProperty("color", data["dark"] ? "#ffffff" : "#000000", "important");
         badge.querySelector("svg").onclick = function () {
           remove_role(badge.querySelector("svg"), pceen_id, role_id);
         };
@@ -185,3 +185,213 @@ function mo_remove_role(badge, dropdownElem, role_id) {
     dropdownElem.style.display = "";
     badge.remove();
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  const searchForm = document.getElementById("pceen-search-form");
+  const searchInput = document.getElementById("pceen-search");
+  const clearBtn = document.getElementById("pceen-search-clear");
+  const sortTable = document.getElementById("sort-table");
+  const emptyRow = document.getElementById("pceen-search-empty");
+  const paginationContainer = document.getElementById("pceen-pagination");
+  const totalCountBadge = document.getElementById("pceen-total-count");
+  const rezModalsContainer = document.getElementById("pceen-rez-modals");
+  const tableHead = sortTable ? sortTable.closest("table")?.querySelector("thead") : null;
+
+  if (!searchForm || !searchInput || !sortTable) return;
+
+  let debounceTimer = null;
+  let activeController = null;
+
+  const normalize = (str) =>
+    (str || "")
+      .toString()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+
+  function updateClearButton(val) {
+    if (clearBtn) {
+      clearBtn.classList.toggle("d-none", !val);
+    }
+  }
+
+  function filterCurrentRows(rawQuery) {
+    const q = normalize(rawQuery.trim());
+    const isNumeric = /^\d+$/.test(q);
+    const rows = sortTable.querySelectorAll("tr");
+    rows.forEach((row) => {
+      if (!q) {
+        row.style.display = "";
+        return;
+      }
+      const name = normalize(row.dataset.name);
+      const promo =
+        row.dataset.promo && row.dataset.promo !== "0"
+          ? normalize(row.dataset.promo)
+          : "";
+      const email = normalize(row.dataset.email);
+      const id = normalize(row.cells[0] ? row.cells[0].textContent.trim() : "");
+      const room =
+        row.dataset.room && row.dataset.room !== "0"
+          ? normalize(row.dataset.room)
+          : "";
+      const roleMatch = Array.from(row.querySelectorAll(".badge a")).some((a) =>
+        normalize(a.textContent).includes(q)
+      );
+
+      let match;
+      if (isNumeric) {
+        match =
+          id === q ||
+          promo === q ||
+          (room !== "" && room.startsWith(q));
+      } else {
+        match = name.includes(q) || email.includes(q) || roleMatch;
+      }
+      row.style.display = match ? "" : "none";
+    });
+    if (emptyRow) {
+      emptyRow.style.display = !q && rows.length === 0 ? "" : "none";
+    }
+  }
+
+  function updateTabLinks(qValue) {
+    document
+      .querySelectorAll('[name="gris_pceens_navbar"] a')
+      .forEach((link) => {
+        const tabUrl = new URL(link.href, window.location.origin);
+        if (qValue) {
+          tabUrl.searchParams.set("q", qValue);
+        } else {
+          tabUrl.searchParams.delete("q");
+        }
+        link.href = tabUrl.pathname + tabUrl.search;
+      });
+  }
+
+  function buildSearchUrl(qValue) {
+    const url = new URL(searchForm.action, window.location.origin);
+    const sortInput = searchForm.querySelector('input[name="sort"]');
+    const wayInput = searchForm.querySelector('input[name="way"]');
+    if (sortInput && sortInput.value) {
+      url.searchParams.set("sort", sortInput.value);
+    }
+    if (wayInput && wayInput.value) {
+      url.searchParams.set("way", wayInput.value);
+    }
+    if (qValue) {
+      url.searchParams.set("q", qValue);
+    }
+    return url;
+  }
+
+  function disposeTableTooltips() {
+    if (typeof bootstrap === "undefined" || !bootstrap.Tooltip) return;
+    sortTable.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((el) => {
+      const instance = bootstrap.Tooltip.getInstance(el);
+      if (instance) instance.dispose();
+    });
+  }
+
+  function initTableTooltips() {
+    if (typeof bootstrap === "undefined" || !bootstrap.Tooltip) return;
+    sortTable.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((el) => {
+      bootstrap.Tooltip.getOrCreateInstance(el);
+    });
+  }
+
+  async function fetchSearchResults(rawQuery) {
+    const qValue = rawQuery.trim();
+    const url = buildSearchUrl(qValue);
+
+    if (activeController) {
+      activeController.abort();
+    }
+    activeController = new AbortController();
+
+    try {
+      const response = await fetch(url.toString(), {
+        headers: { "X-Requested-With": "fetch" },
+        signal: activeController.signal,
+      });
+      if (!response.ok) return;
+
+      const html = await response.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const newSortTable = doc.getElementById("sort-table");
+      if (!newSortTable) return;
+
+      disposeTableTooltips();
+      sortTable.innerHTML = newSortTable.innerHTML;
+
+      const newTableHead = doc.querySelector("table thead");
+      if (tableHead && newTableHead) {
+        tableHead.innerHTML = newTableHead.innerHTML;
+      }
+
+      const newPagination = doc.getElementById("pceen-pagination");
+      if (paginationContainer && newPagination) {
+        paginationContainer.innerHTML = newPagination.innerHTML;
+      }
+
+      const newTotal = doc.getElementById("pceen-total-count");
+      if (totalCountBadge && newTotal) {
+        totalCountBadge.textContent = newTotal.textContent;
+      }
+
+      const newRezModals = doc.getElementById("pceen-rez-modals");
+      if (rezModalsContainer && newRezModals) {
+        rezModalsContainer.innerHTML = newRezModals.innerHTML;
+      }
+
+      if (emptyRow) {
+        const hasRows = sortTable.querySelectorAll("tr").length > 0;
+        emptyRow.style.display = hasRows ? "none" : "";
+      }
+
+      window.history.replaceState(null, "", url.pathname + url.search);
+      updateTabLinks(qValue);
+
+      if (typeof flask_moment_render_all === "function") {
+        flask_moment_render_all();
+      }
+      initTableTooltips();
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        console.error("Live search failed:", err);
+      }
+    }
+  }
+
+  searchInput.addEventListener("input", function () {
+    const val = searchInput.value;
+    updateClearButton(val.trim());
+    filterCurrentRows(val);
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      fetchSearchResults(val);
+    }, 300);
+  });
+
+  searchForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+    clearTimeout(debounceTimer);
+    fetchSearchResults(searchInput.value);
+  });
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      searchInput.value = "";
+      updateClearButton("");
+      filterCurrentRows("");
+      clearTimeout(debounceTimer);
+      fetchSearchResults("");
+      searchInput.focus();
+    });
+  }
+
+  window.addEventListener("pageshow", function () {
+    updateClearButton(searchInput.value.trim());
+  });
+});

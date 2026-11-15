@@ -126,23 +126,36 @@ def pceens(view: str = "active") -> typing.RouteReturn:
 
     stmt = db.select(PCeen)
     if q:
-        search_filters = [
-            PCeen.nom.ilike(f"%{q}%"),
-            PCeen.prenom.ilike(f"%{q}%"),
-            PCeen.username.ilike(f"%{q}%"),
-            PCeen.email.ilike(f"%{q}%"),
-            PCeen.devices.any(Device.mac_address.ilike(f"%{q}%")),
-        ]
-        if view == PCeensViewEnum.rez and q.isdigit():
-            today = datetime.date.today()
-            search_filters.append(
-                PCeen.rentals.any(
-                    db.and_(
-                        Rental._room_num == int(q),
-                        db.or_(Rental.end.is_(None), Rental.end > today),
+        if q.isascii() and q.isdigit():
+            q_int = int(q)
+            search_filters = [
+                PCeen.roles.any(Role.name == q),
+            ]
+            if q_int <= 2_147_483_647:
+                search_filters.append(PCeen.id == q_int)
+                search_filters.append(PCeen.promo == q_int)
+            if view == PCeensViewEnum.rez:
+                today = datetime.date.today()
+                search_filters.append(
+                    PCeen.rentals.any(
+                        db.and_(
+                            db.cast(Rental._room_num, db.String).like(f"{q}%"),
+                            db.or_(Rental.end.is_(None), Rental.end > today),
+                        )
                     )
                 )
-            )
+        else:
+            pattern = f"%{q}%"
+            search_filters = [
+                PCeen.nom.ilike(pattern),
+                PCeen.prenom.ilike(pattern),
+                (PCeen.prenom + " " + PCeen.nom).ilike(pattern),
+                (PCeen.nom + " " + PCeen.prenom).ilike(pattern),
+                PCeen.username.ilike(pattern),
+                PCeen.email.ilike(pattern),
+                PCeen.devices.any(Device.mac_address.ilike(pattern)),
+                PCeen.roles.any(Role.name.ilike(pattern)),
+            ]
         stmt = stmt.filter(db.or_(*search_filters))
 
     match view:
@@ -153,6 +166,7 @@ def pceens(view: str = "active") -> typing.RouteReturn:
                 stmt.join(PCeen.roles)
                 .join(Role.permissions)
                 .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.intrarez)
+                .distinct()
             )
         case PCeensViewEnum.bar:
             stmt = (
@@ -162,6 +176,7 @@ def pceens(view: str = "active") -> typing.RouteReturn:
                     Permission.type == PermissionType.read,
                     Permission.scope.in_([PermissionScope.bar, PermissionScope.bar_stats]),
                 )
+                .distinct()
             )
         case PCeensViewEnum.all:
             pass

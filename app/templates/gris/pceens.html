@@ -10,80 +10,91 @@
 {% block app_content %}
 
 {% macro sort_link(col_id, col_name) %}
-<a href="{{ url_for('gris.pceens', view=view, q=q, sort=col_id, way='desc' if sort == col_id and way == 'asc' else 'asc') }}" class="text-decoration-none text-body d-flex user-select-none">
+<a href="{{ url_for('gris.pceens', view=view, q=q or None, sort=col_id, way='desc' if sort == col_id and way == 'asc' else 'asc') }}" class="text-decoration-none text-body d-flex align-items-center gap-1 user-select-none">
     <span>{{ col_name }}</span>
     {% if sort == col_id %}
-    <span class="ms-1">
+    <span class="mx-auto">
         <svg class="bi flex-shrink-0" width="16" height="16">
-            {{ macros.bootstrap_icon("sort-alpha-down" if way == "asc" else "sort-alpha-up") }}
+            {{ macros.bootstrap_icon("caret-down-fill" if way == "desc" else "caret-up-fill") }}
         </svg>
     </span>
     {% endif %}
 </a>
 {% endmacro %}
 
-<div class="row mb-3">
-    <div class="col">
-        <h1>{{ title }}</h1>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+        <h1 class="fw-bold mb-1">{{ title }}</h1>
+        <p class="text-body-secondary mb-0">{{ _("Administration des comptes, rôles et accès") }}</p>
+    </div>
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <button type="button" class="btn btn-primary pe-none d-flex align-items-center gap-2 fw-semibold shadow-sm px-3 py-2">
+            <span>{{ _("Total :") }}</span>
+            <span class="badge bg-secondary badge-light" id="pceen-total-count">{{ paginator.total }}</span>
+        </button>
+        <button type="button" class="btn btn-success d-flex align-items-center gap-2 fw-bold shadow-sm px-3 py-2"
+                data-bs-toggle="modal" data-bs-target="#mo-add-pceen">
+            <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+                {{ macros.bootstrap_icon("person-plus-fill") }}
+            </svg>
+            <span>{{ _("Ajouter un PCéen") }}</span>
+        </button>
     </div>
 </div>
 
-<!-- Items sorting -->
-<div class="container mb-3 px-0">
-    <div class="btn-toolbar justify-content-between align-items-center gap-3" role="toolbar">
-        <div class="d-flex flex-wrap align-items-center gap-3 flex-grow-1">
-            <div class="d-flex flex-wrap align-items-center gap-2" role="group" name="slt">
-                <span class="me-1 text-nowrap">{{ _("Vue :") }}</span>
-                <a role="button" href="{{ url_for('gris.pceens', view='active') }}"
-                   class="btn {{ 'btn-primary' if view == 'active' else 'btn-outline-primary' }}">
-                    {{ _("Actifs") }}
-                </a>
-                <a role="button" href="{{ url_for('gris.pceens', view='rez') }}"
-                   class="btn {{ 'btn-primary' if view == 'rez' else 'btn-outline-primary' }}">
-                    {{ _("Rezidents") }}
-                </a>
-                <a role="button" href="{{ url_for('gris.pceens', view='bar') }}"
-                   class="btn {{ 'btn-primary' if view == 'bar' else 'btn-outline-primary' }}">
-                    {{ _("Bar") }}
-                </a>
-                <a role="button" href="{{ url_for('gris.pceens', view='all') }}"
-                   class="btn {{ 'btn-primary' if view == 'all' else 'btn-outline-primary' }}">
-                    {{ _("Tous") }}
-                </a>
-            </div>
-            
-            <form action="{{ url_for('gris.pceens', view=view) }}" method="get" class="d-flex position-relative flex-grow-1 flex-md-grow-0" role="search">
-                {% if sort %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
-                {% if way %}<input type="hidden" name="way" value="{{ way }}">{% endif %}
-                <button type="submit" class="btn position-absolute top-50 start-0 translate-middle-y border-0 bg-transparent text-muted px-3 shadow-none" style="z-index: 5;">
-                    <svg class="bi" width="16" height="16">{{ macros.bootstrap_icon("search") }}</svg>
-                </button>
-                <input class="form-control rounded-pill bg-body-tertiary border-0 shadow-sm w-100" type="text" placeholder="Recherche..." aria-label="Search" name="q" value="{{ q or '' }}" style="padding-left: 2.5rem; min-width: 220px;">
-            </form>
-        </div>
+<!-- View tabs & Search -->
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+    <ul class="nav flex-wrap gap-2" name="gris_pceens_navbar" role="group">
+        {% set view_tabs = [
+            ('active', _("Actifs"), 'person-check'),
+            ('rez', _("Rezidents"), 'house-door'),
+            ('bar', _("Bar"), 'cup-straw'),
+            ('all', _("Tous"), 'people'),
+        ] %}
+        {% for tab_view, label, icon in view_tabs %}
+        <li class="nav-item">
+            <a role="button"
+               href="{{ url_for('gris.pceens', view=tab_view, q=q or None, sort=sort if sort != 'id' else None, way=way if way != 'desc' else None) }}"
+               class="btn rounded-pill px-3 d-flex align-items-center gap-2 text-nowrap {{ 'btn-primary fw-semibold shadow-sm' if view == tab_view else 'btn-outline-secondary' }}">
+                <svg class="bi flex-shrink-0" width="16" height="16" role="img">{{ macros.bootstrap_icon(icon) }}</svg>
+                <span>{{ label }}</span>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
 
-        <div class="d-flex gap-2 align-items-center ms-auto" role="group" aria-label="Results">
-            <button type="button" class="btn btn-primary pe-none">
-                {{ _("Total :") }}
-                <span class="badge bg-secondary badge-light">{{ paginator.total }}</span>
-            </button>
-
-            <div data-bs-toggle="tooltip" title="{{ _('Ajouter un PCéen') }}">
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#mo-add-pceen">
-                    <svg class="bi flex-shrink-0" width="24" height="24" role="img">
-                        {{ macros.bootstrap_icon("plus") }}
-                    </svg>
-                </button>
-            </div>
+    <form action="{{ url_for('gris.pceens', view=view) }}" method="get" id="pceen-search-form" class="flex-grow-1 flex-md-grow-0" style="max-width: 380px; width: 100%;" role="search">
+        {% if sort and sort != 'id' %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
+        {% if way and way != 'desc' %}<input type="hidden" name="way" value="{{ way }}">{% endif %}
+        <div class="m3-search-bar d-flex align-items-center px-3 w-100">
+            <svg class="bi text-body-secondary ms-2 flex-shrink-0" width="18" height="18">
+                {{ macros.bootstrap_icon("search") }}
+            </svg>
+            <input
+                type="text"
+                id="pceen-search"
+                name="q"
+                value="{{ q or '' }}"
+                class="border-0 shadow-none px-3 w-100 m3-input"
+                placeholder="{{ _('Rechercher un PCéen, une promo…') }}"
+                aria-label="{{ _('Rechercher un PCéen, une promo…') }}"
+                autocomplete="off"
+            >
+            <a href="{{ url_for('gris.pceens', view=view, sort=sort if sort != 'id' else None, way=way if way != 'desc' else None) }}"
+               id="pceen-search-clear"
+               class="btn btn-link text-body-secondary p-1 text-decoration-none d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle m3-clear-btn {{ 'd-none' if not q else '' }}"
+               title="{{ _('Effacer la recherche') }}">
+                <svg class="bi" width="20" height="20">{{ macros.bootstrap_icon("x") }}</svg>
+            </a>
         </div>
-    </div>
+    </form>
 </div>
 
 <div class="row mb-3">
     <div class="col px-0">
         <div class="table-responsive rounded-4 shadow-sm bg-body-tertiary mb-4">
             <form id="security-form" hidden>{{ roles_form.hidden_tag() }}</form>
-            <table class="table {{ 'table-striped table-hover table-bordered' if g.theme == 'classic' else 'table-hover align-middle table-borderless' }} mb-0">
+            <table class="table {{ 'table-striped table-hover table-bordered' if g.theme == 'classic' else 'table-hover table-bordered align-middle' }} mb-0">
                 <thead><tr>
             <th scope="col">
                 {{ sort_link('id', _("ID")) }}
@@ -142,24 +153,22 @@
                     
                 </span>
             </th>
-            <th scope="col">
-                <span class="d-flex user-select-none">
+            <th scope="col" class="text-center">
+                <span class="d-flex justify-content-center user-select-none">
                     <span>
                         <svg class="bi flex-shrink-0" width="22" height="22">
                             {{ macros.bootstrap_icon("hammer") }}
                         </svg>
                     </span>
-                    
                 </span>
             </th>
-            <th scope="col">
-                <span class="d-flex user-select-none">
+            <th scope="col" class="text-center">
+                <span class="d-flex justify-content-center user-select-none">
                     <span>
                         <svg class="bi flex-shrink-0" width="22" height="22">
                             {{ macros.bootstrap_icon("globe") }}
                         </svg>
                     </span>
-                    
                 </span>
             </th>
         </tr></thead>
@@ -331,7 +340,7 @@
                     </span>
                 </span>
                 {% endfor %}
-                <span class="add-role badge rounded-pill d-inline-flex align-items-center px-0 text-dark">
+                <span class="add-role badge rounded-pill d-inline-flex align-items-center px-0 text-body">
                     <span>&nbsp;</span>
                     <span>
                         <svg class="bi flex-shrink-0" width="15" height="15" style="cursor: pointer;"
@@ -355,7 +364,7 @@
                 </span>
             </td>
 
-            <td class="text-nowrap">
+            <td class="text-center text-nowrap">
                 <div class="d-inline-flex align-items-center gap-2">
                 {% if pceen.is_banned %}
                 {% with ban = pceen.current_ban %}
@@ -389,7 +398,7 @@
                 </div>
             </td>
 
-            <td>
+            <td class="text-center">
                 {% if pceen.locale %}
                 <img class="flex-shrink-0" width="22" height="22"
                      src="{{ url_for("static", filename="svg/lang/{}.svg".format(pceen.locale)) }}">
@@ -402,16 +411,25 @@
         </tr>
         {% endwith %}
         {% endfor %}
-    </tbody></table>
+        </tbody>
+        <tbody>
+            <tr id="pceen-search-empty" style="{{ '' if not pceens else 'display: none;' }}">
+                <td colspan="{{ 11 if view == 'rez' else (10 if view == 'bar' else 8) }}" class="text-center text-body-secondary py-4">
+                    {{ _("Aucun résultat correspondant à votre recherche.") }}
+                </td>
+            </tr>
+        </tbody>
+    </table>
     </div></div>
 </div>
 
+<div id="pceen-pagination">
 <nav class="mt-4" aria-label="Page navigation">
     <ul class="pagination pagination-sm justify-content-center gap-1 border-0">
     {% for page in paginator.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
         <li class="page-item {{ 'active' if page == paginator.page }} {{ 'disabled' if not page }}">
             {% if page %}
-            <a class="page-link rounded-pill px-3 border-0 shadow-sm {{ 'text-bg-primary fw-bold' if page == paginator.page else 'bg-body-tertiary text-body hover-lift' }}" href="{{ url_for('gris.pceens', page=page, sort=sort, way=way, q=q, view=view) }}">
+            <a class="page-link rounded-pill px-3 border-0 shadow-sm {{ 'text-bg-primary fw-bold' if page == paginator.page else 'bg-body-tertiary text-body hover-lift' }}" href="{{ url_for('gris.pceens', page=page, sort=sort if sort != 'id' else None, way=way if way != 'desc' else None, q=q or None, view=view) }}">
                 {{ page }}
             </a>
             {% else %}
@@ -421,7 +439,9 @@
     {% endfor %}
     </ul>
 </nav>
+</div>
 
+<div id="pceen-rez-modals">
 {% if view == "rez" %}
 <!-- Rezident modals -->
 {% for pceen in pceens %}
@@ -484,6 +504,7 @@
 {% endwith %}
 {% endfor %}
 {% endif %}
+</div>
 
 <!-- Ban modal -->
 <div class="modal fade" id="mo-ban" tabindex="-1" aria-labelledby="mo-ban-lab" aria-hidden="true">
@@ -585,7 +606,7 @@
                         <label class="form-label text-muted">{{ _("Rôles") }}</label>
                         <div class="d-none">{{ wtf.form_field(add_pceen_form.roles, class="form-select") }}</div>
                         <div class="d-flex flex-wrap gap-2 align-items-center" id="mo-add-pceen-roles-container">
-                            <span class="add-role badge rounded-pill d-inline-flex align-items-center px-0 text-dark">
+                            <span class="add-role badge rounded-pill d-inline-flex align-items-center px-0 text-body">
                                 <span>&nbsp;</span>
                                 <span>
                                     <svg class="bi flex-shrink-0" width="15" height="15" style="cursor: pointer;"
@@ -635,10 +656,10 @@
     <div id="new-role-template">
         <span class="badge rounded-pill border border-2 d-inline-flex
                      align-items-center px-2">
-            <a href="{{ url_for('gris.roles') }}" class="role_name"></a>
+            <a href="{{ url_for('gris.roles') }}" class="role_name text-decoration-none" style="color: inherit !important;"></a>
             <span>
                 <svg class="bi flex-shrink-0 ms-2" width="15" height="15"
-                     style="cursor: pointer;">
+                     style="cursor: pointer; color: inherit !important;">
                     {{ macros.bootstrap_icon("x-circle") }}
                 </svg>
             </span>
