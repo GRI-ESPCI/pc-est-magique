@@ -55,13 +55,13 @@ def attribution(voeux, pceens, spectacles, promo_1A, bonus, corruption):
     clear_log_file()
 
     for pceen in pceens:
-        if pceen.promo == promo_1A:
+        if pceen.promo == str(promo_1A):
             pceen.discontent += bonus[0]
-        elif pceen.promo == promo_1A - 1:
+        elif pceen.promo == str(promo_1A - 1):
             pceen.discontent += bonus[1]
-        elif pceen.promo == promo_1A - 2:
+        elif pceen.promo in (str(promo_1A - 2), f"M{promo_1A - 1}"):
             pceen.discontent += bonus[2]
-        elif pceen.promo == promo_1A - 3:
+        elif pceen.promo in (str(promo_1A - 3), f"M{promo_1A - 2}"):
             pceen.discontent += bonus[3]
         else:
             pceen.discontent += -10

@@ -11,6 +11,8 @@ from app.utils.validators import (
     Length,
     ValidPCeenID,
     ValidBanID,
+    ValidPromo,
+    normalize_promo,
 )
 
 
@@ -64,7 +66,11 @@ class AddPCeenForm(FlaskForm):
 
     nom = wtforms.StringField(_l("Nom"), validators=[DataRequired(), Length(max=64)])
     prenom = wtforms.StringField(_l("Prénom"), validators=[DataRequired(), Length(max=64)])
-    promo = wtforms.IntegerField(_l("Promo (Optionnel)"), validators=[Optional()])
+    promo = wtforms.StringField(
+        _l("Promo (Optionnel)"),
+        validators=[Optional(), Length(max=16), ValidPromo()],
+        filters=[normalize_promo],
+    )
     email = wtforms.EmailField(_l("Email"), validators=[DataRequired(), Length(max=120)])
     roles = wtforms.SelectMultipleField(_l("Rôles"), coerce=int, validators=[Optional()])
     submit_add = wtforms.SubmitField(_l("Ajouter"))

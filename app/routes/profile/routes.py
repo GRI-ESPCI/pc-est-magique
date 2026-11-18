@@ -26,7 +26,6 @@ def modify_account() -> typing.RouteReturn:
         pceen = context.g.pceen
         pceen.nom = form.nom.data.title()
         pceen.prenom = form.prenom.data.title()
-        pceen.promo = form.promo.data
         pceen.email = form.email.data
         db.session.commit()
         helpers.log_action(f"Modified account {pceen!r} ({pceen.prenom} {pceen.nom} " f"{pceen.promo}, {pceen.email})")

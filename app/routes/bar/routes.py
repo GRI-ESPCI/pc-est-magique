@@ -167,7 +167,11 @@ def search():
             sqlalchemy.func.lower(sqlalchemy.func.unaccent(PCeen.full_name)).contains(unidecode(query).lower()),
         )
         .order_by(
-            (PCeen.promo.desc() if way == "desc" else PCeen.promo.asc())
+            (
+                PCeen.promo_sort_expr().desc().nulls_last()
+                if way == "desc"
+                else PCeen.promo_sort_expr().asc().nulls_last()
+            )
             if sort == "promo"
             else (PCeen.full_name.desc() if way == "desc" else PCeen.full_name.asc())
         )

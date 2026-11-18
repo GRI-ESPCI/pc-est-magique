@@ -1,7 +1,7 @@
 """PC est magique - Effectue toutes les actions à réaliser automatiquement chaque année.
 
 Conçu pour être appelé tous les ans, environ à la fin de l'été :
-    * Remplace le rôle "Élève" par le rôle "Alumni" pour tous les comptes ayant terminé leur 4e année cette année ;
+    * Remplace le rôle "Élève" par le rôle "Alumni" pour tous les comptes ayant terminé leur 4e année (cycle ingénieur) ou leur M2 (Master) cette année ;
     * Envoie également un mail au PCéen l'informant du changement d'état ;
     * Crée un nouveau rôle pour l'année entrante, avec les droits appropriés.
     * Crée une nouvelle collection pour l'année entrante, avec les droits appropriés.
@@ -37,8 +37,8 @@ except ImportError:
     sys.exit(1)
 
 
-def replace_student_role(leaving_promo: int) -> None:
-    pceens: list[PCeen] = PCeen.query.filter_by(promo=leaving_promo).all()
+def replace_student_role(leaving_promo: int | str) -> None:
+    pceens: list[PCeen] = PCeen.query.filter_by(promo=str(leaving_promo)).all()
     total = len(pceens)
 
     student_role = Role.query.filter_by(name="Élève").one()
@@ -84,6 +84,14 @@ def create_new_collection(entering_promo: int) -> None:
         db.session.commit()
         helpers.log_action(f"Annual update: created role {role!r}")
 
+    entering_master_promo = entering_promo - 1
+    master_role_name = f"M{entering_master_promo}"
+    if not Role.query.filter_by(name=master_role_name).first():
+        master_role = Role(name=master_role_name, index=entering_master_promo)
+        db.session.add(master_role)
+        db.session.commit()
+        helpers.log_action(f"Annual update: created role {master_role!r}")
+
     # Add "read / collection 1XX" permission to the 4 promos studying this year
     read_collection = Permission(type=PermissionType.read, scope=PermissionScope.collection, ref_id=collection.id)
     role.permissions.append(read_collection)
@@ -98,9 +106,11 @@ def create_new_collection(entering_promo: int) -> None:
 def main():
     current_year = datetime.date.today().year
     leaving_promo = current_year - 1885
+    leaving_master_promo = f"M{current_year - 1884}"
     entering_promo = current_year - 1881
 
     replace_student_role(leaving_promo)
+    replace_student_role(leaving_master_promo)
     create_new_collection(entering_promo)
 
     print("Done.")

@@ -12,7 +12,6 @@ class AccountModificationForm(FlaskForm):
 
     nom = wtforms.StringField(_l("Nom"), validators=[DataRequired(), Length(max=64)])
     prenom = wtforms.StringField(_l("Prénom"), validators=[DataRequired(), Length(max=64)])
-    promo = wtforms.IntegerField(_l("Promotion"), validators=[DataRequired()])
     email = wtforms.EmailField(
         _l("Adresse e-mail"),
         validators=[DataRequired(), Length(max=120), Email(), NewEmail()],

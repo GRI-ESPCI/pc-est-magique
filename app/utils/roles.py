@@ -18,16 +18,19 @@ def grant_student_role(pceen: PCeen) -> None:
         #flask.flash(_("Accès aux modules élèves débloqué !"), "success")
 
 
-def grant_promotion_role(pceen: PCeen, promotion: int) -> None:
+def grant_promotion_role(pceen: PCeen, promotion: int | str) -> None:
     """Add the role corresponding to an ESPCI promotion, creating it if necessary.
 
     Args:
         pceen: The PCéen to add the role to.
-        promotion: The promotion number.
+        promotion: The promotion identifier (e.g. 145, '145', 'M144').
     """
-    role = Role.query.filter_by(name=str(promotion)).one_or_none()
+    promo_str = str(promotion).strip().upper()
+    role = Role.query.filter_by(name=promo_str).one_or_none()
     if not role:
-        role = Role(name=str(promotion), index=promotion)
+        num_part = promo_str.removeprefix("M")
+        role_index = int(num_part) if num_part.isascii() and num_part.isdigit() and len(num_part) <= 9 else 1000
+        role = Role(name=promo_str, index=role_index)
     if role not in pceen.roles:
         pceen.roles.append(role)
 

@@ -18,7 +18,8 @@
             {{ wtf.form_field(form.nom, value=g.pceen.nom) }}
         </div></div>
         <div class="col"><div class="form-floating mb-3">
-            {{ wtf.form_field(form.promo, value=g.pceen.promo) }}
+            <input type="text" class="form-control" id="promo" placeholder="{{ _('Promotion') }}" value="{{ g.pceen.promo or '-' }}" disabled>
+            <label for="promo">{{ _("Promotion") }}</label>
         </div></div>
         <div class="col"><div class="form-floating mb-3">
             {{ wtf.form_field(form.email, value=g.pceen.email) }}

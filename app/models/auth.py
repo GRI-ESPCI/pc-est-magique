@@ -56,7 +56,7 @@ class PCeen(flask_login.UserMixin, Model):
     username: Column[str] = column(sa.String(64), unique=True, nullable=False)
     nom: Column[str] = column(sa.String(64), nullable=False)
     prenom: Column[str] = column(sa.String(64), nullable=False)
-    promo: Column[int | None] = column(sa.Integer, nullable=True)
+    promo: Column[str | None] = column(sa.String(16), nullable=True)
     email: Column[str] = column(sa.String(120), unique=True, nullable=False)
     locale: Column[str | None] = column(sa.String(8), nullable=True)
     is_gri: Column[bool] = column(sa.Boolean(), nullable=False, default=False)
@@ -272,18 +272,28 @@ class PCeen(flask_login.UserMixin, Model):
         return cls._has_permission(public_role.permissions, type, scope, elem)
 
     @classmethod
-    def find_by_fuzzy_name(cls, nom: str, prenom: str, promo: int | None) -> PCeen | None:
+    def promo_sort_expr(cls):
+        """SQL expression to sort promotions numerically with engineers before masters (e.g. 145 > M145 > 144 > M144)."""
+        promo_num = sa.cast(
+            sa.func.nullif(sa.func.regexp_replace(cls.promo, r"[^0-9]", "", "g"), ""),
+            sa.Integer,
+        )
+        return promo_num * 2 + sa.case((cls.promo.like("M%"), 0), else_=1)
+
+    @classmethod
+    def find_by_fuzzy_name(cls, nom: str, prenom: str, promo: str | int | None) -> PCeen | None:
         """Find a PCeen by a fuzzy name (unaccented + lowercased) and promo.
         
         Args:
             nom: The user's last name.
             prenom: The user's first name.
-            promo: The user's promotion number.
+            promo: The user's promotion (e.g. '145' or 'M144').
             
         Returns:
             The matching PCeen, if one exists.
         """
-        if not nom or not prenom or promo is None:
+        promo_clean = str(promo).strip().upper() if promo is not None else ""
+        if not nom or not prenom or not promo_clean:
             return None
             
         nom_clean = re.sub(r'\W+', ' ', unidecode(nom)).strip()
@@ -292,7 +302,7 @@ class PCeen(flask_login.UserMixin, Model):
         return cls.query.filter(
             sa.func.trim(sa.func.regexp_replace(sa.func.unaccent(cls.nom), r'\W+', ' ', 'g')).ilike(nom_clean),
             sa.func.trim(sa.func.regexp_replace(sa.func.unaccent(cls.prenom), r'\W+', ' ', 'g')).ilike(prenom_clean),
-            cls.promo == promo
+            cls.promo == promo_clean
         ).first()
 
     @property

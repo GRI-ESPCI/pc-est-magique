@@ -11,6 +11,8 @@ from app.utils.validators import (
     EqualTo,
     Length,
     NewEmail,
+    ValidPromo,
+    normalize_promo,
 )
 
 
@@ -28,7 +30,11 @@ class RegistrationForm(FlaskForm):
 
     nom = wtforms.StringField(_l("Nom"), validators=[DataRequired(), Length(max=64)])
     prenom = wtforms.StringField(_l("Prénom"), validators=[DataRequired(), Length(max=64)])
-    promo = wtforms.IntegerField(_l("Promotion"), validators=[Optional()])
+    promo = wtforms.StringField(
+        _l("Promotion"),
+        validators=[Optional(), Length(max=16), ValidPromo()],
+        filters=[normalize_promo],
+    )
     email = wtforms.EmailField(
         _l("Adresse e-mail"),
         validators=[DataRequired(), Length(max=120), Email(), NewEmail()],

@@ -1,6 +1,7 @@
 """PC est magique - Custom Flask Forms Validators"""
 
 import datetime
+import re
 from typing import Any, Callable
 
 import flask
@@ -178,4 +179,18 @@ class ValidBarItemID(CustomValidator):
         return field.data.isdigit() and bool(db.session.get(BarItem, int(field.data)))
 
 
+def normalize_promo(value: Any) -> str | None:
+    """Normalize a promotion input string (trimmed, uppercased, or None if empty)."""
+    if value is None:
+        return None
+    val = str(value).strip().upper()
+    return val if val else None
 
+
+class ValidPromo(CustomValidator):
+    message = _l("Promotion invalide (format attendu : 145 ou M144).")
+
+    def validate(self, form: wtforms.Form, field: wtforms.Field) -> bool:
+        if not field.data:
+            return True
+        return bool(re.fullmatch(r"M?[1-9][0-9]{0,3}", str(field.data).strip().upper()))

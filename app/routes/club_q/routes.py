@@ -681,16 +681,19 @@ def attribution_manager() -> typing.RouteReturn:
 
     # Ajout des forms pour choisir les mécontentements bonus
     discontent_bonus = [
-        ("m1A", "DISCONTENT_BONUS_1A"),
-        ("m2A", "DISCONTENT_BONUS_2A"),
-        ("m3A", "DISCONTENT_BONUS_3A"),
-        ("m4A", "DISCONTENT_BONUS_4A"),
+        ("m1A", "DISCONTENT_BONUS_1A", _("1A")),
+        ("m2A", "DISCONTENT_BONUS_2A", _("2A")),
+        ("m3A", "DISCONTENT_BONUS_3A", _("3A / M1")),
+        ("m4A", "DISCONTENT_BONUS_4A", _("4A / M2")),
     ]
-    for i in range(4):
+    for attr_name, setting_key, label in discontent_bonus:
         setattr(
             forms.SettingAlgoClubQPage,
-            discontent_bonus[i][0],
-            wtforms.IntegerField(default=db.session.scalars(db.select(GlobalSetting).filter_by(key=discontent_bonus[i][1])).one().value),
+            attr_name,
+            wtforms.IntegerField(
+                label,
+                default=db.session.scalars(db.select(GlobalSetting).filter_by(key=setting_key)).one().value,
+            ),
         )
 
     # Ajout du form pour savoir promotion actuelle

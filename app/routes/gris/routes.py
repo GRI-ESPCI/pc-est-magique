@@ -22,6 +22,7 @@ from app.routes.gris.utils import (
     add_edit_ban,
 )
 from app.utils import helpers, typing
+from app.utils.roles import grant_promotion_role
 
 from app.routes.auth import email
 from app.routes.auth.utils import new_username
@@ -71,7 +72,10 @@ def pceens(view: str = "active") -> typing.RouteReturn:
                     role = db.session.get(Role, role_id)
                     if role:
                         pceen.roles.append(role)
-                        
+
+                if promo:
+                    grant_promotion_role(pceen, promo)
+
                 db.session.add(pceen)
                 db.session.commit()
                 
@@ -129,11 +133,11 @@ def pceens(view: str = "active") -> typing.RouteReturn:
         if q.isascii() and q.isdigit():
             q_int = int(q)
             search_filters = [
-                PCeen.roles.any(Role.name == q),
+                PCeen.roles.any(Role.name.in_([q, f"M{q}"])),
+                PCeen.promo.in_([q, f"M{q}"]),
             ]
             if q_int <= 2_147_483_647:
                 search_filters.append(PCeen.id == q_int)
-                search_filters.append(PCeen.promo == q_int)
             if view == PCeensViewEnum.rez:
                 today = datetime.date.today()
                 search_filters.append(
@@ -153,6 +157,7 @@ def pceens(view: str = "active") -> typing.RouteReturn:
                 (PCeen.nom + " " + PCeen.prenom).ilike(pattern),
                 PCeen.username.ilike(pattern),
                 PCeen.email.ilike(pattern),
+                PCeen.promo.ilike(pattern),
                 PCeen.devices.any(Device.mac_address.ilike(pattern)),
                 PCeen.roles.any(Role.name.ilike(pattern)),
             ]
@@ -162,21 +167,26 @@ def pceens(view: str = "active") -> typing.RouteReturn:
         case PCeensViewEnum.active:
             stmt = stmt.filter(PCeen.activated == True)
         case PCeensViewEnum.rez:
-            stmt = (
-                stmt.join(PCeen.roles)
-                .join(Role.permissions)
-                .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.intrarez)
-                .distinct()
+            stmt = stmt.filter(
+                PCeen.roles.any(
+                    Role.permissions.any(
+                        db.and_(
+                            Permission.type == PermissionType.read,
+                            Permission.scope == PermissionScope.intrarez,
+                        )
+                    )
+                )
             )
         case PCeensViewEnum.bar:
-            stmt = (
-                stmt.join(PCeen.roles)
-                .join(Role.permissions)
-                .filter(
-                    Permission.type == PermissionType.read,
-                    Permission.scope.in_([PermissionScope.bar, PermissionScope.bar_stats]),
+            stmt = stmt.filter(
+                PCeen.roles.any(
+                    Role.permissions.any(
+                        db.and_(
+                            Permission.type == PermissionType.read,
+                            Permission.scope.in_([PermissionScope.bar, PermissionScope.bar_stats]),
+                        )
+                    )
                 )
-                .distinct()
             )
         case PCeensViewEnum.all:
             pass
@@ -188,16 +198,16 @@ def pceens(view: str = "active") -> typing.RouteReturn:
     elif sort == "prenom":
         sort_column = PCeen.prenom
     elif sort == "promo":
-        sort_column = PCeen.promo
+        sort_column = PCeen.promo_sort_expr()
     elif sort == "email":
         sort_column = PCeen.email
     elif sort == "username":
         sort_column = PCeen.username
-    
-    if way == "desc":
-        stmt = stmt.order_by(sort_column.desc())
-    else:
-        stmt = stmt.order_by(sort_column.asc())
+
+    order_expr = sort_column.desc() if way == "desc" else sort_column.asc()
+    if sort == "promo":
+        order_expr = order_expr.nulls_last()
+    stmt = stmt.order_by(order_expr)
 
     paginator = db.paginate(stmt, page=page, per_page=150, error_out=False)
 

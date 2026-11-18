@@ -244,9 +244,10 @@ document.addEventListener("DOMContentLoaded", function () {
         match =
           id === q ||
           promo === q ||
+          promo === "m" + q ||
           (room !== "" && room.startsWith(q));
       } else {
-        match = name.includes(q) || email.includes(q) || roleMatch;
+        match = name.includes(q) || email.includes(q) || promo.includes(q) || roleMatch;
       }
       row.style.display = match ? "" : "none";
     });

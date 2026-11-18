@@ -30,7 +30,7 @@ class SAMLAttributes(typing.TypedDict):
     authorizedService: list[str]
 
 
-def process_attributes(attributes: SAMLAttributes) -> tuple[str, str, str, int | None]:
+def process_attributes(attributes: SAMLAttributes) -> tuple[str, str, str, str | None]:
     """Extract authenticated user information from SAML attributes.
 
     Args:
@@ -48,7 +48,7 @@ def process_attributes(attributes: SAMLAttributes) -> tuple[str, str, str, int |
     promos = [
         PROMOTIONS_SERVICES[service] for service in attributes["authorizedService"] if service in PROMOTIONS_SERVICES
     ]
-    promo = max(promos) if promos else None
+    promo = str(max(promos)) if promos else None
     return prenom, nom, email, promo
 
 
@@ -64,7 +64,8 @@ def reconciliate_account(pceen: PCeen, attributes: SAMLAttributes) -> None:
     prenom, nom, email, promo = process_attributes(attributes)
     pceen.prenom = prenom
     pceen.nom = nom
-    pceen.promo = promo
+    if promo:
+        pceen.promo = promo
     
     if not pceen.espci_email:
         pceen.espci_email = email
@@ -74,7 +75,7 @@ def reconciliate_account(pceen: PCeen, attributes: SAMLAttributes) -> None:
             "Compte mis à jour depuis les infos ESPCI (prénom : %(prenom)s, nom : %(nom)s, promotion : %(promo)s)",
             prenom=prenom,
             nom=nom,
-            promo=promo,
+            promo=pceen.promo,
         ),
         "info",
     )

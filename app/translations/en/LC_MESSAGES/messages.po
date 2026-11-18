@@ -6525,6 +6525,10 @@ msgstr "An item with this name already exists."
 msgid "Item ID invalide."
 msgstr "Invalid item ID."
 
+#: app/utils/validators.py:191
+msgid "Promotion invalide (format attendu : 145 ou M144)."
+msgstr "Invalid promotion (expected format: 145 or M144)."
+
 #~ msgid ""
 #~ "Bienvenue sur la billetterie de la saison 2023 du Club Théâtre de\n"
 #~ "    l'ESPCI ! Cette année, ce ne"

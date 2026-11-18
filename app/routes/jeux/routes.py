@@ -622,9 +622,9 @@ def reservations() -> typing.RouteReturn:
             (PCeen.prenom + " " + PCeen.nom).ilike(pattern),
             (PCeen.nom + " " + PCeen.prenom).ilike(pattern),
             PCeen.username.ilike(pattern),
+            PCeen.promo.ilike(pattern),
         ]
         if q.isdigit():
-            search_filters.append(PCeen.promo == int(q))
             search_filters.append(JeuReservation.id == int(q))
         stmt = stmt.where(sa.or_(*search_filters))
 
