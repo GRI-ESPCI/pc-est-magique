@@ -1,0 +1,104 @@
+{% import "macros.html" as macros %}
+
+{% macro clubq_table(heading_id, extra_wrap_class='', wrap_mb='mb-4') %}
+<div class="row mb-3">
+  <div class="col px-0"><div
+    class="{{ (extra_wrap_class ~ ' ') if extra_wrap_class }}table-responsive rounded-4 shadow-sm bg-body-tertiary{{ (' ' ~ wrap_mb) if wrap_mb }}"
+    tabindex="0"
+    role="region"
+    aria-labelledby="{{ heading_id }}"
+  >
+    <table class="table {{ 'table-striped table-hover table-bordered' if g.theme == 'classic' else 'table-hover table-borderless align-middle' }} mb-0 clubq-table">
+      {{ caller() }}
+    </table>
+  </div></div>
+</div>
+{% endmacro %}
+
+{% macro section_header(title, heading_id, add_modal=None, badge_count=None, badge_class='text-bg-secondary', subtitle=None) %}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+  <div>
+    <div class="d-flex align-items-center gap-2">
+      <h4 id="{{ heading_id }}" class="fw-bold mb-0">{{ title }}</h4>
+      {% if badge_count is not none %}
+      <span class="badge rounded-pill {{ badge_class }}">{{ badge_count }}</span>
+      {% endif %}
+    </div>
+    {% if subtitle %}
+    <p class="text-body-secondary small mb-0 mt-1">{{ subtitle }}</p>
+    {% endif %}
+  </div>
+  {% if add_modal %}
+  <button type="button" class="btn btn-success d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2" data-bs-target="{{ add_modal }}" data-bs-toggle="modal">
+    <svg class="bi flex-shrink-0" width="18" height="18" aria-hidden="true">
+      {{ macros.bootstrap_icon("plus-lg") }}
+    </svg>
+    <span>{{ _('Ajouter') }}</span>
+  </button>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro sort_th(key, label='', numeric=False, label_class='') %}
+<th scope="col" data-sort-key="{{ key }}"{% if numeric %} data-sort-numeric="true"{% endif %} tabindex="0" role="button">
+  <span class="d-flex user-select-none">
+    <span{% if label_class %} class="{{ label_class }}"{% endif %}>{{ caller() if caller is defined else label }}</span>
+    <span class="mx-auto">
+      <svg class="bi flex-shrink-0" width="16" height="16" id="sort-svg-{{ key }}" aria-hidden="true"></svg>
+    </span>
+  </span>
+</th>
+{% endmacro %}
+
+{% macro action_th(th_class='') %}
+<th scope="col"{% if th_class %} class="{{ th_class }}"{% endif %}>
+  <span class="d-flex user-select-none">
+    <span>
+      <svg class="bi flex-shrink-0" width="22" height="22" aria-hidden="true">
+        {{ macros.bootstrap_icon("wrench") }}
+      </svg>
+    </span>
+  </span>
+</th>
+{% endmacro %}
+
+{% macro paid_toggle_btn(pceen_id, season_id, amount, is_paid, label_unpaid=None) %}
+{% set unpaid_text = label_unpaid if label_unpaid is not none else _('Non payé') %}
+<button
+  type="button"
+  class="btn btn-sm rounded-pill fw-semibold px-3 clubq-paid-toggle {{ 'btn-success' if is_paid else 'btn-outline-secondary' }}"
+  aria-pressed="{{ 'true' if is_paid else 'false' }}"
+  data-url="{{ url_for('club_q.set_paid', id=pceen_id, season_id=season_id) }}"
+  data-amount="{{ amount }}"
+  data-label-paid="{{ _('Payé') }}"
+  data-label-unpaid="{{ unpaid_text }}"
+  data-error-msg="{{ _('Erreur lors de la mise à jour du paiement.') }}"
+>
+  {{ _('Payé') if is_paid else unpaid_text }}
+</button>
+{% endmacro %}
+
+{% macro respo_salle_btn(salle, respo_season, respo, label=None) %}
+<button
+  type="button"
+  class="btn btn-sm rounded-pill px-3 fw-semibold {{ 'btn-outline-primary' if respo else 'btn-outline-secondary' }}"
+  data-bs-toggle="modal"
+  data-bs-target="#mo-respo-salle"
+  data-respo-url="{{ url_for('club_q.set_salle_respo', id=salle.id) }}"
+  data-salle-nom="{{ salle.nom }}"
+  data-season-nom="{{ respo_season.nom }}"
+  data-current-respo-id="{{ respo._pceen_id if respo else '' }}"
+>
+  {{ label if label is not none else (respo.pceen.full_name if respo else _('Désigner')) }}
+</button>
+{% endmacro %}
+
+{% macro pceen_name_td(pceen, season_id, is_admin) %}
+<td>
+  {% if is_admin %}
+  <a class="clubq-cell-link" href="{{ url_for('club_q.pceen_id', id=pceen.id, season_id=season_id) }}">{{ pceen.full_name }}</a>
+  {% else %}
+  {{ pceen.full_name }}
+  {% endif %}
+</td>
+{% endmacro %}

@@ -26,8 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         try {
             const registration = await navigator.serviceWorker.ready;
-            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-            const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+            const csrfToken = window.PEM.getCsrfToken();
             
             if (isSubscribed) {
                 // Unsubscribe
@@ -95,8 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 btn.classList.add("btn-success");
                 
                 // Sync with server just in case the server missed it
-                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-                const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+                const csrfToken = window.PEM.getCsrfToken();
                 fetch(urlSubscribe, {
                     method: 'POST',
                     headers: { 

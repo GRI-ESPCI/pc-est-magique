@@ -1,13 +1,11 @@
-{% extends "base.html" %} {% import "_form.html" as wtf %}{% block scripts %} {{ super() }}
-<script
-  src="{{url_for('static', filename='js/sort-table.js') }}"
-  defer
-></script>
-<script
-  src="{{url_for('static', filename='js/club_q/voeux.js') }}"
-  defer
-></script>
-
+{% extends "base.html" %}
+{% import "_form.html" as wtf %}
+{% import "club_q/_macros.html" as cq %}
+{% block scripts %} {{ super() }}
+{% if is_admin %}
+<script src="{{ url_for('static', filename='js/sort-table.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/club_q/voeux.js') }}" defer></script>
+{% endif %}
 {% endblock %} {% block app_content %} {% include 'club_q/common.html' %}
 <div class="row mb-3">
   <div class="col">
@@ -26,198 +24,130 @@
   <li>{{ _("Catégorie : ")}} {{ spectacle.categorie}}</li>
   <li>{{ _("Date : ")}} {{ spectacle.date }}</li>
   <li>{{ _("Prix : ")}} {{ babel.format_currency(spectacle.unit_price, "EUR") }}</li>
-  {% if has_permission(PermissionType.write, PermissionScope.club_q) %}
-  <li>{{ _("Nombre tickets : ")}} {{ spectacle.nb_tickets}}</li>
-  <li>{{ _("Places demandées : ")}} {{ spectacle.sum_places_demandees}}</li>
-  <li>{{ _("Places attribuées : ")}} {{ spectacle.sum_places_attribuees}}</li>
+  {% if can_view_lists %}
+  <li>{{ _("Nombre tickets : ")}} {{ spectacle.nb_tickets }}</li>
+  <li>{{ _("Places demandées : ")}} {{ sum_places_demandees }}</li>
+  <li>{{ _("Places attribuées : ")}} {{ sum_places_attribuees }}</li>
   {% endif %}
 </ul>
-{% if has_permission(PermissionType.write, PermissionScope.club_q) %}
+{% if can_view_lists %}
 
-<div class="container mb-3">
-  <div class="btn-toolbar justify-content-between">
-    <h4>{{ _("Voeux : ")}}</h4>
-
-    <div>
-      <button type="button" class="btn btn-success d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2" data-bs-target="#mo-voeu-add" data-bs-toggle="modal">
-        <svg class="bi flex-shrink-0" width="18" height="18" role="img">
-          {{ macros.bootstrap_icon("plus-lg") }}
-        </svg>
-        <span>{{ _('Ajouter') }}</span>
-      </button>
-    </div>
-  </div>
-</div>
-<div class="row mb-3">
-  <div class="col px-0"><div class="table-responsive rounded-4 shadow-sm bg-body-tertiary mb-4">
-    <table class="table table-hover table-bordered">
+{# 1 - Personnes ayant obtenu le spectacle #}
+<div class="mb-4">
+  {{ cq.section_header(_("Personnes ayant obtenu le spectacle"), 'heading-attribues', badge_count=voeux_attribues|length, badge_class='text-bg-primary') }}
+  {% if voeux_attribues %}
+  {% call cq.clubq_table('heading-attribues', wrap_mb='') %}
       <thead>
         <tr>
-          <th
-            scope="col"
-            onclick="sort('id');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("ID") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-id"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('pceen');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("PCéen") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-pceen"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('priority');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Priorité") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-priority"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('asked');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Demandées") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-asked"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('min');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Minimum") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-min"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('given');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Attribuées") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-given"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('total');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Prix total") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-total"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            class="centered"
-            scope="col"
-          >
-            <div class="centered-content">
-              <span>
-                <svg
-                  class="bi flex-shrink-0"
-                  width="22"
-                  height="22"
-                >
-                  {{ macros.bootstrap_icon("wrench") }}
-                </svg>
-              </span>
-            </div>
-          </th>
+          <th scope="col">{{ _("PCéen") }}</th>
+          <th scope="col">{{ _("Promo") }}</th>
+          <th scope="col" class="text-center">{{ _("Places") }}</th>
+          <th scope="col" class="text-end">{{ _("Prix") }}</th>
+          <th scope="col" class="text-center">{{ _("Payé") }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for voeu in voeux_attribues %}
+        <tr>
+          {{ cq.pceen_name_td(voeu.pceen, season_id, is_admin) }}
+          <td>{{ voeu.pceen.promo or "—" }}</td>
+          <td class="text-center">{{ voeu.places_attribuees }}</td>
+          <td class="text-end text-nowrap">{{ babel.format_currency(spectacle.unit_price * voeu.places_attribuees, "EUR") }}</td>
+          <td class="text-center">
+            {% if voeu._pceen_id in paid_pceen_ids %}
+              <span class="badge rounded-pill text-bg-success">{{ _("Payé") }}</span>
+            {% else %}
+              <span class="badge rounded-pill text-bg-secondary">{{ _("Non payé") }}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2" class="fw-bold">{{ _("Total") }} ({{ voeux_attribues|length }})</td>
+          <td class="text-center fw-bold">{{ sum_places_attribuees }}</td>
+          <td class="text-end fw-bold text-nowrap">{{ babel.format_currency(spectacle.unit_price * sum_places_attribuees, "EUR") }}</td>
+          <td></td>
+        </tr>
+      </tfoot>
+  {% endcall %}
+  {% else %}
+  <p class="text-body-secondary mb-0">{{ _("Aucune place attribuée pour le moment.") }}</p>
+  {% endif %}
+</div>
+
+{# 2 - Liste d'attente #}
+<div class="mb-4">
+  {{ cq.section_header(_("Liste d'attente"), 'heading-attente', badge_count=voeux_attente|length) }}
+  {% if voeux_attente %}
+  {% call cq.clubq_table('heading-attente', wrap_mb='') %}
+      <thead>
+        <tr>
+          <th scope="col" class="text-center">#</th>
+          <th scope="col">{{ _("PCéen") }}</th>
+          <th scope="col">{{ _("Promo") }}</th>
+          <th scope="col" class="text-center">{{ _("Mécontentement") }}</th>
+          <th scope="col" class="text-center">{{ _("Priorité") }}</th>
+          <th scope="col" class="text-center">{{ _("Demandées") }}</th>
+          <th scope="col" class="text-center">{{ _("Min.") }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for voeu in voeux_attente %}
+        <tr>
+          <td class="text-center text-body-secondary">{{ loop.index }}</td>
+          {{ cq.pceen_name_td(voeu.pceen, season_id, is_admin) }}
+          <td>{{ voeu.pceen.promo or "—" }}</td>
+          <td class="text-center">{{ voeu.pceen.discontent if voeu.pceen.discontent is not none else 0 }}</td>
+          <td class="text-center">{{ voeu.priorite }}</td>
+          <td class="text-center">{{ voeu.places_demandees }}</td>
+          <td class="text-center">{{ voeu.places_minimum }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+  {% endcall %}
+  {% else %}
+  <p class="text-body-secondary mb-0">{{ _("Aucune personne en liste d'attente.") }}</p>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if is_admin %}
+{# 3 - Liste complète des voeux #}
+{{ cq.section_header(_("Vœux"), 'heading-voeux', add_modal='#mo-voeu-add', badge_count=nb_total_voeux) }}
+{% call cq.clubq_table('heading-voeux') %}
+      <thead>
+        <tr>
+          {{ cq.sort_th('id', _("ID"), numeric=True) }}
+          {{ cq.sort_th('pceen', _("PCéen")) }}
+          {{ cq.sort_th('priority', _("Priorité"), numeric=True) }}
+          {{ cq.sort_th('asked', _("Demandées"), numeric=True) }}
+          {{ cq.sort_th('min', _("Minimum"), numeric=True) }}
+          {{ cq.sort_th('given', _("Attribuées"), numeric=True) }}
+          {{ cq.sort_th('total', _("Prix total"), numeric=True) }}
+          {{ cq.action_th(th_class='centered') }}
         </tr>
       </thead>
 
       <tbody id="sort-table">
         {% for voeu in voeux %}
         <tr
-          data-id="{{ str(voeu.id).rjust(5, '0') }}"
+          data-id="{{ voeu.id }}"
           data-pceen="{{ voeu.pceen.full_name }}"
-          data-priority="{{ str(voeu.priorite).rjust(5, '0') }}"
+          data-priority="{{ voeu.priorite }}"
           data-asked="{{ voeu.places_demandees }}"
-          data-min="{{ voeu.places_minimum }}"
-          data-given="{{ voeu.places_attribuees }}"
-          data-total="{{ str(spectacle.unit_price * voeu.places_attribuees).rjust(5, '0') }}"
+          data-min="{{ voeu.places_minimum or 0 }}"
+          data-given="{{ voeu.places_attribuees or 0 }}"
+          data-total="{{ spectacle.unit_price * (voeu.places_attribuees or 0) }}"
         >
           <td>{{ voeu.id }}</td>
-          <td onclick="window.location='{{ url_for('club_q.pceen_id', id=voeu._pceen_id) }}';">
-            {{ voeu.pceen.full_name }}
-          </td>
+          {{ cq.pceen_name_td(voeu.pceen, season_id, True) }}
           <td>{{ voeu.priorite }}</td>
           <td>{{ voeu.places_demandees }}</td>
           <td>{{ voeu.places_minimum }}</td>
-          <td>{{ voeu.places_attribuees }}</td>
-          <td>{{ babel.format_currency(spectacle.unit_price * voeu.places_attribuees, "EUR") }}</td>
+          <td>{{ voeu.places_attribuees or 0 }}</td>
+          <td>{{ babel.format_currency(spectacle.unit_price * (voeu.places_attribuees or 0), "EUR") }}</td>
           <td>
             {% call macros.edit_row_btn(_('Éditer le voeu'), '#mo-voeu-edit') %}
               data-voeu-id="{{ voeu.id }}"
@@ -232,23 +162,21 @@
         </tr>
         {% endfor %}
       </tbody>
-      <tbody>
-        <tr class="table-group-divider">
+      <tfoot>
+        <tr>
           <td><b>{{ _("Total") }}</b></td>
           <td><b>{{ _("Nb pcéens : ") }}{{nb_total_voeux}}</b></td>
           <td><b>{{ _("-") }}</b></td>
-          <td><b>{{ spectacle.sum_places_demandees }}</b></td>
+          <td><b>{{ sum_places_demandees }}</b></td>
           <td><b>{{ _("-") }}</b></td>
-          <td><b>{{ spectacle.sum_places_attribuees }}</b></td>
+          <td><b>{{ sum_places_attribuees }}</b></td>
           <td>
-            <b>{{ babel.format_currency(spectacle.unit_price*spectacle.sum_places_attribuees, "EUR") }}</b>
+            <b>{{ babel.format_currency(spectacle.unit_price * sum_places_attribuees, "EUR") }}</b>
           </td>
           <td><b>{{ _("") }}</b></td>
         </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+      </tfoot>
+{% endcall %}
 
 <div class="d-flex flex-wrap gap-2 mb-4">
   <a
@@ -283,6 +211,8 @@
   style="border: 1px solid black"
 ></iframe>
 
+{% if is_admin %}
 <!-- Modals -->
-
-{% include 'club_q/modals/modals_voeux.html' %} {% endblock %}
+{% include 'club_q/modals/modals_voeux.html' %}
+{% endif %}
+{% endblock %}

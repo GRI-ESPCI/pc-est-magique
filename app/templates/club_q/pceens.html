@@ -1,52 +1,13 @@
-{% extends "base.html" %} {% import "_form.html" as wtf %} {% block scripts %} {{ super() }}
-<script
-  src='{{url_for("static", filename="js/sort-table.js") }}'
-  defer
-></script>
-<script
-  src='{{url_for("static", filename="js/club_q/pceens.js") }}'
-  defer
-></script>
-<script defer>
-document.addEventListener("DOMContentLoaded", function () {
-  const searchInput = document.getElementById("pceen-search");
-  const emptyRow = document.getElementById("pceen-search-empty");
-  if (!searchInput) return;
-
-  const normalize = (str) =>
-    (str || "")
-      .toString()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
-
-  function filterRows() {
-    const q = normalize(searchInput.value.trim());
-    const rows = document.querySelectorAll("#sort-table tr");
-    let visibleCount = 0;
-    rows.forEach((row) => {
-      const name = normalize(row.dataset.name);
-      const promo = normalize(row.dataset.promo);
-      const id = normalize(row.cells[0] ? row.cells[0].textContent.trim() : "");
-      const match = !q || name.includes(q) || promo.includes(q) || id === q;
-      row.style.display = match ? "" : "none";
-      if (match) visibleCount++;
-    });
-    if (emptyRow) {
-      emptyRow.style.display = visibleCount === 0 && q ? "" : "none";
-    }
-  }
-
-  searchInput.addEventListener("input", filterRows);
-  window.addEventListener("pageshow", filterRows);
-  filterRows();
-});
-</script>
-
+{% extends "club_q/base.html" %}
+{% import "_form.html" as wtf %}
+{% import "club_q/_macros.html" as cq %}
+{% block scripts %} {{ super() }}
+<script src="{{ url_for('static', filename='js/sort-table.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/club_q/pceens.js') }}" defer></script>
 {% endblock %} {% block app_content %} {% include 'club_q/common.html' %}
 
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
-  <h4 class="mb-0">{{ _("PCéens : ")}}</h4>
+  <h4 id="heading-pceens" class="fw-bold mb-0">{{ _("PCéens : ")}}</h4>
   <div class="m3-search-bar d-flex align-items-center px-3 w-100" style="max-width: 380px;">
     <svg class="bi text-body-secondary ms-2 flex-shrink-0" width="18" height="18">
       {{ macros.bootstrap_icon("search") }}
@@ -61,201 +22,64 @@ document.addEventListener("DOMContentLoaded", function () {
   </div>
 </div>
 
-<div class="row mb-3">
-  <div class="col px-0"><div class="table-responsive rounded-4 shadow-sm bg-body-tertiary mb-4">
-    <table class="table table-hover table-bordered">
+{% call cq.clubq_table('heading-pceens') %}
       <thead>
         <tr>
-          <th
-            scope="col"
-            onclick="sort('id');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("ID") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-id"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('name');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Nom") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-name"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('promo');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Promo") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-promo"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('nbvoeux');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Nombre de voeux") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-nbvoeux"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('asked');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Places demandées") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-asked"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('given');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Places attribuées") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-given"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('discontent');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("Mécontentement") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-discontent"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            scope="col"
-            onclick="sort('cost');"
-          >
-            <span class="d-flex user-select-none">
-              <span>{{ _("À payer") }}</span>
-              <span class="mx-auto">
-                <svg
-                  class="bi flex-shrink-0"
-                  width="16"
-                  height="16"
-                  id="sort-svg-cost"
-                >
-                  <!-- Sort button inserted through JS -->
-                </svg>
-              </span>
-            </span>
-          </th>
-          <th
-            class="centered"
-            scope="col"
-          >
-            <div class="centered-content">
-              <span>
-                <svg
-                  class="bi flex-shrink-0"
-                  width="22"
-                  height="22"
-                >
-                  {{ macros.bootstrap_icon("wrench") }}
-                </svg>
-              </span>
-            </div>
-          </th>
+          {{ cq.sort_th('id', _("ID"), numeric=True) }}
+          {{ cq.sort_th('name', _("Nom")) }}
+          {{ cq.sort_th('promo', _("Promo")) }}
+          {{ cq.sort_th('nbvoeux', _("Nombre de voeux"), numeric=True) }}
+          {{ cq.sort_th('asked', _("Places demandées"), numeric=True) }}
+          {{ cq.sort_th('given', _("Places attribuées"), numeric=True) }}
+          {{ cq.sort_th('discontent', _("Mécontentement"), numeric=True) }}
+          {{ cq.sort_th('cost', _("À payer"), numeric=True) }}
+          {{ cq.sort_th('paid', _("Payé")) }}
+          {{ cq.action_th(th_class='centered') }}
         </tr>
       </thead>
 
       <tbody id="sort-table">
-        {% for i in size %}
+        {% for pceen, cnt, dem, attr, amount in pceen_rows %}
+        {% set is_paid = pceen.id in paid_pceen_ids %}
         <tr
-          data-id="{{ str(pceens[i].id).rjust(5, '0') }}"
-          data-name="{{ pceens[i].full_name }}"
-          data-promo="{{ pceens[i].promo or 0 }}"
-          data-nbvoeux="{{ str(nb_voeux[i]).rjust(5, '0') }}"
-          data-asked="{{ str(sum_places_demandees[i]).rjust(5, '0') }}"
-          data-given="{{ str(sum_places_attribuees[i]).rjust(5, '0') }}"
-          data-cost="{{ pceens_a_payer[i] }}"
-          data-discontent="{{ pceens[i].discontent or 0}}"
+          data-id="{{ pceen.id }}"
+          data-name="{{ (pceen.nom ~ ' ' ~ pceen.prenom) | unidecode | lower }}"
+          data-search="{{ pceen.full_name }} {{ pceen.nom }} {{ pceen.prenom }}"
+          data-promo="{{ pceen.promo or 0 }}"
+          data-nbvoeux="{{ cnt }}"
+          data-asked="{{ dem }}"
+          data-given="{{ attr }}"
+          data-cost="{{ 0 if is_paid else amount }}"
+          data-paid="{{ '1' if is_paid else ('2' if amount == 0 else '0') }}"
+          data-discontent="{{ pceen.discontent or 0 }}"
         >
-          <td onclick="window.location='{{ url_for('club_q.pceen_id', id=pceens[i].id) }}';">{{ pceens[i].id }}</td>
-          <td onclick="window.location='{{ url_for('club_q.pceen_id', id=pceens[i].id) }}';">
-            <p class="overflow no_extra">{{ pceens[i].full_name }}</p>
+          <td onclick="window.location='{{ url_for('club_q.pceen_id', id=pceen.id, season_id=season_id) }}';">{{ pceen.id }}</td>
+          {{ cq.pceen_name_td(pceen, season_id, True) }}
+          <td>{{ pceen.promo }}</td>
+          <td>{{ cnt }}</td>
+          <td>{{ dem }}</td>
+          <td>{{ attr }}</td>
+          <td>{{ pceen.discontent }}</td>
+          <td class="clubq-due-cell text-nowrap">
+            {% if is_paid %}
+              <span class="text-success fw-semibold">{{ babel.format_currency(0, "EUR") }}</span>
+              <small class="text-body-secondary text-decoration-line-through">{{ babel.format_currency(amount, "EUR") }}</small>
+            {% else %}
+              {{ babel.format_currency(amount, "EUR") }}
+            {% endif %}
           </td>
-          <td>{{ pceens[i].promo }}</td>
-          <td>{{ nb_voeux[i] }}</td>
-          <td>{{ sum_places_demandees[i] }}</td>
-          <td>{{ sum_places_attribuees[i] }}</td>
-          <td>{{ pceens[i].discontent }}</td>
-          <td>{{ babel.format_currency(pceens_a_payer[i], "EUR")}}</td>
+          <td class="text-nowrap text-center">
+            {% if amount > 0 or is_paid %}
+              {{ cq.paid_toggle_btn(pceen.id, season_id, amount, is_paid) }}
+            {% else %}
+            <span class="text-body-secondary">—</span>
+            {% endif %}
+          </td>
           <td>
             {% call macros.edit_row_btn(_('Éditer le mécontentement'), '#mo-pceen-edit') %}
-              data-pceen-id="{{ pceens[i].id }}"
-              data-pceen-nom="{{ pceens[i].full_name }}"
-              data-pceen-discontent="{{ pceens[i].discontent }}"
+              data-pceen-id="{{ pceen.id }}"
+              data-pceen-nom="{{ pceen.full_name }}"
+              data-pceen-discontent="{{ pceen.discontent }}"
             {% endcall %}
           </td>
         </tr>
@@ -263,25 +87,29 @@ document.addEventListener("DOMContentLoaded", function () {
       </tbody>
       <tbody>
         <tr id="pceen-search-empty" style="display: none;">
-          <td colspan="9" class="text-center text-body-secondary py-4">
+          <td colspan="10" class="text-center text-body-secondary py-4">
             {{ _("Aucun résultat correspondant à votre recherche.") }}
           </td>
         </tr>
+      </tbody>
+      <tfoot>
         <tr>
           <td><b>{{ _("Total") }}</b></td>
-          <td><b>{{ _("Nb de PCéens : ") }}{{nb_pceens}}</b></td>
+          <td><b>{{ _("Nb de PCéens : ") }}{{ pceen_rows|length }}</b></td>
           <td><b>{{ _("-") }}</b></td>
           <td><b>{{total_nb_voeux}}</b></td>
-          <td><b>{{ showed_season.sum_places_demandees }}</b></td>
-          <td><b>{{ showed_season.sum_places_attribuees }}</b></td>
+          <td><b>{{ total_places_demandees }}</b></td>
+          <td><b>{{ total_places_attribuees }}</b></td>
           <td><b>{{ _("-") }}</b></td>
-          <td><b>{{ babel.format_currency(total_payement, "EUR") }}</b></td>
-          <td><b>{{ _("") }}</b></td>
+          <td class="text-nowrap">
+            <b id="clubq-total-restant">{{ babel.format_currency(total_restant, "EUR") }}</b>
+            <small class="text-body-secondary d-block">{{ _("sur") }} {{ babel.format_currency(total_payement, "EUR") }}</small>
+          </td>
+          <td></td>
+          <td></td>
         </tr>
-      </tbody>
-    </table>
-  </div></div>
-</div>
+      </tfoot>
+{% endcall %}
 
 <a
   class="btn btn-primary"
@@ -342,5 +170,4 @@ document.addEventListener("DOMContentLoaded", function () {
     </div>
   </div>
 </div>
-
 {% endblock %}

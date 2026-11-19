@@ -120,6 +120,14 @@ class PCeen(flask_login.UserMixin, Model):
     bar_daily_data: Mapped[list["models.BarDailyData"]] = one_to_many("BarDailyData.pceen")
 
     clubq_voeux: Mapped[list["models.ClubQVoeu"]] = one_to_many("ClubQVoeu.pceen")
+    clubq_payments: Mapped[list["models.ClubQPayment"]] = one_to_many(
+        "ClubQPayment.pceen",
+        cascade="all, delete-orphan",
+    )
+    clubq_salle_respos: Mapped[list["models.ClubQSalleRespo"]] = one_to_many(
+        "ClubQSalleRespo.pceen",
+        cascade="all, delete-orphan",
+    )
 
     events_created: Mapped[list["models.Event"]] = one_to_many("Event.author")
     jeu_reservations: Mapped[list["models.JeuReservation"]] = one_to_many("JeuReservation.pceen")

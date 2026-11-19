@@ -24,9 +24,11 @@ import flask_login
 import flask_mail
 import flask_moment
 import flask_babel
+from flask_wtf.csrf import generate_csrf
 from urllib.parse import urlparse
 
 import markdown
+from unidecode import unidecode
 
 from config import Config
 from app import enums
@@ -96,6 +98,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
     app.jinja_env.globals["copyright"] = in_app_copyright
     app.jinja_env.globals["babel"] = flask_babel
     app.jinja_env.globals["Settings"] = global_settings.Settings
+    app.jinja_env.globals["csrf_token"] = generate_csrf
     app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 
     # Jinja filters
@@ -104,6 +107,7 @@ def create_app(config_class: type = Config) -> PCEstMagiqueApp:
             return Markup(markdown.markdown(text))
         return Markup("")
     app.jinja_env.filters["markdown"] = markdown_filter
+    app.jinja_env.filters["unidecode"] = lambda text: unidecode(str(text)) if text is not None else ""
 
     # Register blueprints
     # ! Keep imports here to avoid circular import issues !

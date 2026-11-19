@@ -4,25 +4,66 @@ from reportlab.pdfgen import canvas
 from reportlab.platypus import flowables
 import io
 import os
+from collections import defaultdict
+from decimal import Decimal, ROUND_HALF_UP
 import openpyxl
 import zipfile
 
 from app import db
 from app.models import ClubQSpectacle, ClubQVoeu, PCeen, ClubQSeason, ClubQSalle
 import sqlalchemy
-from app.utils.validators import DataRequired
-import wtforms
+from sqlalchemy.exc import IntegrityError
 import flask
 from app.routes.club_q import forms
 from flask_babel import _
+from unidecode import unidecode
 from datetime import datetime
-from flask import request
 
 
 cm = rl.lib.units.cm
 
 
-def pdf_client(pceen, season, voeux):
+def pceen_sort_key(pceen: PCeen) -> tuple[str, str]:
+    """Case and accent-insensitive (last name, first name) sort key."""
+    return (unidecode(pceen.nom or "").lower(), unidecode(pceen.prenom or "").lower())
+
+
+def voeux_sum_attribuees(voeux_list) -> int:
+    """Total number of attributed places for an iterable of ClubQVoeu objects."""
+    return sum((voeu.places_attribuees or 0) for voeu in voeux_list)
+
+
+def voeux_sum_demandees(voeux_list) -> int:
+    """Total number of requested places for an iterable of ClubQVoeu objects."""
+    return sum((voeu.places_demandees or 0) for voeu in voeux_list)
+
+
+def voeux_total_price(voeux_list) -> Decimal:
+    """Total cost of an iterable of ClubQVoeu objects (spectacle must be loaded)."""
+    total = sum(
+        (Decimal(voeu.places_attribuees or 0) * Decimal(str(voeu.spectacle.unit_price)) for voeu in voeux_list),
+        Decimal(0),
+    )
+    return total.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
+def group_by(items, key: str) -> dict:
+    """Group an iterable of objects into a dict of lists keyed by the given attribute."""
+    grouped = defaultdict(list)
+    for item in items:
+        grouped[getattr(item, key)].append(item)
+    return grouped
+
+
+def count_by(group_column, *filters) -> dict[int, int]:
+    """Return {group_column value: row count} in a single GROUP BY query."""
+    rows = db.session.execute(
+        db.select(group_column, sqlalchemy.func.count()).where(*filters).group_by(group_column)
+    ).all()
+    return {key: count for key, count in rows}
+
+
+def pdf_client(pceen, season, voeux, is_paid=False):
     # Create a PDF buffer
     buffer = io.BytesIO()
 
@@ -51,8 +92,12 @@ def pdf_client(pceen, season, voeux):
         for voeu in voeux_list
     ]
 
+    total_due = voeux_total_price(voeux_list)
     specs.append("-" * 158)
-    specs.append(f"Total à payer : {pceen_prix_total(pceen, voeux)} €.")
+    if is_paid and total_due > 0:
+        specs.append(f"Total : {total_due:.2f} € — Payé (reste à payer : 0.00 €).")
+    else:
+        specs.append(f"Total à payer : {total_due:.2f} €.")
 
     # Conversion en objets reportlab
     blocs_descr = []
@@ -265,7 +310,7 @@ def excel_spectacle(spec, season, voeux_attrib, voeux_nan_attrib):
     sheet["A4"] = "Places proposées :"
     sheet["B4"] = spec.nb_tickets
     sheet["D4"] = "Places vendues :"
-    sheet["E4"] = sum((voeu.places_attribuees or 0) for voeu in voeux_attrib)
+    sheet["E4"] = voeux_sum_attribuees(voeux_attrib)
 
     sheet["A6"] = "NOM"
     sheet["B6"] = "Prénom"
@@ -372,14 +417,17 @@ def export_excel_spectacles(spectacles, season, voeux_attrib_list, voeux_nan_att
     return zip_buffer
 
 
-def exporter_excel_prix(saison, pceens, spectacles, voeux):
+def exporter_excel_prix(saison, pceens, spectacles, voeux, paid_pceen_ids=None):
     # Code de génération de résumé des payements au Club Q originalement par Loïc Simon - Adapté aux besoin de pem
-    # Code assez (très) moche, attention - il y a moyen de faire ça beaucoup mieux, mais bon...
+    paid_pceen_ids = paid_pceen_ids or set()
     workbook = openpyxl.Workbook()
     sheet = workbook.active
     sheet.title = "Récapitulatif"
 
-    voeux_list = db.session.scalars(voeux).all()
+    voeux_list = db.session.scalars(
+        voeux.options(sqlalchemy.orm.selectinload(ClubQVoeu.spectacle))
+    ).all()
+    voeux_by_pceen = group_by(voeux_list, "_pceen_id")
 
     sheet["A1"] = f"Club Q – Récapitulatif saison {saison.nom}"
     sheet["A1"].font = openpyxl.styles.Font(bold=True)
@@ -399,7 +447,7 @@ def exporter_excel_prix(saison, pceens, spectacles, voeux):
     sheet["A4"] = "Places proposées :"
     sheet["B4"] = sum((spec.nb_tickets or 0) for spec in spectacles)
     sheet["D4"] = "Places vendues :"
-    sheet["E4"] = sum((voeu.places_attribuees or 0) for voeu in voeux_list)
+    sheet["E4"] = voeux_sum_attribuees(voeux_list)
 
     sheet["A6"] = "NOM"
     sheet["B6"] = "Prénom"
@@ -410,46 +458,52 @@ def exporter_excel_prix(saison, pceens, spectacles, voeux):
     sheet["G6"] = "Payé ?"
 
     npa = 0
-    tot = 0
-    for i, client in enumerate(sorted(pceens, key=lambda c: c.full_name)):
+    tot = Decimal("0.00")
+    sorted_pceens = sorted(pceens, key=pceen_sort_key)
+    for i, client in enumerate(sorted_pceens):
         sheet.cell(row=7 + i, column=1).value = client.nom.upper()
         sheet.cell(row=7 + i, column=2).value = client.prenom.title()
-        sheet.cell(row=7 + i, column=3).value = client.promo or client.autre
+        sheet.cell(row=7 + i, column=3).value = client.promo or ""
 
         sheet.cell(row=7 + i, column=4).value = client.email
         if client.email and "@" in client.email:
             sheet.cell(row=7 + i, column=4).hyperlink = f"mailto:{client.email}"
             sheet.cell(row=7 + i, column=4).style = "Hyperlink"
 
-        placesattr = pceen_sum_places_attribuees(client, voeux)
+        client_voeux = voeux_by_pceen.get(client.id, [])
+        placesattr = voeux_sum_attribuees(client_voeux)
         sheet.cell(row=7 + i, column=5).value = placesattr
         npa += placesattr
-        apayer = pceen_prix_total(client, voeux)
+        apayer = voeux_total_price(client_voeux)
         sheet.cell(row=7 + i, column=6).value = apayer
         sheet.cell(row=7 + i, column=6).number_format = "#,##0.00 €_-"
+        sheet.cell(row=7 + i, column=7).value = "Oui" if client.id in paid_pceen_ids else ("Non" if apayer > 0 else "")
         tot += apayer
 
-    tab = openpyxl.worksheet.table.Table(displayName="Données", ref=f"A6:G{7 + i}")
+    last_row = 6 + len(sorted_pceens)
+    if sorted_pceens:
+        tab = openpyxl.worksheet.table.Table(displayName="Données", ref=f"A6:G{last_row}")
 
-    style = openpyxl.worksheet.table.TableStyleInfo(
-        name="TableStyleLight1",
-        showFirstColumn=False,
-        showLastColumn=False,
-        showRowStripes=True,
-        showColumnStripes=False,
-    )
-    tab.tableStyleInfo = style
-    sheet.add_table(tab)
+        style = openpyxl.worksheet.table.TableStyleInfo(
+            name="TableStyleLight1",
+            showFirstColumn=False,
+            showLastColumn=False,
+            showRowStripes=True,
+            showColumnStripes=False,
+        )
+        tab.tableStyleInfo = style
+        sheet.add_table(tab)
 
-    sheet.cell(row=7 + i + 2, column=1).value = "Total"
-    sheet.cell(row=7 + i + 2, column=1).font = openpyxl.styles.Font(bold=True)
+    total_row = last_row + 2
+    sheet.cell(row=total_row, column=1).value = "Total"
+    sheet.cell(row=total_row, column=1).font = openpyxl.styles.Font(bold=True)
 
-    sheet.cell(row=7 + i + 2, column=5).value = npa
-    sheet.cell(row=7 + i + 2, column=5).font = openpyxl.styles.Font(bold=True)
+    sheet.cell(row=total_row, column=5).value = npa
+    sheet.cell(row=total_row, column=5).font = openpyxl.styles.Font(bold=True)
 
-    sheet.cell(row=7 + i + 2, column=6).value = tot
-    sheet.cell(row=7 + i + 2, column=6).font = openpyxl.styles.Font(bold=True)
-    sheet.cell(row=7 + i + 2, column=6).number_format = "#,##0.00 €_-"
+    sheet.cell(row=total_row, column=6).value = tot
+    sheet.cell(row=total_row, column=6).font = openpyxl.styles.Font(bold=True)
+    sheet.cell(row=total_row, column=6).number_format = "#,##0.00 €_-"
 
     sheet.column_dimensions["A"].width = 20
     sheet.column_dimensions["B"].width = 20
@@ -464,44 +518,6 @@ def exporter_excel_prix(saison, pceens, spectacles, voeux):
     workbook.save(excel_data)
 
     return excel_data
-
-
-def pceen_sum_places_demandees(pceen, voeux) -> int:
-    """Gives the number of wanted places for a pceen for the given saison of Club Q"""
-    voeux_list = db.session.scalars(voeux.filter_by(_pceen_id=pceen.id)).all()
-    return sum(voeu.places_demandees for voeu in voeux_list)
-
-
-def pceen_sum_places_attribuees(pceen, voeux) -> int:
-    """Gives the number of given places for a pceen for the given saison of Club Q"""
-    voeux_list = db.session.scalars(voeux.filter_by(_pceen_id=pceen.id)).all()
-    return sum(voeu.places_attribuees for voeu in voeux_list)
-
-
-def pceen_prix_total(pceen, voeux) -> int:
-    """Gives the the total price for a pceen for the given saison of Club Q"""
-    voeux_list = db.session.scalars(voeux.filter_by(_pceen_id=pceen.id)).all()
-    return sum(voeu.places_attribuees * voeu.spectacle.unit_price for voeu in voeux_list)
-
-
-def sum_object(subject, query) -> int:
-    """Return the sum of object in the query corresponding to the subject"""
-    if type(subject) == PCeen:
-        return db.session.scalar(
-            db.select(sqlalchemy.func.count()).select_from(query.filter_by(_pceen_id=subject.id).subquery())
-        )
-    elif type(subject) == ClubQSpectacle:
-        return db.session.scalar(
-            db.select(sqlalchemy.func.count()).select_from(query.filter_by(_spectacle_id=subject.id).subquery())
-        )
-    elif type(subject) == ClubQSalle:
-        return db.session.scalar(
-            db.select(sqlalchemy.func.count()).select_from(query.filter_by(_salle_id=subject.id).subquery())
-        )
-    elif type(subject) == ClubQSeason:
-        return db.session.scalar(
-            db.select(sqlalchemy.func.count()).select_from(query.filter_by(_season_id=subject.id).subquery())
-        )
 
 
 def spectacles_sum_places_attribuees(spectacles) -> int:
@@ -520,63 +536,40 @@ def spectacles_sum_places(spectacles) -> int:
 
 
 def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect, can_edit):
+    """Initialize and process the add/edit vœu admin forms."""
+    add_defaults = {}
+    if spectacle is not None:
+        add_defaults["spectacle_add"] = spectacle.id
+    if pceen is not None:
+        add_defaults["pceen_add"] = pceen.id
 
-    if spectacle != None:
-        # Add spectacle select choice for adding voeu
-        setattr(
-            forms.AddVoeu,
-            "spectacle_add",
-            wtforms.SelectField(
-                _("Spectacle"),
-                choices=[[spect.id, spect.nom] for spect in spectacles],
-                default=spectacle.id,
-                validators=[DataRequired()],
-            ),
-        )
-    else:
-        # Add spectacle select choice for adding voeu
-        setattr(
-            forms.AddVoeu,
-            "spectacle_add",
-            wtforms.SelectField(
-                _("Spectacle"), choices=[[spect.id, spect.nom] for spect in spectacles], validators=[DataRequired()]
-            ),
-        )
-
-    # Add pceens select choice for adding voeu
-    setattr(
-        forms.AddVoeu,
-        "pceen_add",
-        wtforms.SelectField(
-            _("Pcéen"),
-            choices=[[pceen_.id, pceen_.full_name] for pceen_ in pceens],
-            default=pceen.id,
-            validators=[DataRequired()],
-        ),
-    )
-
-    # Forms
-    form_add_voeu = forms.AddVoeu()
+    form_add_voeu = forms.AddVoeu(**add_defaults)
+    form_add_voeu.spectacle_add.choices = [(spect.id, spect.nom) for spect in spectacles]
+    form_add_voeu.pceen_add.choices = [(pceen_.id, pceen_.full_name) for pceen_ in pceens]
     form_edit_voeu = forms.EditVoeu()
 
     # If a form is validated
     if form_add_voeu.is_submitted() and can_edit:
         submit = form_add_voeu["submit_add"].data
-        if submit:
-            if form_add_voeu.validate():
-                voeu = ClubQVoeu()
-                voeu._spectacle_id = form_add_voeu["spectacle_add"].data
-                voeu._pceen_id = form_add_voeu["pceen_add"].data
-                voeu._season_id = season_id
-                voeu.priorite = form_add_voeu["priorite_add"].data
-                voeu.places_demandees = form_add_voeu["places_demandees_add"].data
-                voeu.places_minimum = form_add_voeu["places_minimum_add"].data or 0
-                voeu.places_attribuees = form_add_voeu["places_attribuees_add"].data
-
-                db.session.add(voeu)
+        if submit and form_add_voeu.validate():
+            voeu = ClubQVoeu(
+                _spectacle_id=form_add_voeu["spectacle_add"].data,
+                _pceen_id=form_add_voeu["pceen_add"].data,
+                _season_id=season_id,
+                priorite=form_add_voeu["priorite_add"].data,
+                places_demandees=form_add_voeu["places_demandees_add"].data,
+                places_minimum=form_add_voeu["places_minimum_add"].data or 0,
+                places_attribuees=form_add_voeu["places_attribuees_add"].data,
+            )
+            db.session.add(voeu)
+            try:
                 db.session.commit()
-                flask.flash(_("Voeu ajouté."), "success")
-                return flask.redirect(redirect)
+            except IntegrityError:
+                db.session.rollback()
+                flask.flash(_("Ce PCéen a déjà un vœu pour ce spectacle."), "danger")
+                return form_add_voeu, form_edit_voeu, flask.redirect(redirect)
+            flask.flash(_("Voeu ajouté."), "success")
+            return form_add_voeu, form_edit_voeu, flask.redirect(redirect)
 
     if form_edit_voeu.is_submitted() and can_edit:
         delete = form_edit_voeu["delete_edit"].data
@@ -586,7 +579,7 @@ def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect, can_edi
 
             db.session.commit()
             flask.flash(_("Voeu supprimé."), "success")
-            return flask.redirect(redirect)
+            return form_add_voeu, form_edit_voeu, flask.redirect(redirect)
 
         if form_edit_voeu.validate():
             voeu = db.session.scalars(db.select(ClubQVoeu).filter_by(id=form_edit_voeu["id_edit"].data)).one()
@@ -598,32 +591,16 @@ def voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect, can_edi
 
             db.session.commit()
             flask.flash(_("Voeu édité."), "success")
-            return flask.redirect(redirect)
+            return form_add_voeu, form_edit_voeu, flask.redirect(redirect)
+
+    return form_add_voeu, form_edit_voeu, None
 
 
 def spectacle_form(salles, salle, season_id, redirect, can_edit):
-
-    if salle != None:
-        setattr(
-            forms.EditSpectacle,
-            "salle_id",
-            wtforms.SelectField(
-                _("Salle"),
-                choices=[[salle.id, salle.nom] for salle in salles],
-                default=salle.id,
-                validators=[DataRequired()],
-            ),
-        )
-    else:
-        setattr(
-            forms.EditSpectacle,
-            "salle_id",
-            wtforms.SelectField(
-                _("Salle"), choices=[[salle.id, salle.nom] for salle in salles], validators=[DataRequired()]
-            ),
-        )
-
-    form_spectacle = forms.EditSpectacle()
+    """Initialize and process the add/edit spectacle admin form."""
+    defaults = {"salle_id": salle.id} if salle is not None else {}
+    form_spectacle = forms.EditSpectacle(**defaults)
+    form_spectacle.salle_id.choices = [(s.id, s.nom) for s in salles]
 
     if form_spectacle.validate_on_submit() and can_edit:
         add = form_spectacle["add"].data
@@ -645,7 +622,7 @@ def spectacle_form(salles, salle, season_id, redirect, can_edit):
             db.session.commit()
 
             flask.flash(_("Spectacle ajouté."), "success")
-            return flask.redirect(redirect)
+            return form_spectacle, flask.redirect(redirect)
 
         delete = form_spectacle["delete"].data
         spectacle = db.session.scalars(db.select(ClubQSpectacle).filter_by(id=form_spectacle["id"].data)).one()
@@ -655,17 +632,18 @@ def spectacle_form(salles, salle, season_id, redirect, can_edit):
             db.session.commit()
 
             flask.flash(_("Spectacle supprimé."), "success")
-            return flask.redirect(redirect)
+            return form_spectacle, flask.redirect(redirect)
 
-        else:
-            spectacle.nom = form_spectacle["nom"].data
-            spectacle._salle_id = form_spectacle["salle_id"].data
-            spectacle.description = form_spectacle["description"].data
-            spectacle.categorie = form_spectacle["categorie"].data
-            spectacle.date = datetime.combine(form_spectacle["date"].data, form_spectacle["time"].data)
-            spectacle.nb_tickets = form_spectacle["nb_tickets"].data
-            spectacle.unit_price = form_spectacle["price"].data
+        spectacle.nom = form_spectacle["nom"].data
+        spectacle._salle_id = form_spectacle["salle_id"].data
+        spectacle.description = form_spectacle["description"].data
+        spectacle.categorie = form_spectacle["categorie"].data
+        spectacle.date = datetime.combine(form_spectacle["date"].data, form_spectacle["time"].data)
+        spectacle.nb_tickets = form_spectacle["nb_tickets"].data
+        spectacle.unit_price = form_spectacle["price"].data
 
-            db.session.commit()
-            flask.flash(_("Spectacle édité."), "success")
-            return flask.redirect(redirect)
+        db.session.commit()
+        flask.flash(_("Spectacle édité."), "success")
+        return form_spectacle, flask.redirect(redirect)
+
+    return form_spectacle, None

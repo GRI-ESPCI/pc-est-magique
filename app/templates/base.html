@@ -10,6 +10,7 @@
         {% block metas %}
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
         <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
         <meta name="theme-color" content="#152f4e" media="(prefers-color-scheme: dark)">
@@ -216,8 +217,7 @@
                                                     applicationServerKey: urlBase64ToUint8Array(vapidData.public_key)
                                                 });
                                                 
-                                                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-                                                const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+                                                const csrfToken = window.PEM.getCsrfToken();
                                                 
                                                 const subRes = await fetch('{{ url_for("api.push.subscribe") }}', {
                                                     method: 'POST',

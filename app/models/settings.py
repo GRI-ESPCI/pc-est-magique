@@ -44,5 +44,15 @@ class GlobalSetting(db.Model):
             raise RuntimeError("Outside of request context")
         return self.name_fr if locale.language[:2] == "fr" else self.name_en
 
+    @classmethod
+    def get(cls, key: str) -> GlobalSetting:
+        """Read directly from DB (unlike Settings, which caches per process)."""
+        return db.session.scalars(db.select(cls).filter_by(key=key)).one()
+
+    @classmethod
+    def get_value(cls, key: str) -> int:
+        """Fetch a GlobalSetting integer value from the DB."""
+        return cls.get(key).value
+
 
 from app import models

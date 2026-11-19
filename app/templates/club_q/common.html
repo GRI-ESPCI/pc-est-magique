@@ -4,24 +4,24 @@
   href="{{ url_for('static', filename='css/club_q.css') }}"
 />
 
-{% set is_admin = has_permission(PermissionType.write, PermissionScope.club_q) %}
 {% set admin_views = ['pceens', 'pceen_view', 'voeux', 'saisons', 'attribution', 'mails', 'options', 'spectacles', 'salles', 'salle'] %}
 {% set in_admin = is_admin and view in admin_views %}
 
 {% set show_seasons = view in ['pceens', 'salle', 'pceen_view', 'spectacles', 'voeux', 'salles', 'pceen_reservations'] %}
 {% macro season_dropdown() %}
 {% set current_saison = saisons | selectattr('id', 'equalto', season_id) | first %}
+{% set is_all_seasons = all_seasons is defined and all_seasons %}
 <div class="dropdown">
   <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2 fw-bold shadow-sm px-3 py-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
     <svg class="bi flex-shrink-0" width="18" height="18" role="img">{{ macros.bootstrap_icon("calendar3") }}</svg>
-    <span>{{ current_saison.nom if current_saison else (_("Toutes les saisons") if season_id == -1 else _("Saison")) }}</span>
+    <span>{{ current_saison.nom if current_saison else (_("Toutes les saisons") if is_all_seasons else _("Saison")) }}</span>
   </button>
   <ul class="dropdown-menu dropdown-menu-end shadow clubq-season-menu p-1" style="max-height: 60vh; overflow-y: auto">
     {% if view == 'salles' %}
-    <li><a class="dropdown-item rounded-2 {{ 'active' if season_id == -1 }}" href="{{ url_for(redirect, season_id=None) }}">{{ _("Toutes les saisons") }}</a></li>
+    <li><a class="dropdown-item rounded-2 {{ 'active' if is_all_seasons }}" href="{{ url_for(redirect, season_id=None) }}">{{ _("Toutes les saisons") }}</a></li>
     <li><hr class="dropdown-divider"></li>
     {% endif %}
-    {% for saison in saisons if saison.attributions_visible %}
+    {% for saison in saisons if saison.attributions_visible and (is_admin or view != 'spectacles' or saison.id in respo_season_ids) %}
     {% if view in ['pceen_reservations', 'pceen_view'] %}
       {% set href = url_for('club_q.pceen_id', id=pceen.id, season_id=saison.id) %}
     {% elif view == 'salle' %}
@@ -64,11 +64,12 @@
 {# Onglets #}
 <ul class="nav flex-wrap gap-2 mb-4 pb-1" name="clubq_navbar">
   {% if in_admin %}
+    {% set tab_sid = season_id if (season_id is defined and season_id is not none) else none %}
     {% set tabs = [
-      (url_for('club_q.pceens'), _("PCéens"), 'people', ['pceens', 'pceen_view']),
-      (url_for('club_q.spectacles'), _("Spectacles"), 'receipt-cutoff', ['spectacles']),
-      (url_for('club_q.salles'), _("Salles"), 'building', ['salles', 'salle']),
-      (url_for('club_q.voeux'), _("Voeux"), 'heart', ['voeux']),
+      (url_for('club_q.pceens', season_id=tab_sid), _("PCéens"), 'people', ['pceens', 'pceen_view']),
+      (url_for('club_q.spectacles', season_id=tab_sid), _("Spectacles"), 'receipt-cutoff', ['spectacles']),
+      (url_for('club_q.salles', season_id=tab_sid), _("Salles"), 'building', ['salles', 'salle']),
+      (url_for('club_q.voeux', season_id=tab_sid), _("Voeux"), 'heart', ['voeux']),
       (url_for('club_q.saisons'), _("Saisons"), 'calendar3', ['saisons']),
       (url_for('club_q.attribution_manager'), _("Attributions"), 'check2-square', ['attribution']),
       (url_for('club_q.mails'), _("Mails"), 'envelope', ['mails']),
@@ -79,7 +80,7 @@
       (url_for('club_q.main'), _("Réservations"), 'ticket-perforated', ['reservations']),
       (url_for('club_q.pceen_id', id=user.id), _("Mes réservations"), 'person', ['pceen_reservations']),
       (url_for('club_q.brochures'), _("Plaquettes"), 'book', ['plaquettes']),
-    ] %}
+    ] + ([(url_for('club_q.spectacles'), _("Respo salle"), 'building', ['spectacles'])] if is_respo_salle else []) %}
   {% endif %}
   {% for href, label, icon, views in tabs %}
   <li class="nav-item">

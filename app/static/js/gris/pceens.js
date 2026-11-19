@@ -202,12 +202,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let debounceTimer = null;
   let activeController = null;
 
-  const normalize = (str) =>
-    (str || "")
-      .toString()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
+  const normalize = window.PEM.normalize;
 
   function updateClearButton(val) {
     if (clearBtn) {

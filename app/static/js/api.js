@@ -1,3 +1,13 @@
+window.PEM = {
+  normalize(str) {
+    return (str || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  },
+
+  getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute("content") || "";
+  },
+};
+
 function post_and_reload(url, form, method = "POST", keep_open_selector = null, seamless_swap_selectors = null) {
   let body;
   if (form) body = new FormData(form);

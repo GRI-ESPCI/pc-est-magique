@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "club_q/base.html" %}
 {% import "_form.html" as wtf %}
 
 {% block scripts %}
@@ -14,153 +14,304 @@
 
 <script defer>
 document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('clubq-reservations-form');
   const searchInput = document.getElementById('spectacle-search');
-  const cards = document.querySelectorAll('.clubq-spectacle-card');
+  const sections = Array.from(document.querySelectorAll('.clubq-category-section'));
   const emptySearch = document.getElementById('spectacle-search-empty');
-  const prioInputs = document.querySelectorAll('.voeu-input-priorite');
-  const placesInputs = document.querySelectorAll('.voeu-input-places');
-  const minInputs = document.querySelectorAll('.voeu-input-places-min');
   const submitBtn = document.getElementById('btn-submit-wishes');
+  const submitBtnLabel = document.getElementById('btn-submit-wishes-label');
   const validationErrorMsg = document.getElementById('validation-error-msg');
+  const validationAlert = document.getElementById('clubq-validation-alert');
+  const validationAlertList = document.getElementById('clubq-validation-alert-list');
+  const jumpFirstErrorBtn = document.getElementById('btn-jump-first-error');
   const summaryCount = document.getElementById('summary-wishes-count');
   const summaryLabel = document.getElementById('summary-wishes-label');
+  const unsavedBadge = document.getElementById('unsaved-changes-badge');
 
-  if (searchInput) {
-    searchInput.addEventListener('input', function (e) {
-      const q = e.target.value.trim().toLowerCase();
-      let visibleCount = 0;
-      cards.forEach(card => {
-        const name = card.dataset.name || '';
-        const salle = card.dataset.salle || '';
-        const cat = card.dataset.category || '';
-        const match = !q || name.includes(q) || salle.includes(q) || cat.includes(q);
-        card.style.display = match ? '' : 'none';
-        if (match) visibleCount++;
-      });
-      if (emptySearch) {
-        emptySearch.style.display = (visibleCount === 0 && q) ? '' : 'none';
-      }
-    });
-  }
+  const normalize = window.ClubQ.normalize;
+  const scrollBehavior = () => (window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
+  const isPosInt = v => v !== null && !Number.isNaN(v);
+  const formatNames = list => list.slice(0, 3).join(', ') + (list.length > 3 ? '…' : '');
+  const BADGE_BASE = 'badge rounded-pill px-2 py-1 voeu-badge';
 
-  function getDuplicates() {
-    const counts = {};
-    const dupes = new Set();
-    prioInputs.forEach(input => {
-      const v = parseInt(input.value.trim(), 10);
-      if (!isNaN(v) && v > 0) {
-        counts[v] = (counts[v] || 0) + 1;
-        if (counts[v] > 1) dupes.add(v);
-      }
-    });
-    return dupes;
-  }
-
-  function updateCardState(card, dupes) {
+  const cardRefs = Array.from(document.querySelectorAll('.clubq-spectacle-card')).map(card => {
     const prioInput = card.querySelector('.voeu-input-priorite');
     const placesInput = card.querySelector('.voeu-input-places');
     const minInput = card.querySelector('.voeu-input-places-min');
-    const badge = card.querySelector('.voeu-badge');
-    const prioTile = card.querySelector('.clubq-prio-tile');
-    const minTile = minInput ? minInput.closest('.clubq-input-tile') : null;
-    const val = prioInput ? parseInt(prioInput.value.trim(), 10) : 0;
-    const placesVal = placesInput ? parseInt(placesInput.value.trim(), 10) : 0;
-    const minVal = minInput ? parseInt(minInput.value.trim(), 10) : 0;
-    const hasMinError = !isNaN(minVal) && minVal > 0 && !isNaN(placesVal) && placesVal > 0 && minVal > placesVal;
+    return {
+      card,
+      title: card.dataset.title || '',
+      searchHay: normalize(`${card.dataset.name || ''} ${card.dataset.salle || ''} ${card.dataset.category || ''}`),
+      prioInput,
+      placesInput,
+      minInput,
+      badge: card.querySelector('.voeu-badge'),
+      prioTile: card.querySelector('.clubq-prio-tile'),
+      placesTile: placesInput?.closest('.clubq-input-tile'),
+      minTile: minInput?.closest('.clubq-input-tile'),
+    };
+  });
+  const sectionRefs = sections.map(section => ({
+    section,
+    cards: cardRefs.filter(r => section.contains(r.card)),
+  }));
+  const allInputs = cardRefs.flatMap(r => [r.prioInput, r.placesInput, r.minInput]).filter(Boolean);
+  const initialValues = new Map(allInputs.map(input => [input.name, input.value.trim()]));
 
-    if (minTile) {
-      minTile.classList.toggle('has-duplicate', hasMinError);
+  const hadServerErrors = validationAlert ? !validationAlert.classList.contains('d-none') : false;
+  let hasSubmittedOnce = hadServerErrors;
+  let gapsRevealed = hadServerErrors;
+  let bannerVisible = hadServerErrors;
+  let firstInvalidInput = null;
+
+  function parsePositiveInt(input) {
+    if (!input) return null;
+    if (input.validity?.badInput) return NaN;
+    const raw = input.value.trim();
+    if (!raw) return null;
+    if (!/^\d+$/.test(raw)) return NaN;
+    const val = parseInt(raw, 10);
+    return val > 0 ? val : NaN;
+  }
+
+  // Search filter
+  window.ClubQ.bindFilter(searchInput, q => {
+    let totalVisible = 0;
+    sectionRefs.forEach(({ section, cards }) => {
+      let visible = 0;
+      cards.forEach(({ card, searchHay }) => {
+        const match = !q || searchHay.includes(q);
+        card.hidden = !match;
+        if (match) visible++;
+      });
+      section.hidden = visible === 0;
+      totalVisible += visible;
+    });
+    if (emptySearch) emptySearch.hidden = !(totalVisible === 0 && q);
+  });
+
+  function validate() {
+    const prioCounts = {};
+    const validPrios = [];
+    const dupes = new Set();
+    const missingPlaces = [];
+    const missingPrio = [];
+    let hasMinWithoutPlaces = false;
+    let hasMinExceeds = false;
+    let hasInvalidPos = false;
+
+    const entries = cardRefs.map(ref => {
+      const prio = parsePositiveInt(ref.prioInput);
+      const places = parsePositiveInt(ref.placesInput);
+      const min = parsePositiveInt(ref.minInput);
+
+      if (Number.isNaN(prio) || Number.isNaN(places) || Number.isNaN(min)) hasInvalidPos = true;
+      if (isPosInt(prio)) {
+        validPrios.push(prio);
+        prioCounts[prio] = (prioCounts[prio] || 0) + 1;
+        if (prioCounts[prio] > 1) dupes.add(prio);
+        if (places === null) missingPlaces.push(ref.title);
+      }
+      if (isPosInt(places) && prio === null) missingPrio.push(ref.title);
+      if (isPosInt(min) && places === null) hasMinWithoutPlaces = true;
+      if (isPosInt(min) && isPosInt(places) && min > places) hasMinExceeds = true;
+
+      return { ref, prio, places, min };
+    });
+
+    const missingPriorities = [];
+    if (validPrios.length > 0) {
+      const prioSet = new Set(validPrios);
+      for (let i = 1, max = Math.max(...validPrios); i <= max; i++) {
+        if (!prioSet.has(i)) missingPriorities.push(i);
+      }
+    }
+    const firstGap = missingPriorities[0] ?? null;
+    const sortedDupes = Array.from(dupes).sort((a, b) => a - b);
+
+    const messages = [];
+    let shortMessage = '';
+
+    if (sortedDupes.length > 0) {
+      const list = sortedDupes.map(n => '#' + n).join(', ');
+      messages.push(
+        (sortedDupes.length === 1
+          ? {{ _("Égalité dans le classement : la priorité {list} est utilisée plusieurs fois. Les égalités perturbent l'algorithme d'attribution.") | tojson }}
+          : {{ _("Égalités dans le classement : les priorités {list} sont utilisées plusieurs fois. Les égalités perturbent l'algorithme d'attribution.") | tojson }}
+        ).replace('{list}', list)
+      );
+      shortMessage ||= {{ _("Égalité détectée :") | tojson }} + ' ' + list;
     }
 
-    if (!isNaN(val) && val > 0) {
-      if (prioTile) {
-        prioTile.classList.add('is-active');
-        prioTile.classList.toggle('has-duplicate', dupes.has(val));
-      }
-      if (badge) {
-        if (dupes.has(val)) {
-          badge.textContent = '{{ _("Doublon #") }}' + val;
-          badge.className = 'badge bg-danger text-white rounded-pill px-2 py-1 voeu-badge';
-        } else {
-          badge.textContent = '{{ _("Vœu #") }}' + val;
-          badge.className = 'badge bg-primary rounded-pill px-2 py-1 voeu-badge';
+    if (missingPriorities.length > 0) {
+      const list = missingPriorities.slice(0, 6).map(n => '#' + n).join(', ') + (missingPriorities.length > 6 ? '…' : '');
+      messages.push(
+        (missingPriorities.length === 1
+          ? {{ _("Trou dans le classement : la priorité {list} est manquante. Les priorités doivent se suivre de 1 en 1 sans trou pour le bon fonctionnement de l'algorithme.") | tojson }}
+          : {{ _("Trous dans le classement : les priorités {list} sont manquantes. Les priorités doivent se suivre de 1 en 1 sans trou pour le bon fonctionnement de l'algorithme.") | tojson }}
+        ).replace('{list}', list)
+      );
+      shortMessage ||= {{ _("Trou dans le classement (manquant :") | tojson }} + ' ' + list + ')';
+    }
+
+    if (missingPlaces.length > 0) {
+      messages.push({{ _("Nombre de places manquant pour :") | tojson }} + ' ' + formatNames(missingPlaces) + '.');
+      shortMessage ||= {{ _("Nombre de places manquant.") | tojson }};
+    }
+    if (missingPrio.length > 0) {
+      messages.push({{ _("Priorité manquante pour :") | tojson }} + ' ' + formatNames(missingPrio) + '.');
+      shortMessage ||= {{ _("Priorité manquante.") | tojson }};
+    }
+    if (hasMinWithoutPlaces) {
+      messages.push({{ _("Un nombre de places minimum est renseigné sans nombre de places demandées.") | tojson }});
+      shortMessage ||= {{ _("Minimum renseigné sans nombre de places.") | tojson }};
+    }
+    if (hasMinExceeds) {
+      messages.push({{ _("Le nombre de places minimum dépasse le nombre de places demandées.") | tojson }});
+      shortMessage ||= {{ _("Le minimum dépasse le nombre de places demandées.") | tojson }};
+    }
+    if (hasInvalidPos) {
+      messages.push({{ _("Les priorités et nombres de places doivent être des entiers positifs (à partir de 1).") | tojson }});
+      shortMessage ||= {{ _("Valeur invalide (entier ≥ 1 attendu).") | tojson }};
+    }
+
+    firstInvalidInput = null;
+    entries.forEach(({ ref, prio, places, min }) => {
+      const isDupe = isPosInt(prio) && dupes.has(prio);
+      const afterGap = isPosInt(prio) && firstGap !== null && prio > firstGap;
+      const isAfterGap = gapsRevealed && afterGap;
+      const needsPrio = isPosInt(places) && prio === null;
+      const needsPlaces = (isPosInt(prio) || isPosInt(min)) && places === null;
+      const prioErr = Number.isNaN(prio) || isDupe || (hasSubmittedOnce && needsPrio);
+      const placesErr = Number.isNaN(places) || (hasSubmittedOnce && needsPlaces);
+      const minErr = Number.isNaN(min) || (isPosInt(min) && isPosInt(places) && min > places);
+
+      if (!firstInvalidInput) {
+        if (prioErr || afterGap || needsPrio) {
+          firstInvalidInput = ref.prioInput;
+        } else if (placesErr || needsPlaces) {
+          firstInvalidInput = ref.placesInput;
+        } else if (minErr) {
+          firstInvalidInput = ref.minInput;
         }
       }
-    } else {
-      if (prioTile) {
-        prioTile.classList.remove('is-active', 'has-duplicate');
-      }
-      if (badge) {
-        badge.textContent = '';
-        badge.className = 'badge bg-primary rounded-pill px-2 py-1 voeu-badge d-none';
-      }
-    }
-    return hasMinError;
-  }
 
-  function updateValidationAndSummary() {
-    const dupes = getDuplicates();
-    let totalWishes = 0;
-    prioInputs.forEach(input => {
-      const v = parseInt(input.value.trim(), 10);
-      if (!isNaN(v) && v > 0) totalWishes++;
+      ref.prioInput?.setAttribute('aria-invalid', String(prioErr || isAfterGap));
+      ref.placesInput?.setAttribute('aria-invalid', String(placesErr));
+      ref.minInput?.setAttribute('aria-invalid', String(minErr));
+
+      ref.placesTile?.classList.toggle('has-duplicate', placesErr);
+      ref.minTile?.classList.toggle('has-duplicate', minErr);
+
+      if (isPosInt(prio)) {
+        ref.prioTile?.classList.add('is-active');
+        ref.prioTile?.classList.toggle('has-duplicate', prioErr);
+        ref.prioTile?.classList.toggle('has-gap', !prioErr && isAfterGap);
+        if (ref.badge) {
+          if (isDupe) {
+            ref.badge.textContent = {{ _("Égalité #") | tojson }} + prio;
+            ref.badge.className = `${BADGE_BASE} bg-danger text-white`;
+          } else if (isAfterGap) {
+            ref.badge.textContent = {{ _("Vœu #") | tojson }} + prio + ' · ' + {{ _("trou") | tojson }};
+            ref.badge.className = `${BADGE_BASE} bg-warning text-dark`;
+          } else {
+            ref.badge.textContent = {{ _("Vœu #") | tojson }} + prio;
+            ref.badge.className = `${BADGE_BASE} bg-primary`;
+          }
+        }
+      } else {
+        ref.prioTile?.classList.remove('is-active', 'has-gap');
+        ref.prioTile?.classList.toggle('has-duplicate', prioErr);
+        if (ref.badge) {
+          ref.badge.textContent = '';
+          ref.badge.className = `${BADGE_BASE} bg-primary d-none`;
+        }
+      }
     });
 
-    if (summaryCount) summaryCount.textContent = totalWishes;
+    if (summaryCount) summaryCount.textContent = validPrios.length;
     if (summaryLabel) {
-      summaryLabel.textContent = totalWishes >= 2 ? '{{ _("vœux sélectionnés") }}' : '{{ _("vœu sélectionné") }}';
+      summaryLabel.textContent = validPrios.length >= 2 ? {{ _("vœux sélectionnés") | tojson }} : {{ _("vœu sélectionné") | tojson }};
+    }
+    if (unsavedBadge) {
+      const isDirty = hadServerErrors || allInputs.some(i => i.value.trim() !== (initialValues.get(i.name) || ''));
+      unsavedBadge.classList.toggle('d-none', !isDirty);
     }
 
-    let anyMinError = false;
-    cards.forEach(card => {
-      if (updateCardState(card, dupes)) anyMinError = true;
-    });
-
-    let errorMessage = '';
-    if (dupes.size > 0) {
-      errorMessage = '{{ _("Deux vœux ont la même priorité !") }}';
-    } else if (anyMinError) {
-      errorMessage = '{{ _("Le minimum dépasse le nombre de places demandées !") }}';
+    const hasMissingPair = hasSubmittedOnce && (missingPlaces.length > 0 || missingPrio.length > 0 || hasMinWithoutPlaces);
+    const showSticky = Boolean(shortMessage) && (gapsRevealed || dupes.size > 0 || hasMinExceeds || hasInvalidPos || hasMissingPair);
+    if (validationErrorMsg) {
+      validationErrorMsg.textContent = showSticky ? shortMessage : '';
+      validationErrorMsg.classList.toggle('d-none', !showSticky);
     }
 
-    if (errorMessage) {
-      if (validationErrorMsg) {
-        validationErrorMsg.textContent = errorMessage;
-        validationErrorMsg.classList.remove('d-none');
+    if (validationAlert && validationAlertList) {
+      if (bannerVisible && messages.length > 0) {
+        validationAlertList.replaceChildren(...messages.map(msg => {
+          const li = document.createElement('li');
+          li.textContent = msg;
+          return li;
+        }));
+        validationAlert.classList.remove('d-none');
+        jumpFirstErrorBtn?.classList.toggle('d-none', !firstInvalidInput);
+      } else if (messages.length === 0) {
+        validationAlert.classList.add('d-none');
       }
-      if (submitBtn) submitBtn.disabled = true;
-    } else {
-      if (validationErrorMsg) {
-        validationErrorMsg.textContent = '';
-        validationErrorMsg.classList.add('d-none');
-      }
-      if (submitBtn) submitBtn.disabled = false;
     }
+
+    return { messages, hasRankingIssue: dupes.size > 0 || missingPriorities.length > 0 };
   }
 
-  // Validate and update summary on priority/places/min input/change
-  [...prioInputs, ...placesInputs, ...minInputs].forEach(input => {
-    input.addEventListener('change', function () {
-      const val = parseInt(input.value.trim(), 10);
-      if (isNaN(val) || val <= 0) {
-        input.value = '';
-      }
-      updateValidationAndSummary();
-    });
-    input.addEventListener('input', updateValidationAndSummary);
+  form?.addEventListener('input', e => {
+    if (e.target.matches('.clubq-number-input')) validate();
+  });
+  form?.addEventListener('change', e => {
+    if (!e.target.matches('.clubq-number-input')) return;
+    if (Number.isNaN(parsePositiveInt(e.target))) e.target.value = '';
+    gapsRevealed = true;
+    validate();
+  });
+  form?.addEventListener('focusout', e => {
+    if (!e.target.matches('.clubq-number-input')) return;
+    gapsRevealed = true;
+    validate();
+  });
+  form?.addEventListener('click', e => {
+    const tile = e.target.closest('.clubq-input-tile');
+    if (tile && e.target.tagName !== 'INPUT') tile.querySelector('input')?.focus();
   });
 
-  // Focus input when clicking anywhere on a tile
-  document.querySelectorAll('.clubq-input-tile').forEach(tile => {
-    tile.addEventListener('click', function (e) {
-      if (e.target.tagName !== 'INPUT') {
-        const input = tile.querySelector('input');
-        if (input) input.focus();
-      }
-    });
+  jumpFirstErrorBtn?.addEventListener('click', () => {
+    if (!firstInvalidInput) return;
+    if (firstInvalidInput.closest('.clubq-spectacle-card')?.hidden && searchInput) {
+      searchInput.value = '';
+      searchInput.dispatchEvent(new Event('input'));
+    }
+    firstInvalidInput.scrollIntoView({ behavior: scrollBehavior(), block: 'center' });
+    firstInvalidInput.focus({ preventScroll: true });
   });
 
-  updateValidationAndSummary();
+  form?.addEventListener('submit', e => {
+    hasSubmittedOnce = true;
+    gapsRevealed = true;
+    bannerVisible = true;
+    const { messages } = validate();
+    if (messages.length > 0) {
+      e.preventDefault();
+      validationAlert?.scrollIntoView({ behavior: scrollBehavior(), block: 'nearest' });
+      validationAlert?.focus({ preventScroll: true });
+      return;
+    }
+    if (submitBtn) submitBtn.disabled = true;
+    if (submitBtnLabel) submitBtnLabel.textContent = {{ _("Enregistrement…") | tojson }};
+  });
+
+  const initial = validate();
+  if (initial.hasRankingIssue) {
+    gapsRevealed = true;
+    bannerVisible = true;
+    validate();
+  }
 });
 </script>
 {% endblock %}
@@ -205,156 +356,206 @@ document.addEventListener('DOMContentLoaded', function () {
 
 {# Barre de recherche rapide #}
 {% if spectacles %}
-<div class="mb-4 pb-1">
+<search class="mb-4 pb-1">
   <div class="m3-search-bar d-flex align-items-center px-3 w-100" style="max-width: 480px;">
-    <svg class="bi text-body-secondary ms-2 flex-shrink-0" width="18" height="18">
+    <svg class="bi text-body-secondary ms-2 flex-shrink-0" width="18" height="18" aria-hidden="true">
       {{ macros.bootstrap_icon("search") }}
     </svg>
+    <label for="spectacle-search" class="visually-hidden">{{ _("Rechercher un spectacle, une salle, un genre") }}</label>
     <input
-      type="text"
+      type="search"
       id="spectacle-search"
       class="border-0 shadow-none px-3 w-100 m3-input"
       placeholder="{{ _('Rechercher un spectacle, une salle, un genre…') }}"
       autocomplete="off"
+      autocorrect="off"
+      autocapitalize="none"
+      spellcheck="false"
     >
   </div>
-</div>
+</search>
 
-<form action="" method="post" role="form" id="clubq-reservations-form">
-  {{ form.hidden_tag() }}
+{% macro render_spectacle_card(spect) %}
+{% set prio_field = getattr(form, 'priorite_' + str(spect.id)) %}
+{% set places_field = getattr(form, 'nb_places_' + str(spect.id)) %}
+{% set min_field = getattr(form, 'nb_places_minimum_' + str(spect.id)) %}
+{% set prio_val = prio_field.data %}
+{% set has_voeu = prio_val is not none and prio_val != '' and prio_val > 0 %}
+<div
+  class="card border-0 shadow-sm rounded-4 p-3 bg-body-tertiary clubq-spectacle-card position-relative"
+  data-id="{{ spect.id }}"
+  data-name="{{ spect.nom|lower }}"
+  data-title="{{ spect.nom }}"
+  data-salle="{{ spect.salle.nom|lower if spect.salle else '' }}"
+  data-category="{{ (spect.categorie or '')|lower }}"
+>
+  <div class="row align-items-center g-3">
+    {# Colonne Détails #}
+    <div class="col-12 col-lg-7">
+      <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+        <h5 class="fw-bold mb-0 text-break">
+          {{ spect.nom }}
+        </h5>
+        <span class="badge bg-primary rounded-pill px-2 py-1 voeu-badge {{ '' if has_voeu else 'd-none' }}">
+          {% if has_voeu %}{{ _("Vœu #%(p)s", p=prio_val) }}{% endif %}
+        </span>
+      </div>
 
-  <div id="spectacles-list" class="d-flex flex-column gap-3 mb-4">
-    {% for spect in spectacles %}
-    {% set prio_field = getattr(form, 'priorite_' + str(spect.id)) %}
-    {% set places_field = getattr(form, 'nb_places_' + str(spect.id)) %}
-    {% set min_field = getattr(form, 'nb_places_minimum_' + str(spect.id)) %}
-    {% set prio_val = prio_field.data %}
-    {% set has_voeu = prio_val is not none and prio_val != '' and prio_val > 0 %}
+      <div class="d-flex flex-wrap align-items-center gap-2 mb-2 pt-1">
+        {% if spect.salle %}
+        <button
+          type="button"
+          data-bs-toggle="modal"
+          data-bs-target="#mo-salle-{{ spect._salle_id }}"
+          class="clubq-chip clubq-chip-venue border-0"
+          title="{{ _('Salle') }}"
+        >
+          <svg class="bi opacity-75 flex-shrink-0" width="13" height="13" aria-hidden="true">
+            {{ macros.bootstrap_icon("building") }}
+          </svg>
+          <span>{{ spect.salle.nom }}</span>
+        </button>
+        {% endif %}
 
-    <div
-      class="card border-0 shadow-sm rounded-4 p-3 bg-body-tertiary clubq-spectacle-card position-relative"
-      data-id="{{ spect.id }}"
-      data-name="{{ spect.nom|lower }}"
-      data-salle="{{ spect.salle.nom|lower if spect.salle else '' }}"
-      data-category="{{ (spect.categorie or '')|lower }}"
-    >
-      <div class="row align-items-center g-3">
-        {# Colonne Détails #}
-        <div class="col-12 col-lg-7">
-          <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-            <h5 class="fw-bold mb-0 text-break">
-              {{ spect.nom }}
-            </h5>
-            <span class="badge bg-primary rounded-pill px-2 py-1 voeu-badge {{ '' if has_voeu else 'd-none' }}">
-              {% if has_voeu %}{{ _("Vœu #%(p)s", p=prio_val) }}{% endif %}
-            </span>
-          </div>
+        <span
+          class="clubq-chip clubq-chip-date"
+          title="{{ _('Date et heure') }}"
+        >
+          <svg class="bi opacity-75 flex-shrink-0" width="13" height="13" aria-hidden="true">
+            {{ macros.bootstrap_icon("calendar3") }}
+          </svg>
+          <span>{{ spect.date.strftime('%d/%m/%Y à %H:%M') if spect.date and spect.date.strftime is defined else spect.date }}</span>
+        </span>
 
-          <div class="d-flex flex-wrap align-items-center gap-2 mb-2 pt-1">
-            {% if spect.salle %}
-            <button
-              type="button"
-              data-bs-toggle="modal"
-              data-bs-target="#mo-salle-{{ spect._salle_id }}"
-              class="clubq-chip clubq-chip-venue border-0"
-              title="{{ _('Salle') }}"
-            >
-              <svg class="bi opacity-75 flex-shrink-0" width="13" height="13" role="img">
-                {{ macros.bootstrap_icon("building") }}
-              </svg>
-              <span>{{ spect.salle.nom }}</span>
-            </button>
-            {% endif %}
+        {% if spect.categorie %}
+        <span
+          class="clubq-chip clubq-chip-category"
+          title="{{ _('Catégorie') }}"
+        >
+          <svg class="bi flex-shrink-0" width="12" height="12" aria-hidden="true">
+            {{ macros.bootstrap_icon("tag") }}
+          </svg>
+          <span>{{ spect.categorie }}</span>
+        </span>
+        {% endif %}
 
-            <span
-              class="clubq-chip clubq-chip-date"
-              title="{{ _('Date et heure') }}"
-            >
-              <svg class="bi opacity-75 flex-shrink-0" width="13" height="13" role="img">
-                {{ macros.bootstrap_icon("calendar3") }}
-              </svg>
-              <span>{{ spect.date.strftime('%d/%m/%Y à %H:%M') if spect.date and spect.date.strftime is defined else spect.date }}</span>
-            </span>
+        <span
+          class="clubq-chip clubq-chip-price"
+          title="{{ _('Prix unitaire') }}"
+        >
+          <span>{{ babel.format_currency(spect.unit_price, "EUR") }}</span>
+        </span>
+      </div>
 
-            {% if spect.categorie %}
-            <span
-              class="clubq-chip clubq-chip-category"
-              title="{{ _('Catégorie') }}"
-            >
-              <svg class="bi flex-shrink-0" width="12" height="12" role="img">
-                {{ macros.bootstrap_icon("tag") }}
-              </svg>
-              <span>{{ spect.categorie }}</span>
-            </span>
-            {% endif %}
+      {% if spect.description %}
+      <div class="text-body-secondary small text-break line-clamp-2 mt-1">
+        {{ spect.description }}
+      </div>
+      {% endif %}
+    </div>
 
-            <span
-              class="clubq-chip clubq-chip-price"
-              title="{{ _('Prix unitaire') }}"
-            >
-              <span>{{ babel.format_currency(spect.unit_price, "EUR") }}</span>
-            </span>
-          </div>
-
-          {% if spect.description %}
-          <div class="text-body-secondary small text-break line-clamp-2 mt-1">
-            {{ spect.description }}
-          </div>
-          {% endif %}
+    {# Colonne Formulaire (Voeu) #}
+    <div class="col-12 col-lg-5 d-flex justify-content-lg-end">
+      <div class="clubq-inputs-cluster d-flex align-items-center gap-2 w-100 justify-content-center justify-content-lg-end">
+        <div class="clubq-input-tile clubq-prio-tile {{ 'is-active' if has_voeu }}">
+          <label class="clubq-input-label" for="{{ prio_field.id }}">
+            {{ _("Priorité") }}
+          </label>
+          {{ prio_field(class_="clubq-number-input voeu-input-priorite", placeholder="—", type="number", min="1", inputmode="numeric", **{"aria-invalid": "false"}) }}
         </div>
 
-        {# Colonne Formulaire (Voeu) #}
-        <div class="col-12 col-lg-5 d-flex justify-content-lg-end">
-          <div class="clubq-inputs-cluster d-flex align-items-center gap-2 w-100 justify-content-center justify-content-lg-end">
-            <div class="clubq-input-tile clubq-prio-tile {{ 'is-active' if has_voeu }}">
-              <label class="clubq-input-label" for="{{ prio_field.id }}">
-                {{ _("Priorité") }}
-              </label>
-              {{ prio_field(class_="clubq-number-input voeu-input-priorite", placeholder="—", type="number", min="1") }}
-            </div>
+        <div class="clubq-input-tile">
+          <label class="clubq-input-label" for="{{ places_field.id }}">
+            {{ _("Places") }}
+          </label>
+          {{ places_field(class_="clubq-number-input voeu-input-places", placeholder="0", type="number", min="1", inputmode="numeric", **{"aria-invalid": "false"}) }}
+        </div>
 
-            <div class="clubq-input-tile">
-              <label class="clubq-input-label" for="{{ places_field.id }}">
-                {{ _("Places") }}
-              </label>
-              {{ places_field(class_="clubq-number-input voeu-input-places", placeholder="0", type="number", min="1") }}
-            </div>
-
-            <div class="clubq-input-tile">
-              <label class="clubq-input-label" for="{{ min_field.id }}">
-                {{ _("Min.") }}
-              </label>
-              {{ min_field(class_="clubq-number-input voeu-input-places-min", placeholder="0", type="number", min="1") }}
-            </div>
-          </div>
+        <div class="clubq-input-tile">
+          <label class="clubq-input-label" for="{{ min_field.id }}">
+            {{ _("Min.") }}
+          </label>
+          {{ min_field(class_="clubq-number-input voeu-input-places-min", placeholder="0", type="number", min="1", inputmode="numeric", **{"aria-invalid": "false"}) }}
         </div>
       </div>
     </div>
+  </div>
+</div>
+{% endmacro %}
+
+<form action="" method="post" role="form" id="clubq-reservations-form" novalidate>
+  {{ form.hidden_tag() }}
+
+  {# Alerte de validation #}
+  <div
+    id="clubq-validation-alert"
+    class="alert alert-danger clubq-validation-alert rounded-4 border-0 shadow-sm p-3 mb-4 {{ '' if server_errors else 'd-none' }}"
+    role="alert"
+    tabindex="-1"
+  >
+    <div class="fw-bold mb-1">{{ _("Problème détecté dans votre classement") }}</div>
+    <ul id="clubq-validation-alert-list" class="mb-2 ps-3 small">
+      {% for err in server_errors %}
+      <li>{{ err }}</li>
+      {% endfor %}
+    </ul>
+    <button
+      type="button"
+      id="btn-jump-first-error"
+      class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-semibold"
+    >
+      {{ _("Voir le premier vœu concerné") }}
+    </button>
+  </div>
+
+  <div id="spectacles-list" class="mb-4">
+    {% set categories = [
+      ('section-demandes', 'heading-demandes', _('Spectacles demandés'), 'bookmark-check-fill', 'text-primary', 'text-bg-primary', 'is-demandes', 'mb-5', spectacles_demandes),
+      ('section-non-classes', 'heading-non-classes', _('Spectacles non-classés'), 'list-ul', 'text-body-secondary', 'text-bg-secondary', '', 'mb-4', spectacles_non_classes),
+    ] %}
+    {% for sec_id, head_id, label, icon, icon_cls, badge_cls, hdr_cls, margin_cls, items in categories if items %}
+    <section id="{{ sec_id }}" class="clubq-category-section {{ margin_cls }}" {% if spectacles_demandes %}aria-labelledby="{{ head_id }}"{% endif %}>
+      {% if spectacles_demandes %}
+      <div class="clubq-category-header {{ hdr_cls }} d-flex align-items-center gap-2 mb-3">
+        <svg class="bi {{ icon_cls }} flex-shrink-0" width="20" height="20" aria-hidden="true">
+          {{ macros.bootstrap_icon(icon) }}
+        </svg>
+        <h3 id="{{ head_id }}" class="h5 fw-bold mb-0">{{ label }}</h3>
+        <span class="badge rounded-pill {{ badge_cls }}">{{ items|length }}</span>
+      </div>
+      {% endif %}
+      <div class="d-flex flex-column gap-3">
+        {% for spect in items %}{{ render_spectacle_card(spect) }}{% endfor %}
+      </div>
+    </section>
     {% endfor %}
 
-    <div id="spectacle-search-empty" class="text-center text-body-secondary py-5" style="display: none;">
+    <div id="spectacle-search-empty" class="text-center text-body-secondary py-5" hidden>
       <p class="mb-0 fs-5">{{ _("Aucun spectacle ne correspond à votre recherche.") }}</p>
     </div>
   </div>
 
   {# Barre fixe / soumission #}
   <div class="sticky-bottom bg-body-tertiary p-3 rounded-4 shadow-lg border d-flex flex-wrap align-items-center justify-content-between gap-3 mb-5" style="z-index: 100;">
-    <div class="d-flex align-items-center flex-wrap gap-3">
+    <div class="d-flex align-items-center flex-wrap gap-2 gap-md-3">
       <div class="text-body-secondary">
         <span class="fw-bold text-body fs-5" id="summary-wishes-count">0</span>
         <span class="ms-1" id="summary-wishes-label">{{ _("vœu sélectionné") }}</span>
       </div>
-      <div id="validation-error-msg" class="clubq-validation-error d-none"></div>
+      <span id="unsaved-changes-badge" class="clubq-unsaved-pill d-none">
+        {{ _("Modifications non enregistrées") }}
+      </span>
+      <div id="validation-error-msg" class="clubq-validation-error d-none" role="status" aria-live="polite"></div>
     </div>
     <button
       type="submit"
       id="btn-submit-wishes"
       class="btn btn-primary d-flex align-items-center gap-2 fw-bold shadow-sm px-4 py-2 rounded-pill"
     >
-      <svg class="bi flex-shrink-0" width="18" height="18" role="img">
+      <svg class="bi flex-shrink-0" width="18" height="18" aria-hidden="true">
         {{ macros.bootstrap_icon("check2-circle") }}
       </svg>
-      <span>{{ _("Enregistrer mes choix") }}</span>
+      <span id="btn-submit-wishes-label">{{ _("Enregistrer mes choix") }}</span>
     </button>
   </div>
 </form>

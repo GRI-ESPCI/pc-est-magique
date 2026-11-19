@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                        'X-CSRFToken': window.PEM.getCsrfToken()
                     }
                 }).then(response => {
                     if (response.ok) {
@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     fetch(`/api/push/notifications/${id}/read`, {
                         method: 'POST',
                         headers: {
-                            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                            'X-CSRFToken': window.PEM.getCsrfToken()
                         }
                     }).then(response => {
                         if (response.ok) {

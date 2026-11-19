@@ -27,6 +27,7 @@ from app.models import (
     ClubQSeason,
     ClubQVoeu,
     ClubQSpectacle,
+    ClubQPayment,
     Bekk,
     Club,
     Event,
@@ -36,7 +37,7 @@ from app.models import (
 from app.routes.main import bp, forms
 from app.utils import captcha, helpers, typing
 from app.utils.global_settings import Settings
-from app.routes.club_q.utils import pceen_prix_total
+from app.routes.club_q.utils import voeux_total_price
 from app.utils.bekk_thumbnails import get_or_generate_thumbnail
 from dataclasses import dataclass, field
 
@@ -107,8 +108,8 @@ def index() -> typing.RouteReturn:
     club_q_infos = None
     if context.has_permission(PermissionType.read, PermissionScope.club_q):
 
-        season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value
-        season = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id)).first()
+        season_id = GlobalSetting.get_value("SEASON_NUMBER_CLUB_Q")
+        season = db.session.get(ClubQSeason, season_id)
         attributions_visible = bool(season and season.attributions_visible)
 
         next_voeu = db.session.scalars(
@@ -128,19 +129,24 @@ def index() -> typing.RouteReturn:
         nb_voeux = db.session.scalar(db.select(sqlalchemy.func.count()).select_from(voeux.subquery())) or 0
 
         if attributions_visible and nb_voeux > 0:
-            to_pay = pceen_prix_total(pceen, voeux)
+            voeux_list = db.session.scalars(voeux.options(sqlalchemy.orm.selectinload(ClubQVoeu.spectacle))).all()
+            total_due = voeux_total_price(voeux_list)
+            is_paid = total_due > 0 and ClubQPayment.is_paid(pceen.id, int(season_id))
+            to_pay = 0 if is_paid else total_due
         else:
             to_pay = 0
+            is_paid = False
 
-        visibility = int(db.session.scalars(db.select(GlobalSetting).filter_by(key="ACCESS_CLUB_Q")).one().value or 0)
+        visibility = int(GlobalSetting.get_value("ACCESS_CLUB_Q") or 0)
 
         club_q_infos = namedtuple(
             "ClubQInfos",
-            ["season", "next_voeu", "to_pay", "booking_open", "attributions_visible", "nb_voeux", "pceen"],
+            ["season", "next_voeu", "to_pay", "is_paid", "booking_open", "attributions_visible", "nb_voeux", "pceen"],
         )(
             season,
             next_voeu,
             to_pay,
+            is_paid,
             visibility == 1,
             attributions_visible,
             nb_voeux,

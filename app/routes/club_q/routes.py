@@ -1,12 +1,12 @@
 """PC est magique - Club Q Pages Routes"""
 
+from collections import Counter
+from decimal import Decimal
 import flask
 import os
 from flask_babel import _
+from flask_wtf.csrf import validate_csrf
 import sqlalchemy
-from sqlalchemy import desc
-
-app = flask.Flask(__name__)
 
 from app import context, db
 from app.models import (
@@ -15,6 +15,8 @@ from app.models import (
     ClubQSalle,
     ClubQVoeu,
     ClubQBrochure,
+    ClubQPayment,
+    ClubQSalleRespo,
     PermissionScope,
     PermissionType,
     GlobalSetting,
@@ -24,8 +26,7 @@ from app.models import (
 )
 from app.routes.club_q import bp, forms
 from app.utils import typing
-from app.utils.validators import Optional, DataRequired
-from app.utils.nginx import get_nginx_access_token
+from app.utils.validators import Optional
 
 import wtforms
 import PyPDF2
@@ -34,9 +35,6 @@ from app.routes.club_q.utils import (
     pdf_client,
     pdf_spectacle,
     excel_spectacle,
-    pceen_sum_places_demandees,
-    pceen_sum_places_attribuees,
-    pceen_prix_total,
     spectacles_sum_places_attribuees,
     spectacles_sum_places_demandees,
     spectacles_sum_places,
@@ -45,12 +43,143 @@ from app.routes.club_q.utils import (
     export_pdf_spectacles,
     export_excel_spectacles,
     exporter_excel_prix,
-    sum_object,
+    pceen_sort_key,
+    voeux_total_price,
+    voeux_sum_attribuees,
+    voeux_sum_demandees,
+    group_by,
+    count_by,
 )
 
 from app.routes.club_q.algorithm import attribution
 
 from app.email import send_email
+
+
+def _active_season_id() -> int:
+    """Return the currently configured active Club Q season ID."""
+    return int(GlobalSetting.get_value("SEASON_NUMBER_CLUB_Q"))
+
+
+def _season_spectacles(season_id: int) -> list[ClubQSpectacle]:
+    """Return the spectacles of a season, ordered by date."""
+    return db.session.scalars(
+        db.select(ClubQSpectacle).filter_by(_season_id=season_id).order_by(ClubQSpectacle.date)
+    ).all()
+
+
+def _has_voeu_in_season(season_id: int):
+    """Returns True if the PCeen has at least one vœu in the given season."""
+    return db.select(ClubQVoeu).filter_by(_season_id=season_id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
+
+
+def _season_voeux_pceens(season_id: int) -> list[PCeen]:
+    """Return the PCeens with at least one vœu in the given season."""
+    return db.session.scalars(db.select(PCeen).filter(_has_voeu_in_season(season_id))).all()
+
+
+def _split_voeux_by_attribution(voeux) -> tuple[list[ClubQVoeu], list[ClubQVoeu]]:
+    """Split vœux into (attributed, not attributed), preserving order."""
+    attrib = [v for v in voeux if (v.places_attribuees or 0) > 0]
+    nan_attrib = [v for v in voeux if (v.places_attribuees or 0) == 0]
+    return attrib, nan_attrib
+
+
+def _spectacle_voeux_split(spectacle: ClubQSpectacle) -> tuple[list[ClubQVoeu], list[ClubQVoeu]]:
+    """Return (attributed, not attributed) vœux of a spectacle, ordered by priority."""
+    voeux = db.session.scalars(
+        db.select(ClubQVoeu)
+        .filter_by(_season_id=spectacle._season_id, _spectacle_id=spectacle.id)
+        .order_by(ClubQVoeu.priorite)
+    ).all()
+    return _split_voeux_by_attribution(voeux)
+
+
+def _season_export_data(season_id: int):
+    """Return (season, spectacles, attributed vœux lists, non-attributed vœux lists) for season exports."""
+    season = db.get_or_404(ClubQSeason, season_id)
+    spectacles = _season_spectacles(season_id)
+    voeux_by_spectacle = group_by(
+        db.session.scalars(db.select(ClubQVoeu).filter_by(_season_id=season_id).order_by(ClubQVoeu.priorite)).all(),
+        "_spectacle_id",
+    )
+    splits = [_split_voeux_by_attribution(voeux_by_spectacle.get(spect.id, [])) for spect in spectacles]
+    return season, spectacles, [a for a, _n in splits], [n for _a, n in splits]
+
+
+def _voeu_forms(spectacles, spectacle, pceen, season_id: int, redirect: str):
+    """Initialize and process the (add, edit) vœu admin forms; returns (form_add, form_edit, redirect_response)."""
+    pceens = _club_q_pceens()
+    if pceen is None and pceens:
+        pceen = pceens[0]
+    return voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect, True)
+
+
+def _can_respo_view(pceen_id: int, salle_id: int, season: ClubQSeason) -> bool:
+    """Whether a Respo salle may see the lists of a salle for a season (only once attributions are visible)."""
+    return bool(season.attributions_visible) and ClubQSalleRespo.is_respo_for(pceen_id, salle_id, season.id)
+
+
+def _parse_season_id(raw: str | None = None, *, default_to_active: bool = True) -> int | None:
+    """Parse a season_id string into an int (returns 400 if malformed), optionally defaulting to active season."""
+    if raw is None:
+        return _active_season_id() if default_to_active else None
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        flask.abort(400)
+
+
+def _all_seasons() -> list[ClubQSeason]:
+    """Return all Club Q seasons in consistent reverse-chronological order."""
+    return db.session.scalars(db.select(ClubQSeason).order_by(*ClubQSeason.default_order())).all()
+
+
+def _respo_visible_season_ids() -> set[int]:
+    """Attribution-visible season IDs where the current user is a Respo salle (computed once per request)."""
+    if "club_q_respo_season_ids" not in flask.g:
+        flask.g.club_q_respo_season_ids = ClubQSalleRespo.season_ids_for(context.g.pceen.id, visible_only=True)
+    return flask.g.club_q_respo_season_ids
+
+
+@bp.context_processor
+def inject_club_q_respo() -> dict[str, object]:
+    """Expose admin & respo salle state to all Club Q templates."""
+    pceen = getattr(context.g, "pceen", None)
+    is_admin = bool(pceen) and context.has_permission(PermissionType.write, PermissionScope.club_q)
+    if not pceen or is_admin:
+        return {"is_admin": is_admin, "respo_season_ids": set(), "is_respo_salle": False}
+    season_ids = _respo_visible_season_ids()
+    return {"is_admin": False, "respo_season_ids": season_ids, "is_respo_salle": bool(season_ids)}
+
+
+def _club_q_pceens_query():
+    """Return a Select of PCeens with Club Q read access."""
+    return db.select(PCeen).filter(
+        PCeen.roles.any(
+            Role.permissions.any(
+                sqlalchemy.and_(
+                    Permission.type.in_([PermissionType.read, PermissionType.all]),
+                    Permission.scope == PermissionScope.club_q,
+                )
+            )
+        )
+    )
+
+
+def _club_q_pceens() -> list[PCeen]:
+    """Return all distinct PCeens with Club Q read access, ordered by (nom, prenom)."""
+    pceens = db.session.scalars(_club_q_pceens_query()).all()
+    return sorted(pceens, key=pceen_sort_key)
+
+
+def _validate_csrf_or_abort() -> None:
+    if flask.current_app.config.get("WTF_CSRF_ENABLED", True):
+        token = flask.request.headers.get("X-CSRFToken") or flask.request.form.get("csrf_token")
+        try:
+            validate_csrf(token)
+        except wtforms.ValidationError:
+            flask.abort(400)
 
 
 @bp.route("", methods=["GET", "POST"])
@@ -59,7 +188,7 @@ from app.email import send_email
 def main() -> typing.RouteReturn:
     """PC est magique Club Q page."""
 
-    visibility = db.session.scalars(db.select(GlobalSetting).filter_by(key="ACCESS_CLUB_Q")).one().value
+    visibility = GlobalSetting.get_value("ACCESS_CLUB_Q")
 
     "If the page visibility is set at 0 in the admin parameters, don't show it"
     if not context.g.pceen.has_permission(PermissionType.read, PermissionScope.club_q):
@@ -71,21 +200,25 @@ def main() -> typing.RouteReturn:
     can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
 
     # Ajout dynamique de 1 form par spectacle de la saison
-    season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value  # ID of the season to show
-    spectacles = db.session.scalars(db.select(ClubQSpectacle).filter_by(_season_id=season_id).order_by(ClubQSpectacle.date)).all()
+    season_id = _active_season_id()
+    spectacles = _season_spectacles(season_id)
 
-    saison = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id)).first()
+    saison = db.session.get(ClubQSeason, season_id)
     brochure = db.session.scalars(db.select(ClubQBrochure).filter_by(_season_id=season_id)).one_or_none()
 
     class DynamicClubQForm(forms.ClubQForm):
         pass
 
+    # (pceen, spectacle) is unique in DB, so at most one vœu per spectacle
+    voeux_by_spectacle: dict[int, ClubQVoeu] = {
+        voeu._spectacle_id: voeu
+        for voeu in db.session.scalars(
+            db.select(ClubQVoeu).filter_by(_pceen_id=context.g.pceen.id, _season_id=season_id)
+        )
+    }
+
     for spect in spectacles:
-        voeu = db.session.scalars(db.select(ClubQVoeu).filter_by(
-            _spectacle_id=spect.id,
-            _pceen_id=context.g.pceen.id,
-            _season_id=spect._season_id,
-        )).first()
+        voeu = voeux_by_spectacle.get(spect.id)
 
         setattr(
             DynamicClubQForm,
@@ -128,86 +261,84 @@ def main() -> typing.RouteReturn:
 
     # Gestion des requêtes
     form = DynamicClubQForm()
+    server_errors: list[str] = []
 
-    if form.validate_on_submit():
-        flag = False  # Flag to say if the form results are not following the rules
+    if form.is_submitted():
+        if int(visibility or 0) != 1 or saison is None:
+            flask.abort(403)
 
-        # Checking if form rules are respected. Not twice the same number, and start from 1 to the i-e wish. One form field must be empty or have both (at minima) priority and number of places defined
-        # Checking if one wish has a priority, then a number of places is defined and vice-versa
-        for spect in spectacles:
-            if form[f"priorite_{spect.id}"].data != None:
-                if form[f"nb_places_{spect.id}"].data == None:
-                    flask.flash(_("Un voeu a été défini avec une priorité mais sans un nombre de places."), "danger")
-                    flag = True  # RAISE THE FLAG!
-                    break
-            if form[f"nb_places_{spect.id}"].data != None:
-                if form[f"priorite_{spect.id}"].data == None:
-                    flask.flash(_("Un voeu a été défini avec un nombre de places mais sans priorité."), "danger")
-                    flag = True  # RAISE THE FLAG!
-                    break
+        invalid_numbers_msg = _("Les priorités et nombres de places doivent être des entiers supérieurs ou égaux à 1.")
+        if not form.validate():
+            if getattr(form, "csrf_token", None) and form.csrf_token.errors:
+                flask.abort(400)
+            server_errors.append(invalid_numbers_msg)
+        else:
+            def add_error(msg: str) -> None:
+                if msg not in server_errors:
+                    server_errors.append(msg)
 
-        # Cheking if the minimum number of places is not superior to the number of asked places
-        for spect in spectacles:
-            if form[f"nb_places_{spect.id}"].data != None:
-                if form[f"nb_places_minimum_{spect.id}"].data != None:
-                    if form[f"nb_places_minimum_{spect.id}"].data > form[f"nb_places_{spect.id}"].data:
-                        flask.flash(
-                            _(
-                                "Un voeu a été défini avec un nombre de places minimum supérieur au nombre de places demandées."
-                            ),
-                            "danger",
-                        )
-                        flag = True  # RAISE THE FLAG!
-                        break
+            submitted = [
+                (
+                    spect,
+                    form[f"priorite_{spect.id}"].data,
+                    form[f"nb_places_{spect.id}"].data,
+                    form[f"nb_places_minimum_{spect.id}"].data,
+                )
+                for spect in spectacles
+            ]
 
-        priority_list = []
-        # Checking if every priority is different
-        for spect in spectacles:
-            priority = form[f"priorite_{spect.id}"].data
-            if priority:
-                if priority in priority_list:
-                    flask.flash(_("Deux voeux ne peuvent avoir la même priorité."), "danger")
-                    flag = True  # RAISE THE FLAG!
-                    break
-                priority_list.append(form[f"priorite_{spect.id}"].data)
+            priority_list: list[int] = []
+            for _spect, prio, nb_places, nb_min in submitted:
+                if any(v is not None and v <= 0 for v in (prio, nb_places, nb_min)):
+                    add_error(invalid_numbers_msg)
+                if prio is not None and nb_places is None:
+                    add_error(_("Un vœu a été défini avec une priorité mais sans nombre de places."))
+                if nb_places is not None and prio is None:
+                    add_error(_("Un vœu a été défini avec un nombre de places mais sans priorité."))
+                if nb_min is not None and nb_places is None:
+                    add_error(_("Un vœu a été défini avec un nombre de places minimum sans nombre de places demandées."))
+                if nb_places is not None and nb_min is not None and nb_min > nb_places:
+                    add_error(_("Un vœu a été défini avec un nombre de places minimum supérieur au nombre de places demandées."))
+                if prio is not None and prio > 0:
+                    priority_list.append(prio)
 
-        # Cheking if priority increase one by one from one.
-        if sum(priority_list) != len(priority_list) * (len(priority_list) + 1) / 2:
-            flask.flash(_("Les priorités doivent être croissantes de 1 en 1 en partant de 1."), "danger")
-            flag = True  # RAISE THE FLAG!
+            duplicates = sorted(p for p, count in Counter(priority_list).items() if count > 1)
+            if duplicates:
+                add_error(
+                    _("Égalité dans le classement : plusieurs vœux ont la même priorité (%(dups)s). Les égalités perturbent l'algorithme d'attribution.", dups=", ".join(f"#{p}" for p in duplicates))
+                )
 
-        if not flag:  # If the form is correctly definied, save the results
-            for spect in spectacles:
-                if form[f"priorite_{spect.id}"].data != None:
-                    voeu = db.session.scalars(db.select(ClubQVoeu).filter_by(
-                        _spectacle_id=spect.id,
-                        _pceen_id=context.g.pceen.id,
-                        _season_id=spect._season_id,
-                    )).first()
-                    if not voeu:
-                        voeu = ClubQVoeu(
-                            _spectacle_id=spect.id,
-                            _pceen_id=context.g.pceen.id,
-                            _season_id=spect._season_id,
-                        )
+            if priority_list:
+                missing = sorted(set(range(1, max(priority_list) + 1)) - set(priority_list))
+                if missing:
+                    add_error(
+                        _("Trou dans le classement : priorité(s) manquante(s) (%(missing)s). Les priorités doivent se suivre de 1 en 1 à partir de 1 pour le bon fonctionnement de l'algorithme.", missing=", ".join(f"#{p}" for p in missing))
+                    )
+
+            if not server_errors:
+                for spect, prio, nb_places, nb_min in submitted:
+                    voeu = voeux_by_spectacle.get(spect.id)
+                    if prio is None:
+                        if voeu is not None:
+                            db.session.delete(voeu)
+                        continue
+                    if voeu is None:
+                        voeu = ClubQVoeu(_spectacle_id=spect.id, _pceen_id=context.g.pceen.id, _season_id=spect._season_id)
                         db.session.add(voeu)
-
-                    voeu.priorite = form[f"priorite_{spect.id}"].data
-                    voeu.places_demandees = form[f"nb_places_{spect.id}"].data
-                    voeu.places_minimum = form[f"nb_places_minimum_{spect.id}"].data if form[f"nb_places_minimum_{spect.id}"].data != None else form[f"nb_places_{spect.id}"].data
+                    voeu.priorite = prio
+                    voeu.places_demandees = nb_places
+                    voeu.places_minimum = nb_min if nb_min is not None else nb_places
                     voeu.places_attribuees = 0
 
-                else:
-                    voeu = db.session.scalars(db.select(ClubQVoeu).filter_by(
-                        _spectacle_id=spect.id,
-                        _pceen_id=context.g.pceen.id,
-                        _season_id=spect._season_id,
-                    )).first()
-                    if voeu != None:
-                        db.session.delete(voeu)
+                db.session.commit()
+                flask.flash(_("Vos choix ont été enregistrés."), "success")
+                return flask.redirect(flask.url_for("club_q.main"))
 
-            db.session.commit()
-            flask.flash(_("Vos choix ont été enregistrés."), "success")
+    spectacles_demandes = sorted(
+        [spect for spect in spectacles if spect.id in voeux_by_spectacle],
+        key=lambda spect: (voeux_by_spectacle[spect.id].priorite, spect.date),
+    )
+    spectacles_non_classes = [spect for spect in spectacles if spect.id not in voeux_by_spectacle]
 
     return flask.render_template(
         "club_q/main.html",
@@ -215,6 +346,9 @@ def main() -> typing.RouteReturn:
         title=_("Page de réservation pour le Club Q"),
         form=form,
         spectacles=spectacles,
+        spectacles_demandes=spectacles_demandes,
+        spectacles_non_classes=spectacles_non_classes,
+        server_errors=server_errors,
         season_id=season_id,
         user=context.g.pceen,
         visibility=visibility,
@@ -231,29 +365,39 @@ def main() -> typing.RouteReturn:
 def pceens() -> typing.RouteReturn:
     """Administration page for Club Q."""
 
-    season_id = flask.request.args.get("season_id")
-    if season_id == None:
-        season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value  # ID of the season to show
-    season_id = int(season_id)
+    season_id = _parse_season_id(flask.request.args.get("season_id"))
 
-    showed_season = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id)).one_or_none()
-    saisons = db.session.scalars(db.select(ClubQSeason).order_by(desc(ClubQSeason.debut))).all()
-    subquery = db.select(ClubQVoeu).filter_by(_season_id=season_id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
-    pceens = db.session.scalars(db.select(PCeen).filter(subquery)).all()
+    saisons = _all_seasons()
+    pceens = sorted(_season_voeux_pceens(season_id), key=pceen_sort_key)
+    paid_pceen_ids = ClubQPayment.paid_pceen_ids(season_id)
 
-    sum_places_attribuees = []
-    sum_places_demandees = []
-    pceens_a_payer = []
-    total_payement = 0
-    nb_voeux = []
-
+    voeux_by_pceen = group_by(
+        db.session.scalars(
+            db.select(ClubQVoeu)
+            .options(sqlalchemy.orm.selectinload(ClubQVoeu.spectacle))
+            .filter_by(_season_id=season_id)
+        ).all(),
+        "_pceen_id",
+    )
+    # (pceen, nb vœux, places demandées, places attribuées, prix)
+    pceen_rows = []
     for pceen in pceens:
-        voeux = db.select(ClubQVoeu).filter_by(_season_id=season_id).filter_by(_pceen_id=pceen.id)
-        sum_places_demandees.append(pceen_sum_places_demandees(pceen, voeux))
-        sum_places_attribuees.append(pceen_sum_places_attribuees(pceen, voeux))
-        pceens_a_payer.append(pceen_prix_total(pceen, voeux))
-        total_payement = sum(pceens_a_payer)
-        nb_voeux.append(sum_object(pceen, voeux))
+        pceen_voeux = voeux_by_pceen.get(pceen.id, [])
+        pceen_rows.append((
+            pceen,
+            len(pceen_voeux),
+            voeux_sum_demandees(pceen_voeux),
+            voeux_sum_attribuees(pceen_voeux),
+            voeux_total_price(pceen_voeux),
+        ))
+    total_nb_voeux = sum(cnt for _, cnt, _, _, _ in pceen_rows)
+    total_places_demandees = sum(dem for _, _, dem, _, _ in pceen_rows)
+    total_places_attribuees = sum(attr for _, _, _, attr, _ in pceen_rows)
+    total_payement = sum((cost for _, _, _, _, cost in pceen_rows), Decimal("0.00"))
+    total_restant = sum(
+        (cost for pceen, _, _, _, cost in pceen_rows if pceen.id not in paid_pceen_ids),
+        Decimal("0.00"),
+    )
 
     can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
 
@@ -270,22 +414,43 @@ def pceens() -> typing.RouteReturn:
     return flask.render_template(
         "club_q/pceens.html",
         view="pceens",
-        size=range(len(pceens)),
-        nb_pceens=len(pceens),
-        pceens=pceens,
+        pceen_rows=pceen_rows,
         saisons=saisons,
         season_id=season_id,
         redirect="club_q.pceens",
         user=context.g.pceen,
-        showed_season=showed_season,
-        sum_places_demandees=sum_places_demandees,
-        sum_places_attribuees=sum_places_attribuees,
-        pceens_a_payer=pceens_a_payer,
+        total_places_demandees=total_places_demandees,
+        total_places_attribuees=total_places_attribuees,
+        paid_pceen_ids=paid_pceen_ids,
         total_payement=total_payement,
+        total_restant=total_restant,
         form_discontent=form_discontent,
-        nb_voeux=nb_voeux,
-        total_nb_voeux=sum(nb_voeux),
+        total_nb_voeux=total_nb_voeux,
     )
+
+
+@bp.route("/pceens/<int:id>/paid", methods=["POST"])
+@context.permission_only(PermissionType.write, PermissionScope.club_q)
+def set_paid(id: int) -> typing.RouteReturn:
+    """Set the payment status of a PCeen for a Club Q season.
+
+    Expects ``?season_id=<id>`` (mandatory, never defaults to the active season) and a JSON body ``{"paid": bool}``.
+    """
+    _validate_csrf_or_abort()
+
+    db.get_or_404(PCeen, id)
+    season_id = _parse_season_id(flask.request.args.get("season_id"), default_to_active=False)
+    if season_id is None:
+        flask.abort(400)
+    db.get_or_404(ClubQSeason, season_id)
+
+    paid = (flask.request.get_json(silent=True) or {}).get("paid")
+    if not isinstance(paid, bool):
+        flask.abort(400)
+
+    ClubQPayment.set_paid(id, season_id, paid)
+    db.session.commit()
+    return flask.jsonify({"paid": paid})
 
 
 @bp.route("/pceens/generate_excel", methods=["GET", "POST"])
@@ -293,14 +458,12 @@ def pceens() -> typing.RouteReturn:
 def pceens_generate_excel():
     """Generate the resume of required payements from PCeens to the Club Q"""
 
-    season_id = flask.request.args.get("season_id")
-    if season_id == None:
-        season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value  # ID of the season to show
-    season = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id).order_by(ClubQSeason.id)).one()
-    spectacles = db.session.scalars(db.select(ClubQSpectacle).filter_by(_season_id=season_id).order_by(ClubQSpectacle.date)).all()
-    subquery = db.select(ClubQVoeu).filter_by(_season_id=season_id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
-    pceens = db.session.scalars(db.select(PCeen).filter(subquery)).all()
+    season_id = _parse_season_id(flask.request.args.get("season_id"))
+    season = db.get_or_404(ClubQSeason, season_id)
+    spectacles = _season_spectacles(season_id)
+    pceens = _season_voeux_pceens(season_id)
     voeux = db.select(ClubQVoeu).filter_by(_season_id=season_id)
+    paid_pceen_ids = ClubQPayment.paid_pceen_ids(season_id)
 
     # Create a response object to serve the Excel file
     response = flask.make_response()
@@ -310,55 +473,57 @@ def pceens_generate_excel():
     response.headers["Content-Disposition"] = f"attachment; filename=club_q_payements_{season.nom}.xlsx"
 
     # Write the Excel data from the BytesIO buffer to the response
-    response.data = exporter_excel_prix(season, pceens, spectacles, voeux).getvalue()
+    response.data = exporter_excel_prix(season, pceens, spectacles, voeux, paid_pceen_ids).getvalue()
     return response
 
 
 @bp.route("/spectacles", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
 def spectacles() -> typing.RouteReturn:
+    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+    respo_season_ids = _respo_visible_season_ids() if not can_edit else set()
+    if not can_edit and not respo_season_ids:
+        flask.abort(403)
 
-    season_id = flask.request.args.get("season_id")
-    if season_id == None:
-        season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value  # ID of the season to show
+    saisons = _all_seasons()
+    raw_season_id = flask.request.args.get("season_id")
+    season_id = _parse_season_id(raw_season_id)
+    if raw_season_id is None and not can_edit and season_id not in respo_season_ids:
+        season_id = next((s.id for s in saisons if s.id in respo_season_ids), season_id)
 
-    saisons = db.session.scalars(db.select(ClubQSeason).order_by(desc(ClubQSeason.debut))).all()
-    saison = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id)).one()
-    salles = db.session.scalars(db.select(ClubQSalle)).all()
+    db.get_or_404(ClubQSeason, season_id)
+    if not can_edit and season_id not in respo_season_ids:
+        flask.abort(403)
 
     spectacles_stmt = db.select(ClubQSpectacle).filter_by(_season_id=season_id).order_by(ClubQSpectacle.date)
-    voeux = db.select(ClubQVoeu).filter_by(_season_id=season_id)
+    if not can_edit:
+        respo_salle_ids = ClubQSalleRespo.salle_ids_for(context.g.pceen.id, season_id)
+        spectacles_stmt = spectacles_stmt.filter(ClubQSpectacle._salle_id.in_(respo_salle_ids))
 
     spectacles_list = db.session.scalars(spectacles_stmt).all()
 
     spect_sum_places = spectacles_sum_places(spectacles_list)
     spect_sum_places_demandees = spectacles_sum_places_demandees(spectacles_list)
     spect_sum_places_attribuees = spectacles_sum_places_attribuees(spectacles_list)
+    nb_voeux_by_spectacle = count_by(ClubQVoeu._spectacle_id, ClubQVoeu._season_id == season_id)
+    spect_nb_voeux = [nb_voeux_by_spectacle.get(spectacle.id, 0) for spectacle in spectacles_list]
 
-    spect_nb_voeux = []
-
-    for spectacle in spectacles_list:
-        spect_sum_voeux = sum_object(spectacle, voeux)
-        spect_nb_voeux.append(spect_sum_voeux)
-
-    redirect = flask.url_for("club_q.spectacles", season_id=season_id)
-    if len(spectacles_list) > 0:
-        salle = salles[0]
-    else:
-        salle = None
-
-    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
-
-    spectacle_form(salles, salle, season_id, redirect, can_edit)
-
-    form_spectacle = forms.EditSpectacle()
+    form_spectacle = None
+    if can_edit:
+        salles = db.session.scalars(db.select(ClubQSalle).order_by(ClubQSalle.nom)).all()
+        salle = salles[0] if spectacles_list and salles else None
+        redirect = flask.url_for("club_q.spectacles", season_id=season_id)
+        form_spectacle, resp = spectacle_form(salles, salle, season_id, redirect, can_edit)
+        if resp is not None:
+            return resp
 
     return flask.render_template(
         "club_q/spectacles.html",
         view="spectacles",
-        spectacles=spectacles_list,       # <-- Le template reçoit la liste itérable
-        season_id=int(season_id),
+        spectacles=spectacles_list,
+        season_id=season_id,
         saisons=saisons,
+        is_respo_view=not can_edit,
         redirect="club_q.spectacles",
         user=context.g.pceen,
         form_spectacle=form_spectacle,
@@ -366,43 +531,17 @@ def spectacles() -> typing.RouteReturn:
         spect_sum_places_demandees=spect_sum_places_demandees,
         spect_sum_places_attribuees=spect_sum_places_attribuees,
         spect_nb_voeux=spect_nb_voeux,
-        nb_spectacles=sum_object(saison, spectacles_stmt),  # <-- sum_object reçoit la requête SQL
-        size=range(len(spectacles_list)), # <-- range sur la longueur de la liste
+        nb_spectacles=len(spectacles_list),
+        size=range(len(spectacles_list)),
         total_nb_voeux=sum(spect_nb_voeux),
     )
 
 @bp.route("/spectacles/<int:id>/export_pdfs", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.club_q)
 def spect_export_pdfs(id: int):
-    """Export the PDF spectacle resume for the given id season (or the actual one in the db)"""
+    """Export the PDF spectacle resume for the given season ID."""
 
-    season_id = id
-    if season_id == None:
-        season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value  # ID of the season to show
-    season = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id).order_by(ClubQSeason.id)).one()
-
-    spectacles = db.session.scalars(db.select(ClubQSpectacle).filter_by(_season_id=season_id).order_by(ClubQSpectacle.date)).all()
-
-    voeux_attrib_list = []
-    voeux_nan_attrib_list = []
-
-    for spectacle in spectacles:
-        voeux_attrib_list.append(
-            db.session.scalars(
-                db.select(ClubQVoeu).filter_by(_season_id=season_id)
-                .filter_by(_spectacle_id=spectacle.id)
-                .filter(ClubQVoeu.places_attribuees != 0)
-                .order_by(ClubQVoeu.priorite)
-            ).all()
-        )
-        voeux_nan_attrib_list.append(
-            db.session.scalars(
-                db.select(ClubQVoeu).filter_by(_season_id=season_id)
-                .filter_by(_spectacle_id=spectacle.id)
-                .filter(ClubQVoeu.places_attribuees == 0)
-                .order_by(ClubQVoeu.priorite)
-            ).all()
-        )
+    season, spectacles, voeux_attrib_list, voeux_nan_attrib_list = _season_export_data(id)
 
     # Return the PDF as a response to the user
     response = flask.make_response(
@@ -416,35 +555,9 @@ def spect_export_pdfs(id: int):
 @bp.route("/spectacles/<int:id>/generate_excels", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.club_q)
 def spect_export_excels(id: int):
-    """Export the excel spectacle resume for the given id season (or the actual one in the db)"""
+    """Export the excel spectacle resume for the given season ID."""
 
-    season_id = id
-    if season_id == None:
-        season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value  # ID of the season to show
-    season = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id).order_by(ClubQSeason.id)).one()
-
-    spectacles = db.session.scalars(db.select(ClubQSpectacle).filter_by(_season_id=season_id).order_by(ClubQSpectacle.date)).all()
-
-    voeux_attrib_list = []
-    voeux_nan_attrib_list = []
-
-    for spectacle in spectacles:
-        voeux_attrib_list.append(
-            db.session.scalars(
-                db.select(ClubQVoeu).filter_by(_season_id=season_id)
-                .filter_by(_spectacle_id=spectacle.id)
-                .filter(ClubQVoeu.places_attribuees != 0)
-                .order_by(ClubQVoeu.priorite)
-            ).all()
-        )
-        voeux_nan_attrib_list.append(
-            db.session.scalars(
-                db.select(ClubQVoeu).filter_by(_season_id=season_id)
-                .filter_by(_spectacle_id=spectacle.id)
-                .filter(ClubQVoeu.places_attribuees == 0)
-                .order_by(ClubQVoeu.priorite)
-            ).all()
-        )
+    season, spectacles, voeux_attrib_list, voeux_nan_attrib_list = _season_export_data(id)
 
     # Return the PDF as a response to the user
     response = flask.make_response(
@@ -458,13 +571,11 @@ def spect_export_excels(id: int):
 @bp.route("/salles", methods=["GET", "POST"])
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
 def salles() -> typing.RouteReturn:
-    season_id = flask.request.args.get("season_id")
+    season_id = _parse_season_id(flask.request.args.get("season_id"), default_to_active=False)
+    all_seasons = season_id is None
 
-    if season_id == None:
-        # season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value  # ID of the season to show
-        season_id = -1
+    if all_seasons:
         salles = db.session.scalars(db.select(ClubQSalle).order_by(ClubQSalle.nom)).all()
-
     else:
         subquery = (
             db.select(ClubQSpectacle).filter_by(_season_id=season_id)
@@ -473,18 +584,17 @@ def salles() -> typing.RouteReturn:
         )
         salles = db.session.scalars(db.select(ClubQSalle).filter(subquery).order_by(ClubQSalle.nom)).all()
 
-    saisons = db.session.scalars(db.select(ClubQSeason).order_by(desc(ClubQSeason.debut))).all()
+    saisons = _all_seasons()
+    respo_season_id = _active_season_id() if all_seasons else season_id
+    respo_season = db.session.get(ClubQSeason, respo_season_id)
 
-    nb_spectacles = []
-
-    for salle in salles:
-        if season_id == -1:
-            spectacles = db.select(ClubQSpectacle).filter_by(_salle_id=salle.id)
-        else:
-            spectacles = db.select(ClubQSpectacle).filter_by(_season_id=season_id).filter_by(_salle_id=salle.id)
-        nb_spectacles.append(sum_object(salle, spectacles))
+    season_filter = () if all_seasons else (ClubQSpectacle._season_id == season_id,)
+    nb_spectacles_by_salle = count_by(ClubQSpectacle._salle_id, *season_filter)
+    nb_spectacles = [nb_spectacles_by_salle.get(salle.id, 0) for salle in salles]
 
     can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+    respos_by_salle = ClubQSalleRespo.respos_by_salle(respo_season_id) if can_edit else {}
+    eligible_pceens = _club_q_pceens() if can_edit else []
 
     form_salle = forms.EditSalle()
 
@@ -533,8 +643,12 @@ def salles() -> typing.RouteReturn:
         view="salles",
         salles=salles,
         size=range(len(salles)),
-        season_id=int(season_id),
+        season_id=season_id,
+        all_seasons=all_seasons,
         saisons=saisons,
+        respo_season=respo_season,
+        respos_by_salle=respos_by_salle,
+        eligible_pceens=eligible_pceens,
         redirect="club_q.salles",
         user=context.g.pceen,
         form_salle=form_salle,
@@ -542,37 +656,70 @@ def salles() -> typing.RouteReturn:
     )
 
 
+@bp.route("/salles/<int:id>/respo", methods=["POST"])
+@context.permission_only(PermissionType.write, PermissionScope.club_q)
+def set_salle_respo(id: int) -> typing.RouteReturn:
+    """Assign or remove the Respo salle for a given (salle, season)."""
+    _validate_csrf_or_abort()
+
+    salle = db.get_or_404(ClubQSalle, id)
+    season_id = _parse_season_id(flask.request.form.get("season_id"), default_to_active=False)
+    if season_id is None:
+        flask.abort(400)
+    season = db.get_or_404(ClubQSeason, season_id)
+
+    def _redirect_back() -> typing.RouteReturn:
+        return_to = flask.request.form.get("return_to")
+        if return_to == "salle":
+            return flask.redirect(flask.url_for("club_q.salle_id", id=salle.id, season_id=season.id))
+        return_sid = _parse_season_id(flask.request.form.get("return_season_id") or None, default_to_active=False)
+        return flask.redirect(flask.url_for("club_q.salles", season_id=return_sid))
+
+    raw_pceen_id = (flask.request.form.get("pceen_id") or "").strip()
+
+    if not raw_pceen_id:
+        if ClubQSalleRespo.clear_respo(salle.id, season.id):
+            db.session.commit()
+            flask.flash(_("Respo salle retiré pour %(salle)s (%(saison)s).", salle=salle.nom, saison=season.nom), "success")
+    else:
+        try:
+            pceen_id = int(raw_pceen_id)
+        except ValueError:
+            flask.abort(400)
+        pceen = db.get_or_404(PCeen, pceen_id)
+        if not pceen.has_permission(PermissionType.read, PermissionScope.club_q):
+            flask.flash(_("%(nom)s n'a pas accès au Club Q.", nom=pceen.full_name), "danger")
+            return _redirect_back()
+
+        ClubQSalleRespo.set_respo(salle.id, season.id, pceen.id)
+        db.session.commit()
+        flask.flash(
+            _("%(nom)s désigné·e respo de %(salle)s (%(saison)s).", nom=pceen.full_name, salle=salle.nom, saison=season.nom),
+            "success",
+        )
+
+    return _redirect_back()
+
+
 @bp.route("/voeux", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.club_q)
 def voeux() -> typing.RouteReturn:
 
-    season_id = flask.request.args.get("season_id")
-    if season_id == None:
-        season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value  # ID of the season to show
+    season_id = _parse_season_id(flask.request.args.get("season_id"))
 
-    saisons = db.session.scalars(db.select(ClubQSeason).order_by(desc(ClubQSeason.debut))).all()
-    spectacles = db.session.scalars(db.select(ClubQSpectacle).filter_by(_season_id=season_id).order_by(ClubQSpectacle.date)).all()
-    pceens = db.session.scalars(
-        db.select(PCeen).join(PCeen.roles)
-        .join(Role.permissions)
-        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q)
-    ).all()
+    saisons = _all_seasons()
+    spectacles = _season_spectacles(season_id)
     voeux = db.session.scalars(db.select(ClubQVoeu).filter_by(_season_id=season_id).order_by(ClubQVoeu.id)).all()
 
-    redirect = flask.url_for("club_q.voeux", season_id=season_id)
-
-    if len(spectacles) > 0:
-        spectacle = spectacles[0]
-    else:
-        spectacle = None
-
-    can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
-
-    voeu_form(spectacles, spectacle, pceens, pceens[0], season_id, redirect, can_edit)
-
-    # Forms
-    form_add_voeu = forms.AddVoeu()
-    form_edit_voeu = forms.EditVoeu()
+    form_add_voeu, form_edit_voeu, resp = _voeu_forms(
+        spectacles,
+        spectacles[0] if spectacles else None,
+        None,
+        season_id,
+        flask.url_for("club_q.voeux", season_id=season_id),
+    )
+    if resp is not None:
+        return resp
 
     return flask.render_template(
         "club_q/voeux.html",
@@ -580,7 +727,7 @@ def voeux() -> typing.RouteReturn:
         voeux=voeux,
         form_add_voeu=form_add_voeu,
         form_edit_voeu=form_edit_voeu,
-        season_id=int(season_id),
+        season_id=season_id,
         saisons=saisons,
         redirect="club_q.voeux",
         user=context.g.pceen,
@@ -591,21 +738,19 @@ def voeux() -> typing.RouteReturn:
 @context.permission_only(PermissionType.read, PermissionScope.club_q)
 def saisons() -> typing.RouteReturn:
 
-    saisons = db.session.scalars(db.select(ClubQSeason).order_by(desc(ClubQSeason.debut))).all()
-    spectacles = db.select(ClubQSpectacle).order_by(ClubQSpectacle.date)
-    voeux = db.select(ClubQVoeu)
+    saisons = _all_seasons()
 
-    saison_nb_voeux = []
-    saison_nb_spectacles = []
-    saison_nb_pceens = []
-
-    for saison in saisons:
-        subquery = db.select(ClubQVoeu).filter_by(_season_id=saison.id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
-        pceens = db.session.scalars(db.select(PCeen).filter(subquery)).all()
-
-        saison_nb_voeux.append(sum_object(saison, voeux))
-        saison_nb_spectacles.append(sum_object(saison, spectacles))
-        saison_nb_pceens.append(len(pceens))
+    nb_voeux_by_season = count_by(ClubQVoeu._season_id)
+    nb_spectacles_by_season = count_by(ClubQSpectacle._season_id)
+    nb_pceens_by_season = dict(
+        db.session.execute(
+            db.select(ClubQVoeu._season_id, sqlalchemy.func.count(sqlalchemy.distinct(ClubQVoeu._pceen_id)))
+            .group_by(ClubQVoeu._season_id)
+        ).all()
+    )
+    saison_nb_voeux = [nb_voeux_by_season.get(saison.id, 0) for saison in saisons]
+    saison_nb_spectacles = [nb_spectacles_by_season.get(saison.id, 0) for saison in saisons]
+    saison_nb_pceens = [nb_pceens_by_season.get(saison.id, 0) for saison in saisons]
 
     can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
 
@@ -672,38 +817,23 @@ def saisons() -> typing.RouteReturn:
 @bp.route("/attribution", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.club_q)
 def attribution_manager() -> typing.RouteReturn:
-    season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value  # ID of the season to show
-    subquery = db.select(ClubQVoeu).filter_by(_season_id=season_id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
+    season_id = _active_season_id()
 
     voeux = db.session.scalars(db.select(ClubQVoeu).filter_by(_season_id=season_id).order_by(ClubQVoeu.priorite)).all()
-    pceens = db.session.scalars(db.select(PCeen).filter(subquery)).all()
-    spectacles = db.session.scalars(db.select(ClubQSpectacle).filter_by(_season_id=season_id).order_by(ClubQSpectacle.date)).all()
+    pceens = _season_voeux_pceens(season_id)
+    spectacles = _season_spectacles(season_id)
 
-    # Ajout des forms pour choisir les mécontentements bonus
+    # Mécontentements bonus
     discontent_bonus = [
-        ("m1A", "DISCONTENT_BONUS_1A", _("1A")),
-        ("m2A", "DISCONTENT_BONUS_2A", _("2A")),
-        ("m3A", "DISCONTENT_BONUS_3A", _("3A / M1")),
-        ("m4A", "DISCONTENT_BONUS_4A", _("4A / M2")),
+        ("m1A", "DISCONTENT_BONUS_1A"),
+        ("m2A", "DISCONTENT_BONUS_2A"),
+        ("m3A", "DISCONTENT_BONUS_3A"),
+        ("m4A", "DISCONTENT_BONUS_4A"),
     ]
-    for attr_name, setting_key, label in discontent_bonus:
-        setattr(
-            forms.SettingAlgoClubQPage,
-            attr_name,
-            wtforms.IntegerField(
-                label,
-                default=db.session.scalars(db.select(GlobalSetting).filter_by(key=setting_key)).one().value,
-            ),
-        )
-
-    # Ajout du form pour savoir promotion actuelle
-    setattr(
-        forms.SettingAlgoClubQPage,
-        "promo",
-        wtforms.IntegerField(default=db.session.scalars(db.select(GlobalSetting).filter_by(key="PROMO_1A")).one().value),
+    form_algo_setting = forms.SettingAlgoClubQPage(
+        **{attr: GlobalSetting.get_value(key) for attr, key in discontent_bonus},
+        promo=GlobalSetting.get_value("PROMO_1A"),
     )
-
-    form_algo_setting = forms.SettingAlgoClubQPage()
 
     try:
         # Get the last log file of algorithm attribution
@@ -717,12 +847,9 @@ def attribution_manager() -> typing.RouteReturn:
     if form_algo_setting.is_submitted() and can_edit:
         submit = form_algo_setting["submit"].data
         if submit and form_algo_setting.validate_on_submit():
-            db.session.scalars(db.select(GlobalSetting).filter_by(key="DISCONTENT_BONUS_1A")).one().value = form_algo_setting.m1A.data
-            db.session.scalars(db.select(GlobalSetting).filter_by(key="DISCONTENT_BONUS_2A")).one().value = form_algo_setting.m2A.data
-            db.session.scalars(db.select(GlobalSetting).filter_by(key="DISCONTENT_BONUS_3A")).one().value = form_algo_setting.m3A.data
-            db.session.scalars(db.select(GlobalSetting).filter_by(key="DISCONTENT_BONUS_4A")).one().value = form_algo_setting.m4A.data
-
-            db.session.scalars(db.select(GlobalSetting).filter_by(key="PROMO_1A")).one().value = form_algo_setting.promo.data
+            for attr_name, setting_key in discontent_bonus:
+                GlobalSetting.get(setting_key).value = form_algo_setting[attr_name].data
+            GlobalSetting.get("PROMO_1A").value = form_algo_setting.promo.data
 
             db.session.commit()
             flask.flash(_("Mis à jour."), "success")
@@ -730,13 +857,8 @@ def attribution_manager() -> typing.RouteReturn:
         launch = form_algo_setting["launch_algorithm"].data
         if launch:
 
-            promo_1A = db.session.scalars(db.select(GlobalSetting).filter_by(key="PROMO_1A")).one().value  # ID of the season to show
-            bonus = [
-                db.session.scalars(db.select(GlobalSetting).filter_by(key="DISCONTENT_BONUS_1A")).one().value,
-                db.session.scalars(db.select(GlobalSetting).filter_by(key="DISCONTENT_BONUS_2A")).one().value,
-                db.session.scalars(db.select(GlobalSetting).filter_by(key="DISCONTENT_BONUS_3A")).one().value,
-                db.session.scalars(db.select(GlobalSetting).filter_by(key="DISCONTENT_BONUS_4A")).one().value,
-            ]
+            promo_1A = GlobalSetting.get_value("PROMO_1A")
+            bonus = [GlobalSetting.get_value(setting_key) for _attr, setting_key in discontent_bonus]
 
             save_results = form_algo_setting["save_attribution"].data
             corruption = form_algo_setting["corruption"].data
@@ -788,15 +910,9 @@ def attribution_manager() -> typing.RouteReturn:
 @context.permission_only(PermissionType.write, PermissionScope.club_q)
 def mails() -> typing.RouteReturn:
 
-    season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value  # ID of the season to show
-    saison = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id)).one()
-    subquery = db.select(ClubQVoeu).filter_by(_season_id=season_id).filter(ClubQVoeu._pceen_id == PCeen.id).exists()
-    pceens = (
-        db.select(PCeen).join(PCeen.roles)
-        .join(Role.permissions)
-        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q)
-        .filter(subquery)
-    )
+    season_id = _active_season_id()
+    saison = db.get_or_404(ClubQSeason, season_id)
+    pceens = _club_q_pceens_query().filter(_has_voeu_in_season(season_id))
 
     voeux = db.select(ClubQVoeu).filter_by(_season_id=season_id).filter(ClubQVoeu.places_attribuees > 0)
     spectacles_stmt = db.select(ClubQSpectacle).filter_by(_season_id=season_id).order_by(ClubQSpectacle.date)
@@ -855,38 +971,21 @@ def mails() -> typing.RouteReturn:
 @bp.route("/options", methods=["GET", "POST"])
 @context.permission_only(PermissionType.write, PermissionScope.club_q)
 def options() -> typing.RouteReturn:
-    season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value  # ID of the season to show
-    seasons = db.session.scalars(db.select(ClubQSeason).order_by(ClubQSeason.id)).all()
-
-    # Ajout du form pour le choix de la visibilité de la page pour les options du Club Q
-    setattr(
-        forms.SettingClubQPage,
-        "visibility",
-        wtforms.BooleanField(
-            _("Visibilité de la page de réservation"),
-            default=bool(db.session.scalars(db.select(GlobalSetting).filter_by(key="ACCESS_CLUB_Q")).one().value),
-        ),
-    )
-
-    setattr(
-        forms.SettingClubQPage,
-        "saison",
-        wtforms.SelectField(_("Saison actuelle"), choices=[(s.id, s.nom) for s in seasons], default=season_id),
-    )
+    season_id = _active_season_id()
+    seasons = _all_seasons()
 
     can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
 
-    form_setting = forms.SettingClubQPage()
+    form_setting = forms.SettingClubQPage(
+        visibility=bool(GlobalSetting.get_value("ACCESS_CLUB_Q")),
+        saison=season_id,
+    )
+    form_setting.saison.choices = [(s.id, s.nom) for s in seasons]
 
     # Cheking if something changed in forms
     if form_setting.validate_on_submit() and can_edit:
-        if form_setting.visibility.data:
-            db.session.scalars(db.select(GlobalSetting).filter_by(key="ACCESS_CLUB_Q")).one().value = 1
-
-        else:
-            db.session.scalars(db.select(GlobalSetting).filter_by(key="ACCESS_CLUB_Q")).one().value = 0
-
-        db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value = form_setting.saison.data
+        GlobalSetting.get("ACCESS_CLUB_Q").value = 1 if form_setting.visibility.data else 0
+        GlobalSetting.get("SEASON_NUMBER_CLUB_Q").value = form_setting.saison.data
 
         db.session.commit()
         flask.flash(_("Mis à jour."), "success")
@@ -906,68 +1005,76 @@ def pceen_id(id: int):
     ):
         flask.abort(404)
 
-    season_id = flask.request.args.get("season_id")
-    if season_id == None:
-        season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value  # ID of the season to show
-
-    spectacles = db.session.scalars(db.select(ClubQSpectacle).filter_by(_season_id=season_id).order_by(ClubQSpectacle.date)).all()
-    voeux = db.select(ClubQVoeu).filter_by(_season_id=season_id).filter_by(_pceen_id=pceen.id).order_by(ClubQVoeu.priorite)
-    saison = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id)).one()
-
-    pceens = db.session.scalars(
-        db.select(PCeen).join(PCeen.roles)
-        .join(Role.permissions)
-        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q)
-    ).all()
-
-    saisons = db.session.scalars(db.select(ClubQSeason).order_by(desc(ClubQSeason.debut))).all()
-
-    show_attribution = 0
-    if saison.attributions_visible or context.g.pceen.has_permission(PermissionType.write, PermissionScope.club_q):
-        show_attribution = 1
-    
-    user = context.g.pceen
-    if user == pceen:
-        view = "pceen_reservations"
-    else:
-        view = "pceen_view"
-
-    redirect = flask.url_for("club_q.pceen_id", id=id, season_id=season_id)
-
-    if len(spectacles) > 0:
-        spectacle = spectacles[0]
-    else:
-        spectacle = None
+    season_id = _parse_season_id(flask.request.args.get("season_id"))
+    saison = db.get_or_404(ClubQSeason, season_id)
+    saisons = _all_seasons()
 
     can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+    show_attribution = bool(saison.attributions_visible or can_edit)
 
-    voeu_form(spectacles, spectacle, pceens, pceen, season_id, redirect, can_edit)
+    user = context.g.pceen
+    view = "pceen_reservations" if user == pceen else "pceen_view"
 
-    # Forms
-    form_add_voeu = forms.AddVoeu()
-    form_edit_voeu = forms.EditVoeu()
+    form_add_voeu = None
+    form_edit_voeu = None
+    if can_edit:
+        spectacles = _season_spectacles(season_id)
+        form_add_voeu, form_edit_voeu, resp = _voeu_forms(
+            spectacles,
+            spectacles[0] if spectacles else None,
+            pceen,
+            season_id,
+            flask.url_for("club_q.pceen_id", id=id, season_id=season_id),
+        )
+        if resp is not None:
+            return resp
 
-    total_places_demandees = pceen_sum_places_demandees(pceen, voeux)
-    total_places_attribuees = pceen_sum_places_attribuees(pceen, voeux)
-    prix_total = pceen_prix_total(pceen, voeux)
+    voeux_list = db.session.scalars(
+        db.select(ClubQVoeu)
+        .options(sqlalchemy.orm.selectinload(ClubQVoeu.spectacle))
+        .filter_by(_season_id=season_id, _pceen_id=pceen.id)
+        .order_by(ClubQVoeu.priorite)
+    ).all()
+    obtained_voeux = sorted(_split_voeux_by_attribution(voeux_list)[0], key=lambda v: v.spectacle.date)
+    total_places_demandees = voeux_sum_demandees(voeux_list)
+    total_places_attribuees = voeux_sum_attribuees(voeux_list)
+    prix_total = voeux_total_price(voeux_list)
+    is_paid = ClubQPayment.is_paid(pceen.id, season_id)
+    montant_a_payer = Decimal("0.00") if is_paid else prix_total
+
+    spectacle_attrib_by_id: dict[int, int] = {}
+    if can_edit and voeux_list:
+        spect_ids = {v._spectacle_id for v in voeux_list}
+        rows = db.session.execute(
+            db.select(
+                ClubQVoeu._spectacle_id,
+                sqlalchemy.func.coalesce(sqlalchemy.func.sum(ClubQVoeu.places_attribuees), 0),
+            )
+            .where(ClubQVoeu._season_id == season_id, ClubQVoeu._spectacle_id.in_(spect_ids))
+            .group_by(ClubQVoeu._spectacle_id)
+        ).all()
+        spectacle_attrib_by_id = {sid: int(total) for sid, total in rows}
 
     return flask.render_template(
         "club_q/id/pceen.html",
         title=_("Récapitulatif - ") + pceen.full_name,
         view=view,
-        spectacles=spectacles,
-        voeux=db.session.scalars(voeux).all(),
-        season_id=int(season_id),
+        voeux=voeux_list,
+        obtained_voeux=obtained_voeux,
+        spectacle_attrib_by_id=spectacle_attrib_by_id,
+        season_id=season_id,
         saisons=saisons,
         pceen=pceen,
         user=context.g.pceen,
         total_places_demandees=total_places_demandees,
         total_places_attribuees=total_places_attribuees,
         prix_total=prix_total,
+        montant_a_payer=montant_a_payer,
+        is_paid=is_paid,
         form_add_voeu=form_add_voeu,
         form_edit_voeu=form_edit_voeu,
-        nb_voeux=db.session.scalar(db.select(sqlalchemy.func.count()).select_from(voeux.subquery())),
-        show_attribution=show_attribution
+        nb_voeux=len(voeux_list),
+        show_attribution=show_attribution,
     )
 
 
@@ -982,19 +1089,21 @@ def user_generate_pdf(id: int):
     ):
         flask.abort(404)
 
-    season_id = flask.request.args.get("season_id")
-    if season_id == None:
-        season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value  # ID of the season to show
+    season_id = _parse_season_id(flask.request.args.get("season_id"))
+    season = db.get_or_404(ClubQSeason, season_id)
+    if not season.attributions_visible and not context.has_permission(PermissionType.write, PermissionScope.club_q):
+        flask.abort(403)
 
-    season = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id).order_by(ClubQSeason.id)).one()
     voeux = (
-        db.select(ClubQVoeu).filter_by(_season_id=season_id)
-        .filter_by(_pceen_id=pceen.id)
+        db.select(ClubQVoeu)
+        .options(sqlalchemy.orm.selectinload(ClubQVoeu.spectacle))
+        .filter_by(_season_id=season_id, _pceen_id=pceen.id)
         .filter(ClubQVoeu.places_attribuees != 0)
         .order_by(ClubQVoeu.priorite)
     )
+    is_paid = ClubQPayment.is_paid(pceen.id, season_id)
     # Return the PDF as a response to the user
-    response = flask.make_response(pdf_client(pceen, season, voeux).read())
+    response = flask.make_response(pdf_client(pceen, season, voeux, is_paid=is_paid).read())
     response.headers["Content-Type"] = "application/pdf"
     response.headers["Content-Disposition"] = f"inline; filename=club_q_{pceen.username}.pdf"
     return response
@@ -1005,45 +1114,60 @@ def user_generate_pdf(id: int):
 def spectacle_id(id: int):
     """Sum up of informations concerning the club Q spectacle of the given id"""
     # Get spectacle
-    spectacle: ClubQSpectacle | None = db.session.scalars(db.select(ClubQSpectacle).filter_by(id=id)).one_or_none()
-    if not spectacle or not context.g.pceen.has_permission(PermissionType.read, PermissionScope.club_q):
-        flask.abort(404)
+    spectacle = db.get_or_404(ClubQSpectacle, id)
 
     season_id = spectacle._season_id
-    voeux = db.session.scalars(
-        db.select(ClubQVoeu).filter_by(_season_id=season_id)
-        .filter_by(_spectacle_id=spectacle.id)
-        .order_by(ClubQVoeu.id)
-    ).all()
-    spectacles = db.session.scalars(db.select(ClubQSpectacle).filter_by(_season_id=season_id).order_by(ClubQSpectacle.date)).all()
-
-    pceens = db.session.scalars(
-        db.select(PCeen).join(PCeen.roles)
-        .join(Role.permissions)
-        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q)
-    ).all()
-
-    redirect = flask.url_for("club_q.spectacle_id", id=id, season_id=season_id)
-
     can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+    can_view_lists = can_edit or _can_respo_view(context.g.pceen.id, spectacle._salle_id, spectacle.season)
 
-    voeu_form(spectacles, spectacle, pceens, pceens[0], season_id, redirect, can_edit)
+    voeux = (
+        db.session.scalars(
+            db.select(ClubQVoeu)
+            .options(sqlalchemy.orm.selectinload(ClubQVoeu.pceen))
+            .filter_by(_season_id=season_id, _spectacle_id=spectacle.id)
+            .order_by(ClubQVoeu.id)
+        ).all()
+        if can_view_lists
+        else []
+    )
 
-    # Forms
-    form_add_voeu = forms.AddVoeu()
-    form_edit_voeu = forms.EditVoeu()
+    form_add_voeu = None
+    form_edit_voeu = None
+    if can_edit:
+        form_add_voeu, form_edit_voeu, resp = _voeu_forms(
+            _season_spectacles(season_id),
+            spectacle,
+            None,
+            season_id,
+            flask.url_for("club_q.spectacle_id", id=id, season_id=season_id),
+        )
+        if resp is not None:
+            return resp
+
+    attribues, attente = _split_voeux_by_attribution(voeux)
+    voeux_attribues = sorted(attribues, key=lambda v: pceen_sort_key(v.pceen))
+    voeux_attente = sorted(attente, key=lambda v: (-(v.pceen.discontent or 0), v.priorite))
+    paid_pceen_ids = ClubQPayment.paid_pceen_ids(season_id) if voeux_attribues else set()
+    # The full (editable) vœux list is admin-only; Respo salle only get the two lists above
+    admin_voeux = voeux if can_edit else []
 
     return flask.render_template(
         "club_q/id/spectacle.html",
         title=spectacle.nom,
         season_id=season_id,
         spectacle=spectacle,
-        voeux=voeux,
+        voeux=admin_voeux,
+        voeux_attribues=voeux_attribues,
+        voeux_attente=voeux_attente,
+        paid_pceen_ids=paid_pceen_ids,
+        sum_places_demandees=voeux_sum_demandees(voeux),
+        sum_places_attribuees=voeux_sum_attribuees(voeux),
+        can_view_lists=can_view_lists,
         user=context.g.pceen,
         view="spectacles",
         form_add_voeu=form_add_voeu,
         form_edit_voeu=form_edit_voeu,
-        nb_total_voeux=len(voeux),
+        nb_total_voeux=len(admin_voeux),
     )
 
 
@@ -1052,25 +1176,12 @@ def spectacle_id(id: int):
 def spect_generate_pdf(id: int):
     """Sum up of informations concerning the club Q spectacle of the given id"""
     # Get spectacle
-    spectacle: ClubQSpectacle | None = db.session.scalars(db.select(ClubQSpectacle).filter_by(id=id)).one_or_none()
-    if not spectacle or not context.g.pceen.has_permission(PermissionType.all, PermissionScope.club_q):
+    spectacle = db.get_or_404(ClubQSpectacle, id)
+    if not context.g.pceen.has_permission(PermissionType.all, PermissionScope.club_q):
         flask.abort(404)
 
-    season_id = spectacle._season_id
-    season = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id).order_by(ClubQSeason.id)).one()
-
-    voeux_attrib = db.session.scalars(
-        db.select(ClubQVoeu).filter_by(_season_id=season_id)
-        .filter_by(_spectacle_id=spectacle.id)
-        .filter(ClubQVoeu.places_attribuees != 0)
-        .order_by(ClubQVoeu.priorite)
-    ).all()
-    voeux_nan_attrib = db.session.scalars(
-        db.select(ClubQVoeu).filter_by(_season_id=season_id)
-        .filter_by(_spectacle_id=spectacle.id)
-        .filter(ClubQVoeu.places_attribuees == 0)
-        .order_by(ClubQVoeu.priorite)
-    ).all()
+    season = spectacle.season
+    voeux_attrib, voeux_nan_attrib = _spectacle_voeux_split(spectacle)
 
     # Return the PDF as a response to the user
     response = flask.make_response(pdf_spectacle(spectacle, season, voeux_attrib, voeux_nan_attrib).read())
@@ -1084,25 +1195,12 @@ def spect_generate_pdf(id: int):
 def spect_generate_excel(id: int):
     """Sum up of informations concerning the club Q spectacle of the given id"""
     # Get spectacle
-    spectacle: ClubQSpectacle | None = db.session.scalars(db.select(ClubQSpectacle).filter_by(id=id)).one_or_none()
-    if not spectacle or not context.g.pceen.has_permission(PermissionType.write, PermissionScope.club_q):
+    spectacle = db.get_or_404(ClubQSpectacle, id)
+    if not context.g.pceen.has_permission(PermissionType.write, PermissionScope.club_q):
         flask.abort(404)
 
-    season_id = spectacle._season_id
-    season = db.session.scalars(db.select(ClubQSeason).filter_by(id=season_id).order_by(ClubQSeason.id)).one()
-
-    voeux_attrib = db.session.scalars(
-        db.select(ClubQVoeu).filter_by(_season_id=season_id)
-        .filter_by(_spectacle_id=spectacle.id)
-        .filter(ClubQVoeu.places_attribuees != 0)
-        .order_by(ClubQVoeu.priorite)
-    ).all()
-    voeux_nan_attrib = db.session.scalars(
-        db.select(ClubQVoeu).filter_by(_season_id=season_id)
-        .filter_by(_spectacle_id=spectacle.id)
-        .filter(ClubQVoeu.places_attribuees == 0)
-        .order_by(ClubQVoeu.priorite)
-    ).all()
+    season = spectacle.season
+    voeux_attrib, voeux_nan_attrib = _spectacle_voeux_split(spectacle)
 
     # Create a response object to serve the Excel file
     response = flask.make_response()
@@ -1121,39 +1219,29 @@ def spect_generate_excel(id: int):
 def salle_id(id: int):
     """Sum up of informations concerning the club Q salle of the given id"""
 
-    salle = db.session.scalars(db.select(ClubQSalle).filter_by(id=id)).one()
-    if not salle or not context.g.pceen.has_permission(PermissionType.read, PermissionScope.club_q):
-        flask.abort(404)
+    salle = db.get_or_404(ClubQSalle, id)
 
-    season_id = flask.request.args.get("season_id")
-    if season_id == None:
-        season_id = db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value  # ID of the season to show
+    season_id = _parse_season_id(flask.request.args.get("season_id"))
 
-    saisons = db.session.scalars(db.select(ClubQSeason).order_by(desc(ClubQSeason.debut))).all()
-    spectacles = db.session.scalars(
-        db.select(ClubQSpectacle).filter_by(_season_id=season_id)
-        .filter_by(_salle_id=salle.id)
-        .order_by(ClubQSpectacle.date)
-    ).all()
-
-    pceens = db.session.scalars(
-        db.select(PCeen).join(PCeen.roles)
-        .join(Role.permissions)
-        .filter(Permission.type == PermissionType.read, Permission.scope == PermissionScope.club_q)
-    ).all()
-    salles = db.session.scalars(db.select(ClubQSalle).order_by(ClubQSalle.nom)).all()
+    saisons = _all_seasons()
+    spectacles = [spect for spect in _season_spectacles(season_id) if spect._salle_id == salle.id]
 
     spect_sum_places = spectacles_sum_places(spectacles)
     spect_sum_places_demandees = spectacles_sum_places_demandees(spectacles)
     spect_sum_places_attribuees = spectacles_sum_places_attribuees(spectacles)
 
-    redirect = flask.url_for("club_q.salle_id", id=id, season_id=season_id)
-
     can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
+    respo_season = db.session.get(ClubQSeason, season_id)
+    current_respo = ClubQSalleRespo.get(salle.id, season_id) if can_edit else None
+    eligible_pceens = _club_q_pceens() if can_edit else []
 
-    spectacle_form(salles, salle, season_id, redirect, can_edit)
-
-    form_spectacle = forms.EditSpectacle()
+    form_spectacle = None
+    if can_edit:
+        salles = db.session.scalars(db.select(ClubQSalle).order_by(ClubQSalle.nom)).all()
+        redirect = flask.url_for("club_q.salle_id", id=id, season_id=season_id)
+        form_spectacle, resp = spectacle_form(salles, salle, season_id, redirect, can_edit)
+        if resp is not None:
+            return resp
 
     return flask.render_template(
         "club_q/id/salle.html",
@@ -1162,8 +1250,11 @@ def salle_id(id: int):
         view="salle",
         salle=salle,
         saisons=saisons,
+        respo_season=respo_season,
+        current_respo=current_respo,
+        eligible_pceens=eligible_pceens,
         redirect="club_q.salle_id",
-        season_id=int(season_id),
+        season_id=season_id,
         spectacles=spectacles,
         spect_sum_places=spect_sum_places,
         spect_sum_places_demandees=spect_sum_places_demandees,
@@ -1179,18 +1270,12 @@ def brochures() -> typing.RouteReturn:
     """Club Q Brochure page"""
 
     brochures = db.session.scalars(
-        db.select(ClubQBrochure).join(ClubQBrochure.season).order_by(ClubQSeason.debut.desc())
+        db.select(ClubQBrochure).join(ClubQBrochure.season).order_by(*ClubQSeason.default_order())
     ).all()
-    saisons = db.session.scalars(db.select(ClubQSeason).order_by(ClubQSeason.debut.desc())).all()
+    saisons = _all_seasons()
 
-    forms.Brochure.season_id = wtforms.SelectField(
-        _("Saison"),
-        choices=[[saison.id, saison.nom] for saison in saisons],
-        default=db.session.scalars(db.select(GlobalSetting).filter_by(key="SEASON_NUMBER_CLUB_Q")).one().value,
-        validators=[DataRequired()],
-    )
-
-    form = forms.Brochure()
+    form = forms.Brochure(season_id=_active_season_id())
+    form.season_id.choices = [(saison.id, saison.nom) for saison in saisons]
 
     if form.validate_on_submit() and context.g.pceen.has_permission(PermissionType.write, PermissionScope.club_q):
         add = form["add"].data

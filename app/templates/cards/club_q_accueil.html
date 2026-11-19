@@ -43,7 +43,7 @@
   {% if club_q_infos.attributions_visible %}
   <div class="d-flex justify-content-between align-items-center mb-3">
     <span class="text-body-secondary fw-semibold small">{{ _("À payer") }}</span>
-    <span class="fw-bold {{ 'text-warning' if club_q_infos.to_pay > 0 else 'text-body' }}">
+    <span class="fw-bold {{ 'text-success' if club_q_infos.is_paid else ('text-warning' if club_q_infos.to_pay > 0 else 'text-body') }}">
       {{ babel.format_currency(club_q_infos.to_pay, "EUR") }}
     </span>
   </div>

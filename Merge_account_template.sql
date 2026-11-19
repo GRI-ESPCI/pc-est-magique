@@ -67,7 +67,24 @@ UPDATE subscription SET _pceen_id = target_id_here WHERE _pceen_id = old_id_here
 UPDATE payment SET _pceen_id = target_id_here WHERE _pceen_id = old_id_here;
 UPDATE ban SET _pceen_id = target_id_here WHERE _pceen_id = old_id_here;
 UPDATE device SET _pceen_id = target_id_here WHERE _pceen_id = old_id_here;
+-- Club Q voeux (unique par (pceen, spectacle) : on garde celui du compte cible en cas de doublon)
+DELETE FROM club_q_voeu old
+USING club_q_voeu target
+WHERE old._pceen_id = old_id_here
+  AND target._pceen_id = target_id_here
+  AND old._spectacle_id = target._spectacle_id;
 UPDATE club_q_voeu SET _pceen_id = target_id_here WHERE _pceen_id = old_id_here;
+
+-- Club Q payments
+INSERT INTO club_q_payment (_pceen_id, _season_id, paid)
+SELECT target_id_here, _season_id, paid
+FROM club_q_payment
+WHERE _pceen_id = old_id_here
+ON CONFLICT (_pceen_id, _season_id) DO UPDATE
+SET paid = club_q_payment.paid OR EXCLUDED.paid;
+
+DELETE FROM club_q_payment WHERE _pceen_id = old_id_here;
+UPDATE club_q_salle_respo SET _pceen_id = target_id_here WHERE _pceen_id = old_id_here;
 UPDATE order_panier_bio SET _pceen_id = target_id_here WHERE _pceen_id = old_id_here;
 UPDATE rental SET _pceen_id = target_id_here WHERE _pceen_id = old_id_here;
 UPDATE photo SET _author_id = target_id_here WHERE _author_id = old_id_here;

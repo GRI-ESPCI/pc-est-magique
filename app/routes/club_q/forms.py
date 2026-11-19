@@ -3,7 +3,6 @@
 import wtforms
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
-from flask import Flask
 from flask_wtf.file import FileField, FileAllowed
 from app.utils.validators import (
     DataRequired,
@@ -12,8 +11,6 @@ from app.utils.validators import (
     Email,
     Length,
 )
-
-app = Flask(__name__)
 
 
 class ClubQForm(FlaskForm):
@@ -25,12 +22,19 @@ class ClubQForm(FlaskForm):
 class SettingClubQPage(FlaskForm):
     """WTForm used to say if the page should be visible or not"""
 
+    visibility = wtforms.BooleanField(_l("Visibilité de la page de réservation"))
+    saison = wtforms.SelectField(_l("Saison actuelle"), coerce=int, choices=[])
     submit = wtforms.SubmitField(_l("Mettre à jour"))
 
 
 class SettingAlgoClubQPage(FlaskForm):
     """WTForm for the various options of the algorithm of club q"""
 
+    m1A = wtforms.IntegerField(_l("1A"))
+    m2A = wtforms.IntegerField(_l("2A"))
+    m3A = wtforms.IntegerField(_l("3A / M1"))
+    m4A = wtforms.IntegerField(_l("4A / M2"))
+    promo = wtforms.IntegerField(_l("Promo 1A"))
     save_attribution = wtforms.BooleanField(_l("Sauvegarder l'attribution"), default=False)
     corruption = wtforms.BooleanField(_l("Corruption"), default=False)
     submit = wtforms.SubmitField(_l("Mettre à jour"))
@@ -38,6 +42,8 @@ class SettingAlgoClubQPage(FlaskForm):
 
 
 class AddVoeu(FlaskForm):
+    spectacle_add = wtforms.SelectField(_l("Spectacle"), coerce=int, choices=[], validators=[DataRequired()])
+    pceen_add = wtforms.SelectField(_l("Pcéen"), coerce=int, choices=[], validators=[DataRequired()])
     priorite_add = wtforms.IntegerField(_l("Priorité"), validators=[InputRequired()])
     places_demandees_add = wtforms.IntegerField(_l("Places demandées"), validators=[InputRequired()])
     places_minimum_add = wtforms.IntegerField(_l("Places minimum"), validators=[Optional()])
@@ -82,6 +88,7 @@ class EditSalle(FlaskForm):
 
 class EditSpectacle(FlaskForm):
     id = wtforms.HiddenField("")
+    salle_id = wtforms.SelectField(_l("Salle"), coerce=int, choices=[], validators=[DataRequired()])
     nom = wtforms.StringField("Nom", validators=[DataRequired()])
     description = wtforms.TextAreaField("Description", validators=[Optional(), Length(max=2500)])
     categorie = wtforms.StringField("Catégorie", validators=[Optional()])
@@ -118,6 +125,6 @@ class Brochure(FlaskForm):
     """WTForm used to upload club Q brochures."""
 
     id = wtforms.HiddenField("")
-    season_id = wtforms.SelectField(_l("Saison"), choices=[0, 0], validators=[DataRequired()])
+    season_id = wtforms.SelectField(_l("Saison"), coerce=int, choices=[], validators=[DataRequired()])
     pdf_file = FileField(_l(""), validators=[FileAllowed(["pdf"], "PDF uniquement!")])
     add = wtforms.SubmitField(_l("Ajouter"))
