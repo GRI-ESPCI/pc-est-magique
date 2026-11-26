@@ -50,15 +50,16 @@ def register() -> typing.RouteReturn:
 @context.intrarez_setup_only
 @context.permission_only(PermissionType.read, PermissionScope.intrarez)
 def modify(device_id: str | None = None) -> typing.RouteReturn:
-    """Rental modification page."""
+    """Device modification page."""
     device = None
     if device_id is None:
         device = context.g.pceen.current_device
     elif device_id.isdigit():
         device = db.session.get(Device, device_id)
 
-    if not device:
+    if not device or (device.pceen != context.g.pceen and not context.g.is_gri):
         flask.flash(_("Appareil inconnu !"), "danger")
+        return helpers.redirect_to_next()
 
     form = forms.DeviceModificationForm()
     if form.validate_on_submit():
