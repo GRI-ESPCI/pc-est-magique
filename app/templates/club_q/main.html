@@ -136,8 +136,8 @@ document.addEventListener('DOMContentLoaded', function () {
       const list = sortedDupes.map(n => '#' + n).join(', ');
       messages.push(
         (sortedDupes.length === 1
-          ? {{ _("Égalité dans le classement : la priorité {list} est utilisée plusieurs fois. Les égalités perturbent l'algorithme d'attribution.") | tojson }}
-          : {{ _("Égalités dans le classement : les priorités {list} sont utilisées plusieurs fois. Les égalités perturbent l'algorithme d'attribution.") | tojson }}
+          ? {{ _("Égalité dans le classement : la priorité {list} est utilisée plusieurs fois.") | tojson }}
+          : {{ _("Égalités dans le classement : les priorités {list} sont utilisées plusieurs fois.") | tojson }}
         ).replace('{list}', list)
       );
       shortMessage ||= {{ _("Égalité détectée :") | tojson }} + ' ' + list;
@@ -147,8 +147,8 @@ document.addEventListener('DOMContentLoaded', function () {
       const list = missingPriorities.slice(0, 6).map(n => '#' + n).join(', ') + (missingPriorities.length > 6 ? '…' : '');
       messages.push(
         (missingPriorities.length === 1
-          ? {{ _("Trou dans le classement : la priorité {list} est manquante. Les priorités doivent se suivre de 1 en 1 sans trou pour le bon fonctionnement de l'algorithme.") | tojson }}
-          : {{ _("Trous dans le classement : les priorités {list} sont manquantes. Les priorités doivent se suivre de 1 en 1 sans trou pour le bon fonctionnement de l'algorithme.") | tojson }}
+          ? {{ _("Trou dans le classement : la priorité {list} est manquante. Les priorités doivent se suivre de 1 en 1 sans trou.") | tojson }}
+          : {{ _("Trous dans le classement : les priorités {list} sont manquantes. Les priorités doivent se suivre de 1 en 1 sans trou.") | tojson }}
         ).replace('{list}', list)
       );
       shortMessage ||= {{ _("Trou dans le classement (manquant :") | tojson }} + ' ' + list + ')';

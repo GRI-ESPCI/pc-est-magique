@@ -16,7 +16,7 @@
           {{ cq.sort_th('nbspectacles', _("Spects."), numeric=True) }}
           {% if is_admin and respo_season %}
           {% call cq.sort_th('respo', label_class='text-nowrap') %}
-            {{ _("Respo salle") }}{% if all_seasons %} <small class="text-body-secondary fw-normal">({{ respo_season.nom }})</small>{% endif %}
+            {{ _("Respo(s) salle") }}{% if all_seasons %} <small class="text-body-secondary fw-normal">({{ respo_season.nom }})</small>{% endif %}
           {% endcall %}
           {% endif %}
           {{ cq.sort_th('description', _("Description")) }}
@@ -29,12 +29,13 @@
       </thead>
       <tbody id="sort-table">
         {% for i in size %}
-        {% set respo = respos_by_salle.get(salles[i].id) %}
+        {% set respos = respos_by_salle.get(salles[i].id, []) %}
+        {% set respo_names = respos | map(attribute='pceen') | map(attribute='full_name') | join(', ') %}
         <tr
           data-id="{{ salles[i].id }}"
           data-name="{{ salles[i].nom }}"
           data-nbspectacles="{{ nb_spectacles[i] }}"
-          data-respo="{{ (respo.pceen.nom ~ ' ' ~ respo.pceen.prenom) | unidecode | lower if respo else '~' }}"
+          data-respo="{{ respo_names | unidecode | lower if respos else '~' }}"
           data-description="{{ salles[i].description }}"
           data-site="{{ salles[i].url }}"
           data-address="{{ salles[i].adresse }}"
@@ -47,7 +48,7 @@
           <td>{{nb_spectacles[i]}}</td>
           {% if is_admin and respo_season %}
           <td class="text-nowrap">
-            {{ cq.respo_salle_btn(salles[i], respo_season, respo) }}
+            {{ cq.respo_salle_btn(salles[i], respo_season, respos) }}
           </td>
           {% endif %}
           <td onclick="window.location='{{ salle_href }}';">

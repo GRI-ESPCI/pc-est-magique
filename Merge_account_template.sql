@@ -84,6 +84,14 @@ ON CONFLICT (_pceen_id, _season_id) DO UPDATE
 SET paid = club_q_payment.paid OR EXCLUDED.paid;
 
 DELETE FROM club_q_payment WHERE _pceen_id = old_id_here;
+
+-- Club Q respo salle
+DELETE FROM club_q_salle_respo old
+USING club_q_salle_respo target
+WHERE old._pceen_id = old_id_here
+  AND target._pceen_id = target_id_here
+  AND old._salle_id = target._salle_id
+  AND old._season_id = target._season_id;
 UPDATE club_q_salle_respo SET _pceen_id = target_id_here WHERE _pceen_id = old_id_here;
 UPDATE order_panier_bio SET _pceen_id = target_id_here WHERE _pceen_id = old_id_here;
 UPDATE rental SET _pceen_id = target_id_here WHERE _pceen_id = old_id_here;

@@ -305,14 +305,14 @@ def main() -> typing.RouteReturn:
             duplicates = sorted(p for p, count in Counter(priority_list).items() if count > 1)
             if duplicates:
                 add_error(
-                    _("Égalité dans le classement : plusieurs vœux ont la même priorité (%(dups)s). Les égalités perturbent l'algorithme d'attribution.", dups=", ".join(f"#{p}" for p in duplicates))
+                    _("Égalité dans le classement : plusieurs vœux ont la même priorité (%(dups)s).", dups=", ".join(f"#{p}" for p in duplicates))
                 )
 
             if priority_list:
                 missing = sorted(set(range(1, max(priority_list) + 1)) - set(priority_list))
                 if missing:
                     add_error(
-                        _("Trou dans le classement : priorité(s) manquante(s) (%(missing)s). Les priorités doivent se suivre de 1 en 1 à partir de 1 pour le bon fonctionnement de l'algorithme.", missing=", ".join(f"#{p}" for p in missing))
+                        _("Trou dans le classement : priorité(s) manquante(s) (%(missing)s). Les priorités doivent se suivre de 1 en 1.", missing=", ".join(f"#{p}" for p in missing))
                     )
 
             if not server_errors:
@@ -659,7 +659,7 @@ def salles() -> typing.RouteReturn:
 @bp.route("/salles/<int:id>/respo", methods=["POST"])
 @context.permission_only(PermissionType.write, PermissionScope.club_q)
 def set_salle_respo(id: int) -> typing.RouteReturn:
-    """Assign or remove the Respo salle for a given (salle, season)."""
+    """Assign or remove the Respos salle for a given (salle, season)."""
     _validate_csrf_or_abort()
 
     salle = db.get_or_404(ClubQSalle, id)
@@ -675,28 +675,24 @@ def set_salle_respo(id: int) -> typing.RouteReturn:
         return_sid = _parse_season_id(flask.request.form.get("return_season_id") or None, default_to_active=False)
         return flask.redirect(flask.url_for("club_q.salles", season_id=return_sid))
 
-    raw_pceen_id = (flask.request.form.get("pceen_id") or "").strip()
+    try:
+        pceen_ids = {int(v) for v in flask.request.form.getlist("pceen_ids") if v.strip()}
+    except ValueError:
+        flask.abort(400)
 
-    if not raw_pceen_id:
-        if ClubQSalleRespo.clear_respo(salle.id, season.id):
-            db.session.commit()
-            flask.flash(_("Respo salle retiré pour %(salle)s (%(saison)s).", salle=salle.nom, saison=season.nom), "success")
-    else:
-        try:
-            pceen_id = int(raw_pceen_id)
-        except ValueError:
-            flask.abort(400)
-        pceen = db.get_or_404(PCeen, pceen_id)
+    pceens = [db.get_or_404(PCeen, pid) for pid in pceen_ids]
+    for pceen in pceens:
         if not pceen.has_permission(PermissionType.read, PermissionScope.club_q):
             flask.flash(_("%(nom)s n'a pas accès au Club Q.", nom=pceen.full_name), "danger")
             return _redirect_back()
 
-        ClubQSalleRespo.set_respo(salle.id, season.id, pceen.id)
+    if ClubQSalleRespo.set_respos(salle.id, season.id, pceen_ids):
         db.session.commit()
-        flask.flash(
-            _("%(nom)s désigné·e respo de %(salle)s (%(saison)s).", nom=pceen.full_name, salle=salle.nom, saison=season.nom),
-            "success",
-        )
+        if not pceens:
+            flask.flash(_("Respo(s) salle retiré·e(s) pour %(salle)s (%(saison)s).", salle=salle.nom, saison=season.nom), "success")
+        else:
+            noms = ", ".join(p.full_name for p in sorted(pceens, key=pceen_sort_key))
+            flask.flash(_("Respo(s) de %(salle)s (%(saison)s) : %(noms)s.", salle=salle.nom, saison=season.nom, noms=noms), "success")
 
     return _redirect_back()
 
@@ -1232,7 +1228,7 @@ def salle_id(id: int):
 
     can_edit = context.has_permission(PermissionType.write, PermissionScope.club_q)
     respo_season = db.session.get(ClubQSeason, season_id)
-    current_respo = ClubQSalleRespo.get(salle.id, season_id) if can_edit else None
+    current_respos = ClubQSalleRespo.get_for_salle(salle.id, season_id) if can_edit else []
     eligible_pceens = _club_q_pceens() if can_edit else []
 
     form_spectacle = None
@@ -1251,7 +1247,7 @@ def salle_id(id: int):
         salle=salle,
         saisons=saisons,
         respo_season=respo_season,
-        current_respo=current_respo,
+        current_respos=current_respos,
         eligible_pceens=eligible_pceens,
         redirect="club_q.salle_id",
         season_id=season_id,

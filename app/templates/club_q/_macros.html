@@ -78,19 +78,33 @@
 </button>
 {% endmacro %}
 
-{% macro respo_salle_btn(salle, respo_season, respo, label=None) %}
+{% macro _respo_pill(salle, respo_season, respos_ids, text, variant) %}
 <button
   type="button"
-  class="btn btn-sm rounded-pill px-3 fw-semibold {{ 'btn-outline-primary' if respo else 'btn-outline-secondary' }}"
+  class="btn btn-sm rounded-pill px-3 fw-semibold text-nowrap {{ variant }}"
   data-bs-toggle="modal"
   data-bs-target="#mo-respo-salle"
   data-respo-url="{{ url_for('club_q.set_salle_respo', id=salle.id) }}"
   data-salle-nom="{{ salle.nom }}"
   data-season-nom="{{ respo_season.nom }}"
-  data-current-respo-id="{{ respo._pceen_id if respo else '' }}"
->
-  {{ label if label is not none else (respo.pceen.full_name if respo else _('Désigner')) }}
-</button>
+  data-current-respo-ids="{{ respos_ids }}"
+  aria-label="{{ text }} — {{ _('Gérer les respos salle pour %(salle)s (%(saison)s)', salle=salle.nom, saison=respo_season.nom) }}"
+>{{ text }}</button>
+{% endmacro %}
+
+{% macro respo_salle_btn(salle, respo_season, respos, label=None) %}
+{% set respos_ids = respos | map(attribute='_pceen_id') | join(',') %}
+{% if label is not none %}
+  {{ _respo_pill(salle, respo_season, respos_ids, label, 'btn-outline-primary' if respos else 'btn-outline-secondary') }}
+{% elif respos %}
+  <div class="d-flex flex-column align-items-start gap-1">
+    {% for r in respos %}
+      {{ _respo_pill(salle, respo_season, respos_ids, r.pceen.full_name, 'btn-outline-primary') }}
+    {% endfor %}
+  </div>
+{% else %}
+  {{ _respo_pill(salle, respo_season, '', _('Désigner'), 'btn-outline-secondary') }}
+{% endif %}
 {% endmacro %}
 
 {% macro pceen_name_td(pceen, season_id, is_admin) %}

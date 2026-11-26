@@ -12,12 +12,12 @@
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
   <h3 class="mb-0">{{ title }}</h3>
   {% if is_admin and respo_season %}
-  <div class="d-flex align-items-center gap-2">
+  <div class="d-flex flex-wrap align-items-center gap-2">
     <span class="small text-body-secondary">
-      {{ _("Respo salle") }} ({{ respo_season.nom }}) :
-      <strong class="text-body">{{ current_respo.pceen.full_name if current_respo else _("Aucun·e") }}</strong>
+      {{ _("Respo(s) salle") }} ({{ respo_season.nom }}) :
+      <strong class="text-body">{{ (current_respos | map(attribute='pceen') | map(attribute='full_name') | join(', ')) or _("Aucun·e") }}</strong>
     </span>
-    {{ cq.respo_salle_btn(salle, respo_season, current_respo, label=_("Modifier") if current_respo else _("Désigner")) }}
+    {{ cq.respo_salle_btn(salle, respo_season, current_respos, label=_("Modifier") if current_respos else _("Désigner")) }}
   </div>
   {% endif %}
 </div>

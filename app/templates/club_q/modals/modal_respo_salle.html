@@ -3,7 +3,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 rounded-4 shadow-lg">
       <div class="modal-header">
-        <h5 class="modal-title fw-bold" id="mo-respo-salle-label">{{ _("Désigner un·e respo salle") }}</h5>
+        <h5 class="modal-title fw-bold" id="mo-respo-salle-label">{{ _("Désigner les respos salle") }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Fermer') }}"></button>
       </div>
       <form id="form-respo-salle" action="" method="post">
@@ -13,7 +13,7 @@
         <input type="hidden" name="return_season_id" id="respo-return-season-id" value="{{ season_id if season_id is not none else '' }}">
         <div class="modal-body">
           <p class="small text-body-secondary mb-3" id="respo-salle-context"></p>
-          <div class="mb-2">
+          <search class="mb-2">
             <label for="respo-pceen-search" class="form-label small fw-semibold">{{ _("Rechercher un PCéen") }}</label>
             <input
               type="search"
@@ -25,16 +25,23 @@
               autocapitalize="none"
               spellcheck="false"
             >
-          </div>
-          <div class="mb-2">
-            <label for="respo-pceen-select" class="form-label small fw-semibold">{{ _("Respo salle") }}</label>
-            <select name="pceen_id" id="respo-pceen-select" class="form-select" size="7">
-              <option value="">{{ _("— Aucun·e respo —") }}</option>
+          </search>
+          <fieldset class="mb-0">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <legend class="form-label small fw-semibold mb-0 float-none w-auto p-0">{{ _("Respo(s) salle") }}</legend>
+              <button type="button" id="respo-clear-btn" class="btn btn-sm btn-link text-danger text-decoration-none p-0">{{ _("Tout décocher") }}</button>
+            </div>
+            <div id="respo-pceen-list" class="border rounded-3 p-2 overflow-auto" style="max-height: 15rem">
               {% for p in eligible_pceens %}
-              <option value="{{ p.id }}" data-search="{{ p.full_name }} {{ p.nom }} {{ p.prenom }} {{ p.promo or '' }}">{{ p.nom|upper }} {{ p.prenom }}{% if p.promo %} ({{ p.promo }}){% endif %}</option>
+              <div class="form-check py-1" data-search="{{ p.full_name }} {{ p.nom }} {{ p.prenom }} {{ p.promo or '' }}">
+                <input class="form-check-input" type="checkbox" name="pceen_ids" value="{{ p.id }}" id="respo-pceen-{{ p.id }}">
+                <label class="form-check-label" for="respo-pceen-{{ p.id }}">
+                  {{ p.nom|upper }} {{ p.prenom }}{% if p.promo %} ({{ p.promo }}){% endif %}
+                </label>
+              </div>
               {% endfor %}
-            </select>
-          </div>
+            </div>
+          </fieldset>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _("Annuler") }}</button>

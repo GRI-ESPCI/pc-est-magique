@@ -209,7 +209,7 @@ class ClubQSalleRespo(db.Model):
 
     __tablename__ = "club_q_salle_respo"
     __table_args__ = (
-        sa.UniqueConstraint("_salle_id", "_season_id", name="uq_club_q_salle_respo_salle_season"),
+        sa.UniqueConstraint("_salle_id", "_season_id", "_pceen_id", name="uq_club_q_salle_respo_salle_season_pceen"),
         sa.Index("ix_club_q_salle_respo_pceen_season", "_pceen_id", "_season_id"),
         sa.Index("ix_club_q_salle_respo_season_id", "_season_id"),
     )
@@ -224,11 +224,21 @@ class ClubQSalleRespo(db.Model):
     pceen: Mapped[models.PCeen] = many_to_one("PCeen.clubq_salle_respos")
 
     @classmethod
-    def respos_by_salle(cls, season_id: int) -> dict[int, "ClubQSalleRespo"]:
-        rows = db.session.scalars(
-            db.select(cls).options(sa.orm.selectinload(cls.pceen)).filter_by(_season_id=season_id)
-        ).all()
-        return {row._salle_id: row for row in rows}
+    def _query(cls, **filters):
+        return (
+            db.select(cls)
+            .filter_by(**filters)
+            .join(cls.pceen)
+            .options(sa.orm.contains_eager(cls.pceen))
+            .order_by(models.PCeen.nom, models.PCeen.prenom)
+        )
+
+    @classmethod
+    def respos_by_salle(cls, season_id: int) -> dict[int, list["ClubQSalleRespo"]]:
+        grouped: dict[int, list[ClubQSalleRespo]] = {}
+        for row in db.session.scalars(cls._query(_season_id=season_id)):
+            grouped.setdefault(row._salle_id, []).append(row)
+        return grouped
 
     @classmethod
     def salle_ids_for(cls, pceen_id: int, season_id: int) -> set[int]:
@@ -257,24 +267,18 @@ class ClubQSalleRespo(db.Model):
         )
 
     @classmethod
-    def get(cls, salle_id: int, season_id: int) -> "ClubQSalleRespo | None":
-        """Return the Respo salle (with its PCeen loaded) for a (salle, season) pair."""
-        return db.session.scalars(
-            db.select(cls).options(sa.orm.selectinload(cls.pceen)).filter_by(_salle_id=salle_id, _season_id=season_id)
-        ).one_or_none()
+    def get_for_salle(cls, salle_id: int, season_id: int) -> list["ClubQSalleRespo"]:
+        """Return the Respos salle (with their PCeen loaded) for a (salle, season) pair."""
+        return list(db.session.scalars(cls._query(_salle_id=salle_id, _season_id=season_id)))
 
     @classmethod
-    def set_respo(cls, salle_id: int, season_id: int, pceen_id: int) -> None:
-        """Assign or update the Respo salle for a (salle, season) pair."""
-        stmt = pg_insert(cls).values(_salle_id=salle_id, _season_id=season_id, _pceen_id=pceen_id)
-        db.session.execute(
-            stmt.on_conflict_do_update(
-                constraint="uq_club_q_salle_respo_salle_season", set_={"_pceen_id": stmt.excluded._pceen_id}
-            )
-        )
-
-    @classmethod
-    def clear_respo(cls, salle_id: int, season_id: int) -> bool:
-        """Remove the Respo salle for a (salle, season) pair. Return True if one existed."""
-        result = db.session.execute(db.delete(cls).filter_by(_salle_id=salle_id, _season_id=season_id))
-        return bool(result.rowcount)
+    def set_respos(cls, salle_id: int, season_id: int, pceen_ids: typing.Iterable[int]) -> bool:
+        """Replace the Respos salle for a (salle, season) pair. Return True if changed."""
+        desired = set(pceen_ids)
+        existing = set(db.session.scalars(db.select(cls._pceen_id).filter_by(_salle_id=salle_id, _season_id=season_id)))
+        if desired == existing:
+            return False
+        db.session.execute(db.delete(cls).filter_by(_salle_id=salle_id, _season_id=season_id))
+        if desired:
+            db.session.add_all([cls(_salle_id=salle_id, _season_id=season_id, _pceen_id=pid) for pid in desired])
+        return True

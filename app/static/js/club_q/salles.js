@@ -41,34 +41,53 @@ if (moRespo) {
   const form = document.getElementById("form-respo-salle");
   const contextEl = document.getElementById("respo-salle-context");
   const searchEl = document.getElementById("respo-pceen-search");
-  const selectEl = document.getElementById("respo-pceen-select");
+  const listEl = document.getElementById("respo-pceen-list");
+  const clearBtn = document.getElementById("respo-clear-btn");
 
-  const allOptions = selectEl
-    ? Array.from(selectEl.options).map((el) => ({
+  const items = listEl
+    ? Array.from(listEl.children).map((el, idx) => ({
         el,
+        idx,
+        cb: el.querySelector('input[type="checkbox"]'),
         norm: window.ClubQ.normalize(el.dataset.search || el.textContent),
       }))
     : [];
 
-  function renderOptions(q, selectedVal) {
-    if (!selectEl) return;
-    selectEl.replaceChildren(
-      ...allOptions
-        .filter((o) => !q || o.el.value === "" || o.el.value === selectedVal || o.norm.includes(q))
-        .map((o) => o.el)
-    );
-    selectEl.value = selectedVal;
+  function filterItems(q) {
+    items.forEach((o) => {
+      o.el.hidden = Boolean(q && !o.cb.checked && !o.norm.includes(q));
+    });
   }
 
   moRespo.addEventListener("show.bs.modal", function (event) {
     const btn = event.relatedTarget;
     if (!btn) return;
-    const { respoUrl, salleNom, seasonNom, currentRespoId } = btn.dataset;
+    const { respoUrl, salleNom, seasonNom, currentRespoIds } = btn.dataset;
+    const selected = new Set((currentRespoIds || "").split(",").filter(Boolean));
     if (form) form.action = respoUrl || "";
     if (contextEl) contextEl.textContent = `${salleNom} — ${seasonNom}`;
     if (searchEl) searchEl.value = "";
-    renderOptions("", currentRespoId || "");
+    items.forEach((o) => {
+      o.cb.checked = selected.has(o.cb.value);
+    });
+    items
+      .slice()
+      .sort((a, b) => Number(b.cb.checked) - Number(a.cb.checked) || a.idx - b.idx)
+      .forEach((o) => listEl.appendChild(o.el));
+    filterItems("");
+    if (listEl) listEl.scrollTop = 0;
   });
 
-  window.ClubQ.bindFilter(searchEl, (q) => renderOptions(q, selectEl?.value || ""));
+  clearBtn?.addEventListener("click", () => {
+    items.forEach((o) => {
+      o.cb.checked = false;
+    });
+    filterItems(window.ClubQ.normalize(searchEl?.value.trim() || ""));
+  });
+
+  searchEl?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.isComposing) e.preventDefault();
+  });
+
+  window.ClubQ.bindFilter(searchEl, filterItems);
 }
